@@ -1,0 +1,381 @@
+- With me today, I have Mario Duarte, who is the senior director,
+Volkswagen Group of America. And I'm Sriram Devanathan. I'm the GM for Amazon Q Apps. And we have Nupur Bansal, who's the senior product
+manager for Amazon Q Apps. Thank you. So, let's talk about productivity briefly. Now all of us are looking to be more productive in our work. We wanna do more for our customers, but let's dig into what that word means. So before I came here, I
+searched on the internet, and this is what I found. Basically says work harder, work smarter. Now is that very exciting? I think all the folks in the room, you're probably already doing that. So I don't think this helps by itself. Kind of reminds me of when I was a kid and we played a bunch of sports, but there was one game
+that I was not good at, and it's basketball. And I think you can guess why, right? I was just not as tall
+as my teammates, right? And so the teacher said, "You know, Sriram, you
+need to practice more. You need to practice jumping,
+you need to do all of this." But it was never good enough. The reason is I needed a boost, I needed a superpower that would help me. So anybody want to take a guess about what that superpower
+is gonna be at work? GenAI is gonna be that superpower. It can give you a boost and
+it can augment your skills and it can help you get
+that ball into that basket. We've all seen a bunch of industry reports on how transformative GenAI can be. For example, Gartner thinks that GenAI-supported human work tends to be 30% more productive on average compared to
+unsupported human work. So that's a big deal, right? That can help you be
+the boost at your work. But how does this work in terms of all the other
+challenges of GenAI? And you know, the challenges are many. I think they're kind of well known. First of all, these models,
+they don't know your company, they don't know your data,
+they don't know your processes. Second, security and data privacy. They don't know much about you at work, they don't know your preferences, they don't know what information you use, they don't know what
+data you have access to and what data you don't have access to. It's to the point that many
+CIOs have banned the use of popular chat assistants because they pose a risk to organizations, customers, and data. And fundamentally this is because not all GenAI offerings come with the baseline security
+and safety capabilities that you would expect from
+an enterprise offering. Now at AWS, the way we
+approach GenAI is different. For us, security and meeting enterprise needs are job zero. How many of you are familiar
+with the AWS GenAI stack? Everyone heard it at this point? Okay, I see some hands raised, so I'll kind of do this a bit quickly. At the bottom layer, you've
+got our infrastructure, and that's primarily Amazon SageMaker and custom design chips. And the focus here is on
+cost-effective high performance. The next up, we have Bedrock, and that gives you access to a range of industry-leading models, both from Amazon and from our partners. All of this in a secure, safe, scalable infrastructure setup. And at the top layer, which is what we're talking
+about today, is Amazon Q. Q is a fully managed service
+built on top of Bedrock. And the way to think about Q
+is that it's your best path to see value faster. So let me kind of expand on that a bit. So if you are building a GenAI app, normally, you would need to
+make a bunch of decisions. You'd need to choose the right
+model for the right task. You'd need to balance accuracy,
+performance, and cost. And if you're building
+a RAG-based application, then you have a bunch
+more things to figure out. What Q does is Q frees you up from all of this
+undifferentiated heavy lifting because Q gives you a managed service that takes care of all of these. In short, Q Business allows
+you to iterate quickly and take your ideas to production. Now I listed out a few
+challenges with GenAI, and so we're gonna see how Q Business kind of addresses these. Q connects to all of your data. It has 40-plus built-in
+connectors and more coming to all of the popular
+enterprise applications, S3, Salesforce, Google, Microsoft 365, Confluence has a whole
+bunch of connectors. So it can quickly have
+context on your data. Second, security and data privacy. Q is built from the ground
+up to be secure and private, and it can understand and
+respect your existing identities, roles, and permissions. So if a user doesn't have permission to access some data outside of Q, inside of Q, they won't be
+able to access it as well. And lastly, compliance. Q offers admins a whole range of ways to apply guardrails to customize
+and control your responses. Now Q Apps, which is what
+we're gonna talk about today, leverages all of this and helps you automate your daily tasks. Essentially, Q Apps is the
+simplest way for your teams to use Q Business on a daily basis. So with that, I'd like to invite Nupur to talk about what more
+you can do with Q Apps. - Okay, great. Thanks, Sriram. I think I'm gonna take a
+step back for a quick recap because not all of you may
+be familiar with Q Business. Q Business has come a long way since we last announced its preview at last year's re:Invent. It is now generally available,
+it has a lot more features, but most importantly, it's
+being loved by our customers. Before we go any further, a quick show of hands or just a nod that I can see up from here without being blinded by these lights, how many of us here feel like
+we have a good answer for or have asked just the question, "How does generative AI really
+help me with my daily work?" Quick show of hands, I
+know it's Monday morning, we are just getting,
+okay, I see some hands. Okay, great. We really hope AWS is part
+of that success story, but I see a lot more
+non-hands up in the air. You're not alone. A lot of customers who are deep into generative AI
+solutioning also tell us how it's time consuming,
+requires a special skillset, and it's not really
+accessible and meaningful for everybody on their team. How do we do that? How do we democratize it for
+everybody in the organization? We've got one clear mission for today. We want each of you to walk out of here knowing
+what Q Business can do for you, and the simplest way
+for you to get started. I know it sounds like two things, but let's not get bogged down in the math. The important thing is
+you remember them both so by the end of the session, we can all have our hands up in the air. Now we've seen how conversational AI assistance
+can be useful especially, you know, in responding from
+your organizational data. But for our everyday repetitive tasks, I guess you need some
+more standardization, preferably something that
+doesn't require this back and forth conversation each time. You've already perfected that prompt, write a friendly but
+persuasive customer email. You know all the elements you
+must cover in a sales pitch. You know all the pitfalls you must avoid while writing that business proposal. Right now, these prompts are saved maybe as a note on your desktop, or you go back to your
+conversation history to see what worked last time. We made this a whole lot easier
+for you with Amazon Q Apps. Now Q Apps is a capability
+within Q Business, and it's the most lightweight way for you to automate your everyday tasks, not just for yourself
+but also for your teams. And I'll tell you how. Now like Q Business, for those of you who are
+familiar, not familiar with it, we can cover in a little bit, but it can generate output using your organizational content. It respects the same
+access control guardrails and everything else you
+get from Q Business. But you are gonna see how Q Apps works. So here on this screen, you'll see how I'm chatting with Q to clean up my status updates. Every week, I have to
+send leadership updates on how we are doing against launches. So I'm talking to Q repeatedly,
+refining that output, you know, cleaning up the update. And since my team and
+I do this every week, multiple times a week for all the different
+features we are launching, I'm going to go ahead and
+create a Q App out of it. And in one click, you'll see how my entire
+conversation can be encapsulated into a reusable app. Of course, you don't
+have to start with chat, but the AI agent behind
+the scenes understands what my conversation's objective was and packs it into a neat
+little Q App with a collection of inputs and outputs, which
+intelligently knows, you know, what the end objective
+of my conversation was. So here, I was trying to enter the status, a description of the feature, how we're tracking against that goal. And now as you would do
+in chat, you can refine, but this refinement is
+a one-time thing, right? You are gonna give it
+instruction like keep it factual, don't go off the rails
+and make up something, and I can do it in the app. And once I'm happy with that refinement, and here's the important one, I can share it with everybody on my team. It's not my chat that's private to me. I can share it with
+everybody who has access to that Q environment by publishing it to the common library. Now we are gonna talk a little bit about this common library. What is it? It's a catalog of shared apps, and you can see a couple
+of them over here. So there are apps that can help you write
+your business updates on a weekly basis in that
+company-specified format. You can have apps that identify
+the root cause of a problem, like the first one you see
+up there, 5-Why Analysis, where you're repeatedly asking, you know, "Why did this go wrong?" These are purpose-built apps that are created by individuals, non-technical business
+users to serve general and unique needs of their
+teams and their businesses. And we saw how easy it is to create one. The important thing is
+it's about your work and you can create it on your own. Now here's another example. In this one, what I'm highlighting is how the app can do more
+than just one thing. So again, we have, you know, a Q&A kind of a question where
+the IT troubleshooting app, you can ask, you know, "How
+do I set up my printer?" And using your organizational knowledge, it answers the question,
+but it doesn't stop there. It also goes ahead and
+gives you the option to file a ticket if the
+answer was not sufficient. So here, it's answering that
+question from your IT guide, and in the next step,
+you have this, you know, in your workflow you set
+up that option to say, "Hey, if it's not enough
+and you need more help, you can file that ticket." And this is a action you're taking outside of the Q Business. So we have a lot more actions coming up, and we continue to expand those. Now the apps that you've seen so far, they've all been stateless. There's no record maintained of the input and the output generated, well except in the last case where we filed a ticket
+outside the Q Business system. But we recognize that there was, you know, there's several use cases
+that require some kind of persistent storage. Now you might want to collect
+inputs for your project ideas, you wanna get a pulse on
+your employee satisfaction, send out a survey for that, even collate, you know, questions for
+the next town hall meeting. For that, we have and
+recently announced this, the data collection feature. Now data collection apps
+enables an app creator to collate data across multiple users within the organization. So now you really leaning on that collaborative aspect of Q Apps. And again, we were talking
+about some, you know, use cases like you wanna collect questions for the town hall, you want to track progress
+against the new hire onboarding. The key part here is
+you're not just collating that data from multiple users. Yes, that's important, but you can actually generate
+insights, actionable insights, summarize those ideas
+and I'll show you how with an example from that collected data. So here's a simple use case
+that we actually used at AWS. Here's a Q App for the town
+hall question collector. This app goes beyond, you know, writing a marketing blog
+post or cleaning up my notes, and we'll see how. So multiple users submit their questions for that company-wide town hall. And you can see when, you know, we have all those questions submitted, the app can actually summarize the frequently asked questions, top teams. This is just a very simple example, but the idea is you are leaving that heavy lifting to generative AI, and all you're doing is same
+natural language description, prompting instructions for
+what you want to establish. Okay. Now we also realize that
+you probably don't want tens of different apps in your library for different town hall question
+collectors from every team and for every month of the year. With data collection apps, you can now instantiate
+a run on the same app that gives it a unique shareable link. So now you can pick a name for this run. As you can see in here, I have one for the November
+cycle for the Amazon Q team, and that's the link that I share. So your library will have
+just one data collection app for the town hall question collector, where every time you want to be, you know, holding town hall, you
+can instantiate a new run. We also know that you value your controls. So as an owner of that
+data collection run, you can also decide when you wanna start or stop accepting new responses, whether or not you wanna
+share those responses, the data that you collected
+with the participating users. You always have those controls. With data collection, just to wrap up that idea
+of this new genre of apps, you can do a lot more. Here are some examples
+that I found interesting. There's one for training feedback that I saw coming out from our team, and another one for
+hackathon idea collection. Now with all of these different
+apps, there is a need, an increased need for governance. We mentioned how Q Apps already
+respect your access controls and guardrails like
+the rest of Q Business, but what about your app-specific needs? Admins already have the ability to govern or regulate what apps are in the library, the common library that everybody in the Q environment has access to. But customers also shared with us how they'd like the ability
+to endorse certain apps that meet that specific quality bar. And with that in mind, we
+launched verified apps. Now admins can endorse these apps by marking them as
+verified in the console. And what this does is for all
+the app users in the library, the verified apps bubble up to the top and get this blue check mark, as you can see in the
+top left of the style. Another one on governance. So while verified apps let you, you know, put that stamp of approval
+on the quality of the app, you also want the flexibility
+to share that app only with a select set of users. For those of you who
+have been Q App users, I know this is a big one. All this while, we were only allowing you to publish the app for everybody, but with private sharing,
+as an app creator, you get the control to share
+it with a select set of users. So if your app is only relevant
+to 10 people on your team, those are the 10 users you pick. Now the users still discover
+these apps through the library, but only users who have access
+to that app can see it there. We see thousands of
+Amazonians create general and use case-specific Q Apps to automate their everyday tasks. But it's not just teams at Amazon. Customers like you are
+also seeing immense value. For example, Arcanum AI builds AI systems for back office functions. They specialize in business
+productivity workflows. And through Q Apps, they've been accelerating
+their solution delivery twofold for their customers. In fact, one of the things
+their CEO shared was the aha moment is how in
+the first customer meeting, they're able to get to a
+very useful working app, which, you know, is a deal maker. Now for Druva on the other hand that provides SaaS-based data protection and management solutions worldwide, they're using Q Apps to
+accelerate their request for proposal process. Now RFPs, as you know,
+they're all a little unique, need slightly different responses tailored to that question set, and they are accelerating
+that process by 25%. Proofpoint is another one. They protect data and
+brands from cyber attacks. Their consultants are saving
+several hours every week with use case-specific
+apps like the one they have for contract renewal justifications at the time of renewing contract
+for their end customers. Now with these kind of apps, they're actually now spending more time with their end customers. This is a great segue
+for you to hear from one of our customers that
+needs no introduction on how they discovered and
+are successfully using Q Apps. Their story represents
+one of ease and value that we hope to bring
+to all our customers. With that, I'd like to bring on stage, Mario, senior director
+of learning, training, and development with the
+Volkswagen Group of Americas to share their journey on Amazon Q Apps. (audience clapping) - Thank you, Nupur. Thank you, Sriram. Good morning. I will share with you how we went from not even considering
+generative AI application into our day-to-day activities to fully and successfully
+launching a tool through Q Apps in less than two months. I would love to say it
+was in less than a week because technically it
+was in less than a week, but it took longer to go through
+the administrative process to get the approval to actually do it and getting some of the confirmations. But before I dive into the use case, I would like to share a very
+brief story about myself. And the main reason I wanna share is because the context is related
+to what we faced a couple of months ago when we
+were having a problem that we needed to solve and we really didn't
+have a lot of options. So I am originally from Monterey, Mexico, and like many kids and like many of my friends, my dream was to be a soccer player. Had nothing else in life that I wanted to do other than playing soccer. And I was not just a dream, it was a really, truly, I was for it. But my father had different plans. He wanted me to go to college and have a professional career, and not a soccer player career. So I was not allowed to
+get into the academies of the professional teams
+in my team, in my city. So that was the first time
+that I, without knowing, started to understand what
+adapting and adopting means. I had to adapt to my father plans. I really had no other choice, right? And I had to adopt what his plans were. So fast forward, 17 years old, I actually finished high school. I have my registration to university, I go to the summer camp and the tryouts, and long story short,
+don't wanna bother you. I made it, made it to the third squad of one of the professional teams. I was gonna be a soccer player. I just needed to also do this thing called university, right? So all practices were in the morning. I really didn't care
+what I was gonna study, but I liked math. So I was gonna get into
+engineering, go to my classes, and I come to realize, "Sorry, there's no classes all evenings. You have to take some in the morning." So I had to adapt and adopt again. So I asked, "What career do you have that has all classes at nights?" "It's business administration." "Okay, just this semester
+or all throughout?" "All throughout." "Okay, change me." So 17-year-old decision, right? Long story short, I was not
+a professional soccer player and I'm not an engineer, but I've been able to
+really do a lot of things that I love to do. So the plan here, the thing here is this
+adapting and adopting, and how it relates to what
+I'm gonna be showing you here in a minute. From there, let's go to Volkswagen. I don't think I have to spend too much time
+explaining what Volkswagen is, but I wanna share a
+couple of pieces of data that are related to the context of the problem we were having. So Volkswagen Group is
+a worldwide company. It's one of the largest
+employers in the world. It is one of the two largest
+automakers in the world, and it's definitely the
+largest automaker in Europe. It's large, it has a lot of brands. So it's not just Volkswagen. Volkswagen Group is not
+just Volkswagen brand. You can see all of the
+brands that are part of the Volkswagen Group portfolio. It looks nice and a lot of iconic models, a lot of iconic brands, but
+it makes it very complex. So it is a large and complex organization. We have over 120 plants
+all around the world. Some of them from just one brand. Some of them that produce cars
+from two different brands, three different brands. Really, truly, I don't
+know how to describe how complexity our
+organization is sometimes. From there, we go to
+Volkswagen Group of America. We've been in the US for 75 years. Hopefully, you all saw that great Super Bowl
+commercial earlier this year celebrating our milestone. In the US, we do not have
+that amount of brands, but we do have also a set of brands within Volkswagen Group of America. So we are not as complex as
+Volkswagen Group worldwide, but we also have our own complexity. We have about over 10,000
+employees in the US, and we have close to 30
+locations from west to east, from north to south, all throughout. We cover most of any business
+landscape that you will think, from research and
+development in the US also, from technology development,
+from manufacturing, from sales, marketing, distribution. Financial services, we also
+have and are part of it, and then we have our different brands. Our two main locations
+though are Reston, Virginia. It's in the southern on Washington DC. That's where our headquarters
+are in sales organization. And then we have our manufacturing plant in Chattanooga, Tennessee, which is actually where I work from. Yeah, so a lot of also complexity and a lot of different type
+of business, let's say. Manufacturing and corporate
+is very different. The last thing I'll mention about the US as of December of last year, the manufacturing plant used
+to be a separate legal entity as like everybody else. So we were the same company,
+but we were very different. We were doing things very different. So throughout this year, we have been harmonizing a
+lot of processes, policies, procedures, and systems too. So it had added, once again, complexity is a word
+here in my presentation. So that's Volkswagen Group,
+Volkswagen in the US. The project in which we use
+the AWS Q Apps was related to human resources and an implementation of a new human resources system. This is a global project,
+it was not just the US. Before this project started, there were more than a hundred different
+human resources system setups in the world. Pretty much every plant, every country had their
+own HR system separate. Even though we were the same company, everybody was doing things different. So a couple of years ago, this was decided we were
+gonna implement one system for the entire Volkswagen Group worldwide. And not just one system,
+one global template. What that means is that with all this over a hundred systems were
+doing, everything had to change. So we go back to adapt and adopt. We all had to adapt what
+was decided in Germany, not just systems-wise, but process-wise. And we all have to change to this. So a human resources system, for those that are not
+too familiar with it, is basically the system in which, let me do this, it's not
+going through, there you go. It is the system that
+holds the HR master data for all of our employees, and it holds the modules that are needed to do every single function
+in HR from hire to retire. So there's a recruiting module, there's an onboarding module, there's a learning management system to track and manage skills, the performance and goals,
+succession and development, compensation and variable pay. So once again, all of the
+functions in human resources. This comes with something
+called employee central, which is where the module
+that houses the master data for all of the employees, and then all of their
+reporting related to any of these modules and HR functions. Now there's one thing
+that it's not visible that very few know whoever, like myself and my team that are working on the project know how important this is, but it's something called skills profile. The skills profile is
+actually what merges all of these other modules together. And the skills profile is
+attached to a job role. So every single position in the
+organization has a job role. This job role has a set of skills. That's the skills profile. So those are the skills when
+you're gonna post a position, that's the skills that you're looking for. So they're already
+predefined in the system. Learning management, all of the training that you have to take,
+it's related to that. The tracking of knowledge of skills that you're tracking is
+related to skills profile. Now how are we gonna do this? So what it means is that, as I mentioned, skills profile are tied to job roles. The global template we
+were implementing came with 3,200 job roles. In the US, I mentioned
+we had 10,000 employees, but we actually came up with 4,000 unique job descriptions. Why 4,000? 'Cause there are some job descriptions that have more than one employee. The more clear example is
+in our production facility, we have over 4,000
+production team members. All 4,000 are just one of
+those job descriptions. So we have to match each of these unique job descriptions with one of the 3,200 job
+roles in the global template. So think about you being the person that is sitting down
+in front of a computer, reading each of those job
+descriptions one by one, and then looking at the
+3,200 job roles and saying, "I think it's this one." That's a lot of work, right? And it's not just about
+the amount of work, it's the accuracy and the consistency were
+extremely important for us. So we had to map and we had
+to match these job roles and job descriptions. How would you do that? This is where we started
+having this problem. As I mentioned, this is a global project. We were not the first one to start with. There's a couple of other
+regions in the world that started before us. They've been doing this manually. Literally manually, somebody
+doing it one by one. So there was no best practice, I'll say. This brings you really
+to my problem definition because it was not just about doing it. We didn't have a lot of time to do it. We didn't really have a
+lot of resources to do it. The resources we had for our normal day-to-day
+operations were already overloaded with the implementation of our system and everything that needs to be done for implementing a system like this. So no time, no resources. And even if we had the resource
+from a manpower standpoint, that resource wouldn't have the knowledge to know exactly what was within each of those 4,000
+job descriptions, right? And we just merged a couple of months ago. So we were two different companies. We don't have somebody
+that knows everything on all job descriptions, and we didn't have anybody that knew exactly what those job roles of 3,200 job roles we have
+in the global template. So the accuracy, the
+potential for accuracy and consistency was really little and it was extremely important for us. The options in the global
+template were limited. It's not like we can just
+ask them to make changes. They will say no because that
+global template is utilized for everybody in the world. So they're not gonna
+make changes just for us. So we had to find a solution and we had to find it very soon. What did we do? The first thing we tried to do was just utilizing
+normal spreadsheet. Semi-automation with macros. The job roles came with job clusters, and then job families
+on our job descriptions. We have departments as subdepartments. So we were really trying to find a way to get this done and get it done right, but it was not working and we were not making a lot of progress. So one day, literally
+one day, Lucas Campos, who's also here with us today, and he's the one that is responsible for this mapping within the project. He came to me and asked me, "Hey Mario, we're not making progress. I think there should be a way
+to do it with generative AI." He had already talked
+to Raul Trevino from IT, Raul is also with us here today. Raul had been already
+working with AWS Bedrock and other projects that we
+have on the manufacturing side, and they came up to potentially utilizing
+something called Q Apps. I will be very honest with you, I would love to tell you
+that we strategically decided that we were gonna use AI and this is exactly how we're gonna do it. That's not how it actually
+went. We just stepped into it. When Lucas started
+discussing with the team, there was a lot of hesitation. We don't think that's gonna happen. I don't think it's gonna
+be accurate enough. When he came to me, the first
+thing that came in my mind, not knowing what Q Apps
+are or even GenAI honestly, in regards to application of GenAI, first thing that comes to your mind from an IT project is it's
+gonna be really expensive. And then the answer was
+like no, not really. It was reachable financially. It's gonna take a lot of time. Well, not really. It can
+be done pretty quickly. Well, it's not secure. They did all, as I
+mentioned, those two months. A lot of it was discussing
+with IT security and legal team to see we were able to do it. So I said, "Okay, let's try it." Worst-case scenario,
+we're gonna lose two weeks that are really gonna hurt, but still the potential of having success is actually beyond that. So that second iteration
+was utilizing Amazon Q Apps. What they develop is in
+the system or in the Q App, they thought to the app
+all 3,000 job descriptions. And what we did from there is making input each
+job description one by one, and the app was actually doing
+the mapping and the outcome. The output was this job
+description is mapped with this job role, first iteration. Second iteration within
+that was let's do three. Let's have the app giving us three options like recommendation one, two, and three. So it gave us a little
+bit of flexibility for us to decide what was the
+last one or the final one. And it was working, but we were still having to copy and paste every single job description, and copy and paste the
+outcome into some sort of document that will be manageable. So that brought us to our third iteration. Actually, they also use
+Python to create an ETL. And then with the ETL, what it did is actually was
+automating it completely, the copying and pasting, let's say of the job
+description into the app, and then from the app copying and pasting the outcome into the format, the exact format that we
+needed for the project. So in the next slide, you're gonna see a video
+that shows an example of it. It's dummy data. We're not able to put
+exactly job description. So our job description here
+on the top was not two rows. It was a lot of rows, a lot of words. But that is exactly how actually worked. When I show it to you and when I was actually putting
+this presentation together, it looks pretty simple, right? But it was extremely powerful because we were able to
+achieve our deadline, we were able to do it accurately, we were able to do it consistently. The actual final result came on a weekend. So after several iterations,
+checking it, confirming, making audits to see if it was accurate, the last thing was on a weekend, we left five iteration of
+this running at the same time, all independent to see what
+type of outcome we were getting. We came back to Monday,
+we look at the output, and the output of all five
+iterations was exactly the same. We did audit on several of those just to confirm that it was accurate. It was accurate. So we had made it. We actually were able
+to achieve the mapping or the job mapping, utilizing
+generative AI when once again, honestly myself, I have not
+even considered using GenAI for something like this. In summary, we were able to
+successfully launch that AI in a very short amount of time with a very high return on
+investment, extremely high. We achieved the project due date, and the levels of accuracy
+and consistency were there. So what's next for us
+when it comes to GenAI and actually the utilization of Q Apps? The first thing is we use this
+tool or generated this tool for the utilization in the US. Well, that can be used on
+other regions of the world for this same exact same thing
+because it's multilingual. We're working with Canada and
+Mexico so that we can go ahead and execute it in Canada
+and Mexico the same, and then it's gonna be available for everybody else in the world. So we go from saving hundreds of hours and increasing accuracy and consistency to saving thousands of hours
+with accuracy and consistency. And it's not just the
+launch of the project or the system because I am sure that job role global template with 3,200 job roles
+will continue to evolve. There will continue to be changes. Our organization will continue to evolve. Positions will change, job
+descriptions will change. Well, we have the tool, we'll always have the
+tool to keep doing it with the support of generative AI. And it's also multiplied by utilizing it throughout the entire world for all of our entities around it. So that's one thing. The other thing is since then, we actually implemented one more tool for our culture survey. We have an annual culture survey. On the last question, we ask employees to have free text of how we can improve
+something in the organization. We had over 6,200 comments. Well, after knowing what we
+were able to do with Q Apps, that's an aha moment for me to realize how reachable this is. We went ahead and right
+away contacted Raul and say, "Raul, we need an app." And within a day, two days
+I think we had an app, and we were able to copy paste, and then get the summary of the
+comments from the employees. And it's not just doing it, it's not that we were able
+to do it faster, honestly. We were able to do something that we were not able to do before. We had somebody going
+through the comments, and yes, we were getting the
+main messages, the main topics, the common themes within the comments. But thinking about somebody
+reading 6,200 comments and doing an accurate
+summary of those comments, when you compare it to the GenAI, I mean the accuracy was amazing. And beyond that, as I mentioned,
+we have different brands. So we were able to say, "Okay, this was the
+overall great, thank you," within minutes we had it, right? Now we were able to say, "What about the Audi employees?" Okay, Audi employees, copy
+paste. Within seconds, we got it. What about hourly employees? Sometimes they have a
+different needs depending on the type of job they do. Well, hourly employees, copy and paste. We were able to, within two days, really to get a summary
+of all of our comments and break it down throughout
+the entire organization by locations too. So what comes really for next more than technically is telling
+you we're gonna continue to use it, to me is
+more about the awareness because I myself was not aware
+of how reachable GenAI is, especially with Q Apps, with AWS Q Apps. So bringing the awareness
+throughout the workforce, but mainly to the leadership so that we can keep pushing
+ourselves to find ways so that we can continue to
+have use cases for GenAI so that we can improve our
+efficiency and our effectiveness, which in result of all of this, what matters really the
+most is that we create value for our customers. This is the project that
+we utilize Q Apps for. Thank you very much. It was a
+pleasure being here with you. (audience clapping) - Thank you so much, Mario. I don't think any number of slides that I put up would've done justice and told the story as Mario did, right? You had all the good elements in there. There was something about,
+you know, automation, which I actually didn't cover. So Q Apps also has APIs. It's not just the web app interface that I was showing earlier, but it also has these
+APIs that you can use to connect to any system of your choice. So you can create apps and
+work apps wherever you'd like. Of course, ROI. We like to hear high ROI and
+thousands of hours of savings. So all those are good things. Now back to our mission for today. You and your teams can use Q Business to answer questions, generate content, and securely automate your
+everyday tasks with Q Apps. It's that time where I'm gonna
+again do a show of hands, no, maybe a yay or nay. Do we feel like we understand Q Business, Q Apps a little better? All those in favor, say yay. Okay, louder. I know. Come on, my microphone is
+on. I'm gonna catch that. Once again, all those who
+feel like they're doing better on the Q Business, Q Apps run, yay or nay. - Yay.
+- Okay, thank you so much for that. You can find more about Q Apps,
+of course, on the website. It's in the console within
+the Q Business service, or better yet, catch us right after this. There's a booth at the
+expo hall for Q Apps. Meet us there, and we can't wait to see
+what you create with it. Thank you so much for being here. We are gonna take some questions next.

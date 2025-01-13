@@ -1,0 +1,480 @@
+- My name is Denis Batalov, and I am based out of Seattle. I am a worldwide tech leader for AI/ML, which practically means I help organize the work of, this point,
+hundreds of specialists in AI/ML who are coming out and helping customers build
+AI/ML applications on AWS. And additionally, for the last few years, I've been leading
+responsible AI for the field. Even before generative AI came on stage, it was clear that this
+is an area that requires some additional work, both from the science point of view, engineering point of view, and just generally understanding, and kind of what and how
+to approach this topic. Now, I also lead a team that
+is taking responsible AI as one of the key kind of considerations from the science model
+evaluation and so on. I've been also personally
+participating in ISO and European equivalent sense and leg standardization
+efforts around responsible AI. So contributed to explainability standard, you know, transparency bias and others. So with me today, I have Matt Frey, who is the director of
+software engineering at Cisco. And later on, he'll come on stage and talk through the
+responsible AI journey that Cisco had. Great, so let's get going. Obviously, generative AI has shown tremendous sort of potential. It's a step change in capability for machine learning. And yet we see a number of
+new risks and challenges. Like some of the existing
+ones are still there and we'll talk through some of it too. But certainly with generative AI, there's a whole slew of new issues. Some of those are really, you know, around hallucinations. We've seen so many, you know, pictures popularized with maybe, you know, not having the right number
+of fingers and so on. And there's definitely been
+a great deal of improvement on that front. But we still see an
+occasional issue crop up, even if the numbers are right. You may have seen this
+circulating on the internet as one of those examples. So what is the reason that we really have all
+these generative AI issues, and quality is just one of them. But one important distinction between traditional ML and generative AI is that the models, the
+foundation models are broad and kind of allow for
+many different use cases. And the other, of course, difference is that now you can literally
+take an off the shelf model and start applying it to many,
+many different use cases. Whereas with ML, an example
+of like consumer lending, you'll have specialized training data, you'll build a model that's
+doing just this one thing and therefore it's much
+easier to sort of appreciate or understand the risks that are involved. And certainly the risks are many. We've seen a number of things in the news. And so again, just as a quick reminder, often lawyers, for example, search for case law. And it's very easy to use
+these generative tools. But of course, again,
+hallucinations arise. And it's amazing that
+it hasn't happened once, but actually several times. In fact, this is a different
+case where somebody did the same exact thing and tried to come up with a fake case. And sometimes things are not
+just about hallucinations, but maybe overall quality. Because if a chatbot is incorrectly interpreting a policy, right? Then it's easy for, you know, users to make assumptions or make mistakes. And of course these could be quite costly. And a more recent one
+is in the transcription of kind of AI or AI
+transcription of medical kind of summaries. And you can imagine that if hallucinations crop in into this, it could potentially be quite dangerous as your care team as reviewing the notes
+from previous interactions. You know, some of us are able to filter these
+things pretty quickly because these transcription
+mistakes could be obvious. But occasionally, those actually
+could be quite difficult to, you know, filter out
+and mistakes could arise. But there are some applications
+where hallucinations are actually very welcome. And so this was one of them. Obviously this is where hallucinations are quite welcome in fact. But okay, let's talk
+about these emerging risks and challenges with generative AI. We've talked about ferocity because it's about hallucinations,
+factual correctness, kind of higher level
+quality of the output. We'll talk more about
+intellectual property and data privacy, but toxicity
+and safety is another. It's really a new one
+because now the language that is generated could contain, you know, things that are really, you know, hateful speech,
+threatening, insulting, kind of demeaning to maybe an individual or a group of individuals, right? And so it's very important foundationally to get that right, obviously. But there are some interesting situations where depending on the exact use case, you may allow some of it, right? So for example, if
+you're quoting a person, or maybe it's a passage from a book that was written a hundred years ago and could use a different language, and this is factual,
+this is just what it was. And certain examples or certain situations should permit this kind of thing. And then of course you have
+some other kind of questions that you may, you know, consider as sort of outta
+scope for these chatbots. We'll talk about deny topics
+for example, later on. So that's that. Okay, so responsible AI,
+you hear a lot about it and sometimes it's unclear
+what is it exactly, right? How do we define it? And you know, different organizations may define it slightly differently. The way we look at it is as a number of interrelated concerns, often interrelated that. But in these eight pillars
+of controllability, privacy and security, safety,
+we talked about toxicity, bias and fairness, right? Veracity and robustness, explainability, transparency, governance. You may notice that sustainability is not on the list here, and that is because it's
+usually treated for us as a AWS wide kind of concern separate, but oftentimes it's also lumped into responsibly considerations. So my intent here is
+to actually go through some of these pillars here and talk about specific tooling and technology that is
+available to address this. So, but first I wanna talk about AI risk and assessment of that risk. Because a lot of the regulations that are coming out, right? Certainly if you look at
+EU AI Act, for example, you know, they look at risk first, right? Let's figure out is it prohibited? Is it high risk? Is it kinda low risk type system? And so it's actually important
+to build that capacity or build that capability
+in your organization. And you know, ideally, you should actually be assessing the risk before you start building your project. So we've started helping customers, especially in situations where you may not have like an already well established
+risk management process, or maybe you don't know
+how to do this for AI. We started advising
+customers on how to do it. We've run a few workshops. And in fact, later today
+there's a repeat session in Caesar's Forum, not palace, forum, at 4:00 PM where there's a chalk talk that goes through the process of this kind of risk assessment over a hypothetical kind of
+application and use case. But one way to look at it is
+to start somewhere, right? And usually what you do is you identify all the
+stakeholders for your AI system. Then you figure out what does the different
+severity level mean, right? For your use case. And the likelihood of
+occurrence of harmful events and the severity of these
+harmful events, right? So you start ideating, enumerating these harmful
+events that could happen. And that's where you probably wanna bring different people from sort
+of different, you know, diverse perspectives into this mix. And the tooling can actually
+help assess likelihood of these situations in some ways. Like, you know, toxicity scores and so on. So last year we've had this first sort of chalk talk on risk assessment. We published a blog post. And again, so we continue
+helping customers in this respect as this is definitely an important way to start things, cool. So let's start with
+fairness, bias and fairness. Actually my favorite topic, actually, I could easily talk
+about this for probably a couple of hours. But now what I'd like to say is like if you're want to assess bias or detect bias in say a traditional
+machine learning setup or decision making systems, then in some ways if you have
+the right data available, it is a technically solved problem. So in fact, with Amazon SageMaker Clarify, we've had bias detection
+library for quite some time now. And you know, it supports 21 different metrics for bias. And there's a white paper that explains what these metrics mean. And you know, this library actually is integrated in SageMaker, but it is effectively
+an open source library. So you can run it on your laptop if you want to explore how this works. And one of the difficulties here, well I said 21 different metrics. Well, why so many, right? Well the interesting fact is that there's not a single
+definition of fairness. There's not a single
+criterion of fairness. There are actually several. And the challenges are
+often not in technology, but in actually being comfortable
+with making a decision and saying, I'm pursuing
+this definition of fairness. And by doing so, you may
+actually become unfair according to another criterion, right? And you need to be comfortable
+in making that choice because sort of, there's
+no free lunch there, like you have to make a choice. And oftentimes this comes
+in, you have a trade off between accuracy and
+fairness as well, right? That you need to consider. And so once you decide what fairness criterion
+you're optimizing for, you can then figure out what
+bias metrics are appropriate, whether it's for pre-training data for actually once the models
+have been trained and so on. And so we've published
+this blog post to help people with making that decision, like what are the default metrics that you should choose given the particular fairness criterion that you're trying to optimize for. But when I said this is solved in terms of technology, like I said, there are many other
+additional considerations here. For instance, a lot of
+the fairness metrics are essentially group fairness metrics, which means you're
+optimizing for group fairness for some demographic, right? And in doing so, you may actually make
+it fair for the group, but unfair for one member of that group, one specific member of the
+group, which is kind of odd. And in fact, most laws
+are formulated in the way that, you know, you're not
+allowed to discriminate a person based on various attributes, right? There's a challenge, and it's not like you will
+necessarily make things unfair for some individuals, but it is something you need to consider. And the other thing is
+there's also Simpsons paradox and kinda many different issues like that, but you shouldn't wait, right? Because these issues prevent you from like making progress, right? Start somewhere, see what you're getting, and you know, progress from there. The one interesting question is how does it all relate
+to generative AI, right? Because I've talked about
+the decision making system and you know, oh, well the
+other issue is, for example, if you want to measure bias, you need to know what
+the demographic attribute for a particular individual may be. So if it's race that you're kind of after, well in many cases you're
+not allowed to collect that information about your
+users, your customers, right? So you just don't have that data. And that's part of the problem that you need to either figure out how to impute some of that information or how to get that data right? And in fact, we see for
+example, in EU AI Act, there's already some provisions
+that specifically allow for collection of these
+sensitive attributes for the purposes of just measuring, right? Not of course for any other use like that. And then, okay, going back
+to the generative AI case, the one thing that I
+wanted to highlight here is as much as we care about the language of the chatbots, right? Being sort of not offending
+us in any way, right? That's clearly a foundational requirement. But I would like to see the
+industry move towards more of an outcome-based
+assessment for fairness. And this is possible in the same exact way with these generative systems. Because you know, I want to know whether my
+system is somehow biased in making decisions, right? Did this person get the refund
+that they wanted, right? Did that person get the loan approved? That's the outcome, right? And this is still a decision
+and you can measure that and you can still figure out how your systems are
+doing according to this. Anyways, so moving
+along to explainability, another interesting topic. So historically and okay, very important to not
+confuse it with transparency because explainability is about how this machine learning
+model actually arrived at the output that it did, right? And so understanding that as opposed to maybe just understanding the fact that AI system is based on a specific foundation model or a specific algorithm and so on. So again, when it comes to
+traditional machine learning, the standard approach has always been kind of model agnostic. It's convenient because it doesn't matter what the model inside of it is. You're trying to perturb
+the inputs a little bit and you're seeing how much the outputs are
+affected as a result. And in that case, you can
+try to build a mental model of how this opaque system
+is actually behaving by noticing how the
+perturbations affect the output. Now I can give you an example later. But here is an example
+of how this was computed, and I'm showing you a screenshot
+from SageMaker Canvas. But again, this explainability is built in SageMaker Clarify as well. And here is a model for colorectal cancer survivability beyond sort of five years as a standard kind of metric. And we could look at the high level model, global kind of explainability where we say from sort
+of feature attribution since summary stage of cancer is the most important attribute, alright? Then age of diagnosis is
+the next one and so on. And you can even look at the distribution for age saying here,
+the unfortunate reality is that the older you are
+on the sort of x-axis, the less of a probability of you surviving beyond five years. And so it goes to like
+your 80s and 90s of age at the lower right corner. And of course you can also then examine the explainability of an
+individual prediction. In this case, there's a predict button. I don't know if you
+see it, but at the top. And you also see that maybe
+for this specific patient, the primary reason for the decision is actually not the summary stage, but it could be age or
+something else, right? So that's sort of
+traditional machine learning. But this approach can
+also solve for situations where the generative systems are used for classification, which is one of the common use cases. Just like it's better technology to do a classification with genAI systems. And so one of them could
+be text classification. For example, is the analysis
+of these customer reviews for their sentiment, right? And what you could do there
+is the individual words or sentences or phrases
+are your features, right? And so you could try to perturb the input by eliminating some of these features and seeing if you still
+classify the resulting review as positive or negative, right? And that's how you could
+say, well these portions in green or darker
+green are more conducive to decision one way versus the red ones that pull the decision
+into the other direction. And interestingly, you could
+do the same thing with images for image classification. In fact, this is a very sort of well-known article or a paper where they built a model that distinguishes huskies from wolves. And the model was not working very well. In fact, many huskies were
+sort of misclassified as wolves and they were trying to
+understand how that works. And so this approach is called LIME. Where they actually realize that the model is not
+looking at the animal itself, but the snow in the background and making a determination that's a wolf because there are a lot
+of pictures of wolves with snow in the background
+and training dataset, right? And that's how this was done. And so this is also supported
+by say, SageMaker Clarify. And so here's an example where, or the way it works is you may
+have an image of a pyramid, there is a classification
+that that's a pyramid. And to figure out what
+portions of the image are influencing that decision. Instead of looking at individual pixels, which you could also
+do as features, right? We look at super pixels. Entire regions, where the
+images split into segments and then some of these
+segments are replaced with random noise, right? And you create many such versions of this image, perturbations. And you then see how the
+ultimate prediction is affected. And eventually, you build a heat map and you could see that in this case it's sort of the sides of the pyramid that are darker blue that kind of tell you that these are the portions of the image that are kind of
+supporting the prediction. This is a pyramid, and in this case, it sort of helps us understand that the algorithm may
+be working in the way that we think is sort of
+matching our expectations. All right, what about generative case? Well, things are a little bit harder for generative case, because all the same model
+agnostic SHapley values or SHAP algorithm, and I forgot to mention
+that's the algorithm that's used in sage may
+Clarify Kernel SHAP. You can actually use it
+to predict the generations of certain words based on the inputs, but usually we don't care about generation of a single word. You really want to figure out like why an entire
+completion was generated. But again, for classification, one trick is you can
+actually ask the model how it arrived at that decision. And of course, so in this
+case it would say, you know, this is a particular email, right? And therefore, you know,
+I could categorize this as other product usage question, so it's actually correct. But as you can imagine, such explanations could be
+hallucinatory themselves, right? And so you can't rely on it as like a solid case. The other approaches that we've seen with say agentic architectures is that as these agents
+build plans of action via like chain of thought,
+say react, paradigm, or some others like tree
+of thought, whatever, that plan of action is a
+kind of explanation, right? So you can record it and you
+can then audit it later on and see why an agent did a certain thing in a particular fashion. And we'll talk maybe
+about some other examples of such things in a moment. All right, one last thing
+I wanted to say here. Oh, so I should point out that for genAI, explainability still remains like an active area of research. And so it's hard to come
+by like ready tooling that's easy to use. So some approaches are
+looking at the internals of these transformer
+architectures and models and understanding maybe
+which specific portions of that neural network is
+actually triggered, right? When a certain concept is presented. But it's harder to translate
+that approach to like model agnostic situation, where you switch from one model to another and now whatever you've done
+doesn't work anymore, right? And so there are some approaches where you could do this, but it's still, like I said,
+an area of active research. This slide here, I'm trying
+to basically say, look, the reason we care about bias, fairness, and explainability for these AI systems is because they are perceived as sort of non-transparent, very complex, hard to understand. And if they are not functioning correctly, they could scale these injustices, right? To a massive degree, and so we definitely want to prevent that. But I just wanna remind you actually, it's not just AI systems, but there are very simple
+decision making systems such as this, right? Like you have to be this
+tall to get on the ride. It's an if-then rule, right? Very simple decision system. But where is the explainability of like who came up with that cutoff, right? What are the trade-offs that were used? I mean obviously there's
+security considerations, safety considerations, but
+also probably cost, right? So maybe you could have allowed for smaller kids to ride if you've invested a little bit more into the safety of the optimal product. But again, we don't know, right? And we cannot get access to it. So just as an interesting
+kind of, you know, thought provoking thing, right? Like if you have organizations, governments, legislations, right? They're making decisions. And in some ways, a lot of the technology, especially for like bias
+that we talked about could actually be used to assess the fairness of these systems
+for different demographics. And it's just like not pursued
+typically today, right? Just something to think about, cool. Another one is controllability. We talked about it earlier. So clearly you need to
+monitor the systems. And so this is about observability. We had earlier this week a talk with my colleague from CloudOps space on how to do observability with genAI. This is posted on YouTube now. But in terms of steering AI systems, they may be interesting
+features here and there. And so for example, with Bedrock agents, if you have an action group defined and these agents choose
+to perform that action, well some of these actions could be basically non-item potent. They could have side effects that are serious in this case, hypothetically, like some,
+something is deleted, right? And so here, when the agent decides to choose this action, a user can intervene and say, I want to allow or deny this action. And so this could be configured in the Bedrock agent configuration. Just one example of
+how this could be done. Cool, privacy and security, clearly a very important topic. And here I just wanna remind folks that you know, first of all, for us with say Bedrock, we have a very clear promise that you are always control of your data. Which means that actually we're not using your data
+to improve any models, to improve our models, to
+improve third party models that are available on Bedrock. So much so we actually don't store the prompts and completions
+that flow into these models. In fact, in the early version of Bedrock, in the console, you have a playground and you can kick the tires
+of, you know, certain models. And just like in ChadGPT, you could kind of put a prompt and it records the history of your prompts and completions just for your convenience. And then we realized that well that's actually
+diluting this message. It looks like we're storing something even though this was only
+done in the playground, right? Not for any production use. And so we deleted that capability just to not confuse the customers. Like by default, your data is not stored
+anywhere even, right? Now you may want to store
+the data for your own sake and like log it somewhere. And there is a way to configure
+a CloudWatch, for example, to put those into say an S3 bucket that's under your control, but that's your choice, right? And then you control that fully. And yeah, further more, you know, you choose a particular
+region with which you operate and then of course the data
+doesn't leave that region as it's flowing through the system through the model to
+produce the completion. Now we do have a feature
+called cross region inference with Bedrock, but by default it's off. And so you need to configure
+it in that case you allow for a different region to be used in case of capacity issues
+or a throttling and so on. But again, none of it
+is happening by default. Okay, and of course there's also standard kind of table stakes for AWS. We have encryption and transit, encryption at rest. You know, you may create a custom model. And the data that's used to create that custom model is again,
+likewise not stored anywhere. You put it in S3 initially, it's your own bucket, it's done, it's used for training. And once the training is done, like the data is not needed anymore. So you can do whatever you like with it. Of course, the models that
+you create in a custom way is also only accessible
+to you and nobody else. And so you know, I can
+kind of go on and on, but I think you're getting message and you know, there's
+also access management. And additionally there's
+way for, you know, tracking usage with CloudWatch, you
+know, troubleshoot issues, monitor API activity with Cloud trail. And likewise, various sort of compliance regimes are available. All right, so now we're
+moving more towards sort of additional
+considerations that are heavy or there of importance for generative AI. So we talked a little bit about safety, toxicity, talked about veracity. Robustness is really about making sure that small perturbations to the input do not lead to massive
+variations in the output, right? You want the systems to handle such changes graciously. And so here, one of the things that you need to be aware of, of course, is that every time you
+choose a specific model, there are all kinds of built
+in protections already. There's a lot of guardrails that are just built into the model itself. Usually they're not configurable
+in any meaningful way except for some hyper parameters, maybe like temperature top B, top K that you're passing and so on. But it's important to understand what are these internal guardrails that these models have? So for example, with like
+Titan Image Generator, if you try to ask it to
+generate an image of baby Yoda, it'll actually reject it from the prompt because it knows that this is,
+you know, copyrighted image. And if instead you turn around and try to trick it and like,
+hey, I want to generate, you know, a green small animal with pointy ears wearing a sack or something like that, right? Even if it ends up internally somehow generating something that
+looks like a baby Yoda, it'll actually have another check that will prevent it from being outputted. And so there are all these things that you need to be aware
+of that are happening. So one way to really assess what these are and how they work is to
+use the model evaluations. And so last year, we've launched foundation
+model evaluations with SageMaker Clarify. We also launched an open
+source library called FM-eval. And the same exact technology has been put into Bedrock evaluations. So here you can use automated evaluations for metrics that could be automated using standard datasets
+for this evaluation. And you can also choose human evaluation because there are certain characteristics and metrics that, you know, it's harder to kind of automate, such as creativity of the output, right? Maybe one. So you start with maybe
+default datasets for these, but the real value when you create your own custom evaluation datasets that are based on your use case. And that's really the only
+way you can distinguish how a model is behaving
+for your use case, right? Instead of relying on a leaderboard where as soon as some
+dataset gets published, of course these models will be optimized and trained on that dataset
+and will perform well. So the key thing is to
+have your own dataset and guard it carefully. So lately there's been
+a bunch of new additions to the better side of model evaluations. And so specifically, there
+is an interesting LLM as a judge capability that's
+now available in preview. Of course if you're
+using human evaluation, it may give you a good kind of result that's based in kind of
+human, several humans may be looking at the same
+output making decisions, but it is costly, right? And so if you want to do it at scale, using LLM as a judge could
+be a good way to start. So here's an example. You know, you can't really
+see the the screen much, but you know, on the left hand side, you have response one and response two from the two models and maybe ground truth
+on the right hand side. And so human would look at it and say, well I think I
+like this one more than that and I will choose on Likert scale. And eventually, you get
+some statistics that show, hey, well it looks like
+model A actually performed much better than model
+B for me, or vice versa. Okay, but evaluations are great, these built-in controls are great, but you still may want some customized guardrails around the application that are use case specific. And you may also want some consistency in terms of how you apply these guardrails because you may switch
+from one model to another, but you want your guardrails to remain somewhat resilient. And that's why we've launched
+Amazon Bedrock Guardrails. They have sort of existed for a while now, but the most like recent prior to reinvent launch was the fact that now these could be
+used as standalone APIs, which means they don't necessarily need to work with Bedrock models only. You can apply them to any
+models on AWS outside of AWS. You just call these
+guardrails through an API. And the more interesting thing is also sort of at re:Invent
+is two interesting launches. One is related to image filtering. So now not just text, but also images could be filtered. And then the other thing is
+of course the announcement that was made at one of the keynotes on automated reasoning checks. And this is really a big deal because now you're not just
+relying on sort of randomness of a model to generate the right results. Instead you're applying
+a reasoning checks. And we'll talk more
+about that in a moment. So here's how you define the filters. So I'm just walking through
+a few features, right? You could say for my
+prompts and my completions, I want to make checks on hate speech, insult, sexual content,
+violence, misconduct even. And then you can also say, well, I'd like to
+configure that for images. And then there's also a
+prompt attack capability that lets you automatically detect certain well-known prompt attacks. Then you have denied topics. So you can actually configure
+30 different denied topics, which are effectively
+out-of-scope conversations. You're saying, I don't want my chatbot to ever talk about politics, to ever talk about investment advice, whatever you'd like to be
+blocked basically, right? Because you're ultimately, you're building this
+chatbot for your customers, you're paying for it, right? And so you don't want
+it to talk about things that are completely irrelevant or maybe even off a brand, right? So you program it in English. You define this in a natural language and you know, it's kind
+of fascinating to see. You give some examples even and there's a classifier, there's an LLM that will make these determinations. You have of course also PII detection. And if you have some specialized PII, you may even use regexs
+to define it better. You have profanity filters. There's a standard list you can add your own words
+that you want to be blocked. And prior to automated
+reasoning checks launch, we've launched this contextual
+grounding and relevance, which is super important. It's a first level of defense
+against hallucinations. So for RAG applications,
+you build a context. You retrieve a context. And this classifier will say, will check whether the completion that's produced by the model is actually grounded in that context. And then additionally, you would check or you could check using this whether the output is relevant to the question asked, right? It may still be grounded,
+not relevant, right? And you wanna detect
+both of these situations. And we'll talk a little bit more about automated reasoning afterwards. So one last thing I wanted to talk about
+here is transparency. And well, there are many
+different considerations here. So one of them is, for example,
+knowing that the output or some content that was generated is actually AI generated content. And Amazon joined C2PA steering committee and the image generation models like Titan Image Generator,
+the Nova Canvas model that was announced earlier this week. They all contain invisible watermarks in the image. So if you could like crop
+the image a little bit, you may still actually have the watermark and it would be able to detect
+that that's AI generated. But more importantly, as a more stronger kind of defense is you have an actual credential digital signature attached in the metadata and you can verify it using tools. In this case, you can see this image was actually generated by this model. And of course broadly, we published the so-called
+AWS service cards. That is our transparency statement. We talk about which, or
+how the model was trained? How it was benchmarked? What it should be used for? And what it shouldn't be used for, right? And with the Nova models as well, we do have a technical report separately that goes even deeper
+into the details of this. And so usually customers come to us and say, well, can you give
+us some additional information beyond this to help us clear the usage of the
+models in our company? And so we often answer
+additional questionnaires and happy to provide those to customers to go through the regulatory situation. And so with that, I actually would like
+to welcome Matt on stage and he will talk about the
+Cisco's responsible AI journey. - Thank you, Denis. All right, I'm the other speaker. You'll recognize a lot of the facets that Denis mentioned in
+the responsible AI tools, in Cisco's processes that we've adopted to apply that responsible process into how we're approaching
+AI in our business. There we go, green button. So I wanna start, I'll
+start with a statement and I'd like some hallucination
+detection on this. Cisco is in the business
+of building bridges, true or false, right? Maybe there's not enough context there. Rhetorically, yes, Cisco's,
+our vision is actually to build bridges, to connect humans. We believe that when we connect people, that amazing things can happen
+through those connections. And so part of our vision is building bridges between people. Cisco's best known for
+our networking solutions that ensure connectivity between people, you know, across the world, right? Cisco's collaboration group. We offer software suites
+that provide connectivity internally with your teams and then externally with your customers, the Webex suite and the
+contact center suite. And so when we say Cisco builds bridges, yes, I, here, let me start here. I work in CollabAI. So in this collaboration business unit, we do connect customers
+internally with their teams and externally with their customers. And so CollabAI is this group central to Cisco collaboration business unit where we provide AI functionality to the other product teams who want to integrate AI
+features into their products. That we sit at an intersection
+of product managers who would like to solve
+their customer problems, the engineers, the engineering teams who want to take AI
+tooling and capabilities and use those to solve those problems. And then the centralized Cisco policy that governs how we develop AI features. And so every day I do, in
+my role, I have a front seat at how responsible AI works within Cisco. So I wanna start, we'll just
+go over this very quickly. These are some of the areas that my team has some interaction with. And we help, again, we
+build out AI functionality to help in the customer experience space with contact center, the Webex suite where you think of meetings
+or calling, messaging, that type of interaction between teams. And then in the office,
+if you're in an office with a conference room and you're using conference hardware, that's our Cisco devices. We also develop and deploy
+AI models that run on those. And I'll go into some of these in a little more detail later. So I'm gonna start with how we started our
+responsible AI journey, right? This is probably familiar
+to a lot of people. Cisco, along with many other companies, when ChatGPT was released, restricted access to the
+generative AI models and products while we developed internal processes and workflows to decide
+how to manage procuring and using those products
+within our business, right? Even though we already
+had a responsible AI workflow in place, previous generative AI, the rapid adoption of generative
+AI and the scope of it, like it's in everything, in every function across the scope, right? And so that change in scope introduced some challenging problems that we had to work through. So people across Cisco needed different types of access. To even the same model, you might be wanting to use
+it for different purposes. So we had different use
+cases and needs across Cisco. Some people wanted to take, you know, LLMs and apply it to internal workflows. Other people wanted to
+use these AI advances and put them into products
+that were selling to customers. And then even other people, there's research departments at Cisco who were using previous
+generation language models and just wanted to continue the research and were kind of paused, right? While we sort of figured this out. Satisfying all these
+different needs responsibly required a tight collaboration between groups that didn't always need to work closely together. So like legal, privacy, procurement, IT, the engineering departments, right? Marketing and sales. They all had kind of a stake in this. And yeah, so we had to
+form sort of a central team to help understand the
+needs of these different parts of the business. And then part of the issue was that many of these groups didn't really have previous experience with AI technology. And so there are a lot
+of misunderstandings. I would say if you go away from anything, if I can convey anything
+here, it's education. When you're starting to
+make responsible AI policies have some education. You don't need to know
+deep details about calculus and how machine learning, you know, functions under the hood, but understand the differences between an off the shelf model that is being used for inference. Like understand that that
+model is not learning if you're just running it
+through inference, right? There are different ways of using a model. There's training, evaluation, inference. And the people who are
+making these policy decisions really do need an understanding
+of the differences between those uses of this technology and how that impacts like customer data. That's safe ways to use data or using these systems, right? So we did eventually succeed. We now have a robust process for assessing three main classes of AI. And I would categorize those
+as, one of them is products or services that we use at Cisco that our vendors are adding
+AI functionality into. So we're using something
+and then there's a release, and all of a sudden we've got, you know, AI assistance in all of our products. So we need a good way to determine if those are appropriate
+for our use at Cisco, right? The second category is internal use cases that we have, like documentation that we wanna build bots
+to help us search easily or internal workflows that
+we wanna streamline, right? The third case is when
+we want to take a product that we are providing to a customer and integrate AF functionality
+into that for our customers. That use case is actually
+what I'll focus most on here. Now that's the one that I'm most familiar with in our collaboration BU, that's where our team works with our product teams to
+integrate those AI functions. All right, so I'm gonna
+go back to bridges. I view Cisco's responsible AI program as somewhat of a bridge, like connecting users or
+employees in Cisco to AI, right? How can we do that safely,
+securely, ethically. There are three parts that we assess and I'm gonna look at the foundations, the infrastructure, and
+then kind of the end to end, the road of the bridge, if you will. The user experiences end to end. So first of we'll look at foundations, these I would call the models that support everything
+that's built on top of them. These are the machine
+learning models themselves. So some of these models
+we develop in-house, others we procure from third
+party commercial vendors. Other models you're aware
+are available open source, you can just download them and use them. All right so they're
+different sources of models. So my team, we work across the broad spectrum
+natural language problems. So for these we use
+language models like LLMs or obvious, we have other
+like language classifiers as well that we use for certain cases. There are computer vision
+models that we use. So in a Webex meeting, my team provides the capability to turn on background blur or gesture recognition inside of meetings or AI enabled relighting. So there's some features there with computer vision models. We do audio and speech models as well. One of my favorite
+features in the Webex suite is background noise reduction. And I know all the collaboration
+services have this, but I have three kids and a dog at home and I appreciate this feature. And there's also all of
+the NOP features here are powered by what I
+would call a speech model, which is ASR, automatic
+speech recognition. And these do the
+transcription of audio to text and then downstream we can further process them with NOP models. So when we look at models, we want to take a look
+at few different aspects. One of them is the intended use and the evaluations of this model. So we wanna take a look at why was this model developed? What was the problem that
+it was trying to solve? What's it trying to classify, right? You wanna make sure that you understand why
+a model was developed. You wanna understand your
+sources of training data. So internally, models
+that we develop ourselves, this is pretty easy to do 'cause we know the training
+data that we've used. External models, it's a little harder. If you have a commercial
+vendor who's providing a model or if you have an open source model, we actually have a process
+where we make connections with those companies
+and have an assessment that we ask them to fill out so that we can get a better understanding of how they source their data. Is it ethical? Is it legal? Was it annotated ethically, right? Known biases are edge cases. All models are statistical. They don't handle everything
+100% accurate, right? And so we want to know, it's not that we can't use those models, so we want to know the edge cases of where it's appropriate
+to use those models. An example here that we ran into is some smaller large language models will exhibit a tendency to
+repeat words over and over. Sometimes those words aren't very polite. They're trained off the internet. So it's not that again
+that we can't use them. It's that we want to
+understand this behavior, document it, and be aware
+of it in our use cases. And then lastly, we do need
+to go through licensing and legal contracts. So a third-party vendor, we
+need to negotiate with them the use of the model
+with open source models. We need to, you know, understand the licensing terms of it and make sure that it's
+appropriate for our use, both for like our internal development and then for commercial use as well. I'm gonna go on to the vendor assessment. This I would call maybe the platform that's surrounding the model. There are a few different
+ways that we use model. Some of them we host ourselves, some of them we use managed solutions such as Amazon Bedrock. Amazon SageMaker gives us a little bit more control over where the model's running,
+how it's configured. And then we also in our team, we do self host of models where we're managing the
+infrastructure complete ourselves. Bring up some GPUs, there's some models on
+there and operate them. This assessment is actually
+more focused on the manage, the fully managed solutions
+like Amazon Bedrock. So this usually looks, this is very similar to like if you're assessing a third party that's managing your data somewhere or you're using a cloud solution. The assessment's pretty similar. We wanna know things about
+data privacy and security. Some platforms do. You have to opt out if you don't want them to use your data or have
+a contractual agreement. So you wanna be certain your
+data is not gonna end up training or fine tuning a model and you know, make its way out into the public at some point, right? So we know how data has
+handled in the system. Does anybody have access to it? Is it persistent anywhere, right? We wanna make those
+guarantees to our customers that their data is not, you know, landing in somebody else's
+computer or laptop, right? We wanna look at the availability and support for the model. Is it available in regions that we need to serve our customers? And this changes over time, as you know, data centers are built out and models are deployed
+in different regions. One major thing that we need to consider is the life cycle of models. And this is similar to any software. If a model that we depend on for a feature that we're delivering to our customers is deprecated, and it
+will be deprecated, right? The market changes so fast, you can't depend on a model
+that you're using today to be here in two years, right? So we need to know, like how long will we
+have when it's deprecated? But there was a process that we need to go through to change to a model while keeping
+our customer experience the same with what we
+expect of that model, right? We also look at content moderation. Denis mentioned a few
+areas where guardrails are in effect. Sometimes it's built into the model. Sometimes the platform imposes content moderation, you know, external to the model, but you don't necessarily
+have configuration over it. So we need to understand if that content moderation is a place and how we can configure it to our needs or if we're able to. And then ownership of generated content. This is a little bit of an edge case, but I think the biggest
+impact for us here, there's like four different
+parties involved in here. There's our customers who are purchasing the Cisco product using the AI feature. There's Cisco who's
+developing the feature. There's, you know, the
+provider of the platform and then there's the
+provider of the model. So it's like all these parties and generally, you know, the person who's paying for the
+model owns the outputs. But there are some use cases where it's becoming more common to take large more powerful models and use outputs of those
+to train smaller models to do specific tasks. And those are cases we're gonna make sure that's appropriate for us to do, 'cause we're kind of
+getting into competition with the model that we're using 'cause we wanna replace it with something that's, you know, lower
+latency or cheaper. So we take a look at that. Next, I'm gonna go to
+the final assessment. Let me see, I'll speed it up a little bit. This is the actual end-to-end use case. So the feature itself. This builds on all the information that we've collected so far. We curate and almost make
+like reusable components out of the assessments
+that we've done so far. If we start by looking
+at should this problem even be solved by AI, right? As much as our marketing team
+would like AI, everything, there are things that
+just don't need AI, right? So if AI solution is warranted, are the models that we've selected in the architecture, we've chosen the right fit for the problem. We look at potential negative impacts. Could an end user inadvertently be guided into a choice that's negative
+towards an individual or a group of people, right? We look at data risks. Again, at a broader level, it's not just fine tuning
+that could expose data. You could also have a RAG system, like Denis mentioned earlier, where you're getting
+some data from a system that maybe not everybody who has access to this,
+you know, AI chatbot should be able to see. So you need to, you
+know, take those concerns into account as well. End user enablement. And I would almost call
+this more empowerment. Is the end userwho's working, who's been given these AI outputs, are they aware that it's AI? Are they able to configure or opt out of this
+feature if they choose so? Are they able to adjust it? Can they make edits and like correct it a little bit? So they're almost working more, you know, in conjunction with the AI. And can they report any
+problematic behavior that they see? So it can be looked at. Guardrails, Denis got a good job of showing the scope of guardrails. Some systems need more guardrails or different type of
+guardrails than others. An open conversational
+assistant is, you know, it's open to many more types of attacks than something that's a closed loop. And we more control the data flows that are going into the models. And then an overall system overview. So is there, most systems built with AI have multiple steps. And so do those steps have, is there a chance for compounding errors that could cause negative
+outcomes for customers? We'll go quickly into one example. This is a feature we built
+for our contact center offering called topic analytics. We can take a set of customer transcripts, extract the reason. These are customers calling
+into a call center for help. We can extract the reason of
+why the customer called in, and then group those together and label them as topics so that call center admins can kind of see why customers are calling
+into their contact center. So when we look through this, we realize that the end-to-end solution, if we were to completely rely on AI for all the steps in here, there's three steps in this phase. And if the errors occur
+in the first phase, it'll just compound down into the, you know, subsequent phases. And so we decided to
+shift the UX a little bit, the user experience and
+bring a human into the loop a little bit earlier to
+be able to review, edit, maybe regenerate clusters. So we give the user a little
+bit more power to almost, it's still better than looking through tens of thousands of transcripts yourself, but it gives the user a little bit more control and insight into the final model that's produced. And I'm gonna leave
+you with one more thing in the collaboration BU, we've pioneered one more
+step towards transparency with customers to gain their trust. Every AI powered feature
+that we're developing, we're producing these transparency notes. These allow customers to quickly identify any areas of concern they might have with where the data's flowing, how it's being processed, and then they can make informed decisions on whether this AI feature is right for their business or not. I hope that Cisco's
+experience can help you decide how to apply AI responsibly
+to your business. And I thank you. Back to you Denis
+(audience applauding) - Thank you, Matt. Love the bridge analogy. I think it worked really well. So I wanna wrap up with just a reminder of the automated reasoning
+checks that were announced and kind of explain a little
+bit more how that works. So this is really a kind
+of an industry first product in incorporating
+explicit reasoning using logic rules. And the idea here is that you define a policy in natural language. So maybe you already have
+policy documents likely. These policy documents will be parsed and will be turned into an explicit rules that are then applied to kind of validate your completions from the language model. And so in this kind of example, you know, hypothetically speaking, again, we're talking about some sort of, let's
+say, a unicorn airline. And once you define the policy, and once the rules are in place, for example, the rules could be about, or the policy could be about changes to the ticket, right? I don't know if you could read it, but it says, I'm flying to Wonder City with Unicorn Airlines and noticed my last name is
+misspelled on the ticket. I'm currently in person at the airport. Can I submit the change in person? And the system says, yes, you're allowed to change names on tickets at any time, even in person at the airport. So that's kind of the default situation where, you know, the rules
+have not been validated and have not been applied, right? And so now you can check
+against specific rules. And automated reasoning says, no, this is invalid. And here's the rule and
+here's the reason why. So there's even a form of explainability built into why a certain
+thing was invalid. A name changes allowed if and
+only if changes are allowed or if changes are allowed and the submission is valid. The submission is valid if and only if the
+submission method is email. So yeah, I guess that's really the high level process of
+automated reasoning checks. It's using logic. It's actually using extracted variables as well from that text. So it can reason about them in kind of first order logic available. So with that, oh, one
+other thing I would say is I think currently this
+feature is in gated preview. So you may need to request access to it, if I'm not wrong. But please do and see how
+it works for your use cases. So with that, thank you so much. Please don't forget to
+fill out the survey. (audience applauding)

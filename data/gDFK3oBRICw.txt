@@ -1,0 +1,548 @@
+- Hello, everybody, thanks
+so much for showing up today, I really appreciate you being here. This is obviously the
+Thursday of a long week for many of you I know and I really appreciate you turning out. As the slide says, my name is Tod Golding, I'm a solutions architect at AWS and I've been working in the SaaS domain for about the last eight, nine years, working with different
+customers and partners who are in various stages of building, delivering and operating
+SaaS solutions on AWS. You know, during that time that we've been building these solutions. we've really looked at how and where we could equip
+SaaS builders with tools that would really make it easier for them to address common issues
+and common challenges. And so, we set out to build
+reference architectures and libraries and different mechanisms that ideally would accelerate
+your path to building SaaS. At a minimum, it would give you sort of a concrete implementation of the many of the things we
+talk about through slides. So we built an EKS reference
+architecture, for example, last few years we talked about it, there's good content out there, serverless SaaS, same thing, we built examples of those and those have been extremely
+valuable for organizations who've been able to pick 'em up and immediately sort of get
+real world sort of views of what it looks like to build SaaS. But we started asking ourselves, was there something more we could do? Could we somehow push the
+envelope a little bit further and move beyond sort of just concrete one example of EKS or one
+example of serverless? Could we move into a world we could give people more
+of a composable experience? Could we give them the pieces of SaaS in a way that it wasn't an all
+or nothing sort of solution? I mean, if you look at EKS, it has all the moving parts in there, but if you only wanna consume
+that reference architecture or some dimension of it, you can't easily necessarily
+pull it all apart and just say, "I wanna go
+do just this piece of it." So this is what sort of gave life to this notion of what we
+call the SaaS Builder Toolkit, or you'll hear me reference it as SBT. And SBT, the whole vision behind SBT was to do what any good
+engineering organization and any team that is really
+trying to equip people with better tools is, how can
+we make this more digestible? How can we create a tools sort of universe for these SaaS principles and how can we use that tools universe to make it easier for
+you to pick something up and use it in a more granular way, but also create an opportunity
+for other third parties to jump in and be able to add extensions, and you'll see where this
+dynamic is already happening with SaaS Builder Toolkit. Also, we just wanted it
+to be approachable also. So to me, if you're picking up a tool and you're gonna use it in
+your development environment and you have to wander in to figure out, how do I wanna make a change or how do I wanna customize
+it to do what I wanna do? We didn't want you to have to wander into thousands of lines of
+complex code and, like, where's the thing I'm hunting for? And what if I change
+it, what will it break? We tried, you know, inevitably to make it
+do something valuable, it has to have a fair
+amount of code to it. But we tried to design and structure it with the idea that people
+were going to be coming in and making changes and
+trying to pick it up and consume it in pieces. So my goal for this
+session today really is to, A, give you sort of a
+sense of what the tool is and what the scope of the tool is, but also to go inside of it, right? This is a 400 level session, so once we get through
+this initial part of this, you're gonna see a lot of code and a lot of examples of how you use SBT to compose an environment with the idea that this will give you a
+headstart as you go back. And I'll also share a link
+with you at the end of this that'll point you off
+to SBT as part of this, that'll let you go download it and start looking at it yourself. So hopefully that's what you're here for and we'll definitely get to the code. So like this intro part, we'll get the concepts out there and then we'll get into the bits you probably really wanna see. Now before we can talk a ton about SBT, we also have to deal
+with this open question that I sometimes get. People say, "Well, there's
+no blueprint for SaaS," because I say that all the time if you look at tons of my presentations, there's some there's no
+blueprint for SaaS story in everything I meant because that's true. Different domains,
+different technology stacks, different environments, different teams, there's all kinds of parameters
+that change the shape and the nature of what your
+SaaS solution might look like. And so, yes, it's super contextual building a SaaS application. At the same time, there are constructs, there are themes that span
+most of those architectures and there are those like core concepts that we see over and over and over again, and this is what's kind of behind SBT, which is we said, well, can
+we take those core themes and can we turn those
+essentially into building blocks? And can we tease 'em apart enough and make 'em a composable enough that you could drop in and
+consume them in pieces? So here you'll see I've got a control plane
+and an application plane. If you're not familiar with those, we talk a lot about those in SaaS. This control plane is
+the piece that has been essentially all the horizontal
+cross-cutting concerns as part of our SaaS environment, and we'll dig into what's
+in there a little bit. And the app plane is where all your sort of business
+functionality is, this is where we address tenant isolation and data partitioning and all those classic sort of problems. And we always just refer to this as like the two halves of SaaS. So a lot of SBT as we look
+at it and we ask, what is it? What does it do? You'll see these notions of
+control plane and app plane showing up across the surface of this because they are the big
+higher level constructs that we know, no matter what we're doing, we know we need a control
+plane, we need an app plane. So SBT's gonna try to
+give you a control plane and give you an app plane and then give you composability
+within those moving parts. So if we were to like just
+pull a high level picture out and say, "Well, what are
+the main pieces of SBT? What do I get? What's in the box?" You'll see that we've broken this down into three distinct areas. There's a control plane, obviously, lots of people as we started
+talking more and more about a SaaS control plane kept saying, "Can you give us a ready
+made control plane?" 'Cause so much of what
+you're doing in there, in fact, the control plane
+is one of the best candidates for a sort of ready to use tool because so much of what's in there is common in many solutions. You need tenant management,
+you need metrics and analytics, you need billing. And so, we've gone out of our way with SBT to try to at least create a good packaged, ready to use control plane. It's still not meant to be, you know, production grade, go use it, your ready-to-run control plane, but it has all the moving parts there, it's sort of your job then to take that and make the production version of that for your particular organization. You'll also see in that control plane, third party integrations. So there are very specific concepts, like billing and metering
+and authentication that are in the control plane that could have many providers. And so, in the areas where we thought somebody might wanna bring a different provider to the solution, we tried to create a mechanism that would allow third
+parties to integrate and you'll see where some third
+parties have stepped in here and added to these offerings. And then the concept that I really wanna be sure you get here, and you'll probably hear this multiple times across this talk, is this idea bring your own control plane. This is the control plane, and SBT that we have
+today is a control plane, it isn't meant to be the control plane. We are already are on our own considering, well, we build more control planes using different technology stacks, for example, today, our control plane is implemented with serverless, might we implement a
+container-based version of it? Might we bring in other
+third party products for things like identity and
+other moving parts of this? To me, we don't want you to
+look at the control plane as the one and only control plane, we want you to look at the
+pattern of having a control plane and then asking, is the
+one we have work for you or do we need more of them? Do you wanna contribute
+one in fact potentially. Then the other side of
+this, the app plane, the app plane was a natural place for us to take all the reference architectures that we'd previously built. So like I referenced,
+serverless, EKS, and so on, and say, "Let's take the
+existing version of those, let's pull them apart, let's take the app plane portion of them and put them into SBT and rework them to make them comply with SBT," and then let them consume
+a common control plane. It was almost a proof of
+concept for us to say, "Does this whole app
+plane/control plane work? Can we bring new stacks in? And have we created the
+right sort of boundaries between the control plane and
+app plane to make that work?" And so, if you go get SBT today and you say, "Hey, I
+want your control plane and I want the EKS reference
+architecture as my app plane," you could go get both those halves and that would be your starting point if you wanted to do that. Also, as part of our
+experiment, we brought a new one and we didn't have any CS
+reference architecture before. So we said, "Hey, now
+that we've done this, how easy would it be for
+somebody to introduce a new app plane?" And that team in like two, three weeks introduced a new ECS app plane example. So I think there's proof here that like pulling the control plane out lifted a lot of the burden of producing these
+reference architectures. Third party integrations again and bring your own app plane sort of should be
+self-evident here, right? The app plane is the place for many types of technology
+stacks and solutions. We've seeded it with
+a few to get it going, but we'd expect more to show up there. Excuse me. And then, at the bottom, you'll just see libraries
+and utilities, right? This is where we've
+taken a lot of the things that we have built, token vending machine is a
+really popular library we built that help people who were
+doing tenant isolation, and we took concepts like
+that, we packaged them up, we put them into this libraries area. And so, when you're building an app plane, either using one of ours
+or building your own and you're like, "I wanna
+do tenant isolation, I wanted do that token vending machine," we've given you a way to pull
+that into your environment and easily apply the
+token vending machine. So I would expect that
+libraries and utilities area to grow out a lot more in that space 'cause what we're really
+trying to do is, like, what tools would make it easier for somebody to build a good app plane? Now one of the things we also wanted to do to make this composable to some degree and let people reach in and
+grab just the pieces we wanted, we wanted this to be a
+loosely coupled experience, but we have to acknowledge, if you're gonna have a control
+plane and an app plane, they do have interactions intentionally that move between them. And so, we did have to say we have to define some kind
+of integration contract here. So this is probably one of the few places where you'll say we are very
+prescriptive about how it works 'cause we had to be
+prescriptive at this level. So we defined an interface here, we'll look at the tech
+that's behind that interface that makes that work. But we basically said,
+"What are the common events that would commonly flow between the control
+plane and the app plane?" So onboarding sends events
+over to the app plane to finish onboarding, metrics and analytics and data
+comes back from the app plane back to the control
+plane to be aggregated. But we've also said we've left lots of room
+there for you to say, "Well, I kinda wanna add my own events or wanna add my own protocol
+to this integration," but somewhere here you
+have to have an integration for this to work. And then, inside the control plane, I talked about billing and metering and these other areas where we thought, yes, we can have a
+prescriptive control plane and we can give you
+implementations of those, but we have to acknowledge that people will wanna bring their own and partners will wanna come in and bring their offerings in. So it's here that you'll see examples and we'll look at them of places where we have used the extensibility model of the control plane and these
+interfaces to make this work. And then, in the libraries area, again, first party or third
+party libraries and tools can be brought in through this experience. So I do not wanna give anybody the idea that we've gone out and created this ultimately pluggable experience where you just bring things in and you flip a switch
+and it all just works. Like, to do the make
+these interfaces work, you still have to go write
+the little bit of code that makes it comply with the interface, so we want this to be an
+extensible environment, but some of the extensibility comes through convention as well, like, we've done a good job of saying, "Here's where this happens," but you may still have to drop in and tweak the environment a
+little bit to get that to work. So I don't wanna give you the idea that it's just all self-contained and you're just going
+out and flipping switches to turn things on and off. Now one really important
+takeaway here with SBT is that SBT is a CDK
+heavy experience, right? It has leaned in very heavily to the power and the strengths and the
+expressiveness of the CDK to describe how
+infrastructure's provisioned, how it's configured, 'cause a whole lot of this experience on both the app plane and
+the control plane side is about configuring and provisioning and setting up environments, either the onboarding or the
+initial setup or whatever. And CDK to me, the beauty of that is it's
+a fully expressive language, it's an O language and, by the way, we're in TypeScript, but
+it supports many languages and it has at its root this
+notion of a CDK construct. CDK construct's just the most
+abstract, basic nothing object that is in the library
+that CDK knows about. And what we've done is
+essentially descended from that construct and created a whole library of constructs that are the SBT constructs. So here you'll see we've got
+a control plane construct, and then within that
+control plane construct, it actually has all the bits it does to build out and provision and
+configure the control plane and it uses constructs. There's a tenant management construct, there's a user management construct. So even as you're drilling in, and you'll see this as
+we get into the code, everything's expressed through
+these different constructs. So as you start looking at how and where you might wanna modify
+the behavior or alter it, you're still just dropping in and saying, "Oh, I wanna create my own
+tenant management construct, how do I introduce that? And can I just create my own and can I replace the
+tenant management construct that's there today?" We'll look at how that would work. The other really super important
+point to take away here is that SBT is a tool, it
+is not a product, right? We are not trying to make
+some point and click, like download it, there's an installer, you pull up some UI and you tell it what you
+want your SaaS application or a SaaS environment to look like. It is an in the editor kind of moment where you are composing the
+experience you want through CDK. And in that respect, it is meant to be in the
+hands of a builder or somebody who knows and understands
+how to find their way around, at least around CDK and around some of these coding concepts. And the more you
+understand those constructs and the more you have
+to sort of find your way through these language constructs, the more approachable
+it's going to be for you. So if you say, "Well, what does it look
+like then to do this?" Just to give an example of
+what it would look like, let's say I wanna go build
+a SaaS solution with SBT, we're gonna go out first and install the SaaS Builder Toolkit. It's out there as a
+package here using npm, I'm sure a lot of you have
+seen or used npm in the past, but you essentially install
+SBT into your environment just like you'd install any
+other library off the internet. If you have other extensions,
+you'd install them. And then, now in your code,
+when you drop into your editor, you're essentially saying, which constructs do I wanna pull in? What do I wanna do? Here's the whole sort of
+landscape of constructs we made available to you. You can just use them in
+the most simple fashion and just do things that are
+already turnkey, ready to go. Or you can drop in more granular ways and customize the
+experience that's in here. So in this particular example, I took the simplest model here. Let's say I wanna go create
+and spin up a control plane, this is pseudocode here, I would import the control
+plane out of the toolkit so it was available as
+a referenceable item inside my editor. And then I would go declare a stack, and if you're familiar
+with CDK, basically, anytime we're gonna go provision or configure infrastructure, the surrounding construct
+is referred to as a stack, just like a cloud
+formation stack, et cetera. And then, within the body of this, I would then go tell it, like, what do I want my control
+plane to look like? And this is where I could bring in also app plane constructs, this is where I could bring in libraries, everything else that I would
+need here that would help. And then, when this thing's already and I've put in all the bits
+into the editor that I want, I'm just gonna use CDK
+deploy to go out and tell it, take my constructs and my configuration, deploy it and set up my environment. And the goodness of this is
+we also get CDK's ability to like as we're altering and
+it will do the deltas for us and it'll apply changes for us. So it's turned out to be
+a really good mechanism, at least in our opinion. Okay, so that's enough about like the overall experience of SBT and what it is we're trying to achieve. Let's actually dig into the control plane so you can look and see
+what's under the hood of this. And I started with the
+simplest model here. One where we're gonna say we're essentially not gonna
+configure the control plane a whole lot. We're just going to go out,
+declare a control plane, use most of the default
+behavior of the control plane and see what happens. So as we drop in here, you'll see at the top where I'm essentially importing SBT here because I've already done the
+npm install in my environment. And now I'm gonna go create
+a control plane stack, I have to have some stack,
+this is just a CDK construct. And now as part of setting
+up my control plane, the control plane itself
+has authentication, it has identity for the system admins that are part of this experience and they have to have some provider. And so, in this case, we have provided a default
+implementation of this that is a Cognito auth, so we're gonna set up the Cognito auth as part of this environment. And we have to set that up here 'cause part of it is also telling it who the initial system
+admin user's going to be when we provision the control plane. So then you'll just say, we're just gonna new an
+SBT control plane here. And so, the control
+plane, sbt.ControlPlane that you see here is the
+control plane construct pulled out of this library
+with the default implementation of everything that we have
+provided outta the box. So if you just wanted to
+use it out of the box, it would look like this. And then you'll see where
+as part of the auth, I provide an email address, that is the email address
+for the admin user and that's it. So for me that is the simplest,
+like, if I just download it and just say, "Give me whatever
+control plane you have," I just go run that, go
+CDK deploy that stack, and I have a running control plane. What's actually going on inside that control plane construct? What is it creating for us?
+What's it configuring for us? Well, we talked about it setting
+up Cognito for us for that. It's got a tenant management
+service contract in there, pretty much every control plane you have has to have somewhere
+it manages tenant state, tenant policies, all these
+other attributes of our tenants. So it has a construct that
+it's using to create the table and set all the other bits up. It has to have user
+management for system admin and it doesn't just have it
+to create these initially, it's creating the
+microservices and the APIs and all the things that let you
+interact with these services beyond the initial creation. So for example, if
+there's an admin console or a CLI sitting on top
+of your control plane, it would be using the CRUD interface of this user management system to create new users,
+manage users, et cetera. Same with tenant management service. It isn't just during creation, you might wanna go look
+at the state of a tenant and do something. So there's an API and there's
+services all around that to make that work. The actual control plane API
+itself has to get created here, set up the API gateway and all the bits that are needed for that. And then this event manager
+construct is out there and the event manager construct is about enabling that communication between the control plane and the app plane that
+we talked about earlier. And so, even though
+that bit of code we saw on the previous slide looked like we were hardly doing anything, there's an awful lot going
+on under the hood here. So I wanna take a snippet of that just so you get a sense of if we were to drill into
+that control plane experience and look at a piece of it, I went and pulled out the
+tenant management construct. So if we were to dig
+into the control plane, we'd see somewhere renewing this tenant management construct and using it to initialize our tenant management environment. And buried within it, you'll see one of the things
+it does is it creates a table, it needs a DynamoDB table to create all and store all
+the state as part of this. Well, here you can see constructs again as we go deeper and deeper into this, cascading their way into this experience. Instead of just doing
+the raw commands though, and creating a DynamoDB table, we created a tenant management table that wrappers all the bits that, including the IM bits and the
+configuration of the table and all the stuff that
+has to happen there. And then, if tomorrow you said, "Well, we don't wanna store it in Dynamo or we wanna do something different," you could create your own replacement of that tenant management table construct and do whatever you wanted to do there. Obviously, you'd have to figure out how or if that broke other things. But I'm trying to give
+you a better sense of where the opportunities should drop in and change the behavior if you wanted to. Then you'll also see the
+tenant management Lambda here, and this is a serverless environment. So we're spinning up a tenant
+management microservice that is a series of Lambdas that support all the different operations that you can perform as
+part of tenant management. And you'll see that returned from this tenant management Lambda call is a Lambda variable that's here and we'll see where that
+gets referenced in a moment in a way that's relevant. But then as part of this also it sets up the HTTP integration, this is where it's
+setting up the API gateway to set up the routes, et cetera, that go to your functions. But when we set up the Lambda function, you'll see down below here in this tenant management function, this is the Lambda
+function that was returned. So let me back up a step here. You'll see here
+Lambda.tenantManagementFunc here is referenced when we're
+setting up the HTTP integration, it's actually referencing the code that's pulled in here, that is referencing a place where all the Python's
+sitting in my environment, that is the implementation of all these different Lambda
+functions that are out there. So again, I still feel like
+this is not so crazy difficult to drop in and figure out how
+or if you wanna change it, but you also get a sense of
+the flavor and the approach and the overall design
+model of this experience. I do wanna show you one other part of this which is there's sort of
+creating the control plane, get it all up and running, but then there's the control
+planes up and running and we are going to process
+an onboarding event. Well, what did we do to set that up? And what happens when an
+onboarding event happens? Well, this is all managed by what's called a registration service that gets created inside
+the control plane, and the registration service, essentially, it is
+handling the orchestration of all the different services
+that have to be called to get a tenant onboard the system and it's actually quite a few. And it's also orchestrating any events that have to be sent to the app plane to let the app plane
+do what it needs to do as part of the onboarding experience. And then, by the way, it also has a table that's keeping track of
+the state and the progress of registrations as they go through. So if a tenant starts to onboard and we're starting to call all these different
+bits to get it created, it's updating this registrations table and then there's an API into registrations where you could go through the
+CLI or your console and say, "How's the registration progressing? Or one of these seems to be stuck, could I go look at its state and see where it's at right now?" So here we assign the
+registration a unique identifier and we get the data out of the
+incoming body of the message that's come into our environment, and then you'll see we
+have got a table here, this is where I told you
+we're storing these state, we're putting these items into the table and storing the current
+state of this registration into that table. And then, here, we're posting a message to tenant management, that tenant management service we were talking about earlier, we're posting a message to that tenant management
+service to tell it, go create this tenant in the system, you're creating the very
+first entry for that tenant and setting up the user and the other bits that have to happen as part of that. And then, finally, when that comes back, it will update the tenant
+registration with the tenant ID and the information that came back from the creating of that tenant. And then, as the last bit of this, just 'cause it wouldn't fit on this slide, is we also fire off this
+go create the tenant in the app plane side of this. And here you'll see this
+create a control plane event, when we create this control plane event, we're essentially populating
+the event with the data that we have about the tenant that's onboarding their
+plan, their information, the user that's being onboarded and telling the app plane, "Hey, what kind of event
+are we sending you?" It's that we were onboarding a new tenant and that gets fired off,
+and then when we get back, we'll get the data that comes
+back from it telling it, did it succeed? Did it fail? And ultimately, when
+this all gets wired up, the registration will get updated with, did we successfully provision
+the tenant in the app plane? There are way too many moving parts, that was already way too much
+detail maybe than you wanted. But I do wanna just get you a sense of what's going on there in terms of the movement
+of between the app plane and the control plane, and how this is implemented
+underneath the hood, but also, again, show you how
+it's working inside the CDK. Now the last bit of the control plane here that we wanna talk about, I said there are these interfaces, we've got all of the billing metering. Each one of these have tried to declare an abstraction of these interfaces in a way that they would
+hopefully allow you to at least support the basic operations you'd need for the control plane. They may do way more than the control plane needs them to do, we're just trying to
+introduce the basic operations that seem necessary for
+integration with the control plane for the places we would touch them. And you'll see, we've
+got authentication here, which is tenant, sorry, system admins, and we've got Cognito as
+an implementation of this. You could put Okta in
+here, you could put Ping, you could put different
+implementations in if you want. And then, on the billing side, we've actually had Moesif come along and implement an integration just 'cause we wanted to
+see, did this actually work? Are people able to integrate? And if you go look, there's examples out there
+of a billing integration. And on the metering side,
+Amberflo, oh, went too fast. Amberflo has, oh that's interesting, implemented a whole
+metering solution for us. So, I feel like this whole, I'm sure it's gonna be an evolving thing, but I feel like these interfaces are representing a decent
+point of extensibility and will just over time have to figure out how they evolve to support
+more features and capabilities. Okay, so that's the control plane, that's a sneak peek inside of it. There was lots more we
+could look at there, but I also wanna give you a better sense of what
+happens on the app plane side 'cause the app plane's a
+little bit different here. Like I said at the outset,
+you see these boxes, purple boxes in the control plane, you're gonna have some
+variation of those boxes in most control planes. What shows up in the app plane on the right hand side, who knows? It could be anything, the tech stack, are we deployed in full stack silo? We're deployed in full stack pool or some variation of those things. What tiering strategy, a whole bunch of parameters here would affect how it's routed, is it namespace per tenant for an EKS? Is it separate functions
+if we're in serverless? What is the deployment to it all? Like, it can all look wildly different. And so, for us, we didn't
+want to put any constraints on what could be in the app plane, but we also wanted to say, hey, if you are building an app plane, even if you're gonna go build your own and not use one of the ones we provide, could we give you a
+little bit of a headstart into that app plane that
+it would at least say, what are the common things people that do to build
+an app plane would do to implement their app plane? And could we give you some tools and libraries and mechanisms
+that would make that easier? So if we look at what's involved
+in building an app plane and we sort of just decompose
+this into building blocks, when we build all of our
+reference architectures, even before SBT, we always notice we had this
+notion of what we called the baseline application
+plane infrastructure, which was, hey, I don't
+have any tenants yet, but what do I just need
+before any tenants show up? I gotta create the VPC, I
+gotta create the cluster, I've gotta create the gateway, maybe, I've gotta create some
+other infrastructure. And if I have a fully pooled environment as part of creating baseline, you could argue that I would
+spin up the services I want or I could wait till the
+first tenant onboards. But essentially, almost every one of our
+app plane experiences have this baseline construct, and you'll see construct because CDK is driving this as well. And then, the other, well,
+so, when that completes, you get your baseline environment. And then, the other piece here of that was always the common piece is great, you've got the baseline environment. Now what does it mean to bring a tenant into this environment? And it's here that it depends on where you may or may not have
+per tenant constructs, right? If you have everything pooled and you're doing very little per tenant, this may be a very simple process. If you have siloed or dedicated
+infrastructure per tenant, then in this model during onboarding, you have to do more exotic
+things to figure out what do I have to create
+for each individual tenant? And so, in this model, we also have a tenant
+provisioning construct that says, "Okay, whatever has to happen to get a tenant introduced
+into this baseline environment, we'll go through this construct and it will orchestrate creating whatever needs to
+get created per tenant." And so, this is where
+we've created a library and we've created helpers around this. We've also created all the bits to help with the wiring
+and the event processing. So we'll pick up the fact that you sent us an onboarding event and we'll trigger everything
+that needs to happen and then let you drop in where the specifics of your
+app planes start to show up. Now you could say to yourself, "I wanna go write all that stuff myself, I wanna write my own baseline code, I wanna go figure out what I want my code to look
+like to provision tenants." That app plane will accept
+anything you wanna do in there, it's just do you wanna leverage
+some of the bits we have and some of the convention we have to try to make that a little simpler? That's entirely your choice here. But now when I have this model and I've got this set
+up, now in this model, let's say I have a full stack siloed model and every tenant that comes in gets their own dedicated environment. The provisioning construct
+for the tenant here, through the control plane and onboarding would provision all the
+resources that are needed, configure all the routing, do whatever's needed to get that tenant introduced into the environment, and then it's just rinse and repeat. So the the takeaway from this slide is like even in this app plane, even when it's an open playground for you to go build what you wanna build, you should still look at what
+SBT gives you out of the box to try to give you a bit of
+a headstart in that space. So now what I wanna do is say, "Okay, let's take this
+sort of abstract idea of what it means to introduce and provision the baseline
+environment and provision tenants and map it to something more concrete." So let's go look at what
+the EKS architecture that we have out of the box does to when it is implemented
+as your application plane. So, certainly, we're gonna bring in, if we're using our control plane, you're gonna do the bits
+we've already talked about to get your control plane up and going. And now when you say provision
+your baseline environment, you're essentially saying, "Here's all the resources
+I'm gonna go create, I've essentially got the
+shell of my EKS environment ready to start receiving tenants." And now when I get an onboarding event, the onboarding will go out and now it'll run the provisioning script that we talk about, and in this case, it'll create a tenant namespace, it'll bring the services that are needed to life, and then each subsequent tenant will just get introduced this way, right? So when I'm all done, I
+have this right hand side that is essentially the application plane with support for all the
+onboarding and onboarding events that are coming from the control plane. So if you dig into the
+CDK code behind this, all we've really done here is said, "Well, all the things that worked good on the control plane
+will probably work well on the application plane side
+of this problem as well." So here you'll see all the expression of like create the EKS
+cluster that you just saw, go create all the resources
+that are needed for that. Go create the app plane
+stack that's needed over here for provisioning and setting up tenants 'cause that whole app plane
+stack is a thing we're gonna use when we provision individual tenants. And then go set up the
+API for all of this, go configure all those bits. So essentially, all we're
+doing is this is CDK code you could have all written yourself but we're just bringing in and packaging and delivering it the same way
+we delivered the code you saw on the control plane side. So it's got a kind of
+consistent feel to it. So what actually gets provisioned
+in this EKS architecture? What would we do? What's created here? And I won't go into the detail, but essentially, we're using
+a sub-domain for tenant that's going through
+an ingress controller, it's setting up namespace
+for individual tenants, that's just the choice we made here, and then setting up the
+routing to make that work. And you'll see here we're also setting up, each namespace has to
+set up all the routes. The order table is a siloed order table so it needs to be created
+on a per tenant basis. And then the product table gets created and is shared by all tenants. What's here isn't as relevant as like, well, what would it mean now to go write the provisioning
+part of this experience that would do the per tenant provisioning that has to happen here? And how can we at least
+mechanize that enough that if you go write your own, it has whatever it has in this box? You would know where to drop in in SBT to do what you want to do. So let's look at a conceptual view of what at least it does
+right now to make that work. So I get my onboarding request, the app plane receives
+the onboarding event and then here you see this app plane stack that I talked about, we've created this construct,
+this app plane stack that is out there that is
+essentially gonna orchestrate everything that's needed to
+create any per tenant resources that are happening during onboarding. So there's a tenant lifecycle management, the word construct is
+coming out of my mouth every two seconds here because that's what all
+these things are, right? And then, it fires up
+an AWS code build job, it's basically saying, "This is the heavy lifting
+I'm just gonna do for you, I'm gonna get the event,
+I'm gonna create the job and I'm gonna manage the lifecycle, the provisioning of this, no
+matter what it's provisioning." And then it's gonna run
+this provisioning script, nothing exotic at all here. And then, really, it's
+your job, if you just said, "I want my app plane to
+look entirely different than anything you have in your app plane," I could stop right here and say, "I'll go write my own code for this provisioning script right here and I'll fill it in
+and tell it what to do. But at least the event processing, the creation of the job and the spin up and the execution of this and the message back to the control plane would still all be plumbed for you." But in this case, because we know what we're
+doing with this EKS example, we're gonna configure those
+sub-domains you saw earlier in the processing of
+the routing for those, we're gonna go set up the tenant identity as part of this experience, we're gonna provision those namespaces, this is where we're gonna
+set up the manifests and all the other things to do to set up the namespace and the services, and we're gonna provision
+the service account. So when we're all done with this and with the execution of this and we send the message
+back to the control plane, we should have all the resources created that are needed for a tenant. And the good news to me in this model is that if you wanna drop
+in and change some of this, it's findable, it's locatable, it's granular enough that you can decide how and where you wanna
+tweak the experience, and, of course, the event comes back. Now if we look inside
+the CDK view of that, you can see here this is
+this job that I talked about. We spin up this job, this job essentially goes out and says, "I'm gonna manage and orchestrate the execution of the provisioning
+of this infrastructure." And you'll see a reference
+here, the provisioning script that I referenced in the previous slide. And when I run that provisioning script, it essentially goes out, and this is a snippet of
+some of what's going on. You can imagine this file
+is a much bigger file, but here you see the authentication getting set up in the environment, the setting at Cognito and
+the auth and bits of that. You also see the manifest here 'cause we're in EKS, we're using a manifest
+to describe the services and the footprint of the services and how they're gonna get spun up, and this can also include how we're gonna set up the
+routing and those bits. And then also we're setting
+up a service account 'cause we need to set up and
+configure the service account as part of the experience. So it's the code you
+write every day, honestly, I mean, if you didn't see SBT at all, you'd still write some
+version of this code. Ideally though, it's packaged in a way that if you go grab it from us, you see some kind of convention here that helps you more quickly figure out how you might drop in and customize it or configure it or alter
+it to meet your needs. The other piece here of the app plane that gets lost in this is that, again, I've said it's a bi-directional
+sort of integration here between the control
+plane and the app plane. You do have to send events back from the app plane
+to the control plane whether onboarding succeeded or failed, more billing units and billing information that's going back to help
+the billing implementation, figure out how to generate your bill, metering data sent back, log data could be potentially
+sent back here, metrics. So we do what we can on this side to also make it easier for you to publish and send those messages across EventBridge so that you can easily integrate
+them with a control plane. And if you're using one of the out of the
+box billing services, for example, like Moesif
+that I showed you earlier, it'll automatically ingest those events, apply them and you're good to
+go, you have billing working. So how do you customize this experience? What does it really
+mean to customize this? I feel like it's not the
+classic extension model of here's the library, and then
+you just sort of add your bits as an extension of it, it's more like here's
+the whole surface area of a bunch of code, some places you can
+extend through interfaces, other places you're
+going to have to extend by actually dropping in
+and modifying the code. Part of this whole, we're a tool, not a
+product sort of mindset. There are things that are core to SBT that if you wanna continue to use SBT and keep up with new capabilities, that's where you're gonna ask
+yourselves questions about, well, if I'm veering from
+what they've intended, am I not gonna be backwards compatible? That's the probably the
+biggest open question there. But let's say I wanna
+create my own control plane and I've decided, like
+I mentioned earlier, I want my own tenant
+management service here. So here you'll see,
+I've got a control plane that's my own control plane, instead of the default one
+that comes out of the box. And I'm gonna say, well, one of the things
+I wanna construct here is I wanna construct a
+tenant management service, but instead of constructing the default tenant management service, I'm gonna construct my
+tenant management service. We've also talked about
+variations of this, which you could, instead of implementing
+your own tenant service as our own tenant management construct, you could also descend from the existing tenant management construct and just override the attributes or just the attributes
+that you wanna change, it kind of depends on whether
+it's a wholesale replacement or a modification of how it works today. The other thing you'll see here is there's already a tenant
+configuration service, but I'm gonna go add and
+change some of the behavior of the tenant configuration service as part of spinning up this control plane. But then, I'm also going to
+use, oops, it went one too many. The user management service that's here, I'm just using the out of
+the box one that is there, I already think it works fine, I'm fine with how it
+manages and creates users. There's some more things that
+would need to be in this box, but you can't fit 'em all in a slide. But my point is, I'm
+now picking and choosing where I'm bringing in my own code and created my own constructs here, my own tenant management service, altering slightly the
+behavior of other constructs that already exist there by
+changing their configuration, and in other cases, just saying, "No, some of them work just
+fine just the way they are," I compose all those things
+into my own control plane stack and now when I deploy, I get that flavor of
+stack as my control plane. The other thing is here
+on the app plane side, we did this whole talk
+about all these moving parts of how we've created these constructs to make it easier for you
+to have a whole life cycle of what it means to bring
+the app plane to life and integrate it with the control plane. Well, each one of these
+pieces in this puzzle represents a point where
+you could decide to drop in and either replace the
+code or change the code, you know, I could easily
+see people saying, "I've got the serverless SaaS
+implementation out of the box or the EKS solution out of the box, but I don't like this dimension
+of how that's implemented or my app needs a different behavior," and be able to just change something in the provisioning script for example and get the behavior you want. The other thing is just extending the
+SBT environment, right? So, you could, there's a couple of ways to think about extending it, one is just through these interfaces. If you just wanna go introduce
+your own billing construct or you wanna introduce your
+own metering construct, you're absolutely free to do that. If you were interested in
+extensibility of your own, could you introduce your own interfaces? Not super likely that you would do that, but absolutely that's
+another point or an area where you could potentially introduce your own customizations. And then, is this customization or not? I don't know, but you could go write your
+own control plane, right? You could say I'm gonna replace
+the entire control plane, I'm gonna write it all, I'm gonna build a
+containerized version of it and use different solutions that are the control plane I want, but I'm still gonna comply
+with the interface model that exists for integrating
+with the application plane and I'm gonna use one of the
+existing application planes. To me, that's still
+some form extensibility in that you're still
+leveraging the interface between the control plane and app plane to make your control plane fit
+into the overall experience. And then, the other one here is just bringing your own
+app plane to this, right? I think in most cases people are going to either customize one of the existing app planes that we provide as a starting point or they're just gonna go say
+write their own from scratch. But what we're gonna see
+here, even from my team, is you're gonna see
+more and more app planes being added to SBT, because we can add them
+quicker because of this model, there are lots of app planes
+that we, account per tenant, we've talked about account
+per tenant forever, VPC per tenant, we've
+talked about those forever, but we don't have really good examples for you to go and grab. Well, now if we just implement that model inside the app plane and then we bring in
+all the other goodness of the control plane that's already there, we can give you kind of
+an end-to-end solution without writing as much code. I actually think I did
+a talk on Monday also about cell-based architecture and this emerging sort of use
+of cell-based architecture. I won't dig into what that
+means a whole lot here, but I can absolutely see
+us building an app plane that uses cell-based architecture here. And then, this last notion, SaaS anywhere, which is this idea of, what if I have remote
+resources in my app plane? Suppose my app plane runs mostly in the SaaS provider account, but the storage has to run
+in the customer's account. We're seeing more and
+more of that show up, especially in the generative AI space. Well, I could still go
+build an example of that or go build my own app plane that had some implementation
+of, what does it mean to have part of my app
+running in the app plane that I control and part of
+it interacting with resources that are running remotely? So these are nothing about that, we could do all of that without SBT. The overarching story is though that you could bite off these new models, you could attempt these new models ideally without having to reinvent the entire surface area
+of your SaaS environment. I did say I would share the
+URL for this with all of you. So if you are interested in
+going and grabbing a look at it, we are very much interested
+in getting feedback on, you know, is this product, we've had tons of partners
+who are building with it now and people who are doing modernization and transformation for businesses, who are grabbing this and using
+it as their starting point. And I really think its future
+is very much dependent on kind of how or where we
+see more opportunities to bring greater extensibility to it. But we're always gonna do that without trying to make it so complex that you can't drop in and get moving and doing the things that are valid for your particular environment. Now a few takeaways here, I think it should be super clear from what we talked about here that there's not like one
+journey for how to use SBT. It isn't, oh, everybody gets SBT, everybody goes and
+installs a control plane, everybody picks and chooses
+and installs their app plane and pulls in whatever libraries they need, whenever they're implementing, and that will be everybody's journey. I definitely think the value here is I just want the control plane or I just want the app plane, I'm gonna bring my own control plane or I just want these particular libraries. It's the picking and
+choosing of all of that and the option to grab things
+and use them as you need it, that I think is super valuable. I honestly think though that also we've just had a lot of people say, "Can you just give us a control plane?" And I also think that, for some people, that will be the best starting point and they'll just grab the control plane and use it as the foundation of, "This is what a control plane looks like," 'cause we talked to a lot of
+organizations about saying, "Even if the same team is building the control and the app plane, you should still treat the control plane as a separate product," there are important differences between deciding what's
+happening in the control plane, what's happening in the app plane and how those sides
+are revised and updated over the lifecycle of your solution. And having that boundary between those two ends up being super valuable for a lot of the
+organizations we work with. So for me, even seeing that
+interface that you see today between the control and the app plane ends up driving that behavior and getting you to
+think about those things as being different bits. The bit I beat to death already,
+I think it's pretty clear, hopefully you see from the CDK experience and you see the way
+that you're dropping in and this is an editor-based experience and that you have to have a think about, what are the constructs I'm using? How can I configure the constructs? All those other moving parts, that is the power and the value of SBT. And as we mature it, you'll see more and more
+things being CLI driven and we're less and less
+about trying to put some kind of UI around
+all this and treat it like it's some kind of finished product that has an install and a
+point and click experience. If you don't like CDK, you probably won't like
+SaaS Builder Toolkit a ton. We've absolutely, you think you could write a
+Terraform version of this, it would be awesome, it's just spinning a Terraform version and a CDK version and another version, that's a pretty big lift, but it's not that one's
+better than the other, as much as we kind of had to go all in with one of these approaches, and a whole lot of the
+goodness that to me is in SBT is buried in what we can do with the CDK. I would absolutely love
+to see us almost exist as a separate CDK library to some extent 'cause I think that's
+a lot of what SBT is, but there's more to it than that 'cause you still have to know like, what are the overarching
+things you're trying to achieve with your broader SaaS application? And then, like I said, pick and choose the things, the components best fit your application. And then, finally,
+like, help us grow this, help us figure out where it
+needs to go, give us feedback. Send an email to me if you want, my email address is at the end of this. Do whatever you want, but I would get out there and experiment. There was a workshop for SBT
+also at re:Invent this year, so you can go, if you wanna just go and do some really simple hands-on thing that'll kind of take you through
+setting it up and deploying and creating a control plane
+and doing all those steps. And I'm not gonna show
+all these 'cause I think almost all of them have
+happened now. (laughs) And then, I will wrap here. I really appreciate you getting here, I sort of rushed through
+the code bits of this just 'cause I didn't want it to be sort of an eye strain
+moment of trying to like, sort through a whole bunch
+of code on the screen. But hopefully by digging
+in a little bit here and just giving you a sense of what's happening
+under the hood of this, you can get a better feel for what it is we're trying to achieve with this and how you can use it when you get back home and you decide, I wanna just poke in here
+and see what's going on. So other than that, I really hope the rest of
+your re:Invent is awesome, and I appreciate you showing
+up today and have a good day. (audience applauding)

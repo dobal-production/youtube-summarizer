@@ -1,0 +1,310 @@
+- All right. Hi, everyone. Welcome to our AIM211 re:Invent session on accelerating content
+production with generative AI featuring the NFL. I am Jessie Fry. I am a Principal Worldwide
+Amazon Q Specialist, and I focus specifically
+on Amazon Q Business. Presenting with me? - I'm Eric Peters. I'm the Director of Asset
+Management & Post-Production with NFL Media. - Fantastic, looking forward to this. All right, so before we get started, I actually wanted to get a bit of a sense of where you are all at with regards to your
+generative AI journey. So with a show of hands, you know, I'm just gonna ask you
+a handful of questions. You're welcome to participate or not. How many of you are actually
+leveraging generative AI in your day-to-day job today
+or even in your personal life? Oh wow. Impressive. And the second question is, how many of you have actually
+implemented generative AI or a generative AI solution within your organizations this year? Fantastic, wow. And last but not least,
+a little bit left field, but how many of you actually
+watch Thursday night football? And for those of you who come
+from overseas, don't worry, or, you know, there's no
+right or wrong answer. But just wanted to kind of
+contextualize a little bit the fandom that is before me. Fantastic, okay. Ooh, I got a so, so? Depends on the game. Okay, fantastic. All right, well, all these
+questions really encapsulate, you know, what we're
+gonna be covering today. So thank you so much for participating. Speaking of which, wanted to walk you through
+the agenda very briefly. I'm gonna start off by giving
+you an overview of Amazon Q, what the ecosystem looks like, and then we'll double
+click on Amazon Q Business. I will then hand over to Eric who's gonna walk you through
+the NFL's problem statement as well as how Amazon Q was identified as the right solution, and we'll dive deep into that solution. We'll then walk through
+the proof of concept and how we ended up testing Amazon Q, what our lessons learned were, what worked, what didn't work, but also how were we able to articulate the impact of Amazon Q Business in the context of, of course,
+the NFL's problem statement. We'll then start wrapping up the session with some key takeaways so that you can really
+walk away from this session with all the knowledge that you need to be able to get out there and, you know, embark on your own
+Amazon Q Business journey and do so successfully, of course. And last but not least, we'll discover what's next
+between the NFL and Amazon Q. All right, let's get started. So as some of you know, we've actually launched
+Amazon Q in preview at re:Invent last year, making it generally available with some pretty game-changing
+features as of April, 2024, so April of this year. So what is Amazon Q? Well, Amazon Q includes
+a suite of products that are tailored to, you know, different personas and use cases. First up we've got Amazon Q Business. Now, Amazon Q Business is a
+generative AI-powered assistant that can answer questions. It can also provide
+summaries, generate content, and complete tasks based
+on the data and information in your enterprise systems. We also have Amazon Q Developer, and as the title suggests, it uses generative AI technology to accelerate your software
+development lifecycle at scale. We of course have Amazon Q in QuickSight. Now, Amazon Q in QuickSight enhances business productivity
+using generative BI, so generative business
+intelligence capabilities, to accelerate decision making. And of course we have Amazon Q in Connect. Now, Amazon Q in Connect
+uses generative AI to deliver agent-suggested responses as well as actions to
+address customer questions and of course aiming to
+provide faster issue resolution and improve customer
+satisfaction at scale. I promise this is the last one. We also have Amazon Q in AWS Supply Chain. This unifies data and of course provides
+ML-powered actionable insights, building contextual collaboration
+and demand planning. So as I've mentioned, we're gonna focus a lot
+of our time and attention on Amazon Q Business today
+for this particular session. So let's just have a quick overview of Amazon Q Business's top capabilities. First up, Amazon Q Business actually delivers quick,
+accurate, and relevant answers to your business questions
+securely and privately. That is because Amazon Q Business actually quickly connects to
+your business data information and of course systems, and that enables, in turns, to allow your employees to
+have tailored conversations but also lets them solve
+problems, generate content, and take actions relevant
+to your business. Now, Amazon Q Business also respects existing access controls based on end user permissions, and that is because Amazon Q is built to be secure and private. It can understand in respect your existing
+identities, roles, and permissions. What that essentially means is that if a user doesn't have access to a particular data point outside of Q, they will not have access
+to it within Q either. Now, Amazon Q also offers
+40 plus built-in connectors, and that is to popular
+enterprise applications as well as document repositories. Now, that includes S3, you
+know, Google Drive, Salesforce, Microsoft 365, ServiceNow, Slack, Zendesk, just to name a few. And that allows you, in turn, to bring actionable
+insights to your employees really in one unified experience. Now, it also allows your administrators to apply guardrails to
+customize and control responses. So that's really ensuring that the instance of Q that you deploy reflects your company's voice but also adheres to the ethical standards that have been set by your leadership. Now, last but certainly not least, with Amazon Q Business you're
+able to streamline daily tasks with user-created
+lightweight applications. That's truly powerful because now you're able to unlock the power of seamless productivity by enabling your employees to essentially create secure and highly customized applications that are tailored to your unique data but as well as your business needs. All right, so now that we understand, you know, what Amazon Q is and of course, you know,
+where it sits in the ecosystem and what the core strengths are, I wanted to take a look
+at some of the use cases where we've seen Amazon
+Q truly shine this year and also help further contextualize the art of the possible
+with this technology. So, first up, we have
+customer and IT support. Here, the implementation of
+Amazon Q is actually twofold. The first one is that you're
+able to provide your end users with a generative AI chatbot system that helps them help themselves. Essentially, they're able to self-serve and resolve IT issues by themselves, mitigating the number of net new, you know, IT tickets are created. This, in turn, really helps, you know, letting your IT help desk staff focus on bigger, larger,
+more complex problems. On the flip side of that, we also see Amazon Q being implemented within the IT help desk support staff, where they're able to leverage Q to allow them to solve
+tickets much more quickly. And that is done by giving them access to past resolved tickets very
+quickly and interactively, but also giving them access to complex technical documentations, you know, in a few click. Now, the next stop I wanted to talk about was risk and compliance. Now, this use case is
+very similar in nature to that of the previous one, but here you're essentially
+giving your employees a generative AI chatbot assistant that is trained on compliance
+data or documentation, allowing your employees to access the latest and greatest
+within risk and compliance in one unified experience. Now, we actually also have
+knowledge management assistant. Now, this is pretty impactful because it has been
+ground zero of a use case for a lot of our customers, especially the larger enterprises. And that is because our
+customers in those areas want to centralize management and increase knowledge sharing and knowledge retrieval quality whilst reducing the time
+and effort that is required to either resolve an issue or get ramped up to a, you know, net new task or net new technology. We also have of course human resources, another popular use case. It's really allowing your end users in the human resources department to optimize end-to-end processes. And here we have customers like Deriv who are using Amazon Q to
+do things like creating, you know, net new job
+descriptions and job postings all the way through to
+customized onboarding plans for their new hires. And this is helping them expedite the end-to-end, you know, process across their HR, you
+know, day-to-day life, but also allowing their end users and their net new hires to find pertinent information
+much more quickly. All right, we also have,
+last but not least, the operations space. So the operations space
+tends to take a, you know, the use case tends take a
+couple of different meanings depending on where you're
+sitting in the organization. So when we look at industries like the financial
+institutions, for instance, they tend to find the operations team and have Amazon Q at the
+epicenter of that operations team where they're using Q
+to maintain, you know, existing processes and
+keeping them up-to-date but also understanding how these processes are
+actually performing. But if you're in the manufacturing
+and engineering space, you are getting your operations
+team on the shop floor to use Amazon Q to query highly complex technical documentation to help resolve supply chain issues, all the way through to
+training net new hires. All right. So now that I feel we have a
+good baseline understanding of Amazon Q Business and Amazon Q overall and, you know, where it truly shines, I'm gonna hand over to Eric who's gonna walk you through the problem statement for the NFL and our journey together
+implementing it within the NFL. Thank you. - Thanks, Jessie. So before we get into the
+solution that we put together, I'd like to give just a brief
+look at NFL Media at a glance. Ultimately, we are, obviously,
+a powerhouse of a brand. Everybody knows the NFL. NFL Media encompasses NFL Network, which was started in 2003, and has grown to include such
+things as RedZone and NFL+ and many other platforms that
+everyone knows and loves. Within that ecosystem, we have over 250 content
+creators and production staff that are working tirelessly to bring everyone all of that content that everybody loves to
+consume on a daily basis, especially after game day. So we have a threefold problem here. The first problem that we have
+is just with our staffing. We have hundreds of staff, and many of those people
+are hired seasonally. And while many of them do roll on toward the beginning of the season and roll off after the season, it's never fully like that. So there's a lot of training that goes into training our workforce. Traditionally, we've given three to five hours worth of
+onboarding training each year to go through workflows and
+policies and procedures. The, you know, "How do I do
+this within the facility, "how do I do that? "How do I get this file to this place?" That sort of thing. And because we're a large facility and we are a live production facility, we have hundreds of complex workflows. And these workflows are always changing, and we have new use cases that come up, and our task is to ultimately make sure that our entire workforce is capable of working
+within those workflows and able to get the
+answers to their questions on how to do things
+quickly and efficiently. And, ultimately, if our users are not able to execute what they need to in the timeframe that they need to, then airtime is at risk. Because if my piece that I've edited isn't able to make air
+when it's supposed to and it's delayed, then it could be too late. Because with the news cycle as it is, you know, tomorrow's too
+late for today's content. So if we take a look here
+at the pre-Q Business world that we were living in, I like to think of this
+as a many-tentacled beast that content creators have for how they can actually get a solution to a technical question. You know, they might be
+asking a question like, "What are the delivery specs "to deliver a file to our
+master control for air?" Or it could be as simple as, you know, someone that's working on a Sunday that wants to watch RedZone
+while they're working and they need to know what channel to tune into on our internal TV system in order to watch RedZone. So there are lots of paths
+that you can see here for how to get to an answer, but that doesn't necessarily mean that all of those are good paths. One of the paths that I
+have up there is guess. You would be amazed at
+the number of people that will just, you know, sort of like throw out a guess as to how to do something, expecting that that is going to be, you know, an efficient way
+of getting things done. It is not. So in the best of conditions,
+using these workflows, you know, maybe people can find an answer within five minutes, but, sometimes, especially if maybe you go down the wrong path initially or you are on an email chain
+that maybe goes unresponded because, you know, it's on
+a Friday going into Saturday and nobody responds, you know, it could take 24
+hours, sometimes even longer, to actually get the answer back. And, ultimately, you're
+never fully guaranteed that you're going to get the
+correct answer to your question going down any of these given paths. So what do we do? We started looking at generative AI as a way that we could
+streamline users' ability to find answers, evaluating multiple
+available tools on the market to see what might be a fit
+for us in this capacity. So we're looking,
+ultimately, for a solution that allows for us to have a single trusted source
+of data for all queries, and we need a tool that's going to allow the content creators to spend more time in the creative space and less time in the minutiae of the technical part of their job. So let's make the technical
+part the easy part. Let's get it out of the way. So about a year and a half ago at a GenAI Day hosted
+by AWS for the league, we met Jessie for the first time, and she started telling us
+about Amazon Q Business. And we said, "Hey, maybe maybe
+this Q thing is an option "and it sort of solves this
+problem that we're looking at." So we started on this journey of what turned out to be
+about a three month POC. And, you know, I think as
+we sort of dove into this, there's really a lot to love about Q. The fact that it's a turnkey,
+fully managed solution, it's a huge plus when you
+work on a team like I do where it's a very small team, we don't have developers that can set up a complex solution and maintain that complex solution. You know, obviously, as I said, we looked at some other options for how we could potentially do this, and, you know, there are lots of solutions that have a great playground
+where you can, you know, throw some documents in and test it out. But then you look at how it actually would
+scale into production, and that playground goes away. You're now building. And again, small team, we don't really have the
+resources to be able to build. I think the next thing that's really great is there are a lot of data connectors. So if you have a data source
+within your organization that you want to harness, chances are Q Business can
+probably help you out with that. It is very, very easy to deploy, and I will sort of hammer
+this point couple times here. Because within about five to 10 minutes of the first time that I tried to deploy a Q Business app on my own, it was in sort of the lead-up to a call with Jessie and her team in which we were supposed
+to be talking about how do we deploy a Q app to start testing. So imagine Jessie's surprise
+when we jump on a call and I say, "Hey, look at
+this cool app that I built." And it really is that easy. I mean, you know, you can
+click through pretty quickly to get to a version of a Q app that lets you start iterating on testing. And I think the last point is also a very valid
+one, of security, right? Inside a larger organization, one of the biggest roadblocks
+is always gonna be security. And the fact that all of
+this is built on top of AWS, which is something that our InfoSec team is already familiar with, already sort of comfortable with what the security measures are, it made for an easier conversation for getting this ultimately deployed. So we went about going into this POC and started testing our first app. And not only did I build the
+first app very, very quickly, at some point on a call
+with Jessie and her team, there was an idea thrown out of, "Well, we really should
+try to rebuild this app "to see if we can solve this
+issue that we're facing." And I said, "Okay, that sounds great. "I'll do that a little bit later." And they said, "Well, we
+can do it really quick. "You've said that we
+can do this very quick." I said, "Yeah, but I've
+just been to the eye doctor, "my eyes are dilated, I cannot
+see the computer screen." I could see the computer screen. I saw like four versions
+of the computer screen. And still we decided to push ahead, and I still was able to deploy
+this very, very quickly, even barely being able to see. So I just like to hammer
+home this point of, you know, it's so easy to spin up an app. We started out with a
+single S3 data source, and we very quickly moved on from that into two S3 data sources so that we could start playing
+around with relevance tuning. Most of the documentation that
+we were initially focused on was falling into one of two categories. It was either NFL-authored documentation that was technical information that was specific to our
+business inside our facility, and then there were vendor documents, things like user manuals,
+the Premiere Pro user manual, things like that, that,
+yes, it's a great resource, yes, it's written by the
+company that wrote the software, but it doesn't necessarily always apply to the things that we're doing
+inside of our organization. So with that relevance tuning, we could start to play around so that we could sort
+of push up the relevance of the documents that we had authored that were specific to our organization. We were also constantly testing
+different configurations. So I think at one point I had
+as many as probably five apps that were running side by side, and I would just do constant A/B testing. They each were set up in slightly different
+configurations so that, you know, I could just very
+quickly test things out, and then I'd say, "Hey,
+this one's not really doing "what I'd like it to." So delete it, start over,
+spin up a new app maybe. But it made it really, really easy for us to do a lot of A/B testing just
+between app configurations. Another big piece of our POC was realizing that we needed to rewrite
+a lot of our existing data. So most of our old documentation was like what you see up
+in the upper-right corner, lots of people are probably
+familiar with this, lots of big screenshots,
+lots of red bounding boxes, you know, not necessarily
+telling you to click somewhere or look somewhere, but just drawing your eye to the place where you should be looking. And the text in lots of
+cases was very sparse. So what we determined that we needed to do was we spent several
+days doing a deep dive, rewriting a majority of our documentation in much more verbose text. We also used that as an opportunity to update some of our documentation that was a little out-of-date. And all in all, doing this data refinement led to probably about
+a 20% jump in accuracy over the course of the POC. So now we have figured out what
+we need to do with our data, but now it becomes this question of, how do we sort our data? We ended up with six data
+sources in total, as you can see. The NFL data source, kind
+of talked about already. Those are all the NFL-authored documents. There was a small admin data source that had documents that were specifically protected by ACLs so that it was only available
+to a select group of people. And then we had this
+playground data source. The playground was
+somewhere that, you know, I sort of used throughout our testing as a place where I don't really
+know if this is a document that makes sense to put in Q Business, but we'd throw it in, we'd re-index, we'd ask some questions, test it out, and then it, at that point,
+went one of two places. It either got sorted into
+an appropriate data source or we threw it out and said, "This isn't really
+what we want it to do." But having that playground data source is sort of like having you know, your own sort
+of staging environment where you can just quickly test things and then pull it back out. We're doing a web crawl of nfl.com. And then we also have
+this temp data source. So it's an S3 bucket that
+has lifecycle policy on it. And these are for documents
+that we only need to reference for a very, very short period of time. So in the off-season, our facility, which is right next to SoFi Stadium, sometimes SoFi Stadium will have like a music
+event, that sort of thing, where they use all the
+parking lots for these events. So our security team
+will send out a bulletin that has ingress and egress
+information for employees. It might say what the hours
+of operation of this event is, that sort of thing. That document's really only relevant maybe a week before the
+event until up to the event, maybe a little bit after. But after that it's not important anymore. It's never gonna be accessed again. So this temp data source
+has a lifecycle on it so that it's automatically
+dumping documents out as they become irrelevant, and there's an automatic indexing that's happening on a regular schedule so that we're always indexed with the most current
+documentation in that data source. So once it came time to test our solution, we've already reworked our data, and we've decided how we think we want to set up our data sources. It came time to create
+a test set of questions. So I created a set of a
+hundred questions and answers, put this into an Excel spreadsheet, and then also set up four different Bedrock
+Knowledge Bases solutions, all using different LLMs so that I had a way of doing A/B testing across a couple different
+variations of this RAG solution. Ultimately, the solution... The answer to the
+questions got categorized into one of four categories
+on the spreadsheet. It was either correct, and that's good, it was partially correct or
+incomplete in its information, it was just flat out wrong, or there was no answer provided. And this was all still
+kind of happening pre-GA. So we were on regular sync
+calls with Jessie and her team, and I would provide her with, "Here are the results of the
+latest round of testing." She and her team would go off and diagnose what was going
+on with some of the questions that, you know, seemed like they should have gotten
+answers but didn't. I would go through the questions and say, "Okay, on this one, you know, "maybe I need to rework our
+documentation a little bit "because it's not quite clear enough." And so we kind of iterated
+through this process a few times, continued testing, and at the same time, under the hood, again, fully managed service so there was a model update that happened, and that alone led to
+an 8% jump in accuracy. By the end of the POC, we had jumped from a
+little under 70% accuracy to about 93%. And at that point we decided
+that this was a solution that was good for us to
+move into production. So our production app, like any
+good app, has to get a name. So we nicknamed this The Duke after the official NFL football. This was rolled out in August of 2024, right before the start of the season. As I mentioned, we're spread
+across six data sources. That structure remains the
+same in our production app. We currently have about 300 users that are registered to
+be able to use this, and it is getting daily use by our production teams
+and content creators. And I can tell you that, you know, lots of the questions that
+would come in on a regular basis were coming in through a Slack channel that we had set up for our facility. That Slack channel is no longer getting these sorts of technical
+operations questions that we were intending to solve. So if we look at, you know, the words from a couple
+of our production folks. We have Kallyn who's a producer
+on our digital platforms, who noted that her team's now able to get answers to questions in a minute where it used to take
+sometimes up to a day. And if you have seen any of
+the highlights on our network, maybe you saw highlights from last night's very,
+very snowy Buffalo game or you saw the close call
+for the Chiefs on Friday, Zach and his team are responsible for creating those highlights. And he's noted that, you know, having The Duke in his team's hands lets them spend more time
+putting together those highlights and less time trying to
+figure out the answers. So they've both recognized that
+there's a lot of value here and that there's a lot of
+time that's being saved by having this to use. So at this point, you know, the impact is kind of undeniable. What once took five
+minutes to maybe 24 hours, you can now get an answer
+at the snap of your fingers, you know, 10 seconds, maybe 20 seconds. We're now doing a single hour of training for our production team at
+the beginning of the season instead of the three to five hours that we may have done in the past. And all of our data is distilled down into a single source of
+knowledge within The Duke. So at this point I'd like to
+just walk through a quick demo of what The Duke is now capable of. Maybe. Ah, there we go. So, you know, it can still do the technical operations questions, you know, "What's the format of a file "that I need to deliver
+to our master control?" As originally intended. We also have made it so that all of the
+documents that are in S3 are available to all of our users. So if they wanna reference
+it directly, they can. But now it can do a lot more. So we're indexing the
+player pronunciation guides that come out at the
+beginning of every season. So if you're not sure how to pronounce someone's name, like you can get the answer very quickly. Or if you want to get the season schedule for the Seahawks, you know, you can ask it. And because of the fact
+that it's crawling nfl.com, there are also a couple other NFL-authored data sources in there that have a lot of schedule information. You can get that information, and if you need it as a bulleted list, then you can just ask it to reformat it. And now you've got this bulleted list. And if you can imagine
+doing this with maybe, you know, more internal documentation, obviously, InfoSec, pretty happy that this is self-contained. And if, like me, you are
+still a little confused about the new kickoff
+rules for this season, it can also answer that question for you. - One of the things that I think is also pertinent to note is you're able to provide feedback, so you see the thumbs up, thumbs down. So as an end user you
+can provide feedback. Every single annotation that
+you're seeing on the screen, like the ones and the twos and the threes, they're actually telling you where the citation
+comes from in documents. You can double click and dive deeper into that documentation, and you can further dive into the sources and provide feedback. We have some pretty cool announcements coming up in the next few days that will give you a
+little bit more insights into how that feedback will
+be processed in the backend for administrators to be able
+to fundamentally understand, you know, where the return on investment really happens for customers or for you as an implementer. But I thought this might
+be worthwhile mentioning. - So if we take a look at the architecture that we're using today, we've certainly grown
+up from the pre-GA world that we were living in where we started with one S3 data source then moved on to two. So we have an organization
+instance of Identity Center that allows our users to
+authenticate using Okta. So we are authenticating
+with the same method that we are using across
+every other app and website within our organization, which makes security very happy. Our six data sources are all connected to CloudFront distributions so that our users within our VPN are able to access
+those documents directly and download them if they need to. And our admins are able
+to monitor analytics using the analytics
+dashboard within the console. Now, one area where we found ourselves spending more time, I think, than was probably expected
+was in user training. So within the first month, we onboarded 200 plus employees. And in training sessions
+we would ask our users, "Okay, who has experience with LLMs?" And you'd get a couple
+very tentative hands. And we'd say, "Okay, how many of you "know what ChatGPT is?" And we'd get a few more hands. "How many of you use ChatGPT?" Maybe a couple more hands. But I think ultimately what we found is that many of our end users, which ultimately like, you know, our users kind of skew on the younger side for the most part, they were not nearly as aware of LLMs and a lot of this technology
+as what we maybe expected. I think we assumed that
+everyone was using this sort of on the side. Certainly not the case. So we spent a lot of time teaching them good prompting techniques. But once we gave them some training, this was quickly adopted as a go-to for them to get all the
+answers that they needed for their technical questions. Ultimately, this brings down the time to answer to under a minute, and it lets us hit that goal of keeping the content creators in the creative space for longer and less distracted by the minutiae of trying to figure out the process. So if we look at the
+key takeaways overall. Again, I'm gonna come back
+to this, it's easy to deploy. It's so easy that I have
+been challenged to do this blindfolded and one hand
+tied behind my back. - [Jessie] I mean, if he can
+do it with his eyes dilated, I think that's a fair ask. And I did, I challenged him to that. I'm still waiting. - One day.
+(Jessie laughs) You're able to start really
+small, you can experiment, and then you can scale
+quickly when you're ready. You don't need to have
+perfect data to get started. You can start experimenting, you can plug in what you have, see if you're headed
+in the right direction, see if you want to try
+and refine your data or see if, you know, some data just isn't the right
+fit for this solution. But ultimately you shouldn't be afraid to rework your data. It seems like a lot of work to do upfront, but it can certainly pay
+dividends down the road. And there's really no
+one-size-fits-all approach to how you set up your data sources. As you saw, we started with
+one, we moved on to two, and then we ended up with six. We've experimented with a few more, but, you know, for now, six is sort of that
+comfortable space for us. Might not be the same for anyone else. And the most important
+thing to remember is, as the saying goes, your tools are only as
+good as your craftsmen. So make sure that you invest the time in training your workforce to be able to use the tools appropriately for the solution that you've provided. So you might be wondering, what comes next for The Duke? It's a great question. We're always looking for
+additional stakeholders within our organization to add new use cases within our current existing app, The Duke. And we're working with multiple internal business
+units in that regard. There are other business units that say, "Hey, this seems like a great solution, "but we don't want to have an app "that's tied to what you're doing." So they're experimenting on their own. I think we're also hoping that one day The Duke can be combined with our Bedrock project, Playbook Pro, which if any of you were in the session earlier this morning, you may have seen that. But putting everything into a unified UI where our users can access everything all under one roof would also be something that we're looking to do in the future. And we're very excited to be exploring some of the new features that you guys are gonna be hearing about throughout the week. - Fantastic, okay. Well, this marks the end of our session. Now, we will be available
+for questions after this. We want to leave enough time to make sure that we could ask questions. We'll be outside waiting for
+you guys if you have any. We've also put in our
+LinkedIn, respectively, if you wanna stay in touch or ask questions that
+you hadn't thought of after this session. And of course we would
+love to get your feedback, you know, understanding
+whether we could improve and, you know, what's
+worked really well for you. So please do complete the survey. We will take five stars and up of course. And in the meantime, I know it's Monday, it's lunchtime, I'm sure, for some of you. So I hope you have a wonderful re:Invent. Don't overdo it and stay hydrated. Thank you very much, take care. - [Eric] Thank you.
+(audience applauds)

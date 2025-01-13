@@ -1,3 +1,137 @@
 - "video_id": "csvPepC6tKk"
   "title": "AWS re:Invent 2024 - An insider\u2019s look into architecture choices\
     \ for Amazon DynamoDB (DAT419)"
+- "video_id": "7YOy4fngycY"
+  "title": "AWS re:Invent 2024 - Building resilient applications on AWS with Capital\
+    \ One (ARC334)"
+- "video_id": "wnBzSpFyvYM"
+  "title": "AWS re:Invent 2024 - Think big, build small: When to scale and when to\
+    \ simplify (ARC331)"
+- "video_id": "ZOQwxxgvKJs"
+  "title": "AWS re:Invent 2024 - Right-sizing your application services: Rethinking\
+    \ microservices (ARC324)"
+- "video_id": "OkT12t-fvRE"
+  "title": "AWS re:Invent 2024 - Learn to create a robust, easy-to-scale architecture\
+    \ with cells (ARC335)"
+- "video_id": "AzUG7GOfh7w"
+  "title": "AWS re:Invent 2024 - Scaling on AWS for the first 10 million users (ARC201)"
+- "video_id": "PAr1DY82ymE"
+  "title": "AWS re:Invent 2024 - Anatomy of an AWS Region (ARC204)"
+- "video_id": "BiAcK5wI6fQ"
+  "title": "AWS re:Invent 2024 - Leveraging human-AI collaboration to reinvent knowledge\
+    \ management (ARC205)"
+- "video_id": "Ru_FWuZXPJI"
+  "title": "AWS re:Invent 2024 - Architectural best practices throughout the lifecycle\
+    \ (ARC206)"
+- "video_id": "RaFx-4qrsJk"
+  "title": "AWS re:Invent 2024 - The incident is over: Now what? (ARC207)"
+- "video_id": "xRTBxufndZo"
+  "title": "AWS re:Invent 2024 - Navigating the journey to becoming a cloud solutions\
+    \ architect (ARC211)"
+- "video_id": "jZsoQ4qs1bM"
+  "title": "AWS re:Invent 2024 - Scaling Prime Video for peak NFL streaming on AWS\
+    \ (ARC311)"
+- "video_id": "CbkqQznZS9Y"
+  "title": "AWS re:Invent 2024 - Best practices for creating multi-Region architectures\
+    \ on AWS (ARC323)"
+- "video_id": "J_y4-haLf8s"
+  "title": "AWS re:Invent 2024 - The ideal micro-frontends platform (ARC325)"
+- "video_id": "MjPRd_UWCS0"
+  "title": "AWS re:Invent 2024 - Chaos engineering: A proactive approach to system\
+    \ resilience (ARC326)"
+- "video_id": "kWpGMnkBhMI"
+  "title": "AWS re:Invent 2024 - Mastering resilience at every layer of the cake (ARC327)"
+- "video_id": "q0McaAp0iGY"
+  "title": "AWS re:Invent 2024 - How Amazon.com uses AWS Regions to improve customer\
+    \ experience (ARC328)"
+- "video_id": "c2ekr1Us51s"
+  "title": "AWS re:Invent 2024 - Failing without flailing: Lessons we learned at AWS\
+    \ the hard way (ARC333)"
+- "video_id": "rvHd4Y76-fs"
+  "title": "AWS re:Invent 2024 - Try again: The tools and techniques behind resilient\
+    \ systems (ARC403)"
+- "video_id": "_wwu0VKy3w4"
+  "title": "AWS re:Invent 2024 - The future of Kubernetes on AWS (KUB201)"
+- "video_id": "a_aDPo9oTMo"
+  "title": "AWS re:Invent 2024 - Automate your entire Kubernetes cluster with Amazon\
+    \ EKS Auto Mode (KUB204-NEW)"
+- "video_id": "ZxC7SkemxvU"
+  "title": "AWS re:Invent 2024 - Bring the power of Amazon EKS to your on-premises\
+    \ applications (KUB205-NEW)"
+- "video_id": "WkPrmHKZsq4"
+  "title": "AWS re:Invent 2024 - How to build scalable platforms with Amazon EKS (KUB301)"
+- "video_id": "QMzor8haEOM"
+  "title": "AWS re:Invent 2024 - Amazon EKS for edge and hybrid use cases (KUB310)"
+- "video_id": "JwzP8I8tdaY"
+  "title": "AWS re:Invent 2024 - Simplify Kubernetes workloads with Karpenter & Amazon\
+    \ EKS Auto Mode (KUB312)"
+- "video_id": "25tRVE2xq1I"
+  "title": "AWS re:Invent 2024 - High-performance generative AI on Amazon EKS (KUB314)"
+- "video_id": "yuXF-NXaelI"
+  "title": "AWS re:Invent 2024 - Securing Kubernetes workloads in Amazon EKS (KUB315)"
+- "video_id": "g9USwIPr7Xs"
+  "title": "AWS re:Invent 2024 - Building production-grade resilient architectures\
+    \ with Amazon EKS (KUB404)"
+- "video_id": "AAwa5gc1XNA"
+  "title": "AWS re:Invent 2024 - Amazon EKS as data platform for analytics (KUB405)"
+- "video_id": "8fes5sP0rs0"
+  "title": "AWS re:Invent 2024 - Networking strategies for Kubernetes (KUB406)"
+- "video_id": "A93camZSpLc"
+  "title": "AWS re:Invent 2024 - SaaS architecture pitfalls: Lessons from the field\
+    \ (SAS305)"
+- "video_id": "rIyvHoIK-V4"
+  "title": "AWS re:Invent 2024 - SaaS storage strategies: Scaling, securing & tuning\
+    \ multi-tenant data (SAS306)"
+- "video_id": "r-5sgMrm45c"
+  "title": "AWS re:Invent 2024 - Supporting federated identity in multi-tenant environments\
+    \ (SAS307)"
+- "video_id": "wYm_PJc2U8c"
+  "title": "AWS re:Invent 2024 - SaaS meets cell-based architecture: A natural multi-tenant\
+    \ fit (SAS315)"
+- "video_id": "gDFK3oBRICw"
+  "title": "AWS re:Invent 2024 - Accelerating multi-tenant development with the SaaS\
+    \ Builder Toolkit (SAS406)"
+- "video_id": "hq3h5HNIBPE"
+  "title": "AWS re:Invent 2024 - Generative AI meets multi-tenancy: Inside a working\
+    \ solution (SAS407)"
+- "video_id": "lzuLhp1UF4Q"
+  "title": "AWS re:Invent 2024 - Maximize business impact with Amazon Q Apps: The\
+    \ Volkswagen AI journey (AIM201)"
+- "video_id": "1ygxKw1xUf8"
+  "title": "AWS re:Invent 2024 - Migrating to Amazon Bedrock and accelerating gen\
+    \ AI app development (AIM203)"
+- "video_id": "SCXw2xuoF6o"
+  "title": "AWS re:Invent 2024 - Responsible AI: From theory to practice with AWS\
+    \ (AIM210)"
+- "video_id": "G2kLlSQhp90"
+  "title": "AWS re:Invent 2024 - Accelerating content production with generative AI,\
+    \ featuring the NFL (AIM211)"
+- "video_id": "9w0klemREMw"
+  "title": "AWS re:Invent 2024 - Boost employee productivity with Amazon Q Business\
+    \ (AIM213)"
+- "video_id": "tGibMJj9Mqw"
+  "title": "AWS re:Invent 2024 - Boost productivity and empower revenue teams with\
+    \ generative AI (AIM214)"
+- "video_id": "l4-rYzAm3JI"
+  "title": "AWS re:Invent 2024 - AWS App Studio: The fastest and easiest way to build\
+    \ applications (AIM218)"
+- "video_id": "3m5SuekEgHw"
+  "title": "AWS re:Invent 2024 - Accelerate innovation with generative AI and no-code\
+    \ machine learning (AIM227)"
+- "video_id": "aCBox2j75Vc"
+  "title": "AWS re:Invent 2024 - How Principal Financial improved productivity with\
+    \ Amazon Q Business (AIM228)"
+- "video_id": "v7r7Nqow9d4"
+  "title": "AWS re:Invent 2024 - Scale FM development with Amazon SageMaker HyperPod\
+    \ (AIM229)"
+- "video_id": "ytaJPyRCYlw"
+  "title": "AWS re:Invent 2024 - What\u2019s new with Amazon Q Business (AIM237)"
+- "video_id": "WaAJixyEkvE"
+  "title": "AWS re:Invent 2024 - Revolutionizing supply chain: Jabil's journey with\
+    \ Amazon Q Business (AIM253)"
+- "video_id": "iZCJPZWExSQ"
+  "title": "AWS re:Invent 2024 -Enhancing software vendors\u2019 gen AI features with\
+    \ the Amazon Q index (AIM280-NEW)"
+- "video_id": "gCz0wZZrd9U"
+  "title": "AWS re:Invent 2024-Accelerate gen AI: Amazon SageMaker HyperPod training\
+    \ plans & recipes(AIM301-NEW)"

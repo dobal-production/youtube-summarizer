@@ -1,0 +1,627 @@
+- Today, as a part of
+the session, SaaS 407, we'll walk you through how you could build various multi-tenant gen AI architectures. Primarily, we'll walk you through how you could resolve various
+SaaS architecture challenges so that it will yield you a robust gen AI multi-tenant architecture. This is a 400 level session. We'll go deeper into the code. Primarily, when we are talking about resolving various
+architecture challenges, we'll bring up a piece of a code and try to walk you through about how you could resolve
+a particular challenge and explain, you know, how that would yield your
+robust gen AI architectures. And at the end of this
+session we'll provide you some GitHub report links, which will have most of those codes and also provide you a repo link of a workshop which we built
+a new workshop which we built, which kind of like covers most of the concepts which
+we're going to talk about today. Having said that, myself, Ujwal Bukka, I am a senior solution
+architect from AWS factory team. My team primarily helps various ISVs and enterprises with this SaaS journey. We provide business and technical guidance through which we try to
+accelerate their SaaS journey. Along with me is my colleague. - Hi everyone. My name is Mehran Najafi. I'm a principal solution architect
+based in Toronto, Canada. Very happy to be here the
+first day of re:Invent and talking about gen
+AI and multi-tenancy. So as you all know, building a solution that has a built-in LLM could be complex to even serve one customer. We are dealing with LLM. Either you need to host it on
+your hardware accelerators, which could be expensive or you are using some SaaS
+solution pay per token that also could be complex and expensive. You may need to fine tune your
+model to serve your customer. Then you need to host it. You are dealing with the customer data. The customer data could be
+sensitive, confidential, and if you are using
+some agentic workflow, then you are dealing with
+a complex agent as well. So that agent need to
+have access to the API and to other databases or third party. So even serving a single
+customer could be complex. Now let's think of just scaling
+it to thousands of tenants, thousands of customer. So we have even more challenges and more problems that we
+are dealing with multiple LLM that might have been fine
+tuned to serve each domain or each type of your users. Now we are dealing with
+lots of customer data. We need to make sure that one customer doesn't have accidentally or purposely access to
+another customer data. The cost for some of the use cases could be just exp exponentially higher. That makes some use cases just
+economically not feasible. Or agents. Now we are dealing with
+many, many agents, right? So there are many architecture
+challenges that in this talk with Ujwal, we are gonna look
+at, you know, many of them. And see that how AWS with the
+managed solution can help you. Can help you to scale your
+multi-tenant LLM-based solution that you really can focus on
+the area that are more specific to your solution and you leave
+those complex part to AWS. So first, let's look at two
+popular gen AI architectures. You know when you want to
+build LLM-based solution, as you may know, you know,
+very popular use case or very popular architecture is building it through the RAG. The other one that we are gonna talk is through the fine tuning. But in a RAG, the idea here is that we leverage a generic LLM. We don't go through
+customization and fine tuning. We use a LLM that has already been trained based on lots of lots of data. We use it as it is. How we can make it more specific to our customer request
+is through the RAG. RAG stand for Retrieval
+augmented generation. Here, we have customer data that we embed. We use some vector databases,
+we embed them, vectorize them. That knowledge will be stored
+inside that vector store. Then when that user request
+comes, the user requests go to the vector store, we
+use some similarity search functionality of that database to retrieve those knowledge
+relevant to that user prompt or user query. Then they provide that to our LLM. I'm pretty sure everyone
+heard about Amazon Bedrock. Amazon Bedrock is like
+AWS way of connecting you to a lots of different LLM options. Bedrock send that request
+with those relevant knowledge to the LLM behind Bedrock. That could be from Amazon, like Amazon Titan from
+our partner Tropic Cloud Meta, Llama 3, Cohere or others. And then the response will be generated and back to the user. So that's our RAG. Then the other pattern
+is using fine tuning. Here, the purpose is we
+don't send those contexts or those relevant knowledge
+every time that could add to the length of your prompt. Instead of doing this, we use that training data from our
+user to fine tune a model. So go through the training job,
+fine tuning it, customizing that LLM to have those knowledge already embedded into our model. So when we have that fine tuned model, when a user request comes,
+then that already know about that background, that knowledge. So a response will be generated
+and sent to that user. A couple of points here. First, so in many use
+cases, we may use RAG or we may use fine tuning. Each has its own pros and cons. For RAG, it's much simpler on the LLM because we don't have to fine tune and also we can use
+those generic shared one. On the fine tuning, no, we need to go through the fine tuning,
+then when we have LLM, that's a customized and that's fine tuned
+for our own use case. That means that we need to host it. We need to pay for those accelerator, those hardware behind the scene. However, we are saving on
+the length of our prompt. We don't have to include
+those contexts every time that the user prompt
+will be sent to the LLM. But as we will see, in some cases, we are using the combination of these two. We have a RAG architecture
+which instead of using that generic LLM, we are
+using a fine tune model. Just for you know, you can think of, we use the aesthetic
+data to fine tune a model and for that dynamic
+piece that we don't want to fine tune a model every minute or every night or every week. So we use that portion as a RAG. So we will see it shortly. The second point, as I mentioned and the purpose of this
+session is that help you to see how AWS with managed services can help you abstract away lots of this complexity for you that you can build a
+multi-tenant solution easier. In terms of RAG, Amazon
+Bedrock has a feature called Amazon Bedrock Knowledge Base that is basically like a managed RAG. It helps you to connect
+your Bedrock knowledge base to a data store that like S3 that you have your user data there. Then you connect it to a vector store, could be OpenSearch
+Serverless for this talk or it could be other option and you can configure
+LLM, which LLM to use. Then Amazon Bedrock Knowledge Base, it does everything for you. It embeds the data, put
+them into a vector store, it does the retrieval and it send it to the Bedrock. Whatever I put it here, it can be just abstracted away into the Amazon Bedrock Knowledge Base. On the other hand for fine tuning, Amazon Bedrock has a
+customized model feature that you just need to point Bedrock to where your data is stored and then you define which
+LLM you want to customize, then run the customization job for you. So really, you will get
+this like out of the box and you can focus on
+how we can now put them into the multi-tenancy. Now, let's look at just a
+scale what I set for one user and see where are those
+multi-tenancy aspect coming to picture. Now we don't have only one
+user, we have number of tenants. You see here two, but
+it could be thousands. Let's say with two tenant, each tenant has its own data store. We need to store them into a vector store. Very first challenge here is
+that how many vector store. Do we want to use one vector store for vectorizing or tenant? Or we want to have an isolated one and we have multiple of them? In any way, we need to make
+sure that each tenant knowledge is isolated that is not mixed with the other tenant knowledge. Next we need to put them into
+a SaaS solution framework. So SaaS is not just about, you
+know, serving one customer. We have a number of tasks
+for onboarding a tenant for provisioning resources for that tenant because each tenant may have some specific dedicated resources and also tenant management. You know, for billing, monitoring, you know, control whatever. So here we need to also
+look at the SaaS solution that support LLM. And then when a user send a prompt through that SaaS solution,
+that go to our vector store that has multi-tenant
+knowledge embedded there and with the tenant context, that relevant knowledge will be extracted and then that will be sent to the Bedrock. The LLM basically behind the Bedrock. This is RAG. We don't need to fine tune a model, we don't need to customize a model. So we can use the same generic shared LLM to serve our tenant. So this was on the RAG, you know when we have multi-tenancy there. For fine tuning, now we have not one user,
+we have a number of tenant. Each tenant has its own data store. We use Bedrock customization feature to create a fine tune model
+for each of those tenants. Using Bedrock, we can host each of those on a provision throughput model that enable us that the other tenant or the other user will not
+have access to that tenant. So those LLM are dedicated
+to each of our tenant. Now when the tenant request comes through that SaaS
+solution, it'll be sent to the fine tune model associated with that a specific tenant. So this is you know, a very
+high level of how this RAG and fine tuning would
+look like in the context of multi-tenancy. Now we want to go deeper
+into each of the SaaS and you know, multi-tenancy challenges and see that how we can address those. When we look at the
+SaaS, you may familiar, there are a number of isolation pattern. One of them is called pool that we are utilizing
+the shared resources. So we try to use the same service but use them for multiple tenants. On the other extreme, we have silo that we dedicate resources to each tenant. So we are in this talk, we are gonna look at these two extreme, but for your own use case,
+your own application, you can look at, you know,
+something in the middle based on you know, what makes sense to have a shared services and what it makes sense to
+have a dedicated services. Very first question that
+probably every SaaS provider will answer is that how you
+want your user experience to be? For gen AI more
+specifically is new, right? So many customer, they
+want to try your service before getting into a
+like a more expensive and more paid experience. It's good to have a tiering strategy to support different type of users. What's important here is
+that for your basic tier, we have the most economically
+feasible architecture because you don't want
+to make it expensive than you are losing money. So you really want to keep it
+as less expensive as possible. Then we are using more like
+a pool, the shared services. We want to use as many
+shared services as possible, but at the same time we
+need to have, you know, those tenant isolation, those scaling, all of the those aspect as well. So for basic tier, as I
+mentioned, the goal here is to use as many shared services as possible and we are using RAG here. Why we are using RAG? Because we want to use the LLM
+probably is the most complex and expensive part of solution. We don't want to go
+through the fine tuning because when you fine tune for one tenant, the other tenant cannot use them. Then you need to host them. You need to pay per hour. You cannot pay per token
+in most of the cases. When we look at the premium tier, we are looking at more like
+a RAG plus fine tuning. But here for basic tier, we are using RAG. First, we have a storage we need to store or tenant data. We are utilizing even one, remember this is an extreme case. So we are using one bucket but inside that bucket,
+we dedicate prefixes to each of our tenants. Then we are using tenant
+Amazon Bedrock Knowledge Base. Amazon Bedrock Knowledge base
+is that abstraction layer. It means that by itself,
+it doesn't have any cost. The cost coming from the resources and like the services that it use. In knowledge base, we
+connected to a storage. This is our S3. Then the data is injected and the knowledge base
+use Bedrock to embed and vectorize those data and store them into our vector store. For vector store, we are using
+Amazon OpenSearch Serverless which enable us to use the same collection but using tenant specific
+indexes inside that collection. So we can have many indexes. Each index represents one
+tenant in our collection. We don't have to have
+a different collection for different tenant. Now when a tenant and other tenant look at each of these basic
+tier tenants request comes, go through the API gateway
+that again is gonna be shared. Then we have some pool compute. This could be lambda function,
+this could be like EC2, EKS, ECS, whatever, it has
+the logic of calling the LLM. This is RAG, very first step is to retrieving the knowledge
+relevant to that prompt that go to the tenant one knowledge base, the knowledge base go through
+the OpenSearch Serverless and find those relevant knowledge and then that request will be
+sent to that shared Bedrock. So, and we are paying basically per token. If this is the agentic workflow, it means that it's not
+about question answering. We need some tasks to be done. We want some API to be called, some data to be retrieved from a database. We are using a shared agent. So Bedrock agent can also
+support multi-tenancy with some context it
+decide which API gateway, which API and which action group to call or which database it goes. Here, because we only have one agent and we have multiple knowledge bases, each knowledge base per tenant. As we will see later in premium. So in premium, we will
+have a one-to-one relation between agent and knowledge base. But here, agents need
+to look at the context, decide about which tenant ID and then go to that specific
+knowledge base for that tenant. Very similar for tenant two, we have a dedicated prefix into our S3 that go to its own knowledge base. We have a dedicated index
+inside the OpenSearch Serverless and then when a tenant two request comes, it go all the way to the Bedrock and to the tenant to knowledge
+base to serve that tenant. Now let's look at the premium tier. Premium tier is the tier
+that they are already paying. So we want to provide
+the best user experience, the lowest latency, the
+most isolation for them. And we are looking at the silo pattern. Dedicated services, you know, for each of those services
+that we have in our pattern, we are using RAG plus fine tuning. First, we use data or training data to fine tune a model using
+Amazon Bedrock customized model. We have a fine tune model for this tenant. Now for the RAG portion of the solution, again, we have a data, put
+them into the knowledge base. This is probably more the
+data with the dynamic nature. We have a dedicated OpenSearch
+Serverless collection for each tenant and we
+have an index inside that. So when a request comes, we have a dedicated even API gateway. We have a dedicated compute
+like a dedicated lambda, dedicated EC2. I know we have a like we
+have a workshop on this and we have some working code in
+a Git repo so you can use. It goes to its dedicated knowledge base. The request to retrieve
+the data from the op. From the shared to the dedicated resources to support both of these and premium. And if it is agentic workflow,
+we have a dedicated agent for this premium tier that go to its dedicated action
+group with API and databases or any other third party that
+this agent to perform the job. So the next challenge is we
+want to build a SaaS solution. As you for... Component, one is the control
+plane, the SaaS control plane that it solve the issue
+on the tenant onboarding, you know you want your tenant
+information, the payment data, the type of tier that they
+want to join, basic or premium. And also looking at the tenant management, you want to collect
+some metric how the user are using your service looking at the log. Using all those data that help you to basically monitor those tenant activity inside your solution. For the tenant provisioning,
+there are some resources that need to be provisioned
+when that tenant is onboarded and this is different for
+basic and premium tier. For basic, we are using
+mostly the shared services. It means that even before
+any tenant onboarded into the system, those services exist. Here, we have a pool S3 dedicated bucket, which which is empty. We have a pool OpenSearch
+Serverless collection. Again, no index is there. We have agent that already set up. Then when a new basic
+tier tenant is onboarded, what we need to do is to create
+a prefix for that tenant. We need to create an
+index inside or OpenSearch and then we create a knowledge base. This could be quicker because you know most of
+those in those services already exist there. On the other hand, for a premium tier, we have start with empty right? There is nothing there. When a tenant premium tenant is onboarded, then we create a dedicated
+S3, dedicated fine tune model. We have dedicated knowledge base and also a dedicated OpenSearch
+Serverless collection. The next challenge to look
+at is data partitioning. So data partitioning is
+very important in SaaS because it's very important. We are dealing with lots of tenant data, lots of customer data. We want to enforce the
+isolation as much as possible. So no one tenant should
+access to the other tenant. In order to later, we will look at how we enforce the isolation. Really, the first step
+is that we logically and physically partition data in a way that isolation can
+apply there efficiently. Our basic tier, we are
+using shared services, the isolation is inside
+those shared services. For S3, we have a dedicated prefix to each of our tenant
+for OpenSearch Serverless for vector restore is dedicated index. And the good news here is that the knowledge base is abstracted so we really don't have to put
+that into a, you know, pool. So it's already assigned to our tenant. So every tenant has its own
+dedicated knowledge base. For premium, it's much simpler because we have a dedicated
+resources, dedicated bucket, dedicated OpenSearch Serverless
+cluster and the same. The knowledge base is dedicated
+to this type of tenant. So next, my call is gonna
+talk about the isolation. - Thanks, Mehran. So the next topic which we'll talk about
+is tenant isolation. Tenant isolation means you need to make sure a particular tenant is able to access only tenant specific resources. What we'll do here is like
+what we'll pick basic here and the premium tier we'll
+try to highlight the areas of the architecture where
+we need to implement. Then we'll deep dive into and talk about how we
+could implementation. So start off with basic tier. You have seen this
+basic tier architecture, the areas where in this
+architecture you need to implement tenant
+isolation is knowledge base. So we are creating a knowledge
+base for each of your tenant and then we need to make
+sure this knowledge base is only pulling the data from
+the tenant specific prefixed and pushing and pulling the data from the tenant-specific index in the shared pool collection. Next, the pool compute. This pool compute is shared
+across multiple tenants so the services in this compute are shared across multiple tenants so
+you could not directly attach an execution role to it. It gives you a broader scope which would access all
+the tenant resources. Instead, what you need to do is basically enrich the
+services in such a way that they generate the
+scope credentials in runtime which are specific to
+this particular tenant and use those scope credentials to access tenant specific resources. In a bit second here, we'll talk about how to implement that. And the pool agent. The pool agent again
+with tenants resources. So it's shared across multiple tenants. So we need to make sure
+this pool agent is enrich in such a way that it
+uses the scope credentials which are generated in runtime which are specific to
+that particular tenant and then uses that scope
+credentials to interact with tenant specific resources. And again in a bit
+second, we'll understand how to implement tenant solution for this. The other angle to here is,
+the other part here is we need to make sure that this knowledge
+base is only able to push and pull the data from
+the tenant specific index. And the way you do that is by leveraging a data access policy which is defined at the OpenSearch Serverless collection. Think about this more as a
+open serverless collection. Look at that policy, what
+you will see is a principle. That principle is basically is nothing but the service role of the knowledge base and if you look at the
+permissions of that, you could see that you know this knowledge
+base is only empowered to push and pull the data from
+the tenant specific index. This is how you make sure the tenant-specific index and this is how you would
+enforce tenant isolation for the knowledge base. Moving on for the pool compute,
+as I mentioned earlier, we need to make sure this
+pool compute in real time generates the scope
+credentials which are specific to this particular tenant and
+use those scope credentials to interact with tenant
+specific resources. Know let's understand how
+we could implement that. I'll try to give you an example. Interacting with the API gateway. Token. Placing a placeholder. This is how you define in a back roll. So now what the lambda authorizer does is, from the durability token,
+it gets the tenant ID, it reaches out to the control plane to get the knowledge base ID
+of that particular tenant. When you are onboarding a
+tenant, when you not sure whether you observed, there is a service called tenant management service which kinda like captures
+the tenant-specific metadata or the metadata which is
+generated during the onboarding. So it has captured the knowledge base ID of that particular tenant when you are onboarding a tenant. In this case, you know, the tenant one. So now, coming back to
+the lambda authorizer, the lambda authorizer from the
+JW token gets the tenant ID, goes to the control plane,
+gets the knowledge base ID and then takes the knowledge
+base ID and this a back roll and interacts with a service
+called security token service. Basically it makes an API call and sends these two things as a parameter and get back the scope or
+credentials which are specific to the particular tenant
+which give access only to the tenant specific resources. And those credentials will be passed on to the backend service and the service will use those scope credentials to interact with the
+tenant specific resources. Now, let's double-click on
+the lambda authorizer code and also we'll look at the service code to understand this in bit more detail. So if you look at the
+lambda authorizer code, the first thing the lambda authorizer does is it validates the durability token. From the durability token,
+it gets the tenant ID and then taking the tenant
+ID, it makes an API call to the control plane to
+get the knowledge base ID from the control plane. And once the it gets that information, it makes a call to a assume role method. If you look at the definition of that particular method within that assume role method
+definition, the first thing what you're doing is basically
+you are making an API call or to the security token
+service where you are passing the role which you want to assume and also the additional parameters which you want to replace in that role. In this case, the knowledge base ID. Once you do that, the response
+of that method invocation, what you get back is
+the scope credentials. From that response, you could parse the scope credentials which are specific to this particular tenant, which give access only to this
+tenant specific resources. And now coming back to
+the lambda authorizer, there you have to package a response, you know, successful response
+or a failure response so that the API gateway
+can authorize this request. As a part of that response, you could add these scope credentials and pass that response
+back to the API gateway and the API gateway in
+this case would authorize the request and passes the
+response to the backend service. And if you move on to the backend service, if you look at the backend service code, the first thing the backend
+service code is doing is basically from the input
+event or the input request, it's kinda like getting
+the scope credentials which are specific to
+that particular tenant. Using that scope credentials, we are creating a Boto3 client, in this case, the Bedrock client. This Bedrock client will give access only to the tenant specific resources that is the knowledge base in this case. And then using this Bedrock
+client, you create a construct called the knowledge base retriever. Basically it's just a construct through which you could interact
+with the knowledge base. And you could see that when
+you're creating this construct, we are using the Bedrock
+board of the client, which we created in the previous step using the scope credentials which are specific to
+this particular tenant. And then we put all these things together where you invoke the LLM
+by passing the input prompt and the knowledge base retriever. So the couple things happen here. So the first, the input
+prompt will be sent to the knowledge base retriever to get the tenant specific
+data and then the input prompt and the tenant specific
+data are put together and interacted with
+the LLM through Bedrock to get the final tenant specific response. Now moving on to the pool agent. Again, here we'll use a similar approach, what we just talked about
+and implement isolation. Let me give an example of that. Let's assume again tenant
+one is sending a request to the API gateway,
+and at the API gateway, you have seen the same lambda authorizer. And that authorizer validates the token and then gets hold of this
+IAM role, which is similar to what we have seen it and
+the lambda authorizer again from the JW token gets a tenant ID, goes to the control plane,
+gets a knowledge base ID and then passes the knowledge base ID and the role through the
+security token service and gets the scope credentials. And those scope credentials
+will pass to the backend service and this backend service now when it's invoking the agent, it'll pass the scope
+credentials to the agent so that this agent will
+use the scope credentials which are specific to that
+particular tenant to interact with the tenant specific resources. In this case, the knowledge base. And again, I'm just showing
+an example of knowledge base as a tenant specific resource here, but you could apply this concept to any other tenant specific resources like DynamoDB table or S3 bucket. Basically, you would enrich
+this IAM role with access to that S3 bucket or DynamoDB table. Now, let's double-click
+on this service code and the agent code and understand how all this comes together. So if you look at the service code, the first thing service
+code does is basically, it gets the tenant-specific
+scope credentials. Once it gets a tenant-specific
+scope credentials, it makes it invokes the
+call to invoke the agent. Invoking the agent, it
+passes the scope credentials through a session attribute. You could see that you know, you are passing the scope credentials and also any additional metadata you can pass through
+the session attributes. At this point, the agent gets kicked in and agent code gets kicked in. And if you look at the first part, what is basically from
+the session attributes, you are passing the scope credentials or you're getting the scope
+credentials which are specific to this particular tenant. And also you could see there that you know it is also getting additional metadata it requires. And once the it gets the
+scope credentials and story, we are creating a Bedrock client
+using the scope credentials which will give access only to the tenant specific resources. And now, the agent code will try to invoke the other methods
+using that Bedrock client which will give only to the tenant access to the tenant specific resources. Now, isolation for a pool agent. Moving on to premium tier, again, you have seen this
+premium tier architecture. The areas where you need
+to enforce tenant isolation would be the knowledge base and also the pool siloed compute. In here, since we are
+creating a dedicated compute for this particular
+tenant, the isolation story is pretty straightforward in a sense, since it's a dedicated compute, you could attach an execution role directly to this compute
+which give access only to the tenant specific resources. Similarly, we have a
+dedicated agent just specific to this particular tenant,
+you could pretty much attach an execution role to it and
+then it will give you access to the tenant specific resources. Now let's double click
+on these three components and understand how you could
+enforce tenant isolation. Again, for the knowledge base, you've seen in the premium tier, we are creating a dedicated collection in the open serverless collection. And if you look at the knowledge base, for the knowledge base, you
+will attach a service role and for the service role
+to access the collection and then interact with the model. Here, you're making
+sure this knowledge base is only interacting with
+the dedicated S3 bucket. Since it's a dedicated S3
+bucket, you're kind of like, you know, giving direct access to it. And then again, at the
+OpenSearch Serverless collection, you would use the data access policy and if you look at the data access policy, the first thing you would see
+is you define the principle and then if you look at
+the set of permissions where you are making
+sure this knowledge base is only interacting with
+this dedicated collection, in this case. This is how you would
+enforce tenant isolation in the case of a premium
+tier for the knowledge base. For the siloed compute,
+let's take an example. Tenant three is interacting
+with your API gateway. The request goes to this dedicated compute which has a dedicated service. Since this is a dedicated service, you could pretty much
+attach an execution role and if you look at the execution role, the execution role is
+basically giving permissions which are specific to
+this particular tenant, In this case that you are
+giving access to the tenant using this permissions,
+this service would interact with the knowledge base. And if you look at the service code, you would see that you know,
+since it's a dedicated service, you could pretty much directly
+inject the knowledge base ID into it through the
+environmental variables or the environment variables. And then you would
+create the Boto3 client, which is the Bedrock client. Since the service is directly
+attached to the execution. And this, when you create
+this Bedrock client, it would get the permissions
+from that execution role. And then you would create
+the knowledge base retriever with this Bedrock client which you created in the previous step. And then you would put all this together and then invoke the LLM
+bypassing the input prompt and the knowledge base retriever. And for the silo agent, again, let's assume tenant three is interacting with the API gateway, the
+request goes to the service and the service would invoke the agent. In this case, again the agent
+you would directly attach an agent execution role to the
+agent which gives permissions to the tenant-specific resources and that's how the agent would interact with tenant-specific resources. And if you look at the
+code of this agent code, it's pretty straightforward. You are basically the service
+code is basically invoking the agent and if you
+look at the agent code, it is getting all the permissions from the attached execution role. So it is just executes it and using the permissions it's getting from the attached execution role. A challenge which we'll talk about is how do we calculate cost per tenant for these architectures? In order to calculate cost per tenant, first, we need to
+understand a couple things. When you are thinking of
+calculating cost per tenant, you need to capture capture metrics with the tenant context
+specifically for the areas of your architecture where you want to measure the tenant
+resource consumption. So you basically capture the metrics and then you need to
+aggregate the metrics. When you're aggregating the metrics, you aggregate those metrics by a tenant and get the percentage of consumption by each of your tenants. Once you get the
+percentage of consumption, you multiply that with a
+total cost of the service to get the cost pertinent. So basically, you need
+to capture the metrics within context and aggregate the metrics. So when you're capturing the metrics, what we usually suggest is
+look at your architecture and try to pick the areas of your architecture which contributes most to your AWS bill. In this case, the most of your cost would be attributed from interactions with the large language model. So if you look at the basic
+tier and premium tier, you could see some various components of your architecture which kind
+like interacts with the LLM. And you might be already familiar that the way the LLM charges you is based on the number
+of tokens, input tokens and output tokens generated
+when you are interacting with the large language model. So what I'm trying to
+get to here is basically, we need to capture the
+number of input tokens and output tokens generated
+when various components of your architecture are interacting with the large language model. Here, I'll try to across the
+basic tier and premium tier, I'll try to summarize
+the various components which interacts with the
+large language model. Those are one, the compute. The compute interacts with
+the large language model primarily to get this the
+final tenant-specific response. And in a bit second, we'll understand how you could capture
+the metrics with respect to the compute when it's interacting with the large language model. And then the knowledge base. The knowledge base again interacts with the large language model to primarily generate the embeds. And then in a better
+second, we will understand how to capture those metrics. And then the agent. As you've seen, we could assign a task to the agent, agent interacts
+with the large language model and then performs its task and then in a bit second we'll understand how to capture those metrics. The idea is that once you
+capture those metrics, we get some kind of a hypothetical,
+you know, a percentage of consumption here, just I'm
+throwing you a numbers here, but once you have this percentage of consumption across your
+tenants, you would multiply that against the service cost,
+in this case, the Bedrock to get the cost per tenant
+for using the Bedrock. The other area where, you know, we'll talk about capturing the metrics is the storage. Specifically for the basic tier. Since the basic tier, you have seen that we are using a collection which is shared across multiple tenants. Create index for each of your tenant. I'll look you through how
+you could capture the metrics when you using the shared pool collection. And then from that, how you could get the percentage of consumption. Once you remove these
+from your architecture, the basic tier and premium tier, the only left out components primarily in the premium tier are
+these dedicated resources. These are dedicated
+resources which are specific to this particular tenant. In this case, since they
+are dedicated resources, you could use a different approach to calculate cost per tenant. That is basically you could
+tag them with tenant ID. And then using a cost and usage report, which will be available from AWS billing and cost management service, you could pretty much aggregate your cost of these components,
+these dedicated components by tenant ID, basically the
+by the tag and tenant ID. So now, let's pick up
+each of these components and drill down into it and understand how you could calculate, you know, how you could capture the metrics with respect to when they're interacting with the large language model. To start off with, you know, the compute. Let's assume multiple
+tenants are interacting with the API gateway, the request goes to the backend service and this service would use
+some kind of an API to interact with the Bedrock and it
+gives back the response. So when you're interacting with this API, the API you could use is if
+you are using a converse API, the interactions between the service and the response which you go comes back from that converse API will
+have the number of input tokens and output tokens generated for
+that particular interaction. So now what you could
+do is like, you know, this service can use
+some kind of a library. In this case I'm just showcasing
+a metrics manager library. Think of this as a piece of
+code which basically takes the tenant context and the output response and then from the tenant
+context, it'll get the tenant ID. And then from the response, it gets the number of input
+tokens and output tokens and then tries to put them together and publishes to the CloudWatch logs. If you look at the code of the service, the way it would look
+like is the first thing the service is basically doing is getting the scope credentials and
+create Bedrock client. And then it creates a
+knowledge base retriever with that Bedrock client and
+then you're invoking the LLM, this is where you would
+use the commerce API to invoke with the LLM. And once you do that
+based upon the response, then you would use this
+metrics manager library where you could see that, you know, I'm passing the input
+event as a parameter. From there, it'll get
+the input tenant context that is the tenant entirety. And then I'm also passing
+the number of input tokens and output tokens generated, which comes out of that particular
+response which you made, or the call which you
+made in the previous step. And then it would record the
+things in the CloudWatch log as shown here. Where it captures the 10
+entirety along with the number of input tokens and
+output tokens generated for that particular interaction. And moving on to the knowledge base. For the knowledge base, first, before we understand how
+to capture the metrics, we need to understand what
+are the different areas where the knowledge base interacts with the large language model. First, when you're reducing the data into the knowledge base, it
+interacts with the Bedrock to generate the embeddings. And the other use case
+where it'll interact with the knowledge base, knowledge base interacts with
+the large language models is basically when a particular
+tenant request comes through. If the compute interacts
+with the knowledge base to get the tenant specific
+data, that's when, you know, the knowledge base interacts with the large language
+model through Bedrock. The challenge here is
+that the interactions between knowledge base and the Bedrock comes out of box for you. There is no way for you
+to inject some custom code to capture the metrics. One way of this challenge
+is at the Bedrock level, you could enable the logging. Once you enable the logging, the Bedrock knowledge base. (crackling
+drowns out speaker) The log message look something like this. And within that log message,
+you could see that you know, you could get the number of input tokens consumed for that particular interaction. Since the knowledge base deals
+with the embedding models, it only, you know,
+deals with input tokens. There are no in output tokens. This is good that you
+know you got the number of input tokens, but
+the challenge is like, how do I attach the tenant context? So now the one way to resolve
+this is like, you know, adapt some kind of a convention where when you are defining
+your knowledge base, have that service role defined
+with the tenant entity. So if you look at this message,
+there's another attribute (crackling drowns out speaker) and we use the convention
+where that service role, we have appended the tenant ID to it. So now when you're
+aggregating the metrics, you could pass this message and get the tenant ID from that identity and also get that input
+tokens and put them together. And moving on to the agents. And again, let's assume multiple tenants are interacting with your
+service and the service would invoke any agent
+and assign a task to it and the agent would interact
+with your large language model and complete the task for you. Before we dive into how
+to capture the metrics, we need to understand few things
+with respect to the agent. The way agent performs a task is whenever a task is
+assigned to the agent, it breaks down the task and
+then runs in three stages. That is pre-processing
+stage, orchestration stage, and post-processing stage. In each of these stages, it interacts with the large language model using a specific payload format and then send using a
+specific input payload format, it sends specific payload format from the large language model. And if you look at those payloads, which I'll show you in a bit
+second here, you should be able to pass the number of input
+tokens and output tokens. So the idea here is to,
+the service role needs (crackling drowns out speaker) the interactions that
+large language the agent is making with the large models. The way you would do that is
+when the service is invoking the agent, it would enable the tracing. And once it enables the tracing, the agent will keep on sending
+back the tracing messages back to the service with
+which you could passe into it. And then get the number of
+input and output tokens. So let's say now the service
+can look into the tracing, which is produced by the agent. For the pre-processing
+stage, you would see that you know the agent
+input format in this format and then sending to a
+large language model. And the response you would
+is something like this, which is model invocation output. And if you look at those
+responses, you would see that you know, there it has the number of input and output tokens. I'm just showing you a format
+of these messages here. So if you look at the orchestration stage, you would see the similar kind of format. You would see there, they know the model invocation output has the input and output tokens. If you look at the
+post-processing stage, again, you would see that you know, it has a model implication output message which has the input and output. Now the idea here is the service can pass this model implication output messages and get the number of input
+tokens and output tokens and also from the service role, service can also get hold
+of the tenant context. From the tenant context,
+it can get the tenant ID and put them together and log
+that into the CloudWatch logs. Now let's look at the service code, understand how you could implement this. So in the service, the service code first, what it is doing is
+basically invoking the agent. When it is invoking the
+agent, you could see that it is enabling the tracing. Since you have enabled the tracing, the agent would keep on sending
+you back the trace messages and you could basically
+listen to the stream of messages and loop
+through those streams. And then using metrics manager, you basically pass those messages, you know the model
+notification output message and also from the inputting event, you would get the tenant
+context and put them together and log it to the CloudWatch logs. And now, moving on to the vector store. Here, now I'll specifically
+walk you through how you could capture some
+kind of a storage metrics for the basic tier where a collection is shared
+across multiple tenants. Let's assume you know you
+have the application plane. Within the application plane,
+we have a pool collection, which is shared across multiple tenants where you create index
+per each of your tenant. Before we understand how
+to capture the metrics, we need to take a step back
+and understand inherently how an OpenSearch Serverless collection charges you for the usage. It charges you in three ways. One, storage cost that is amount of data stored underneath the collection. Indexing cost, the amount of
+computational units consumed when you're interacting with the particular index and
+the search and query cost. That is the amount of
+competition need consumed when you're searching
+and querying their data. So now, for each of these
+tenant indexes, you need to get the storage cost indexing cost and search and query cost. For the storage cost, if you look at these indexes
+underneath these indexes, you'll directly get the amount of data stored underneath these indexes. So pretty straightforward. But for the indexing and
+search and query cost, things become a little bit
+challenging and interesting where you need to come up with an approach where you have to pick a
+metric which closely resembles that index and search and query cost. What I mean by that is, let's take an example of indexing cost. For the indexing cost. What
+you could pick a metric which closely resembles the indexing cost is again the amount of data
+stored underneath these indexes. So to put that all together,
+what I'm trying to say is like, you know, for the storage cost and for the indexing cost,
+you could pretty much use the amount of data stored
+underneath the indexes as a metrics to drive the tenant costs. So the way you would do that
+is basically you could build a standalone service that basically hits your OpenSearch Serverless collection and gets the amount of data stored underneath these indexes and tries to log that information into the CloudWatch logs. Again, here you could see that, you know, the challenge here is how
+do I get the tenant context? This service is a standalone service. It might not have access to the JW token and from that it might not be able to get the tenant context. Again, you could use a convention
+here when you're defining your OpenSearch Serverless
+collection, you could define, we could name the indexes
+with the tenant ID. So now, this standalone service can hit your OpenSearch
+Serverless collection and get the tenant ID from the index names and also get the amount of
+data stored underneath it, put them together and publish
+it to the CloudWatch logs. So now storage and index cost is done. The only left out thing
+is search and query cost. That comes into the picture
+when multiple tenants are interacting with your compute. And that compute would interact with your OpenSearch Serverless collection through the knowledge base. Again, here, for the
+search and query cost, you need to come up with a
+metric which closely resembles your search and query cost. One example would be you
+could capture the amount of execution time for a particular query. Use that as a metric
+for certain query cost. So let's assume you're using that and then you would build a small library which basically captures
+that execution query and then passes that information execution time of that particular query. And also the tenant context
+to the metrics manager, which can elect publishes this metrics. And again here, what I outlined here is more a fine grain approach where I went into nitty gritty details about how you could calculate or capture the metrics of storage cost of a particular tenant with respect to open and serverless collection. But in reality, like you know, based upon your
+requirements, you could adapt a more coarse grain
+approach where you could use some kind of an approximation
+where you pick one metrics and use that metrics as an approximation and slice and dice your
+cost across your tenants. Like in this case, you could
+pretty much use the amount of data stored underneath these indexes and use that metrics to slice and dice your cost across your tenants. So at this stage, in your architecture, you have all the metrics captured in your CloudWatch logs
+with the tenant context. So what you need to do
+is aggregate the metrics. I'll try to high paint a
+high level picture here about how you need to
+aggregate the metrics. And then we'll deep down, we'll double click onto those components and we'll understand in a bit more detail. So the first thing, what you
+could do is you're gonna build some kind of lambda function, which basically uses a CloudWatch
+insights query to interact with your CloudWatch logs
+and get the tenant, you know, aggregate the percentage of
+consumption across your teams. Basically aggregate all
+the number of input tokens and output tokens generated
+for each of your tenants and get the percentage of
+consumption across your tenants. Once you get that, then
+you could use Athena service and interact with the cost and usage reports to get
+the total service cost. And then you would multiply
+the percentage of consumption with this total service cost
+to derive the cost per tenant. You would store that information in some kind of a DynamoDB table. And once you have that information,
+then you could visualize that data and you know,
+slice and dice that data whichever way you would,
+you know, anticipate. And then now, let's look at the code of this lambda function, the lambda aggregated
+function, and try to understand how to implement this logic. So the first thing, what I said is you need to query the metrics. The thing, what you could do
+is you could see in this code, it is using the CloudWatch
+insights query to get the number of input tokens and output
+tokens with the tenant context. Basically, the tenant ID
+across your CloudWatch logs. The next query, basically
+it is trying to get the total tenant input and output tokens across all the tenants. And then you're kind of like
+dividing both of these values to get the percentage of
+consumption across your tenants. So basically, you're trying to get the tenant attribute percentage for input tokens and output tokens. The next thing you need to do is basically get the service cost. For the service cost, again, as I mentioned earlier,
+we said you could use Athena to interact with the cost and usage report to get the service cost. In this case, you could execute
+a, you know, Athena query. And then once you
+execute this Athena query and now from the results,
+what you could do is pass and get the service cost
+for the input tokens and output tokens for using
+a particular LLM model. So now you've got the service cost and you've also got the
+percentage of consumption. The next, what you need to do is basically calculate cost per tenant. For that what you need to do
+is, as I mentioned earlier, you just have to multiply both of them. That's what this method is doing. This method is basically
+multiplying the tenant percentage against the total service
+to get the input tokens and output tokens, how much
+it's costed for the input tokens and output tokens for
+each of your tenants. And then you're kinda like combining those to get the total cost for this service, in this case, the basically the Bedrock. And once you have that total
+service cost, you would store that in some kind of a DynamoDB table. This is how you could, you know, calculate cost per tenant
+for your architecture. And moving on to the last
+architecture challenge, which we'll talk about
+today, is noisy neighbor. One way to mitigate the
+noisy neighbor conditions is to enable some kind of
+a throttling experience you know, for your tenant at API level. In here, I'll try to showcase
+you how you could implement that throttling experience
+using tenant token usage. If you look at the basic tier and the premium tier, there is some piece of an architecture which is common, which is nothing but this. So basically you have an API
+gateway, the API gateway, you use lambda authorizer
+to authorize the request and pass that request
+back to the microservice and the microservice would
+interact with the Bedrock. And now what you could do is
+you might be already familiar that the API gateway
+level, you could enable some kind of usage plan, which kinda like throttles the request. Additional to that, what you
+could do is you could introduce some kind of a tenant token usage plans. And again, I'm just giving you
+a hypothetical number here, but you could have a different
+usage plan for basic tier and different for premium tier. And now when you're onboarding a tenant, you would assign this token usage plan and that information
+again would be captured by your tenant management service, which will reside in your control plane. And now what you need is a piece of an architecture which in real time, needs to aggregate the
+number of input tokens and output tokens generated
+for each of your tenant. The assumption here is that obviously, your architecture is already
+capturing those metrics, and for that what you could do is build this simple architecture that is, again, you could use
+some kind of lambda function, which queries your CloudWatch logs and tries to do, aggregate
+those number of input tokens and output tokens across
+your tenants and publish and push that into some
+kind of a DynamoDB table. And again, based upon how realtime you want this information, you could build more robust architecture to get this realtime consumption or the generation of tokens. And once you have that, when the request comes to the API gateway, the lambda authorizer would invoke and the lambda authorizer
+using the tenant context or the tenant ready, it can
+reach out to the control plane. From the control plane, it can get the usage plan
+assigned to the particular tenant. And then in real time it can
+hit this tenant usage table and get the current usage
+of that particular tenant and compare both of those values
+to decide whether to allow or dissolve this particular request. And again, at the API gateway level, you could enable the caching. If you enable the caching, this logic might not run
+for each and every request, but again, based upon your requirements, you can change those configurations which suits your requirements. Now let's double click and look into the code of
+the ante usage calculator and also the lambda
+authorizer to understand this in a bit more detail. So for the tenant token usage calculator, the first thing it does is basically, it you know, uses CloudWatch log queries and aggregate tries to aggregate
+the tenant usage by tenant and then stores that information in some kind of DynamoDB table. And then for the Lambda authorizer you make using a tenant ID, you make a call to a control plane to get that assigned token usage
+for this particular tenant. And then you invoke a
+method to check the limits. And if you look at that method, the first thing it is doing is basically, it is hitting that
+tenant token usage table to get the current token usage
+for that particular tenant. And then basically, you're
+comparing the assigned tokens to the particular tenant
+against the token usage to decide whether to allow or disallow this particular request. And then finally, you
+know, just to summarize some of the takeaways for this session. We have introduced, you
+know, a couple architectures through basic tier and premium tier. But again, be aware that
+there are, you know, AWS service quotas and limits to it and try to look at those things and you know, build your own architecture based on those, you know, service quotas. As we are outlining here, when you're building this
+architecture and going through this architecture,
+we try to resolve each and every SaaS
+architecture challenges so that it'll yield your
+robust architecture. So try to think about in those angle, when you're building
+your own architecture, try to resolve various
+architecture challenges, which are specific to your requirements that will yield your robust architecture. And then when you're
+building a SaaS solution, you would obviously try
+to shoot for providing a tenant-based experiences
+for that, you know, try to leverage a tiering strategy. As we outlined, we try to define a basic tier and a premium tier. Through that, we are trying to provide a different experience for
+your different tenants. And then when you're
+implementing tenant isolation and data partitioning, the
+way you would implement the concepts would be similar, but the way you implement them might be different. Like for example, in this case, we use open serverless collection. We walk you through how you could implement tenant isolation. But again, in reality you might use a different vector store, you might have a different
+tool to implement it, but the idea is the concepts are the same, but the way you implement
+might be different. So just keep that in back in your mind. And then utilize IAM wherever possible to implement tenant isolation. And then when you're
+capturing the metrics, always, always try to capture the metrics with the tenant context so that you could aggregate
+the metrics later on across your tenants. And again, once you have that information, you could use that in different ways. Like for example, you
+could see in our session, we capture the metrics,
+the number of input tokens and output tokens generated for each of your tenants with the tenant context. And use that to derive cost per tenant and also use the same metrics to enable some kind of a tenant
+throttling experience of based upon 10 token usage
+at the API gateway level. And this is the GitHub repo
+link, which we mentioned earlier where you have most of this code. And this is the new
+workshop which we built. And we are running this
+workshop on Wednesday morning. The idea of this workshop is a SaaS 405. If you're interested, you know, feel free to join that workshop. I'll just pause the information, yeah. And then these are some
+of the additional sessions which are presented by my teammates. You know, if something
+piques your interest, feel free to join these sessions. And these are some of the
+workshops and build sessions. And finally, thank you. Thanks for stopping by and you know, being patient
+and listening to our talk here. And then I really appreciate
+you guys being here. And then, you know, please
+do fill out the survey.

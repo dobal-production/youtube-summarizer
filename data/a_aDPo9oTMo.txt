@@ -1,0 +1,410 @@
+- Hey, everybody. Welcome to CUBE 204, Automate your entire Kubernetes cluster with Amazon EKS Auto Mode. Can everyone hear me all right? Great, this is super weird. (laughs) My name is Alex Kestner, and I'm a product manager
+on the Amazon EKS team. I'm joined by Todd Neal,
+who's a software engineer and the lead engineer for EKS Auto Mode. Really excited to share with you today one of the biggest changes for EKS, maybe even since the
+service launched in 2017. So over the next 45 minutes,
+we'll talk a little bit about why so many
+customers choose Kubernetes to operate on AWS, and how Amazon Elastic
+Kubernetes Service came to be, highlighting the work
+that we've been doing over the last seven years. Then we'll talk about EKS
+Auto Mode and why we think it's one of the most exciting
+launches for the service. And while I'd be happy to tell you all about the
+great things that you can do with Auto Mode and how much easier it makes operating Kubernetes, later on, I'll hand it over to Todd, who will show you firsthand what it's like to use Auto Mode with a demo. Finally, I'll come back and walk you through in
+detail some of the features of EKS Auto Mode and wrap
+up with a quick summary. So before we get to EKS
+Auto Mode, or even to EKS or even to Kubernetes, it's important to remember the fundamental shift that the creation of cloud computing had when AWS first launched. The cloud fundamentally changed how we thought about
+building applications. It's hard to remember
+what it was like to build and deploy applications
+before Amazon introduced the fundamental primitives
+of S3 and EC2 in 2006, let alone the explosive growth since then of the variety of cloud
+computing primitives and higher order services
+that exist today. But with so many different
+applications deployed in so many different ways and running in so many different places,
+we needed a consistent model for how to operate in
+this complex landscape, and that's where Kubernetes came in. Kubernetes was created
+to help customers manage the increasing complexity of the cloud. It's the leading cloud operating model, and its popularity is only increasing. In 2023, 84% of organizations surveyed by the Cloud Native Computing Foundation, a super majority, are either
+using Kubernetes in production or piloting it for their organization. Without a doubt, Kubernetes
+is the defacto standard for operating in the cloud. This is because Kubernetes
+is incredibly useful. It has a relatively simple set of APIs for managing large groups of servers and coordinating your
+applications to run across them. Because it was born in the era, and from frankly, the
+complexities of the cloud, it also prioritized consistency. After all, what good is simplicity if there's a different version of simple for different applications,
+let alone the different places your applications need to run? And while Kubernetes itself
+covers the vast majority of the functionality you
+need to build, deploy, scale, and operate any kind
+of exciting application you can think of to
+delight your customers, it's extensible, which makes
+it incredibly powerful. There are currently over 195
+open-source projects managed under the CNCF, and hundreds
+more landscape projects which run on, integrate
+with, or extend Kubernetes. You can even write your own. Okay, so Kubernetes is pretty good, actually, Kubernetes is great, but running and operating Kubernetes clusters is hard, which is why seven years
+ago, we launched Amazon EKS right here at re:Invent in 2017. This was in response that
+we at AWS got from customers that managing Kubernetes
+at scale was hard. They had to monitor, scale, manage the Kubernetes control plane to meet their requirements
+for security and resiliency, let alone find ways to
+integrate their cluster and their applications with the other AWS services they needed. Since then, Amazon EKS has emerged as the most trusted way to run Kubernetes, offloading the
+undifferentiated heavy lifting of hosting the Kubernetes
+control plane to AWS while remaining fully
+Kubernetes conformant. This allows customers to focus
+on running their applications instead of managing control
+plane infrastructure. And since then we've been
+busy, we didn't stop. Since launching in 2017, we've been busy delivering new features and enhancements not only
+to EKS, the AWS service, but also to the broader
+Kubernetes open-source community. We started with a basic
+managed control plane, and have steadily added
+capabilities for compute management, auxiliary software, security,
+scalability, networking, observability, and troubleshooting. We started with a basic
+managed control plane, and since then have had
+more than 250 launches over the last seven years, expanding into additional regions, reducing prices, introducing
+open-source plug-ins for storage and networking. We've been really busy. We've even created brand
+new open-source projects that have become emerging
+industry standards like Karpenter, to the point
+that we've now gone deep into every aspect of operating Kubernetes at what we think may be
+the largest scale anywhere. We now run tens of millions
+of Kubernetes clusters for customers every year,
+and this keeps growing. But there's even more that we
+think we can do for customers that use EKS for some of the
+largest, most sophisticated and mission critical
+applications in the world. Over the past years,
+we've heard from customers that even though EKS has
+greatly simplified what it takes to run and operate
+Kubernetes clusters on AWS, with its managed control plane and all of these 250 additional launches, it still took a lot of work
+to manage the data plane of clusters where
+applications actually ran. Let's look at what it took
+to get up and running. So first, customers had to choose how to create their cluster, whether that's using
+infrastructure as code or the AWS Management Console, and decide on their cluster
+architecture, for example, a few large clusters to
+share across applications or dedicated application specific-clusters that could be a little bit more nimble. Next, they would have
+to select, configure, and install the essential
+Kubernetes plug-ins needed to run production grade workloads. These plug-ins provide
+Kubernetes native tooling and integrations for fundamental
+infrastructure primitives needed by their applications, things like persistent storage volumes, compute auto-scaling, and
+various networking capabilities. Then they needed to select, configure, and provision the ideal compute
+to run their applications. Amazon EC2 offers a vast
+portfolio of instance types for a wide variety of use cases, but for some customers
+this was overwhelming, and configuring the instances to meet their requirements
+was challenging. Finally, with those pieces in place, they they could deploy their
+applications into the cluster, but this is really just the beginning of actually running their applications. Once deployed, they had
+to continuously monitor all of this infrastructure
+and operational software, repairing when unexpected
+issues inevitably arose, and upgrade it as new Kubernetes versions or operating system patches for their instances were released so that they can remain
+up to date and secure. And of course, even
+then they weren't done. They needed to continuously analyze and optimize the infrastructure provision for cost efficiencies, oh. (chuckles) So this is what a typical
+cluster looks like on EKS today, and you can see that there's
+a portion that is managed by AWS, the the cluster control plane, including the API server
+instances and ETCD, and then a series of other infrastructure and software on the
+right side of the diagram that is effectively managed by customers, EKS add-ons, the instances
+where application run, and other AWS services that are needed by their applications to function. If this sounds like a lot of work and a lot of infrastructure
+to manage, we think so too, which is why we're really excited today to announce Amazon EKS Auto Mode. EKS Auto Mode is not
+only a major evolution for easily running production-ready
+Kubernetes clusters, it's a fulfillment of our vision for how Kubernetes should
+operate in the cloud. If we built Amazon EKS today,
+this is how we would build it. You can use EKS Auto Mode to get Kubernetes conformant
+managed compute, storage, and networking for any
+new or existing cluster. This makes it easier for you to leverage the security,
+availability, scalability, and operational excellence of AWS for your Kubernetes applications. So let's talk about what you get with Amazon EKS Auto Mode. EKS Auto Mode allows you to create application-ready clusters, pre-configured with the essential
+capabilities and best practices from our seven years of
+running tens of millions of clusters every year. Auto Mode dynamically
+scales cluster compute based on your application's needs. It selects, provisions, secures, and upgrades AWS-managed EC2
+instances within your account using AWS-controlled access
+and lifecycle management. It handles OS patches, health monitoring, and updates and limits security risks with ephemeral, time-limited compute, which strengthens your
+security posture by default. To help you remain efficient, it automatically selects
+the best EC2 instances for your applications, and continuously optimizes them for cost. Auto Mode also simplifies
+cluster upgrades, reducing the operational work required of running Kubernetes clusters, and enabling you to
+focus on the activities that are critical to your business, instead of meeting
+infrastructure for your clusters. I think it should be clear why all these features
+are valuable for customers running Kubernetes on AWS today, but to be really, really explicit, they all help you reduce
+the amount of time that's required to launch new workloads, allowing you to get new products or modernized applications
+to market faster. Auto Mode also helps improve
+application availability, performance, and the
+security of your applications and infrastructure, meaning that your applications are
+better able to meet the needs of your users and your organizations. Finally, it does all of
+this while optimizing for cost efficiency, both
+of compute costs as well as your team's time, meaning
+it will reduce the overhead of running Kubernetes applications, and enables you to focus on things that are truly critical for your business. So let's look at what it would take now with EKS Auto Mode to get started. With just one step, creating a cluster, Auto Mode provides fully automated and Kubernetes conformant
+managed compute networking and storage for any EKS cluster. Once you've created a cluster
+with Auto Mode enabled, there's nothing else you need to do before you can begin
+deploying your applications. Moreover, when you're
+running your application, Auto Mode will automatically
+provision the infrastructure your application needs,
+scales these resources to meet your application's
+changing demand, and automatically optimizes them for cost to keep you efficient, and monitor any infrastructure
+for health issues, repairing it automatically when necessary. All of this eliminates a
+ton of operational work so that you and your teams can
+focus on building application that drive innovation for your business and delight your customers. So we saw the architecture
+before in Amazon EKS cluster. Let's look at what the EKS
+architecture looks like now with Auto Mode enabled. You can see that not
+only does AWS continue to be responsible for managing
+the cluster control plane, but has also taken over responsibility for the integrated Kubernetes capabilities for compute storage and networking. Auto Mode launches EC2 managed
+instances which allow you to delegate operational
+responsibility to EKS for the instances themselves, even though they reside in your account. Finally, you can continue to use all of the other AWS resources
+that your applications need, and those continue to work
+just like they did before. So another way to think about how the Amazon EKS
+Auto Mode changes the role that each AWS and our customers play, we think about the shared
+responsibility model. This shows what part of a
+customer's architecture is their responsibility and which is ours. So previously with Amazon EKS,
+we are responsible of course for all of the AWS Global Infrastructure and foundation services, as well as the cluster control plane, but everything above the
+control plane was ultimately our customers' responsibility, whether that was compute
+lifecycle management, patching operating systems, monitoring and repairing the underlying EC2 instances for health issues, as
+well as configuring agents that needed to run on
+the instance themselves to integrate them with
+the Kubernetes cluster. With Auto Mode, we've moved this boundary of shared responsibility significantly. We now take on even more of the undifferentiated
+heavy lifting, including all of the cluster capabilities
+for compute storage and networking, but also
+operating system patches, monitoring, and health and repair of the EC2 managed instances where applications actually run. And that leaves you to
+focus on your application, application security, and how those applications are running, and how they're monitored. Now, you could certainly bring
+any other additional add-ons your applications might need, and this frees you up
+to focus on the things that are truly useful for your business. Speaking of, I'd like
+to share a little bit about what a few customers
+had to say about EKS Auto Mode during a limited beta that
+we ran earlier this year. So Astronomer is a company
+that's on a mission to deliver the world's data
+by empowering businesses and data teams to enhance their workflows and availability with Astro, a modern data data
+orchestration platform powered by Apache Airflow. Astronomer manages approximately
+300 Amazon EKS clusters as the infrastructure foundation for their Astro Airflow
+as a service product. This figure only increases with every customer that they onboard. Managing a fleet of clusters required time and energy and resources in
+their day-to-day operations. Excuse me, Astronomer decided to adopt Amazon EKS Auto Mode after using it in this early access beta to reduce the operational
+burden of managing large fleets of Amazon EKS clusters as they scale. It enabled them to meaningfully
+reduce the amount of time and engineering effort required to support their clusters by nearly 50%, and reduce their compute
+infrastructure costs as well. Another customer, FICO, is a leading analytics software
+company helping businesses in over 90 countries make better decisions that drive higher levels of growth, profitability, and customer satisfaction. You're probably familiar with their widely-used
+consumer credit score that financial institutions use when deciding whether or not
+to lend money or issue credit. Using AWS, FICO delivers high-volume analytics software and tools to enterprises around
+the globe, including 95% of the world's financial
+institutions in the US. After participating in the same beta, FICO decided to use EKS Auto Mode to power their FCO platform for non-production and
+ephemeral developer environments to lower the amount of
+infrastructure, compute spend, and time invested into operations. FICO is now evaluating EKS Auto Mode for their production environments to extend this reduction
+of engineering effort to manage infrastructure further
+across their environment. But it's one thing for me
+and other AWS customers to tell you about how great EKS Auto Mode, but it's another thing for us to show you, and for that, I'm gonna
+hand it over to Todd, who will give you a demonstration about what Auto Mode can do, Todd. (crowd chattering) - Thanks, Alex, appreciate
+the introduction. Yeah, so it's one thing to hear all about Amazon EKS Auto Mode, but it's really something
+special to just see it in action, and I'm just super
+excited to show it to you. So we're gonna start by just creating a brand
+new EKS Auto Mode cluster. And so to do that, I'll
+go to the EKS.console and click the Create cluster button. If you're a current user of EKS, you'll see some changes here. You'll see the new quick
+configuration mode, which is used to create in EKS Auto Mode
+that is pre-configured with a bunch of defaults that will probably work
+best for most customers. I'm gonna select a different
+Kubernetes version, and then I'm gonna select the
+cluster and node IAM roles. If I don't have IAM roles that work, I can click the Create
+recommended role button to create compatible
+roles and then use those. Beyond that, it's pick the VPC for me, and I'll expand this to show the configuration
+settings for the cluster. And you can see it will be
+using some managed node pools that I'll be the
+administrator of the cluster. Down towards the bottom, you see the network
+settings for the cluster. And on the right hand
+side, you see the settings that are fixed for the
+life of the cluster, and the things that I can change later on. And finally, you see that
+observability is enabled and the cluster logging
+is enabled as well. And so with that, we'll
+actually click the Create button and create our new EKS Auto Mode cluster. (ambient music) The first thing that happens
+is when you create a cluster, it goes into the creating state, so at this point, AWS is provisioning a new high-availability
+EKS control plane for you. It will take a few minutes
+for this to finish, but very shortly, if I
+click the refresh button, you'll see our cluster will move from the creating state
+into the active state. (ambient music)
+(participants chattering) And at this point, I have a fully functioning
+EKS Auto Mode cluster, and that's visible. If I scroll down, I can see that EKS Auto Mode is enabled here for this particular cluster. I can see what version I'm running, all the sort of standard stuff, but we'll also go look at the resources that are currently turned off or currently installed in this cluster. We start with pods, there are none. There's also no deployments,
+there's no DaemonSets. We have a fully functioning cluster, but there's no workloads running. We'll actually go look
+at the nodes as well, and again, there's no nodes running. It's a fully-functioning working cluster, but effectively scaled to zero, and there's no compute running. If we click the Compute
+tab, we again see no nodes, but we do see our managed node pool, it's a general purpose,
+in-system node pool, and we will look at these in a bit more detail using the console. So if we flip over to the console, (ambient music)
+(crowd chattering) we'll first be inspecting the
+general purpose node pool. We think this is well-suited for sort of general compute types. The managed node pools are
+visible in the, you know, via the Kubernetes API. And if we look at the
+general purpose node pool in particular, we can
+see that it's configured with disruption budgets, with a default consolidation policy. It's configured to use the CM and R types, and it's configured to also
+select the newer generations of those types, and then if we
+scroll down just a bit more, we'll see that it's on-demand, and it's also configured
+for the AMD 64 architecture. (crowd chattering) And at the very bottom, we'll see the status for this node pool. The status is how EKS
+Auto Mode lets you know that this node pool is up,
+working, and ready to go. We can see that our node class is ready, so the referenced node class is working and configured, and everything else about that particular node
+pool is ready as well, and that via the resources, it's actually managing
+no resources right now. We'll look at the system
+node pool in detail. System node pool again
+looks very familiar. It has the same consolidation policy, it references the same node class. There are two changes
+between the general node pool and the system node pool
+that I want to call out. The first, as we scroll down
+just a bit more, we'll see that the system node pool
+supports Graviton processors by default as well, and also has a taint for
+critical add-ons only. The system node pool, we intend to be used for things like a policy enforcement, some sort of cluster critical component that you want isolated from
+the rest of your compute. And again, we see the status
+on the system node pool, and it's managing no
+resources at the moment. So we have a working cluster, our node pools are all
+reporting that they're healthy and everything is ready to go, so the next thing we should
+do is probably launch an application onto this cluster. So we will begin with
+a sample application, and we have a GitHub repository with the AWS Containers
+retail sample application. And we'll show the
+architecture diagram here, and this is intentionally over-engineered for demonstration purposes, so it has a lot of components. There's databases, multiple
+services, EVS volumes. There's a service of type load balancer, so it creates a load balancer service. And again, it's built for demonstration, and so fairly complicated,
+and we'll be installing this into our cluster to see
+how EKS Auto Mode reacts. So we'll just kubectl apply the YAML for that sample
+application to our cluster. (crowd chattering) The deployments, the
+services, the config maps, the, you know, PCs,
+everything will be created, and now we go back to the console to look. We can see that the deployments are now, have just now begun to be created. The pods will be created
+very soon or very soon. If we go look at our nodes, there's none yet, but
+we'll refresh one time, and EKS Auto Mode has launched a node to support this compute, and there's some topology
+spreads in that deployment, so we'll actually get some more nodes. So we'll wait a few
+seconds and refresh again, and we'll have more EKS Auto Mode nodes that are supporting that
+particular application. We'll go down and look at our
+deployments one more time. Now that our nodes are
+up and our pods are up, our deployments are now healthy, they're running on our
+EKS Auto Mode nodes, and we'll go investigate
+the storage configuration. So there's a persistent volume
+claim for the MySQL database that's part of that sample application. So EKS Auto Mode created an
+EBS volume, it attached it to the instance, it's going
+to follow that pod around as it moves from node to node,
+depending on consolidation, or as we replace nodes for patching, again all happened outta the box. And lastly, we will look at the services, so if we go onto to networking, the UI service is configured
+to be of type load balancer, so EKS Auto Mode will automatically create a load balancer for us. And this is all using standard
+Kubernetes constructs, so I can actually go back to the console and actually look at this same data. So we'll switch to the console, and we'll look at the UI service. (crowd chattering) And we see our load balancer address, so we'll grab our load balancer
+address, we'll copy it, and we'll throw it in a browser so we can go look and see
+what we just deployed, and we have our sample
+retail store application. We'll click around a bit to
+just show that it is functional, you can add things to
+the cart and checkout, and what I really wanna highlight is just kind of what that demo was. We sort of one-click created a cluster, step two, we applied our
+workload to the cluster, there was no step three, 'cause everything's running at this point, and that is sort of the magic
+that EKS Auto Mode brings to deploying applications onto EKS. (crowd chattering) If you had a very keen eye
+when we actually created that cluster, we picked Kubernetes 1.30, but EKS supports Kubernetes 1.31, so we're gonna upgrade that cluster and see how EKS Auto Mode
+simplifies that process. So we'll just click the Upgrade cluster
+button within the console, and this will take a few
+minutes as EKS again provisions and gracefully upgrades
+a control plane for us, but if we refresh, we'll see that our control plane will be
+upgraded to Kubernetes 1.31. And now EKS Auto Mode
+has noticed a difference between the data plane that
+the Kubernetes 1.30 nodes that are running and the
+Kubernetes 1.31 control plane. So we'll actually go to the console again to watch this upgrade happen,
+and this is all configurable via disruption budgets on your node pools and your pod disruption budgets will do the upgrade gracefully. We see EKS Auto Mode has already launched a replacement node, (crowd chattering) and pretty soon we'll
+get a few more nodes, and then those workloads
+will be gracefully moved from the old Kubernetes 1.30 nodes to the new Kubernetes 1.31 nodes. (crowd chattering) And so not only did we create
+a cluster in one click, we just upgraded our cluster in one click, and since AWS is responsible for all those core cluster
+components, you can rest assured that they're compatible with Kubernetes, that we keep them all patched, and we keep them all
+working and healthy for you. One final feature of EKS Auto Mode that I'm really excited about is the health monitoring and auto repair. We manage a lot of nodes at
+EKS, and we've seen nodes fail in a lot of really interesting ways. And we've taken those failure modes and encoded that logic into
+a node monitoring agent that is deployed on every EKS Auto Mode. So we'll describe the node and
+then we'll be able to go up and look at the status and see
+the various node subsystems that we're now monitoring on these nodes, and again these are reported via node status conditions and events, so they're Kubernetes native constructs that you can monitor yourself. We see a few new conditions
+on the nodes showing that we're monitoring the
+kernel, the container runtime, the storage, and networking
+for this particular node. And to show the auto repair, we need to make this
+node fail in some way. So we have a pod that will
+actually induce a failure on this particular node, so we'll apply this pod to the
+cluster and it'll be created, and it will cause this node to fail. It's now running, and we'll describe that node
+again and see what happens. (crowd chattering) And we immediately see
+a new event on the node. The node monitoring agent that's running on the node detected that the networking is
+having an issue on the node. It tells us what happened, the IP address management
+Daemon has failed. It tells us some reasons why
+it think it may have failed. And if we go look at the
+condition on the node in the console, we'll also
+see it reported there. Now, EKS Auto Mode knows that
+when this failure happens, no more pods can schedule to the node 'cause they can't be
+assigned IP addresses. It's effectively fatal. And probably the best thing to do is to launch a replacement node and again migrate those
+workloads gracefully from the failed node back
+over to a new healthy node. So we're just watching this happen, we're gonna create a watch for some nodes, and we'll see a new node get launched, and that new node, if it comes up healthy, will indicate to EKS Auto Mode that hey, there's a healthy node and a failed node, we can now migrate the workloads over. Those workloads will be
+migrated over gracefully, and without any operator intervention, we've detected a failure on
+a node, replaced the node. If you had redundancy in your services, you may not have even
+noticed that failure occur, and you can see it tomorrow
+morning over coffee by looking at your events
+or your monitoring system. But our application is again
+healthy, back up and running. And with that, I wanna thank
+you, and I will hand it back over to Alex to dive into a few of the core capabilities of EKS Auto Mode. (participants applauding) - Awesome, thank you, Todd. Yeah, it is truly remarkable to see how much easier it is to use
+Kubernetes with EKS Auto Mode. But now I wanna spend a little bit of time digging into the specific
+features of EKS Auto Mode so that we can tell you a
+little bit more about it. So as we mentioned, there's
+three main categories of features or capabilities
+of EKS Auto Mode. Is integrated cluster capabilities for compute auto-scaling
+and lifecycle management, networking, and storage. At the compute layer, Amazon EKS Auto Mode is
+powered by Karpenter, which dynamically selects and scales the best-suited instance
+types for your application. It also continuously optimizes
+the managed compute running in your cluster to improve costs. On the storage side, Auto
+Mode provides you the ability to launch block storage
+for any staple application by providing a managed
+version of the EBS CSI driver. And when it comes to networking, Auto Mode enables connectivity between the pods running in your cluster. The updated and streamlined
+VPC CNI assigns IP addresses directly from the subnets
+attached to your cluster. And like Todd mentioned,
+Accordion S runs locally on every node in an Auto
+Mode-enabled cluster, providing DNS-based service
+discovery and resolution. A network proxy also runs on each node, which maintains network rules on the nodes and enables, you know,
+network communication. Finally, you're able to
+(indistinct) load balancers to distribute traffic across your pods, across pods running your application via the AWS Load Balancer Controller, which is also run outside of
+the cluster and managed by AWS. So let's dig into the compute
+capability of EKS Auto Mode. There's a few important things that the compute capability does. So first, with Auto Mode, we've launched a fundamentally new
+kind of operating model for Amazon EC2 instances
+called EC2 managed instances. Managed instances are
+deployed in your account by another AWS service like EKS, while you delegate
+responsibility for launching, securing, and managing to that service. When you deploy
+applications with Auto Mode, right-size compute resources, EC2 managed instances, will
+automatically be chosen, provisioned, and dynamically scaled as needed by the
+applications in your cluster. Over time, Auto Mode continuously
+optimizes the instances running as demand on
+your application changes. Underutilized nodes will be terminated, and if cheaper compute can be found to meet your application's resource and scheduling requirements, existing compute resources
+will be replaced, and your nodes will be gracefully drained and application pods migrated to the new, more cost-effective compute. Finally, you get the flexibility to choose the right
+compute for your workload. If you need to use specific
+EC2 instance types, you can specify them via
+user-defined Auto Mode node pools, and Auto Mode also supports the various EC2 instance
+type purchase options like Compute Savings Plans,
+Reserved Instances, or Spot, so you can continue to benefit
+from their deep cost savings. One other thing that's
+interesting about EKS Auto Mode is that the instances that
+come up that are launched by Auto Mode run Bottlerocket. Bottlerocket is a container
+optimized operating system from Amazon that doesn't
+include many of the things that you find in general
+purpose operating systems. This helps not only improve
+the security posture of your instances, but
+also improves performance and reduces the security over the work that you'd have to do to
+maintain the security posture that your organizations require. This is an open-source project, and one that maybe, you know,
+you're already familiar with, but one that we found to
+be a particularly good fit for Auto Mode, both for
+us and for our customers. (crowd chattering) There's a ton of networking
+features in EKS Auto Mode, and kind of thinking about them in a few different categories, first are sort of the pod networking and cluster networking features. Every EKS Auto Mode node
+again comes with Accordion S that runs locally on the instance, eliminating many common scaling challenges with Accordion S if it were to run as a dedicated deployment in the cluster. As I mentioned earlier,
+we've also streamlined, and in some ways improved
+the existing VPC CNI that is now runs partially
+outside of the cluster, providing pod and and service networking with a default network policy enforcement. Finally, we provide a
+fully-managed network proxy on every node that is
+running in EKS Auto Mode so that workloads have the
+connectivity that they need. But that's just connectivity and networking features
+within the cluster. Obviously, applications also
+need to be able to be reached or communicate with, you know, with things that run
+outside of the cluster, and for that, we provide
+a managed load balancer for EKS Auto Mode clusters. It comes pre-configured with
+networking best practices, and satisfies the Kubernetes ingress with application load balancers and service resources with
+network load balancers. One of the things that
+you can be mindful of if you start to use Auto
+Mode is that we've created a new ingress class
+that specifically works with this version of VPC CNI, sorry, this version of the
+Load Balancer Controller to tell Auto Mode to kick into gear. When you annotate that service,
+that ingress class with the, you know, the appropriate
+sort of annotation, that'll tell Auto Mode to take action. The final capability for
+our Auto Mode storage, and Auto Mode comes with an EBS CSI driver or block storage driver outta the box. This lets you provision
+and manage the lifecycle of block storage volumes from Amazon EBS directly from your applications. Similarly to the new ingress class, Auto Mode comes with a
+new storage class as well. You can see that the
+ebs.csi.eks.amazonaws.com is a little bit different maybe than the storage class that you're used to if you already are using Amazon
+EKS for stable workloads. When you create a new storage
+class, then reference it as you define applications
+that need persistent storage, that'll tell Auto Mode to
+provision the necessary resources that those applications require. You can continue to use
+other kinds of storage with EKS Auto Mode using the add-ons that already exist for Amazon EKS. They'll work perfectly well alongside the EBS block
+storage driver for Auto Mode. So here, you can see a little example of like what a potential
+storage class might look like if you wanted to use, you
+know, wanted to make use of the block storage
+devices within Auto Mode. One of the other things that, it's not exactly a
+capability of Auto Mode, but something that really is,
+that underpins all of the work that we do on Amazon EKS is
+around Kubernetes conformance. So Kubernetes conformance
+is this idea that a certain Kubernetes provider
+should pass a series of tests that indicate it's a
+managed Kubernetes service, will work with any other
+Kubernetes conformant product or feature or service, and like always, EKS Auto Mode is fully
+Kubernetes conformant. This means that not only
+you can leverage a variety of CNCF open-source projects that are also Kubernetes conformant, but you can also make use of the ecosystem of partner solutions that many folks use with their EKS clusters today. In fact, I'm happy to share that because Amazon EKS Auto Mode
+is Kubernetes conformant, you can take advantage of all of these partners products today. They've been validated for launch, and something that we think
+is particularly exciting, you'll see more and more partners be added to this list over time as we continue to validate additional ones and have partners update
+their solutions as needed. So I wanna summarize really quickly what you get with Amazon EKS Auto Mode. First, you get increased agility, reducing the time it takes
+to launch new workloads, and allowing you to get new products or modernized applications
+to market faster. You can reduce operational overhead, reduce the operational overhead of running Kubernetes applications, and simplifying EKS upgrades, enabling you to focus on the things that are truly critical to your business. You can lower costs with
+Amazon EKS Auto Mode, it maintains application availability, and improves performance by dynamically right-sizing
+compute automatically. Finally, Auto Mode is secure by default. It in increases your security posture with container-optimized operating system, automated operating system patches, and ephemeral, time-limited compute. So if you'd like to learn more
+about Amazon EKS Auto Mode, and you weren't able to attend the builder session
+earlier today at the Wynn, you can come to the other
+side of the strip tomorrow from 3:30 to 4:30 at the MGM for another, or read the blog or user guide
+about Amazon EKS Auto Mode. Here, I'll leave these up for a second so that everyone can grab a photo or open the links on their phones. (crowd chattering) Great, and so with that,
+I wanna thank you so much for your time, and looking forward to seeing all of the wonderful things that folks use EKS Auto Mode to build. Thank you so much. (participants applauding)

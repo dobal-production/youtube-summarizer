@@ -1,0 +1,417 @@
+- Welcome to re:Invent 2024. I hope you all had a chance to catch Matt's keynote this morning and the exciting announcements we made regarding our gen AI foundation model. Today, we have a really
+interesting panel discussion set up for the folks here. We have some industry leaders who are gonna discuss how they developed their foundation models and how they're looking to innovate and deliver
+to their customers. I'm Shubha Kumbadakone. I'm a senior manager in
+our gen AI org at AWS. I lead go-to-market for our SageMaker HyperPod service, which is a differentiated gen
+AI-infrastructure offering. I'm joined here today by Jeff. I'll let all of our panelists
+introduce themselves. So why don't you go ahead, Jeff? - Happy to start. Hi,
+everybody, I'm Jeff Boudier. I'm a head of product at Hugging Face. Hugging Face, our mission is to democratize good machine learning, and I'm excited tell you more about it. - Waseem. - Hi, everyone, my name is Waseem AlShikh. I'm the cofounder, CTO at Writers. Writers is a generative AI
+platform for enterprise, and our mission, to transform
+work for enterprise. We're proud to be leading platform for the more than 300 enterprise company in healthcare and financial services. - And Robert. - And I'm Robert Bakos. I'm cofounder and CTO at HOPPR. We're building foundation
+models in medical imaging and a medical-grade platform to be able to support
+inference for those models. - So before we get started
+with the panel discussion, I wanna kind of quickly
+provide an overview of what HyperPod is and what it delivers. How many of you in the room today are looking at building out
+your own foundation models or are in the process of figuring out how to kick off your
+gen AI model production? (panelists laugh) What are you looking at? Are you looking at building
+out your own model? Are you looking at fine-tuning
+existing open-source models? How are you kind of thinking about it? - [Audience Member] Fine-tuning. - "Fine-tuning"? All right. But you are looking at training over, you know, a couple of
+GPUs across a couple of nodes and looking at how to architect that out. Is that right? Got it. So, a lot of the customers we talk to who are looking to do
+exactly what was just said, which is fine-tune models or even build your own foundation models, typically they have
+certain key considerations. If you kind of think about what are some things
+that are top of mind for them, one of the first things is the data: like, "How ready is my
+data to train my model? Is it labeled? How differentiated is it? Do I have enough data to
+actually train my model? If not, where can I get or gather all of this data source from? What kind of data am I using? Is it just text? Is it multimodal? What kind... How does that impact my
+storage and file systems that I need to choose for my training?" The second is "how much GPU horsepower do I need? Or how much accelerator or
+compute horsepower do I need to actually train this model?" Depending on how large the model is, how much your data size is, how many GPU hours are you looking at? And what kind of GPUs do you really need? Do you need the H100s? Is the A100s enough? Do non-GPU solutions work? All of these are things that
+customers are figuring out to kind of understand what is the cost and what is the time
+that it will take them to actually get to market. And of course, as they think about spinning up these
+hundreds to thousands of accelerator compute clusters, how you manage this cluster, how the scaling efficiency works is also important. If you're doubling the number of GPUs you're using to train your model, does that translate to double your training performance? If not, how can you actually improvise your
+training performance? And how do you manage
+your compute cluster? If you have hundreds
+and thousands of GPUs, how are you doing your job submission? How are you making sure
+your cluster is utilized at at least close to 100%? And what is your cluster uptime look like? And that directly comes down to what is the resiliency or
+the infrastructure resiliency of your cluster. How often are these GPUs failing? And how much time are you spending, are your
+data scientists spending, trying to analyze what has failed versus actually innovating and building out the model itself? We heard a lot of these
+concerns from our customers, and working backwards from them, we designed and built SageMaker HyperPod. It was launched last re:Invent, and since then, it has seen some really good
+traction with customers. It's really resonating. Because it is purpose-built
+for distributed training, it is resonating with customers who are looking
+at launching training jobs across hundreds of GPUs or maybe even, you know, less
+than 100 to 10s of thousands. We are able to easily scale
+up and scale down the size of the cluster that customers need to actually train their models on. What does HyperPod really deliver? And why do we say it is custom built for
+distributed training? It enables your data scientists to get better training performance. And by that, I mean we provide a persistent cluster
+that is on a single spine so we are able to immediately reduce
+the networking overhead that is required because of the forward and backward passes that your distributed
+training will require. And having all these
+nodes optimally colocated in our data centers and providing them to you as a cluster will immensely improve
+your networking speeds. We also provide support for any distributed training
+framework that you want to use, whether it's FSDP, DeepSpeed,
+or any other choice. We also provide proprietary SageMaker
+distributed training libraries that provide performance
+enhancements over PyTorch. And so if you're fine-tuning
+Llama or fine-tuning Mistral, you can actually get
+performance enhancements by using these proprietary libraries, but if you do not want to and you want to kind of continue using what you have used so far, you have that flexibility as well. The most important value prop of HyperPod, it's the resiliency. And why is resiliency so important? If you think about the scale at which a lot of this
+fine-tuning happens, even a single failing GPU will stall your entire training job, which means that you are spending cycles trying to understand what
+caused your GPU to fail: "Was it an application error? Was it a memory problem? Was it a thermal issue? Was it a really bad node that needs to be swapped
+out and replaced?" You're spending a significant
+amount of time analyzing that versus what you actually
+want to spend time on, which is your model development. How does SageMaker HyperPod
+actually address this issue? We do some deep health
+checks off the nodes as your cluster is being spun up, so as your cluster is being created and as your cluster is being updated, we do health checks and
+we replace the bad nodes. When your cluster is up and running, we have agents that are
+continuously monitoring node health, and if we detect a faulty node, that is, a node that has failed, we can automatically swap that out with a warm pool of healthy nodes. And you can then kick
+off your training job from the last checkpoint that
+is saved in an S3 bucket, or you have the option of letting us do that
+automatically for you. Now, it's important to note that this resiliency benefit is actually what a lot of managed services deliver. When you have a failing
+node under the hood, managed services will automatically
+take care of it for you, but managed services also provide a layer of abstraction away
+from the infrastructure. And for most advanced ML users, they want that control or the deeper level access
+to the infrastructure, and by that, I mean being able to SSH into the nodes, being able to do NICKEL
+testing or DCGM testing. They want that level of visibility. They want to be able to use any open-source tool and framework and library
+that they opt for, and they wanna be able to have a deep visual
+profiling and visualization of cluster and GPU utilization as well as tools to see what's
+going on with their cluster. HyperPod allows you to do that, so while it is removing the
+undifferentiated heavy lifting of infrastructure resiliency management, you continue to use the compute, the networking,
+the frameworks, the libraries. All of that control is still
+very much in your hands, and you're able to actually build out and
+optimize performance as required. You do get root access to all the nodes. You're able to do your NICKEL testing as well as your DCGM testing, and you're able to look
+at cluster utilization and monitor your cluster by using Container Insights
+through CloudWatch. Like I said, we also provide our proprietary distributed
+training libraries for data parallel and
+model parallel training, so any optimizations you want over FSDP, you can get them by using
+these proprietary libraries. So, to kind of wrap it up, what HyperPod delivers
+is a way for customers to really innovate their
+foundation model development. You can customize your compute, use the range of GPU and
+non-GPU-based instances that AWS delivers. You can choose the tech
+stack that you want to use. You have a persistent cluster that you can use across your workloads. You are able to SSH into the nodes, have that root-level access, have all of the control and
+flexibility that you want when you're building out
+your training architectures as well as your inference architectures, and have an easy way, continue to use Slurm or Kubernetes to orchestrate as well
+as submit your jobs. That means your existing tools and your existing technology stack does not have to change. You can continue using
+your tools of choice. And then you can use model recipes that we have published to easily kick off or spin up
+these clusters and get going with minimal overhead. With that, I wanna now turn
+it over to our panelists, and let's start with you, Jeff. Why don't we get the audience familiar with what, how, oh, sorry, (laughs) how you're looking to
+innovate for 2025 and beyond? Hugging Face is a well-known brand. You've done a lot for
+the gen AI community. What are some of the things
+that you want to innovate in 2025 and beyond? - Thank you, thank you so much, and before I talk about Hugging Face, I wanna give a big shout-out
+to our friends at Writer AI because, when people ask me, "What would be the great
+example of an AI-first company?" I'll always use Writer AI because they're doing all
+the things that enable them to maximize their impact. The first thing is open science. They do state-of-the-art research, pushing the limits of what's possible, and publish some great papers. The second thing is
+open-source contribution. If you go to Hugging Face and find the Writer organization, there is the Palmyra family of models, I think, over 14 models, that are freely publicly accessible on the Hugging Face Hub. I think they were
+downloaded over 10,000 times just last month, so it's amazing impact. And on top of that, they build amazing added
+value into their product, into the features that it
+provides to their customers, so it's a really, really great example, and I'm so glad to be
+on this panel with you. I started my introduction by saying the mission of Hugging Face. So, our mission is to democratize
+good machine learning, and by good, I mean based on open source, community-driven, and built from ethics-first principles. And we do this in different ways. We do this through open science. I'm gonna talk a little
+bit more about that. We do this through open source, and we do this through
+our products and services. So that means the Hugging Face Hub. If you work with open models, you've probably gone on the hub to find explore models and assess them. There are over a million models today that are available on Hugging Face Hub for any kind of machine learning tasks. Over seven million people
+are building their own AI with the hub publicly. But also, privately, there
+are over 150,000 organizations that are built on the hub to
+collaborate around models. Open source, you're probably familiar with the Transformers library, and there are over 20 different tools: text generation inference, deploy models, data sets, accelerates, and many more. But I wanna talk more
+about the open science because that's something
+that's really, really important to our mission. We want to be able to contribute, to the community,
+new foundational models where there is a gap of performance between what the best closed models offer and what is available to the community. And to do that, we leverage HyperPod. I can talk a little bit about
+how we do that, if you want, or we can do that later. - Well, we can definitely
+touch on that later. I wanna go a lot more deeper into how HyperPod is kind helping you build these new models, but because you started off with Writer, I wanna kind of go to Waseem and have him talk about
+what Writer's charter is. Jeff touched on your Palmyra LLMs. How are you building that? What are you trying to
+accomplish for your customers? - Yeah, sure, thank you. Thanks, Jeff. So, when we started Writer... Started Writer in 2020. We started from day one under the mission to help
+enterprise transform work. That mean basically how
+AI can really help them. When we start seeing this clear stages, it's like we go on through between 2022, 2023, and '4, and we're trying to say,
+when we starting Writer, we've been building those model and with every year, bigger models, more capabilities, and we're seeing more
+and more advancement. Now, every time we put a bigger models and
+more complex structures, you'll go on to actually
+get bigger challenges. So touch really quick, and HyperPod, for example, help us a lot for our latest models. So, we have our latest models,
+which is Palmyra X 004. Our frontier model exist today. The best functional calling model exists in the market today. I don't... Basically, to build it,
+we use HyperPod for this. Now, why that's important there, because the change happen in our mind for building those model when you start to scale them. We went from change like "can I build a
+model one or two billion? Sure, one node, two node, not big issue." The biggest challenges
+start happening with us when we start bringing those
+model at few hundred billions. At that stage in not just the technology
+and the knowledge, you need hardware to be
+actually reliable, not failing. So to build on top of this, how we're see and our
+vision that we're building, we're doubling down on actually building better
+models, more complex models. We're big believer on not
+just bigger-parameter models. Within parameters of the
+model itself is not useful. It's contain only knowledge. We're a big believer what
+we call the deeper models. That's what we keep our model today, and a few hundred
+billion, not a trillions, outperform our larger model because we're going way
+deeper in the layers, more than 500 layers in the model itself, which (indistinct). Now, to do that kind of training, you'll need actually something reliable, not just "oh, it's a GPU cluster. All the same. It's running." You need make sure training is keep running
+and the training continue, especially when training could actually take three months to
+five months per models and any failing there actually
+could really cost a lot of effort, team, and
+actually implementation. Now, big part also, just
+to touch really quick here. To build all of this,
+HyperPod help us a lot. But also, the biggest help we get, it's the open-source community, so you know, I'll go back to you, Jeff. Without having this amazing
+open-source community, especially with Hugging Face sponsor it, it's would been hard for
+us to actually innovate. Whatever we build today and
+any innovation is coming, especially the latest thing
+we announced two weeks ago, something called self-evolve models, it was actually just built on top of all the open-source
+scientists, paper, model, and data exists in the market today. - Interesting, and Robert, HOPPR is in a very... It's in healthcare. You're looking at diagnostic imaging. How are you looking at
+building your foundation model? And how much of the open-source community are you kind of leveraging
+to build your models? - Yeah, so we are building... So, I mean, as you know
+or as you may know, medical image data is very large data. It's painful to work with, and obviously you need, you know... Because we're training on
+16-bit, high-resolution images, often our models need to be able to consume multiple images at once. We need to be able to leverage
+the compute infrastructure that HyperPod offers. That's one, you know, really... That's really been a big boon for us in the services, you know,
+that AWS has been able to offer there. Needing to be able to move this data, you know, within these
+clusters really at scale is really critical for us. We are using a number of... We have our own proprietary
+vision transformer that we're working with as well as leveraging open-source
+language models to build, essentially, you know,
+multimodal image-to-text models that allow us to be able to identify the features in medical images and be able to output those
+in various forms through text, whether that's a preliminary
+radiology report, a list of findings in
+the study or being able to, you know, output
+segmentation masks, for example, and bounding box
+representations through XML. So you know, a number
+of different approaches that we're taking there and leveraging the power, you
+know, that HyperPod offers has been just a big boon for us in being able to really
+optimize for the large data that we really have to work with. - Got it, and thanks
+for sharing that, right? So Jeff, coming back to you, you mentioned how you're
+looking at science models and how you want to bring more to the open-source community compared to closed models. Let's double-click a little
+bit more on that, right? Like, what are some of the
+things that are key concerns as you're building out these models, from a data side as well as
+from the infrastructure side? As you build out these models, what are some of the things
+that you are thinking through? Would love to kind of then tie it back to how, you know, HyperPod
+is addressing a lot of those requirements. - For sure. Yes, as I said, I... The main goal of our open
+science team, our researchers, is to close the gap between the best available
+open models and closed models. And so back in the world of GPT-3, together with the community, we built BLOOM that was, at launch, the best fully open multilingual
+large language models, 175 billion-parameter. Later, after Codex, our team, along with the community, built the StarCoder family of models, which, at launch, were the best
+available fully open models to do code. Later, our science team built IDEFICS, I-D-E-F-I-C-S, which is a family of model which, at launch, was
+the best open available model for multilingual LLM tasks. And more recently, just
+a couple weeks ago, our science team released a
+small LM family of models, which, again, at launch, are
+the best open available models at this size. So really, the goal is to close the gap, but we didn't always have HyperPod, and I remember the days of BLOOM. So, that was like two to three years ago. When you innovate on the science to find a better model architecture, like, that's science, but what makes the science real is the model checkpoint that you can find and use
+and download on Hugging Face, and doing that is not a science job. It is a hardcore engineering job, and when we built BLOOM, there was like 1,000
+researchers that came together to contribute to this project from every organization in the world. But the engineers that were actually holding
+the cluster together during the training of BLOOM was a very, very small team, and the lead engineer
+for that was Stas Bekman. And Stas wrote, actually,
+a book on his experiences, an open-source book; it's on his GitHub; where he tells the tales and
+all the learnings and insights that he learned through the
+pain of the BLOOM training. And the good news is that now, with HyperPod, like, we don't need to
+book anymore (laughs) because, all of the pains
+that we had to go through, they're sort of productized and offered as a service within HyperPod. And so when I talk about IDEFICS, when I talk about small LM, this leverages our
+internal science cluster that is managed by HyperPod, and there are a few of those features which you briefly discussed
+that are critical for us to basically have this cluster being in autopilot mode, so to speak, to provide better insights to the users; the users are our researchers; and to allow us, as a business, to have more flexibility
+in how we use the cluster. So things like... We have a pretty big CPU partition. By pretty big, I mean like 48,000 vCore that is pretty much in autopilot, leveraging spot instances as
+we go to scale up and down. We scaled up our cluster, up to 1,000 GPUs. And through the access
+to the low-level metrics, we are able to have smart GPU management so that, whenever some
+kind of issue arise, we can make the decision to either isolate the node and restart it or to keep the node and heal it. We also have access to metrics that we can build up for our researchers; for instance, something
+that we care deeply about is the CO2 consumption
+through these training jobs, and we've instrumented it so that, as a user of the cluster, I can have not only metrics about the GPU utilization
+and the performance but also about the CO2 consumption of the job at hand. And flexibility is also important so that we can reconfigure
+the cluster pretty easily, depending on all the jobs from our research team and even beyond. - Got it. And what... You mentioned scaling
+to thousands of GPUs. How has some of the automated
+resiliency capabilities that HyperPod has kind of introduced helped your overall training experience? Can you kind of- - Yes, I think, like, the
+first thing that comes to mind is GPU utilization, and that's comes at the GPU level to make sure that you
+don't have faulty nodes that just sit around and not being self-healed. But that's also at the cluster level to make sure that we are
+utilizing the resources as the jobs come in. So if you zoom out, that means, like, much
+better GPU utilization overall for the cluster. - Got it, and Waseem, you also have trained on HyperPod, and I believe you have a couple of, you know, data points that you would like to
+talk about, as well. Do you wanna also kind
+of share your experience on how HyperPod has helped with these as you start scaling your model? And you mentioned, going from one to two billion
+to hundreds of billions, how HyperPod has really helped- - Sure. - with some of that. - And I think the big things since we start experiment and then start actually
+using and real training, using HyperPod... The biggest shift, like, not just help with
+scaling and implementation; we need a smaller team to use it; is the thinking how we manage, actually, cost and how we think about,
+actually, resource allocation. Before HyperPod, simply would always think about any kind of training clusters in one thing: "It's the GPU. Who's gonna give the cheapest?" All of us actually go on
+PDGX cluster, similar speed; H100, same infra connections. But that changed with HyperPod because, in HyperPod, we
+start having more visibility about, actually, something
+way more important, especially at scale, which is basically
+resilient and stability. Usually, before HyperPod, we
+will be thinking, about it, "My cost of training will
+be the cost of the cluster plus another 60 to 70% of the cost itself because the cluster could shut down, the hardware failure is going be happen." Actually, this one thing
+nobody talking about is it's fail a lot, more than you think. You know, I think... I believe the Llama... Facebook or Meta AI team, in the Llama model, I
+believe, the last one, they talk about it a lot: how the cluster failed; I
+believe I'm not mistaking; every hour or so with one GPUs failed. So going back to our thinking just help us change how we think about it and how we think about our cost. So eventually, what we
+start actually seeing, just calculating real cost, is not just a GPU price. It's still important to
+have a good price on it, but it's cheapest price compare, actually, to resilient and stability, way more important. When you kick the job, it's not just a job actually. You could lose the whole work. You could actually need people, if you work across, you
+know, multiple time zone, to wait for few hour to someone fix a node,
+replace a node, and doing it. Now think if all of this
+actually just happening and you're not worry about it. System can actually monitor it, especially, again, when you run it at more than a few weeks to few months one job, one models. This is bunch, actually, data we we'll be running internally, so basically, first, we
+starting with a setup, you know? If you talk about simple clusters, like, a few hundred nodes, at least, you will need,
+you know, 72 hours. Bigger cluster take way longer just to connectivity, configurations. Make sure every node have the same versions, software
+versions, same operating system, literally same libraries across those node is actually... It's be interesting. Stuff related to what's
+called automation, you know? The whole thing, just
+end to end, build it. One thing actually is not in the slide that worth mentioning here. Usually, when you're running training job, we will need at least team of
+four to six AI ops engineers just literally babysitting the cluster, monitoring those (indistinct), monitoring those GPU's and those node. And HyperPod just change it. Now literally, I have one engineers. He, just looking at
+it, will do everything. We rely a lot on automation, so auto checkpoint will save them. The auto healing replacing that bad node, all of this just... AWS take care of it, and from our side, we're literally sitting there just absorbing (indistinct) the process if there's no big issue with the (indistinct) itself, meaning now I just free
+another five to six engineers literally to help with
+other task in the company. So just that thinking of the goals and how you
+actually allocate resources, that help us a lot, and this actually coming to how we think about it from infra also, now how we going with the infra, how we can scale our model, how many replica do we need, how many node we allocate. This is stuff start changing our thinking and also help us more from budgeting 'cause this is basically the biggest spend we
+have today at Writers, the GPU clusters, building those model, serving those model at a scale for enterprise customers, billions of token every
+day across customers, stability with the high availability. You will need a lot of GPUs. Manage them and someone with the team with quite a lot of resources. Again, our team today, we
+cross multiple time zone. It's been hard, so switching to someone that actually could
+be managed it end to end, that actually been big win for us. - And what have... Do you use Slurm? Or do you use the Kubernetes
+version of HyperPod? - We use a Slurm for now, and we're really excited
+about the Kubernete. We think that we're going to
+utilize the Kubernete HyperPod for inferences. This is going to be big for us with the next generation of the models. Something we touch about it, what you call self-evolving models. It's a new type of transformers, full-attention mechanism that actually have a memory layer with each transformer layer, meaning, customer today,
+they can have their own model that actually learn, real time, from the action with the models. And those models still
+can be safe and isolated in the Kubernetes clusters when actually relying
+on a Kubernetes security to secure the network for each customer and
+each model around it. So, today, it was a Slurm and do the planning for
+inference to scale more with the Kubernete HyperPod. - All right. And how... You mentioned now you have one engineer instead of, like, a team of, you know- - So, for each training job today, we'll allocate one, maybe two,
+but usually one, engineer, compared to full team just
+babysitting the cluster. - Right, and have they
+been able to leverage all of the profiling tools and
+the visualization tools to get a clear understanding of how the GPUs are being utilized? And you know, how has that kind of helped? Because you're significantly
+scaling down your team but it also means that there's that much more
+visibility that that person has to kind of monitor performance. - 100%. So, now because this visibility,
+not just for the ops team, also help our scientist and
+research team to (indistinct) because now we have visibility about utilization and
+which level of training, the pre-training or the post training, utilization or issue or actually scaling, especially when you have
+a large amount of data, 'cause, by end of day, those
+cluster is not just a GPU. You still have a CBU and RAM and storage. You need to monitor all of them, so having a tools give
+you full visibility. So, when the ops team can
+actually see everything, can it trigger and automate everything, putting some kind of events
+to triggers in real time help a lot. Also, the same time, now our research team in, actually, partnership with the ops. They have a tool they can actually work and
+monitor and work with them. There's not anymore
+"it's bare metal cluster. We cannot touch it. We
+cannot see any things. We have a DevOps on site managing and babysitting the cluster." This is changing to one person actually seeing 100 of
+those node, sometime more, and you have the research team, actually partnership with them, looking at all the data,
+all the monitoring. - Right, and moving on to you, Robert, you mentioned 16-bit images, right, and high-resolution images that
+are required for your model. How has your training
+architecture on HyperPod kind of helped address that
+data challenge that you have? - Yeah, so one of the... Sorry, I'm speaking too loud. One of the biggest challenges that we have is that we need to use
+fairly large instance types because we need to make sure we have 80 gigabytes
+of GPU memory or above to be able to accomplish
+what we need to accomplish. And so as you may know, access to those instance
+types is challenging. It requires, you know, coordination, lead time, and AWS to be able to prepare those, 24-7 billing. And so once we're doing that, we're leveraging all... We're leveraging the cluster for a significant amount of
+our operations, essentially. Anything that's using GPUs, we're almost exclusively
+using the entire cluster for. We've installed Docker,
+JupyterHub on the cluster. We do a lot of our experimentation
+on the cluster itself. And so we're... It's a really flexible tool that allows us to be able to install the tools
+that we need on the cluster, be able to use those GPUs
+in the optimal manner, you know, depending on
+what that workload is, whether we're running
+large-scale training jobs or we need to have some of our researchers running experiments on just a couple GPUs within the clusters. So that's been, you know, a really... It's a really flexible tool that allows us to be able to
+do whatever we really need, and these are challenges. Because of the types of data that we need to kind of deal with, we do have to have access to those fairly large GPU instance types. It's really flexible. It's
+been a really powerful tool. - How have you kind of looked at distributing or sharding your data across these GPUs because of the size of the
+dataset that you're dealing with? - So, we actually have installed our own distributed file system on the cluster itself. We've also used FSX, but we've had some issues
+with performance on FSX, so. You know, the power of this is that you can get down as
+low level as you need to to be able to install
+the tools that you need, so having that, you know, that customized
+distributed file system, has really allowed us to be able to optimize the way in which we're storing data across the cluster to be able to optimize for our workloads. - All right, and so I'm gonna now double-click a little bit more just on the kind of
+distributed training techniques each of you have kind of implemented. This goes a little bit perhaps, you know, on how you can do so across all these accelerators on HyperPod as well as any kind of new innovations in those techniques itself that you're experimenting with. So again, starting with you, Jeff, what are some of the sharding
+techniques that you've used? What are some of the libraries that you have actually worked with and any best practices that you can share with the folks here today? - Yeah, I can share better than practices. I can share the library. So, we built a library called Nanotron to make it easier to run
+large-scale trainings, and it's little companion Lighteval, which is an easy way to run evaluations. The sort of type of training
+techniques that we use really depend on the project that the science team embarks on. So, I talked about BLOOM that was 125-billion-parameter model. Small LM, I think we went down
+to under a billion parameter, like 175 million parameter for the small smallest one
+that's for the smartphone, so depending on the job, like, we have very different requirements in terms of how many GPUs
+for how long would we need. And so the flexibility
+that we have in HyperPod to sort of isolate job and only use exactly the
+resources that we need is very helpful. - All right, and what about you, Waseem? How have you looked at, you know, your distributed
+training techniques? What libraries have you used? How did it work? - We've been using a lot
+of libraries so it's not... Like, each generation of our model actually been (indistinct) using different type of libraries. PyTorch has a lot of utilization. Using NeMo Megatron, one of the... Actually, we implementation we used to build and train those model, and this a beauty of HyperPod. Like, we didn't have the limitation of what type of software
+or library you wanna use. We can go, you know... As we mentioned, it's very low level to install. You know it. You guys did install your
+own file system, right? Which is the cool part around it. So you're not limited to very high level, where (indistinct) like, "This is specific SDK or
+specific way to build it," so definitely give us a lot. So, for example, the latest model, we have our own implementation. We should actually,
+coming open source soon, have a paper about it, something called a frugal transformer. It's a system using managed KV cache between the layers itself of
+the transformer layer itself, so even as a very, very custom, it was piece of cake to
+actually run it on HyperPods. We didn't have any limitation around this. That's the same thing
+when you're running stuff using PyTorch or an older model. We utilize a lot of
+NeMo Megatron libraries. It been actually working
+just very straightforward without any challenges, and I believe it's going to continue 'cause, you know, the
+open-source community's coming with a lot of amazing thing every day. And having flexibility
+from the hardware side to change and utilize any
+libraries without any limitation, 'cause just the speed of innovation is so amazing in the
+open-source community, it's actually key for any tools. Like, the idea of we need
+to be a very strong opinion how we use specific hardware
+and specific libraries. It's gon' be hard to utilize,
+at least in our side. - And Robert, like, how are you... How have you kind of looked at your distributed training libraries? How did it work with HyperPod? Any engineering effort that was required to get it kind of going? - Yeah, within HyperPod, it's been fairly easy. When we've been using DeepSpeed... We're primarily using
+DeepSpeed and PyTorch. You know, we're currently
+implementing FSDP for another of the models
+that we're working on. You know, from a HyperPod perspective, it's really easy to get up and running. You can install whatever
+libraries you need. Like I said, you can get, you know, as low level as you need to get, and you really have full control, which I think is... You know, it's a really powerful feature. As you know, you really... You know, when you're
+working at this scale with this type of data and, you know, these type of GPUs, you really need to be able
+to optimize for your workflow and you really have to
+have the capabilities to turn every knob. And so yeah, ultimately, I think we found quite a lotta flexibility. Haven't really had, you know, a lotta the challenges that we had even with some of the previous iterations. Like, the SageMaker training had a little bit more limitation, so you know, really happy with
+the move to HyperPod there. - And we've talked quite
+extensively about training, but after training comes inference, and that is where... There are a different
+set of challenges, right? Scalability, throughput, latency. And I'm gonna start with
+you this time, Robert, just to kind of mix
+things up a little bit. How have... How are you thinking about
+deploying your models? And tell us more about how
+you're architecting that out. And what are some of the
+considerations there? - Yeah, so, medical images, as you may or may not know, often contain many images. You know, an X-ray, for example, like a chest X-ray, for example, usually contains at least two images: frontal and lateral. A 2D mammogram will have
+at least four images at 4K resolution each. And so you now, you really need to be able to optimize the way that you leverage the... Sorry, my brain is... (laughs) I'm gone blank. You really need to be able to leverage the cluster, you
+know, really efficiently. And so what we've done is... We are... Oh shoot, I'm sorry. I'm (chuckles) drawing a blank. Can you repeat the question real quick? - It's really about how you're thinking about using the HyperPod
+cluster, because it is a (indistinct) cluster-
+- Yeah, for inference. Got ya, yes. Sorry.
+- across (indistinct). - Sorry. Yeah, so for inference, right now, we are using
+SageMaker endpoints, but we can only support up to two images, because of the type of instance
+types that they support. And so we are really looking at HyperPod as a much more scalable approach to being able to do inference on more than just those two images, to be able to support four
+images / 10 images at a time, to be able to perform the
+inference that we need to, and ultimately, you know, we're looking at possibly building out
+our own queuing mechanism on top of that. We haven't quite gotten to that point. We'll be kind of launching here in Q1, so haven't gotten it
+out the door just yet. But that is kind of the approach, to be able to make this more scalable for more of those images. - And it's also important, if it is a persistent cluster and it is existing GPU
+capacity that's available, to be able to kind of leverage it for both training and, once you're done training, to also leverage it for inference really helps optimize the resources and, you know, the
+carbon dioxide emissions and everything else, right, like your general TCO of
+utilizing that infrastructure. So Waseem, how are you kind of looking at building out infrastructure? You did mention EKS for inference. Any specific things that are top of mind? - You know, I will put it in this way. One of my engineer, he said just, "I think HyperPod going to make
+one of our dream come true," which is running model in Kubernetes. We've been trying this for years. We've been... Before, actually, we start using
+these existing technologies came from AWS, we've been relying on, literally, bare metal
+or just standalone server to run inference. I'm not sure if you guys have experience around running larger models on Kubernete. It not the best experience, you know? Especially how you actually scale and auto scale those models, the GPU is inside the
+Kubernete cross multiple node. It's actually really, really tough, so the solution that SageMaker team came up with have basically take the
+powerful side of Kubernetes, when you can actually have the networking, the
+isolation, the auto scale, but also linking this with HyperPod to manage, actually,
+those (indistinct) GPUs. It been actually very, very seamless. This is something... We've been looking
+forward to implement it. We are actually today in a process figuring out how we start
+doing the migrations, 'cause, in inference, it not just the time for first talking in models. It's not just the processing itself, especially in enterprise. There is tough matter, like
+number of request per second, you know, how many Coconut
+request allowed to be utilized, the speed in general between those models, sometime also stuff
+related to availability and making sure just
+the SLAs go above 99%. Utilize from there, so this is basically the nice solution when you can really think about
+it more like a serverless, but it's still Kubernete. You still can see it how much
+utilize and how we implement, which is get to a second
+part, which more surprising. My CFO, actually, Roger, he love it because now can look at the stuff like... You know, actually, my cost. You know my margin. You know how much I actually... We can think and help our customer to think about the cost and scaling. We see a lot of customer care less about, basically,
+how many talking per day and they care more about how many concurrent
+requests in the second and sometime vice versa between them. And all this help us actually serve our
+customer in a better way. - And Jeff, are you currently using your HyperPod
+cluster for inference? Or are you planning to? - So, today, we have our science cluster that's really focused on training, and we have a production infrastructure, where a lot of the inference that happens through Hugging Face is, and it's all managed with Kubernetes, things like HuggingChat. It's like an open-source
+ChatGPT you can use for free. Things like the Inference API I mentioned. A million models available on the hub, you can try them all
+right there from the page. Things like Inference Endpoints, if you want to deploy
+dedicated infrastructure for any of the models hosted on the hub, including your private models. But for us, inference is very
+important to the mission, and by inference, I mean the ability for customers to deploy within their own infrastructure, so maybe if you use some of the models available
+on Hugging Face on AWS, you probably use our
+Deep Learning Containers. We build and maintain
+Deep Learning Containers so that you can use any Hugging
+Face model outta the box in an environment that works to do any kind of training and inference within your own tenancy, and that's really important because we don't wanna live in a world where a handful of companies are sort of controlling
+all the experiences that every single company or user has. A lot of our everyday experiences
+are already powered by AI, and that's only going to accelerate. If there's only a handful
+of models behind all this, that creates a whole lot of issues. The world that we want to live in is one where AI is very much decentralized and it is within the
+abilities of every company to build and host their
+own models themselves. And it's only if you can
+build and host your own models that you can really control
+your customer's experience, that you can really protect
+the customer's data. Often, the GPT models behind APIs, they change from one day to the next. You won't be aware of it, but all of a sudden, your
+customer experience changes, requires you to send customer information through the internet to a third-party provider. So there's a whole bunch of issues that I think the industry
+will be reckoning with, and it's very important for us to provide a wide variety of options for companies to be able to host their own and
+control their own AI. A recent example of that is HUGS. So, HUGS, for Hugging
+Face Gen AI Services, is a new service we launched
+just a few weeks ago. It's on the AWS marketplace, and you have an optimized
+out-of-the-box deployment for the most popular open models that you can host in your own AWS tenancy. But to go back to your initial question, what's interesting to us is that HyperPod gives us flexibility in how we want to utilize the cluster, so it would be possible for us to be able to use the capacity that we have in the science cluster when the training jobs,
+the training workloads, from the science team would not utilize it fully and dedicate that in a very dynamic way to add to our production infrastructure. - Right, and you just
+mentioned marketplace as well as some of the other, you know,
+avenues through which the AWS-Hugging Face
+partnership is kind of active. I wanted to kind of touch on how has partnering with AWS as a cloud service provider really benefited in
+Hugging Face's mission. How has it really helped
+you reach that faster or helped strengthen your
+position in the market? - It's a very synergetic collaboration because through our
+collaboration with AWS... I mentioned the SageMaker
+Deep Learning Containers that you can all find in use to deploy and train Hugging Face models, but we also collaborate with the team that builds the new Trainium and Inferentia
+custom AI accelerators. I think, earlier this morning,
+Trainium2 was announced. We're very, very excited about that. And so through this collaboration, we not just make it easy for customers to build their own AI, but also we make it more cost-effective. And so with Inferentia, with Trainium, you can use them directly
+with Hugging Face models. We build open source to make
+it easy for you to do that. On the marketplace, there is a machine image,
+an AMI, that's available for you to set up your own workloads. - And Waseem, the same question to you: how has this partnership helped Writer? And any comments on that. - You know, I think the biggest thing can notice when you partnership with AWS, in general, they understand, actually, that technology is not just
+a software and documentation. You go figure it out by yourself. Like, HyperPod itself as a system is not that complex to implement, but it's still a new technology. So I remember the early days
+when we introduced HyperPod. The team actually was
+with us online in Slack. We have on a call, you
+know, few time in a day if it required to train the engineer to utilize them, to actually use the tools, and that actually help a lot. So we don't feel you will feel as that's a product and you use it. it feel, actually, true partnership. You actually care about
+really utilizing the system, implementing, and training, and that not just... You know, I mentioned just the HyperPod, just our recent experience, but that's cross other services also. So appreciating, you know, the partnership with AWS in general and to appreciate the understanding that, regardless what the
+company size, big or small, they still actually
+care for those details. - 'Kay, and Robert, how 'bout yourself? - Yeah, the partnership with AWS honestly has enabled us
+to do what we're doing. Without AWS, we wouldn't have... I mean, we start with snowball devices that get loaded with data, moved into S3, de-identified at scale through Spark jobs, and moved to the compute clusters in whatever region they were reside down to, you know, being able to move that data onto FSX, move that onto our cluster, be able to train at scale. It's really everything
+across the entire spectrum that's kind of enabled us to be able to accomplish what we have with a, you know, relatively
+small group of engineers, so the partnership's been fantastic from a technical perspective. You know, from a support perspective, we have great partnership there, being able to get unblocked when we run into any issues, and even from a strategic perspective and, you know, just kind
+of collaborating with us to understand where are we going, what are the pain points
+that we experience, and how can we provide feedback to iterate on the services that we're leveraging. - Great, thank you. With that, we are almost at time, so I wanna take some time
+to thank all three of you for coming today and
+talking to the audience. I also want to open it up for any Q and A. We will be here for, I
+think, the next five minutes before the next session starts, so if you want to come over to the podium to ask any questions that you
+have or just chat with us, please, feel free to do so. But thank you all for
+attending this session, and thanks to our panelists
+for taking the time to talk. (audience applauds) - Thank you. - Thank you. (Robert speaks indistinctly)

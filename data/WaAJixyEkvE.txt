@@ -1,0 +1,431 @@
+- Thank you for the Jabil
+team for coming out here. Excited to do this
+presentation with you guys. I'm gonna give you guys a
+quick overview of Q-Business, and some of the launches and
+how we're working Q-Business on supply chain, and then I'll give it
+over to the Jabil team, May, and the good stuff will begin. These are some cool slides showing how massive supply chains have gotten, and, of course, how Jabil
+is involved in supply chain. We're gonna get through these because I want to get to the fun stuff. Come on, here we go. Hold on, hold on, okay, here we go. So, hopefully many of you
+saw the keynote this morning, and you heard a lot of the things that Matt and Andy were talking about. Amazon's essentially been
+using machine learning in our logistics for the last 25 years, and so you look at 4,000 products
+sold per minute on Amazon. The way we match products to
+users is via machine learning. The first primary delivery
+was in December of 2016. We used neural networks to
+make these deliveries possible. We have billions of Alexa
+interactions each week powered by about 18 models, machine learning models under the hood. We have 1.6 million packages
+delivered every single day. If you listen to Andy this morning by using machine learning, and generative AI in just this last year, we cut that by 10%. Sorry, we increased the speed at which we can deliver
+those packages by 10%. So, we've been doing this
+for a very long time. Rufus, hopefully some
+of you who are shoppers on Amazon have used Rufus to help find products more efficiently. Our pharmacy, Amazon Pharmacy, we're helping fill prescriptions faster by leveraging generative AI. And Ads, of course you know
+that we're matching ads to our customers and
+we're using generative AI to match the best possible advertisement to the customers possible. And then finally, Maestro is our playlist
+generator on Amazon Music. And again, the point of
+these last two slides is just to show how deep the experience we have using generative AI, and machine learning to make our products for our customers better. So, here's a cool little video. The paths that optimize
+robotic picking routes, and fulfillment centers
+are always getting more and more complicated and more complex. And the routes that these
+packages can take through the fulfillment center
+become more and more complex. And again, we're using machine
+learning every single day to squeeze out every piece of inventory, every piece of productivity
+to deliver packages faster to our customers out of
+our fulfillment centers. So, what are we gonna talk about today? The business impact of generative AI. Some of the generative AI use cases in supply chain specifically,
+as it relates to Jabil. Q-Business and Q-Apps. Q-Apps is a capability
+inside of Q-Business that we'll talk about briefly. And then the really fun stuff is Jabil's generative AI journey that May will get to momentarily. So, this is actually one
+of my favorite slides because again, we expect generative AI
+to impact 80% of jobs. The reason why this is
+most exciting to me is because I believe that
+things like Amazon Q, which we're about to talk about, is where that's really gonna happen. The things that impact everyday
+users, the business users, the non-technical users can
+use these products seamlessly to help them be more productive
+and be more effective. That's how we're gonna get this to 80%. So, the business impact of
+generative AI in supply chain. 43% of working hours across
+supply chain activities could be impacted by generative AI. 29% of working hours could
+be impacted, $0.5 trillion. So, these numbers are just massive. And using generative
+AI to move the needles and more effective supply chains is presenting a massive opportunity. I'm gonna skip over this one. So, this is the generative AI stack, how we think about it in AWS. At the bottom here, we'll
+get through this quickly, but at the bottom here, you
+have things like SageMaker, our chips, hopefully you heard
+about those this morning, Tranium, where you can, you know, Amazon Backpack is, I consider this like the operating system for our customers like you
+to build applications on top of these models. And at the very top of the
+stack, my favorite area, is the application layer. And this is Amazon Q and AWS App Studio. We're only gonna focus on Amazon Q today, but this is like the top
+of the stack, you know, really that fully managed
+layer using generative AI to help businesses like
+you be more productive and more efficient. So, what's Amazon Q Business? Amazon Q Business is the most capable
+generative AI assistant helping you get access to information, massive amounts of information, helping you get insights
+into those documents. And actually, now we're
+helping you take action, and actually do work and
+execute work against that data. And so, what's very cool
+about Amazon Q Business is as you load this data, and you load these documents
+and we honor the permissions, we honor the security, so that
+people, when they're using, when employees are using Q Business, they're only able to access information that you've actually
+permissioned them to see. We connect over 40 different
+data sources, so that's S3, Google Docs, Google Drive,
+Microsoft Office, SharePoint, Confluence, the list goes on and on, but we really enable you to
+bring in your unstructured data, your documents, from any system you have within your organization. And Q Business then allows
+you to get those insights. So, this is actually
+a really cool feature, when you ask Q Business a question, it actually will reference the document in which Q Business found that answer. And so, you can see at the bottom here, actually did I just, you can see below, right? Typing in that prompt and
+you can see the documents that are actually being
+referenced for that answer, and then the end user can go
+straight to those documents and dig deeper. So, one of our customers'
+favorite features, we got these built-in connectors across all these different apps
+that I mentioned earlier. So again, we're enabling
+you to bring in your data from wherever it resides. We also have a custom connector. If you have homegrown on-premises systems, you can integrate with those as well. So, this is actually one
+of the cool features, perform actions using plugins today. Actually, if you were
+watching the keynote, we just launched 50 more of these today, but essentially Q Business can interact with a Zendesk or a Jira,
+create a Jira ticket, update a Jira ticket, update Salesforce. And so, this really
+enables your organization to build pretty advanced workflows. You know, as an example, I need to make an update to a customer. It could go upload the Salesforce entry, update the ticket in Zendesk, maybe potentially update a document. And so, we're enabling you to establish these pretty
+sophisticated workflows across multiple systems. We also have custom plugins
+as well that allow you to create actions and take
+actions against custom systems that a lot of our customers have as well. And then this is the most important thing that I want to hit home. We adhere to those data and
+privacy and security needs. And so when you're pulling
+in these documents, pulling in this information
+from these various systems, we are honoring those
+permissions and that security and privacy of those documents
+so that when that end user, when that employee comes in and asks a question or prompts Q Business, we only allow them to
+access the information that they are permissioned to see. And so, when we built Q Business, security and privacy were
+really there from the get-go. We built these from the ground up with security and privacy in mind. And we will never ever
+use your information to train our models or
+make our models better. And finally, boost
+productivity and further. I think, you know, the way I like to
+explain this is you think about like the beginning of this year. You know, a lot of us were
+asking questions about our data and getting some cool answers. It was cool. And then we were able to
+actually create content and generate content. And that was cooler. But I think all of us
+really want these things to do work for us and make our jobs easier
+and actually execute tasks and do things. And that's where this is going. And, you know, we released
+an automations engine that allows you to automate workflows. Think about onboarding
+a new employee, right? They gotta get a badge. They gotta get a laptop. They gotta get secure access. They gotta sign their contract. All these things that have to happen when onboarding a new employee. And through Q Business, through
+automations in Q Business, we're enabling you to build
+these workflows end-to-end that actually work asynchronously. And so, you could think about all these complicated workflows within your organization
+that you'll be able to automate via Q Business. We have Q Apps. These are, think about this, again, some people get
+confused by the name Q Apps. Q Apps is just a feature
+within Q Business. And the best example I
+like to give is, you know, imagine there's a new employee coming in and you want to choose their
+level, their department, how many years of experience they have. And automatically, Q Apps will
+give you an onboarding plan for that employee. And so, these things, where you have these repetitive prompts that you're doing every
+morning or every day, you can actually create an
+app, a very lightweight app to automate this process. So, you don't have to type in that prompt every single morning. You get in and just, again, it's just a way to
+make you more efficient and more effective and more productive. We have a library. So, if you create these apps
+and you want to share them with other employees in your organization, you can easily do that and
+it's very easily discoverable by other folks in your organization. And that is it. So, I want to bring up
+May, the star of the show. This is 11 minutes. I still told you it would be 10. - Yeah.
+- Here you go. Thanks. - So good afternoon. For those who did not put on the headset, you might want to do that, right? So, I'm sure you can hear me, but I'm sure you'll be
+delighted to hear more about our success story. So, David, thanks very
+much for inviting me to share this session. Jabil, right? And for many of you guys, probably Jabil is the
+best kept secret, okay? It's the best kept secret,
+but I do actually wanted to share the secret with you
+in a little while, right? So here we are. What I actually put in this title is: Transforming Manufacturing and Supply Chain Solution
+on Management with GenAI. And why are we saying what
+we are saying right now? So, for the Jabil story, again, I say it's the
+best kept secret, right? So, for folks who doesn't
+know about Jabil, right? We have many different
+pronunciations like Jabil, right? But Jabil is actually
+a manufacturing company our headquarter in USA, Florida. And it is actually built
+by this two gentlemen, James and Bill. So, when you put James and Bill together, you actually have Jabil, okay? So, it is actually a very
+unique manufacturing company, and this is where we are, right? So we are a manufacturing
+company headquarter in US, second largest contract
+manufacturing in the world, right? So, if you actually look at our revenue, we are close to about
+29 billion and managing about 140,000 employees with
+over 60 years of experience. So, when we talk about Jabil, what we are really doing is we
+actually manufacture, right? So that's our core business. And the vision of Jabil is
+really to become the best, the world most advanced and trusted manufacturing
+solution provider in the world. So, that's our vision. So, when you Google and look at Jabil, that's really what we say we wanted to do. So, when I have such a strong
+vision from our chairman, from our CEO, so that
+means a lot to us, right? A lot to us when I'm saying that, hey, we are here to
+transform manufacturing. We are here to actually shape
+the future of manufacturing. So, if you look at the business
+that we actually cut across, we have 400 customers, 400 brands, right? So, these are brands that you're probably holding
+in your pockets, right? Or when you look up,
+they're the satellites, or when you're driving,
+those are some of the EVs that we are manufacturing. So, our business actually
+spans from healthcare to consumer products, to electronics, to many,
+many other things, right? So, there are so many 400 different brands that power the world. So, the lifecycle that we are
+looking at for Jabil actually is an end-to-end lifecycle, right? We're involved in some
+cases with designing of the product with the customers. We are then using the product, and actually do the manufacturing, do the new product introduction,
+do the manufacturing, and then ship out and pack out, right? So, it's an end-to-end cycle. And what is interesting right
+here is that when you look at Jabil in such a 29 billion
+company, 400 customers, on a day-to-day basis, we
+are dealing with a lot, a lot of transactions. We are dealing with a lot of supply chain. We are dealing with a lot of global span. So, I bear in mind this number,
+25 billion of global span that we are trading through
+in our supply chain network. We have 38,000 suppliers
+within our network, right? So those are the wealth
+of data that we are actually dealing through
+on a daily basis, okay? So, this is just a backdrop as to why we say we need AI, right? We do need AI to actually
+help us be more efficient, be more productive, and actually find ways to
+actually be cost-effective. And what's more is that
+when you look at Jabil, we are not just a manufacturing company. Yes, we are, but the wealth of knowledge that we have accumulated in
+the manufacturing processes, in supply chain, is also shaping the way that we are transforming
+our business, right? For example, if you read here, we are also providing
+practitioner-to-practitioner supply chain services to
+other manufacturers, right? Potentially our customer or non-customers, we are also teaching
+them and guiding them, and sharing with them our best practices on how to do supply chain. So, that is actually a very
+big part of the transformation that we are doing. Okay, so that's actually
+everything about Jabil. So, it is not just the best-kept secret, it is actually a good secret, right? All right, so when we
+actually start to think about, hey, then what are the things that I need to do to actually help to shape this transformation? So AI is something that's
+very close to heart, right? Not just for me, but actually
+for most people right here. We actually started the AI
+journey probably like seven, eight years ago, right? So we started with some of
+the manufacturing sites, actually piloting some of
+the computer vision solution that actually can augment inspection. So that's where we
+actually started, right? So that's when, before ChatGPT and all the generative
+AI really gets exciting for many people, right? But when we actually step
+back and think through, right? So, what are the key building blocks that are important for us when we actually start
+to build an AI strategy? So, it is actually kind of defined by these five key pillars, right? So everything that we do, it needs to have a value proposition. Why are we doing this? Why are we doing the AI
+projects that we are doing? We are not doing it for POC, right? I think we are over the stage of POC, and it's very important. So, this afternoon, I actually attended a kind
+of round table session with some of the industry experts, right? And we were actually chatting. So should we still be doing pilot? Should we still be doing POCs? I think at certain point in
+time, especially on GenAI, there are a lot of good
+solutions out there, Q being one, right? So, I think for us, it is
+very clear that first of all, we need to actually build our solutions and build it knowing why
+we are building it, okay? So that's why I say it
+needs to create value, okay? And we are shaping the
+way on how we are working. So, in fact, I just completed
+my long-term planning for the IT team presenting to the board and presenting to my leadership team. So, one of the very key focus item that we say we're going to do
+is exactly what we say, right? The new way of working. How do we actually empower our employees? Bear in mind, 140,000
+employees that I have, right? So, part of it are
+workers, but we also have knowledge workers in the whole ecosystem. So how do I actually make
+sure that from my operators, workers, to technicians, to my leaders, my finance controller, my supply chain officer, my buyers, how do I actually have a certain persona for them such that for
+every of this persona, we can actually empower
+them to actually work the most effectively, okay? And that's where GenAI actually comes to play a big part of it. And I'll share a little bit
+about what we are doing here. Okay, so while we have all this ready, I think what's important
+where we build the AI strategy is what is the digital core? Where is the digital foundation? And where is it? Right here. So again, a lot of what
+we are talking about, and I think in this morning keynote speak, keynote Matt actually shared that, hey, it is important
+that when we talk about any of the things that we are doing, be it AI or GenAI, the foundation actually comes in with, you need to actually have
+a good infrastructure. You need to actually
+have your data in place such that you can
+actually start to do that. So, this is what I call a solid
+digital foundation, right? How do we actually handle our data? How do we look at our data? How do we curate the data? How do we actually set a
+semantics layer for our data? So, all these are things that we have to actually do in preparation of that. And the notion of continuous
+improvement never stops, right? So, I'm also driving
+transformation for the company. So, it is important. Why? When we actually think
+about transformation, sometimes it's a buzzword that has been thrown around, right? And people got scared. Are you trying to replace
+my work with transformation? No, that's not what I'm
+talking about, right? I'm talking about the
+new way on how we use, leverage on people, process,
+and system to do new things in a new way, and in a much efficient way. So the continuous improvement
+needs to always kick in while we think through our strategy. And very importantly, how do we actually use all this AI in a responsible way? So, I was quite happy when, you know, okay, let me step back, right? I was not that happy when we
+actually started this journey because everybody is
+looking at IT and say, hey, you guys own the data. Hey, you guys have the data. Hey, you got to do this
+for me and that, right? So, we come to a big
+discovery that we know that we don't own the data. I'm not sure how many of you guys here are from IT versus business, all right? So, I'm sure you share the
+same sentiment as me, okay? So, they look at you,
+hey, where's the data? Give me that data and
+give me that dashboard and give me that insight. I don't own the data, right? So, that's when we actually
+started on our journey about one and a half year ago that we say, hey, we need to actually
+make the organization realize that data and the
+initiative needs to be owned by the functional owners, okay? So, we set up a council where actually appoint senior leaders, right, really senior leader at the VP, SVP level that each of the function needs to send a representative
+and they sit in my data and AI council. So collectively, we all make the decision. Collectively, they know what's their roles and responsibilities and collectively, we design an AI and data
+policy that spells out what are the gut rules, what
+are the do's and don'ts. How do we actually use data
+and AI responsibly, right? Of course, we are in
+this evolving journey. We are still tweaking and
+actually refining our policy, but I think it is a good start. It's a good way to start, right, to make people realize that, hey, you don't just use your
+data and pass it to somebody to actually create a model for you, right? How do you actually safeguard your data? So, those are actually a
+very important asset for us. So, that was some of the lesson learned when we actually start on this AI journey. So, when we actually think through it, what's important for me is the North Star. What do I want to create with
+this GenAI initiative, right? So, I talk about the Data and AI Council. So collectively, collectively, we all decided that there
+are three categories of AI initiative that we will sponsor
+and run in Jabil, right? So, we set up very, very
+clear guidelines that one, it needs to be, again,
+remember what I was saying, for value creation, right? So, the AI project needs
+to be creating value for the collective us, not
+just you, not just her, but the collective us. So, we actually deep dive
+to actually understand what are some of the business problem, what is actually affecting
+everybody badly, right? What are some of the key
+concerns or processes that are spending a lot of time
+that we can actually improve on using AI technology or
+machine learning, right? So those are what we call a category of advanced machine learning projects. So that's the first pillar. And remember, we are a
+manufacturing company, right? I talk about our journey
+like seven years ago, starting on computer vision to augment our quality inspector. So that's the second category
+of computer vision projects that we are doing. And last but not least, the
+third category of AI projects that we are working on are
+the GenAI project, okay? So, the GenAI project actually
+start with a North Star. I call it the North Star, right? They kind of changed the
+word that I use here, right? Jabil Brain is what I aspire
+to create for Jabil, right? We wanted to actually
+use the GenAI technology to actually create a
+brain, a artificial brain or a smarter brain that can actually fish all the tested knowledge that
+we have within the company into that brain so that
+we can query, we can ask, we can actually drive insight from all this different knowledge that we have, right? That is a lot of knowledge. Think about it, right? So, I have 100 different
+locations operating out of 35 countries, right? So, 140,000 employees. Every day, people are coming
+out with different ideas. So how do I capture that, okay? So Jabil Brain is my North Star. I wanted to create that brain
+for the organization, right? So, and that's where we said
+that we actually see a lot of potential value creation that I can actually get out of this. So, I see gentlemen nodding their head and appreciating, yeah, that's the thing that we need, right? So using the technology,
+using the data point, how do I actually improve
+my product design? Think about it. I have lots of DFX, right? Design for X means anything, right? I have lots of DFX. How do I actually leverage
+on the DFX that I've created for product A to actually
+be applied to product B, or C, or D, right? And how do I actually
+use the lesson learned that I've learned from the manufacturing
+process and actually use it and be applied to other cases? So, that is about product design. That's about predictive manufacturing. I think anybody who is
+from the manufacturing, this is always a use case
+that's talked about, right? So, we do AI for predictive manufacturing, but in reality, can we really do that? Or how many people has already done the predictive manufacturing? So, I will not claim that
+we have done it fully, but we definitely have a path to actually create
+predictive manufacturing, which I'm pretty proud about that, right? So, we also know that, you know, how do I actually use this
+data to actually help us in supply chain resiliency? And that's a very interesting one. So, there are a few use cases
+that I'm sharing today, right? In fact, three use cases. One is actually on
+manufacturing itself, right? The other two are on supply chain, okay? And all these use cases are
+actually powered by Amazon Q and, in fact, Amazon Q QuickSight, right? So, what I was quite
+happy this morning hearing from the keynote is actually
+the announcement about Q and QuickSight actually
+working seamlessly together. So that will solve a lot
+of our problem also, right? So, operations, so operation really means in the manufacturing
+floor, in the shop floor. Ask Me How, there's a joke
+behind Ask Me How, right? So, we are working with this operation VP. His name is Me How, right? Think about it, it's Me How. So, it was funny when we actually started to create this notion of Ask Me How, right? So, it's like asking me how
+on what to do, but joke aside. So, this is really what we
+are doing on Ask Me How. On the right-hand side, I think that's a very familiar interface that David was actually showing, right? So that's the interface on Q. So, the challenges that we have, right? I will not say it's challenges. It's really a lot of
+opportunity that we have. So again, I think for folks
+who are in the manufacturing, you know that we have a lot of documents. A lot, a lot of documents, right? And you know that some of the
+time the operators actually do need help, right? They do need help, but sometimes they will not voice it, right, and the other big challenges
+is 100 locations, 35 countries. So, you can imagine a lot of our, even though our documents
+are created in English as the standard language, but a lot of our operators actually do not really understand, okay? So, there are questions
+also where, you know, the thing about us, our
+processes are SMT lines. Our processes include mechanical lines. So, we have CNC, injection
+molding, and SMT machines. So, you know, for SMT machine, it is very common that you have a few of the equipment's error code
+that come out occasionally, right, when you're manufacturing. So, for example, the
+nozzle, nozzle error 001. Okay, I'm just making it up, okay? Nozzle error 001. So, what does that mean
+for a new operator? How would I remember
+the 10,000 error codes that's coming out from my SMT machines? So, if I actually log in, and this is really happening today, right? If I log into my, Ask Me How, and I put in nozzle code error 001, what does it mean? So, it will actually come out with that documentation and say, this is what it means. This is how you can actually solve it. And this is actually,
+while we are learning, we are actually also taking, keeping track of how many times have the error 001 actually come up, and we are actually starting
+to form our knowledge base as to when you actually
+have this kind of error, what are the potential
+solutions that's been created? So, think about it, right? It is not, if I use the analogy, it is like a library that have books that answer your question, but it also have answers for you before you ask your questions, right? So, I thought that's quite
+an interesting analogy. So, the other good things about what we are using
+on Ask Me How across the site right now is that
+it's multilingual, right? So, we have folks from Poland, right? The documentations are in English. So, after coming out with error 00, nozzle error 001, in English, I just say, translate to
+Polish, and here it goes, right? It actually prompt me
+with the right answer, and it actually index and refer me to where did I get this information. So, this is how we are using it. Of course, this is just baby step. Think about the possibility that we can really use it extensively across the manufacturing
+shop floor, right? This is just a baby step. We use it as a library. We use it as a knowledge base, but what I really wanted to create is beyond that, beyond that, really building an insight,
+a knowledge insight on how we can solve potential problem before it actually happens. It needs to be a closed-loop
+system that actually prompt us before the errors happen or
+before something break down in the manufacturing shop floor, right? So, the results are obvious. The results are obvious. It actually reduce downtime
+because before it happens, the operator can actually
+ask the questions, right? So, it definitely increase efficiency. I don't have to wait for my technician. I don't have to wait for
+my supervisor to come in and step in and actually
+tell me what's going on. I don't have to stop the line to actually wait for the answer. So there is a lot of good
+benefits that come out from this, right? So, I'm very hopeful this is
+actually going to help us a lot and the operators like it, right? It is basically a intelligent
+shop floor assistant to them. So, the other one is, I
+promise you I'm going to share about the two-use case study
+on supply chain, right? PIP, it actually stands for
+Procurement Intelligence System or Programs, okay? So again, remember the numbers
+that I was talking, right? 25 billion of global
+spend, 350,000 suppliers that we are dealing on a daily basis. So, if you think about
+the procurement processes that we are involved in, right? Again, I think challenge is
+probably not the right word. The opportunity that I do see in this whole procurement
+process is as a buyer, right? Or as a category manager, what is important to me
+is for my 400 customers, I need to know when is the best time to buy my commodity, right? To buy my capacitor, to buy my
+steel, my resin or whatever. So we already have a system
+called the PIP that's built. What we are adding on top of this procurement intelligence system is exactly the Amazon Q system, all right? Think about the possibility. And it's interesting, it started out with my chairman challenging
+me, hey, you know, we have all the demands coming
+from our customers, right? We know what are the demands and we have all the third
+party reference note. We deal with the traders, we deal with brokerage that
+actually sells the part. So, if you married the
+two, what are the insights that can actually provide to
+us as a manufacturing company? It does actually give a
+very good big prompt, right? Think about it, if we are
+seeing a lot of demands on capacitor, okay? And we are saying that,
+hey, from the supply side, there is likely to be a
+shortage of capacitor. So, what is the next
+action that I'm gonna do? If I'm the procurement officer, I probably will actually start
+to buy a lot of capacitor and stock it up, right? If not, my customer will be
+running short of the capacitor. So, this is exactly how we're using all
+this intelligence today. So, we can actually query, right? Which I will show a video shortly on how we are using it today with Q. So, let me see how I can
+actually show that video. So, this is a snapshot
+on our PIP system, right? And the brain. So, I'm not sure whether you can read it. So, I think what it says
+is, what's the latest new in the electronic industry
+for October 2024, right? That's what we query the Q. You can see that when
+you actually question it, it actually went out to actually consolidate all the internal, external information, the demand signal, the supplier's information, and consolidate and give us a report. Hey, this is what's happening. For supplier ABC, this
+is what's happening. For supplier DEF, this is
+what's happening, right? For your customers, this is
+actually the trend that we see. So, this is a lot of good
+insight for us, okay? So of course, there's more
+that we can do, right? But this actually is very exciting because it actually prompt
+my chairman to think through, hey, if I actually peel the
+onion down a little bit, right, besides just buying capacitor,
+so what are the raw material that's being used to create
+this capacitor, right? Do I need to actually go source
+for some sand or iron ore? I mean, it makes his
+imagination run wild, right? I'm not saying we would do that, but it actually help him to prompt for potential business ideas that's gonna come next. So that was about procurement, right? So, the other one is what we call the supply chain assistant, or V-command, literally
+meaning virtual command. It's a command-and-control
+system for the supply chain. And remember what I said about our supply chain management? We actually are very good in that, and we started to provide it as a service to customer and non-customers. And V-command is actually the platform that we have created and we're
+still evolving it, right? We have created to actually
+provide this platform for the services that we are
+providing to our customers. So it includes supply chain as a service, it includes logistic as a service, includes procurement as a service. So, those are the services that we're providing to customers. But if you start to think about it, procurement as a service,
+yeah, I have my PIP. There's a lot of intelligence that I already can actually provide to my customers. So again, what are the
+opportunity here, right? We are constantly looking out
+on how we can actually use all the supply chain
+services to increase revenue and actually create new
+margin for the company, okay? So, it is definitely a
+sales opportunity for us on how we actually use supply
+chain information, right? So, in V-command, like what I say, it's a combination of
+supply chain services, procurement services, logistic services. So, everything that we're
+using right now is using Q to actually prompt us, to actually give us what is the best landed
+cost for any customers who wanted to create distribution center. So that's one. How do I actually identify the risk that's involved in the
+supply chain, right? Should there be an earthquake
+or typhoon or hurricane? So for the customer X, do we have alternative for them, right? So, can we actually identify very quickly what are the other alternative
+suppliers that's around, you know, 10 kilometer from their area so that we can actually replenish with another new suppliers. So, we talk about risk management, right? We talk about providing the best price for our customers when we
+actually go out to source. So, there's tons of
+opportunity right here, right? So, in V-command, we
+create this V-commander or SCM assistant to actually start to help our supply chain practitioner to actually start using all the data that we have, okay? Again, there's tons of data here, right? So, the concept is the same, right? So, how do I actually use all this data to actually help me prompt? So again, there is actually
+a video right here. So, this is how the look and feel, right? So, we initiated the V-command queue. Sorry, I can't even read the word. So, summarize, okay, Method is one of the company
+electronics forecast. So, you actually go out to
+actually source for, let's say, Method is our customer,
+Method Electronics. Of course, this is pseudonym, right? So, for Method Electronics, I wanted to actually know everything about Method Electronics, right? Their data, because they are our customer, we can actually know and
+summarize their data point, and we can actually go source for external information
+and complement it. So, everything that we do
+know about Method Electronics will help us to decide
+on what we want to do on the supply chain side. So again, remember, I was
+talking about V-command is really a sales engine
+for supply chain services. So, to me, to the supply chain officer, this is actually helping us
+to reduce the sales cycle, because it's a very convincing platform. This is a super convincing platform. Once we actually reduce
+down the cycle time on how we convince people
+that, hey, all the insights, all the information that I've collected are providing good
+insights to our customers, it actually help to increase our revenue and increase our margin, right? So those are the three use cases. So, on a daily basis, we have many, many use cases that come
+up and actually wanted to actually experiment on Q. But again, I'm not interested
+in experimenting, right? I'm interested in actually
+productizing it and making sure that the solution that we make, it needs to replicate throughout
+all my 100 locations, okay? So again, that's why the governance is actually very important for us. So, with that, we have also
+set up a GenAI council, right? The baby tiger cubs
+from the big AI council, where again, each of the
+function will come back. They have to think through
+what is the right use case for them and justify what are the ROI that we are going to see, okay? Collectively as a council, we will discuss about all this initiative and
+decide which is the right one where we actually need to put
+resources to do it, right? So, until we are actually
+ready, we will actually, the next thing that we'll do is probably to empower them to do it, right? With the guideline, with the policy, we will empower them to do it, and they follow a certain
+guideline on how to do it and that's how we can actually
+expedite the deployment. So, the GenAI journey forward, right? Again, I say that we are
+still in baby steps, right? There are a lot of things that we can do, and we are still evolving, okay? So, this is what we think are
+super important and again, we call it the building blocks on how we can be successful in GenAI. It includes teaching our
+people on AI literacy. I think it's super important
+that everybody needs to have a common knowledge about what we are talking about. When I talk about data,
+when I talk about AI, when I talk about GenAI, do they know what we are talking about? It needs to create a common understanding. So, using the Workday platform, we actually roll it out
+to every single individual and say that, hey guys,
+you guys got to complete this initial program, okay? So, I think it helps,
+and we were also doing, I was doing a lot of education session to the Jabil management team
+and also to our board, right? I think the whole ChatGPT helps a lot because even the board
+members wanted to know what we are doing, wanted
+to learn about ChatGPT and this is perfect avenue for me to actually start promoting
+and educating people. I think with more exposure,
+with more knowledge, that's when they can actually know and support you more, okay? So, I find that really helpful, right? The AI literacy. The cross-functional collaboration, I talk about that, right? Again, it's not my job,
+it's not my only job, but it's everybody's job. So, where everybody is involved, they actually feel that
+they own it together. Value-driven use cases, we
+don't just do it for fun, right? We do it for a purpose. What's the ROI? What's the value? How do you actually account for value? So, for me, I even created a
+new role for my team, right? Because I'm driving transformation, I even created a new role
+that's called a value tracker, a financial controller that I pull out that will actually help us to
+track all this value, okay? I think when you are able to track ROI, it becomes more convincing. Collaboration on AI, right? So, I think partnership is super important and this is where we feel
+that partnering with AWS and using the Q actually give
+us a lot of velocity, right? It gives me a lot of
+confidence because I know AWS, or other partners, right? The partners actually
+invested a lot on R&D, they invested a lot on security
+and protecting our data and this is where we actually
+make a very hard decision that we stop all our own
+chatbot development, right? And actually, focus on vendor solution. So, this is another decision point, right? So, the brain continues to grow, I do want to extract as much
+tacit knowledge as possible, right, everybody has a
+lot of tacit knowledge, how do I actually use it and
+use it in a good way, right? And API is super important here, so we do actually put
+in place API strategy. Last but not least, right, this is actually my last slide that talks about Jabil commitment. We are shaping the
+future of manufacturing, we wanted to revolutionize manufacturing and become responsible in
+harnessing the data and AI, right? So, for me, it is not just shaping the future of manufacturing, we are also building with the community to build the future of manufacturing. So, David, I'm not sure
+where you are right now, so back to you. - Take these off. I think-
+- Yeah. - Thank you so much, May. I think that's, so a couple of things, you can get going on Q
+business immediately, you can do it from the console
+and spin up an app, a Q app, you can add your data immediately and get going and start playing and we got FAQs, a user guide, and if you have an account executive, or someone that you're
+working closely with, we're here to offer
+solution architect support to help you get going. We also help you with adoption
+support and train you, and your end users on
+how to use Q business and adopt Q business. So, feel free to leverage those resources, and we're here to help, and thank you guys all so much for coming, you loyal followers, and thank you again, JabIl and May, for taking the time today, and I hope everyone has
+a great rest of the week. (audience applauds)

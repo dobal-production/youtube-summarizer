@@ -1,0 +1,637 @@
+- Good morning everybody. Welcome to Kub 201, the
+future of Kubernetes on AWS. My name is Nathan Taber and I'm really excited to
+talk to you this morning. I'm gonna be joined a little
+bit later by Hyungtae Kim. So, our special guest speaker. I'm the head of product for
+Kubernetes and registries at AWS, and let's get right into it. So, we're here because
+there's a fundamental shift in how we use computers. So since mainframes and
+integrated microcomputers, enterprise computing has
+required significant investments in hardware and data center space. And in 2006, Amazon introduced
+Amazon S3 and Amazon EC2. And these were the first
+Amazon Web Services. They're part of the reason
+why we're all here today. And they represented standard, publicly available
+expressions of the storage and compute primitives
+that are used by amazon.com to run, what was then and
+I think still is today, one of the largest and most
+highly trafficked websites in the world. And this is the cloud, a set of computing primitives you can use to run any application from
+websites to data processing, to machine learning models. And over the nearly 20 years, AWS has grown to over 220 services, and we've spawned a
+number of other clouds, including complex tooling used to manage applications and infrastructure. The cloud has fundamentally
+changed our computing model, how we store, process
+and retrieve information. We can now write and deploy applications across the world in minutes. We can instantiate entire data centers to train AI models so complex, that just a few years
+ago, they would require multi-billion dollar
+supercomputer investments. You can do things with a few
+clicks in the AWS console, that not too long ago would've taken years of planning, investments and construction. So the cloud has fundamentally changed how we think about building applications. But with so many different
+applications running in so many different places,
+people have struggled with a consistent model of how to operate in and out of the cloud. And this is not a new problem, right? There have been many
+solutions over the years that people have developed,
+and that they've tried, but today the leading cloud
+operating system is Kubernetes, and Kubernetes has become
+incredibly popular. So, a super majority of
+enterprises right now are using Kubernetes in production, or they're piloting its use. And this is largely because Kubernetes is actually useful, right? It's an incredibly useful tool. It has a simple set of APIs
+for managing large groups of servers and coordinating
+how your application runs across all of those servers. And I say simple because Kubernetes has about 1500 API methods or functions across about 55 core resources, and that's compared to
+over 10,000 API functions for the AWS Python SDK, right? So relatively simple, but simplicity is just one core value
+proposition of Kubernetes. (Nathan clears throat) Andy Jassy has said, "If you believe developers
+will build applications from scratch using web services as primitive building blocks, then the operating system
+becomes the internet". And within the internet though, there are multiple domains, so places outside of
+the internet also exist. And this is where Kubernetes shines, with a set of primitive building blocks that you can use to work everywhere from your data center, to
+AWS, to F16 fighter jets, and yes, they seriously did that. You can Google it. They have run Kubernetes
+on F16 fighter jets. And finally, Kubernetes
+is extensible because, believe it or not, 1500
+functions is not enough to power a cloud. And this extensibility
+is what allows customers to use Kubernetes in so many places. There are currently 195
+open source projects that are managed under the Cloud Native
+Computing Foundation, and there's hundreds
+more landscape projects which run on, integrate
+with, and extend Kubernetes. You can even write your own project, and I'm guessing that many people here have either seen that or
+they've done it themselves. Okay. So point taken, Kubernetes is awesome. And actually the truth is, is that using Kubernetes is awesome. Kubernetes has an amazing
+developer experience. Running Kubernetes is hard, and Kubectl Apply versus hundreds of lines of YAML, plugins, network
+configuration, cluster upgrades, Kubernetes is generally
+a hard system to operate, especially at scale, and
+especially in multiple places. And so on AWS, we're in our seventh year of managed Kubernetes. We announced Amazon EKS right
+here at ReInvent in 2017. And over the last seven years, we've gone deep into every
+aspect of operating Kubernetes at what we think may be the
+largest scale on the planet. We've taken a basic managed control plane and steadily added capabilities
+for compute management, auxiliary software, security,
+scalability, networking, observability, troubleshooting, we'd authored dozens of
+new open source projects, we've given some of them away to the Cloud Native Computing Foundation, we've made fundamental changes
+to how Kubernetes works, built a full suite of public
+and internal integrations that help tie AWS and Kubernetes together, and we count ourselves as the home to many of the largest and
+most sophisticated applications and machine learning models in existence that are built on Kubernetes. And we now run tens of
+millions of clusters for customers every year. And this is growing quickly. If there's an Edge case,
+our teams have seen it. We like to say this at AWS, that there's no compression
+algorithm for experience. So over the next 45 minutes or so, I wanna talk about how AWS is innovating to help realize the vision of Kubernetes. And like I said, we're
+lucky to be joined today by Hyungtae Kim, he's a
+principal software engineer at Snowflake. Snowflake is an exabyte scale
+data platform built on AWS, and I'm really excited to
+hear a little bit later from Hyungtae about how
+Snowflake is using EKS to scale machine learning
+for their customers. So, yeah. So, your goal is to
+deliver business value, not to operate an infrastructure system. Our customers only want
+to touch what they need to touch when they need to touch it. So our goal is to take away that undifferentiated heavy lifting of operating these systems, and to deliver the fundamental components that you need to build a production-ready Kubernetes environment. So, what does that mean? What does a Kubernetes environment even look like these days? This is how we see it, right? There's several layers to the stack of actually taking Kubernetes and putting it into production. At the bottom layer, right? We have the infrastructure, and the infrastructure is the compute, the networking, the storage, the core fundamental
+components that AWS builds and runs at scale for its customers. On the next layer, we have
+the Kubernetes control plane. We handle scale,
+availability, integrations and extensions around the
+Kubernetes API server, at CD, all the other control plane components. And above that, you need
+management tooling, right? Tools and components for
+deployment, observability, governance, traffic and security. And then above that, even further, you have developer tooling, for those things like
+internal developer platforms, job management, ML workflow management, things that people call ML ops these days, analytics platforms, right? And your applications, your code and your data all are containerized and they run all the way down this stack. And of course, off to the side, we have container registries because all of these things
+are packaged as containers and then run down on this infrastructure. And so our goal with Kubernetes is to make it really easy for customers to go from applications and data into a full stack Kubernetes environment. So I'm gonna talk a little bit about that. Let's start with the registry, right? So everything starts with
+a container registry. This is the place where your code and your data lands initially. Well, data may be landing
+in places like RDS or S3, but application code is being packaged, it's being built with clients,
+including Finch, Docker, there's a number of other
+tools that are coming in. And we have Amazon ECR,
+which is AWS's managed OCI, container registry, really
+great registry product. We've been running ECR actually
+longer than Amazon EKS. And you can build with any client, you can put that image into ECR, and then you can deploy that
+out anywhere in AWS cloud. So you can deploy that
+onto EKS, ECS, Lambda or anywhere else you want something to go. And so we've been enhancing
+ECR over the last few years. ECR is a very active place
+of investment for us. In this last year, we
+actually have upgraded our image scanning on ECR because what we found is really important for customers is that
+these images are secure, and you wanna run images
+that have been scanned, that are signed that you know are running trusted code in production. And so previously we had
+an image scanning library called Claire, and Claire was great, but it also didn't have
+all of the libraries and all the vulnerability databases that our customers demanded. So in 2024, we integrated
+with Amazon Inspector and introduced ECR basic
+and enhanced image scanning. And so enhanced image scanning
+is an upgrade project. We have basic, which runs on Inspector and then enhanced, which brings in over 50 vulnerability databases and 12 plus operating systems. And you can enable this
+inside of every ECR registry and automatically scan images on push, or at any other schedule. The other thing that we've done in ECR is make it easier for customers
+to centralize their estate of images in ECR before they pull them. And so essentially establishing
+a delivery pipeline of container images all the
+way down to the cluster. And one of the ways that we've done that was with ECR Pull Through Cache, or PTC, an authenticated Pull
+Through Cache allows you to synchronize an upstream registry that comes from Docker hub,
+from GitHub Container Registry or any other public registry source, and synchronize that image down into ECR. When you set that sync up, we automatically create
+a private repository in ECR to house that image, all the different variants of it, and we periodically run with
+that synchronization process to bring updated images down into ECR. They can there be scanned, and they can sit next
+to the infrastructure that you need to pull. So this improves security, and it also improves image pull times to help your applications start faster. And like everything else,
+it is available right now. And because of the work we've done on ECR and its footprint, Amazon ECR now has over 2 billion image
+pulls every single day. And this is because
+it's used with every way that customers run containers,
+including on Kubernetes. Okay, so that's some of our innovations and things that we've done on
+the container registry side. Let's go ahead and talk a little bit about the Kubernetes control plane. So one of the biggest challenges
+that customers have faced with Kubernetes, is keeping
+the control plane up to date. And on Amazon EKS, there
+was a point in time where our performance on
+keeping the control plane up to date, was honestly,
+a little bit abysmal. So our high watermark for this
+was 243 days behind upstream. And we've invested heavily
+over the last two years in automation that has led us move from qualifying new
+Kubernetes versions in weeks, down to qualifying new versions in days. And so in 2023, we put this
+automation into practice and we launched four
+versions of Amazon EKS in order to keep up to date. And so now we've slowed that down. We're now launching three versions a year, which is in pace with the
+Kubernetes upstream release cycle. And we've had a consistent performance of about 40 to 35 days behind upstream. I don't think we're gonna
+go much faster than this. There may be a time, but we typically wait for a new minor version of
+Kubernetes to stabilize, typically to a .1 release
+before we pull that down and make it a part of Amazon EKS. But honestly, I think next
+year I may not show this graph because it's getting extremely boring, and that's the way that we like it. But as we've accelerated,
+as we've brought in images and versions much faster into Amazon EKS, our customers have faced another problem, which is getting onto those
+latest versions, right? So upgrading Kubernetes
+can be a really big pain. And so what our customers
+told us last year was that, look, it takes
+us a little bit longer than 14 months, which is the
+typical version release process in order to move to a new
+version of Kubernetes. And so we listened to
+that customer feedback and we introduced
+Extended Version Support. Extended Version Support for Amazon EKS gives you an additional 12 months of full support for AWS for
+any Kubernetes minor version. So what happens after 14 months in the community release cycle is that all support for that
+version goes outta date. So the documentation is
+removed from the website, the downloadable binaries are removed, bug tickets, bugs are not
+just not worked on anymore, they're no longer accepted. And so effectively this version
+is wiped out from existence, but on Amazon EKS, we've
+invested in order to keep that running for an additional 12 months. So our teams will look at
+new versions of Kubernetes and new CVEs that come down. We'll cherry pick appropriate patches and we'll patch all of the
+systems running old versions of Kubernetes to keep them secure so that you can continue operating while you plan your move
+to the next version. And so what's really nice
+about Extended Version Support is that you choose when and
+how much you want to use this. You can run into Extended Version Support on any minor version. You can upgrade back to
+Standard Support at any time. You don't need to choose special versions of Kubernetes to hop between, you don't have to plan a strategy. You can adjust when you upgrade based on your business priorities. Also, at the same time, many customers were finding themselves running Extended Version
+Support and saying, wait, this is a dev cluster. I actually don't care if you
+guys upgrade it automatically. Can I make sure that this always just stays on Standard Support? And so a few months ago we
+announced upgrade policies and upgrade policies
+keep the control plane automatically updated
+on standard versions. So you can set an upgrade policy
+on any Kubernetes cluster, any EKS cluster, and
+when you set that policy, we'll always keep that
+control plane updated on the latest standard
+version of Kubernetes. So this is a great solution
+for dev and test clusters, or even canary staging clusters where you wanna see what the
+impact of that upgrade is, and you never wanna worry about that falling into an
+Extended Support mode. And that is available now. So having more time to
+upgrade is part of the story, but also having more
+confidence when you upgrade is the other part of the story for Kubernetes versions, right? And so our customers
+wanted to be able to see what's gonna happen when
+I upgrade this version? And so we introduced
+Upgrade Insights last year, and Upgrade Insights effectively is a report card for your cluster. We run this continuously,
+we give you 30 days of data, and we're looking at what API calls are coming into the API server, and we're looking at
+all the future versions of Kubernetes that you're not running. So unfortunately, I did not
+sort my list by version here, but you can see that I'm
+running a 1.25 cluster in this example. And Upgrade Insights is
+testing the API server and the calls that are
+being made against it all the way up through version 1.32. So if I wanted to skip multiple versions, I can actually say, hey, I
+want to go to 1.26 or 1.27, I can check my report card
+against those versions and see if things are passing or failing. And what that looks like,
+is I get a high level view, but then I can go directly in and say, okay, where am I getting that error? What's gonna fail out if I upgraded this control plane right now? And so in this case, I'm using a v1 beta 1 pod
+disruption budget call, and in 1.25 that's replaced
+with a v1 pod disruption budget. So if I upgraded this cluster
+from 1.24 to 1.25 right now, I could expect that Kub State Metrics, and this is actually my
+application, I named it "App", I know that that's not
+very creative (laughs), but you can see that Kube State Metrics and App are the two things here that are making that API call. And so those are the things
+that I need to go and fix before I upgrade my cluster. And so what we really like
+about Upgrade Insights is that it allows us to
+get down into the details and allows your teams
+to understand precisely what's going on on the
+cluster before you upgrade, to give you more confidence and to prevent failures during an upgrade. And like everything else,
+this is available right now. This is inside of every EKS console. If you pop open the console, you'll find this in the
+observability dashboard. And it's running on
+every cluster by default. There's no cost to this, by the way. This is just available
+for every single cluster. So obviously observability
+is extremely useful when we're upgrading,
+but observability is also a really important part
+of operating a system like Kubernetes every single day. And one of the things that
+our customers always have to do is to configure
+observability on their clusters. And so this year we wanted
+to make that a lot easier and we introduced enhanced
+control plane observability. So this came out a few months ago, and what we did is we
+added two major things. First, we added additional metrics for the cluster, Kube Controller Manager, and Kube Scheduler Metrics. And you can scrape these
+in new Prometheus endpoints and export them to any
+observability system. We also added new
+pre-configured dashboards in the EKS console that
+gives cluster administrators visual representation
+of these key metrics, and that lets you rapidly assess, is your control plane healthy? Is it performing the way
+that we expect it to perform? And so, these are really nice. You can see right here, they're prebuilt, they're in CloudWatch. You can deep dive into
+any of these dashboards. And as part of this, we built this whole new
+observability suite inside of EKS. And you can see my Cluster Insights tab is off to the right there. It's a little bit small. And we have the metrics, but we also, this is my favorite part,
+we deeply integrated with CloudWatch Log Insights. So CloudWatch Log Insights has
+been around for a long time, exporting CloudWatch logs, logs from EKS to CloudWatch has also been
+around for a long time, but this is something that you had to go and you had to figure
+out and run yourself. Now in the EKS dashboard, you have pre-configured log queries and you just press the button, Run Query, and you're gonna see a
+list of the log query for certain common things that you may wanna look at on the cluster. So one of my favorites
+here is Top Talkers. What this means is what are
+the services on the cluster that are the most chatty
+with the API server? So this is a great log
+query to run for example, if you're seeing some
+weird behavior anomalies in the API server, maybe
+things aren't performing up to your expectations,
+you're seeing that metric, you can go in and run
+the Top Talkers query and you can say, hey, you know,
+it looks like what is this? My v1 beta 1 ingresses, has made 1700 calls against the API server in the last 30 minutes,
+so maybe I need to go look at some of these things,
+I may see a spike here and I can get right down
+into the root problem. So these dashboards are not meant to replace deeper observability tools, but they're meant to be a starting point for observability and
+quick troubleshooting when you're doing cluster administration. And available now. Going a step deeper,
+CloudWatch actually has done a huge amount of improvements
+over the last year to make it easier for container
+customers to use CloudWatch. So we now have Container Insights with enhanced observability
+for Amazon EKS. So we put a subset of this
+stuff in the EKS console that's available out of the box. And then clicking into CloudWatch, you actually have deeper
+performance overviews that can look across one or more clusters. It can give you alarms,
+utilization statuses, it gives you data that allows you to take more proactive action
+against the performance of your clusters and your
+cluster applications. And it gives you metrics and
+visibility into cluster health. We recently added GPU Neuron
+and Windows Support as well to these Container Insights. This is a really nice feature. I've been super impressed with the work that the CloudWatch team has done, and this is available now with
+CloudWatch and Amazon EKS. This week at ReInvent, we actually did a really cool thing for network traffic as
+well with CloudWatch. So we've had VPC flow logs for a long time with CloudWatch VPC, and CloudWatch just announced
+Network Flow Monitor a few days ago. So this is a really cool new feature that gives you visibility
+into the performance of the network traffic, between the boxes in the AWS data center. So a lot of times you may experience, if you're running it especially at scale, customers have problems where they may see network degradations or they're trying to
+troubleshoot networking issues, and what CloudWatch
+Network Flow Monitor does is it allows you to see exact data and places in the network path where you could see
+performance degradations. Amazon EKS is integrated with Network Flow Monitor out of the box. We automatically annotate
+the metadata that's traveling between the EC2 instances
+inside of the cluster. So when you go into CloudWatch
+Network Flow Monitor, you can understand the state
+of that network traffic that's bound by the cluster, and whether that's communication
+between cluster nodes or in and outta the cluster, and it's more easy to troubleshoot
+performance degradations on the network layer. And like everything right
+now, it's available right now. This is a new launch at ReInvent. We're really, really excited about it. One of the other things that we built for observability with our customers has been Split Cost Allocation Data. And so one of the biggest issues when you move to Kubernetes, if anyone's ever operated
+in a VM world, right? We did these monolithic applications and you would do one application per VM, you would have really nice tagging, you'd get these beautiful
+costs and usage dashboards, as an administrator,
+you're running everything, it works really nicely,
+as a finops administrator you get these really nice reports, and then one day the team says,
+we're moving to Kubernetes. And you move to Kubernetes
+and everything becomes a black box on the financial side, right? Because you have these shared clusters and multi-tenant microservices, and how do you understand
+the exact cost of things? So there have been
+tools including Kubecost that we've supported running with Amazon EKS for a number of years. But our customers told us they wanted this natively available in Amazon EKS. And so we partnered with
+the AWS Cost and Usage team to introduce Split, (sneezes) excuse me, to introduce Split Cost Allocation Data. And what this does is
+that we have a managed way that we are automatically collecting data for pod utilization on the cluster. We're putting that together
+with your actual cost of running EC2 on the backend,
+and we're building a new cost and usage report that gives
+you fine-grained reporting. And this reporting can break
+down against the pod level, against the deployment
+level, the job level, namespaces and clusters. We automatically ingest
+those true EC2 costs and we give you this native report to help you understand the actual cost of your applications. Cool. So, that's a lot on observability. The other thing that
+we've done with add-ons, is when you run a cluster, right, just running the control
+plane is not enough. You often need to bring
+all these different types of operational tools into Amazon EKS. And a few years ago we launched add-ons, which helps you create clusters that have batteries included. And we've expanded the catalog of add-ons over the last year. We've added five or four new add-ons that are first party from Amazon EKS, including CloudWatch Container Insights, CSI Snapshot Controller,
+the Pod Identity Agent and the Node Monitoring Agent. We've also enabled you to launch clusters without the core networking add-ons. Some customers told us that
+they wanted to launch clusters, for example, without VPC CNI, so now you can configure
+that at cluster launch in the add-ons API. And we've also launched over
+40 marketplace add-ons to date. So we have the first party
+add-ons that are coming from AWS, and then we've added a
+marketplace integration where you can actually take more than 40 marketplace add-ons, you can choose which ones you
+wanna run in your clusters, and with a single click, you can subscribe and launch those into
+your Amazon EKS clusters. So made it really easy to
+get tools like Datadog, Kubecost, New Relic, Splunk, et cetera, into your clusters with a single click. And when you install those
+add-ons on the cluster, customers asked us to
+make them more secure, and to improve the security posture of their clusters in general. So last year at ReInvent, we talked a lot about pod identity, which allows you to assign IEM roles down to specific pods. This year we took pod identity and we integrated it with EKS add-ons. So now in a single click,
+when you set that add-on up, you can create and associate
+a specific IEM role with that add-on, so that
+everything on the cluster has a reduced scope of security and improved security blast radius. And it's available now. On the security side, we've
+been continuously investing in security for EKS. So pod identity, bringing
+pod identity to add-ons, we've had encryption at the cluster level for secrets for a number of years. You've been able to bring a KMS key to EKS and encrypt your secrets. We thought that that was good,
+but it wasn't good enough. And so starting this year,
+we now encrypt everything on the cluster with KMS v2 keys that we provide by default. And we don't just encrypt secrets, we encrypt every single object now. You can still bring your own CMK as well to encrypt on top of our KMS v2, but by default now everything
+in Amazon EKS clusters is fully encrypted. In addition to encryption
+and security controls, we've also improved our access
+controls for Kubernetes. So Cedar is a new open source language that was built by AWS, and this is a language that allows you to write more expressive
+and explicit policies for access control. And recently at KubeCon, we
+announced expanding Cedar to Amazon EKS and Kubernetes. So using Cedar allows you to have features and functionality that are not
+available in Kubernetes RBAC like denials, conditions and attribute and label based access controls. And so we're really excited about Cedar, it's a new open source
+project that we're doing to bring Cedar and EKS together, and we think this will
+be a really nice upgrade for customers to allow
+better access control in and out of clusters. Additionally, on the networking side, one of the biggest
+pushes from AWS is IPv6. I know you're seeing a lot of IPv6 talk, I think we've been talking about IPv6 for the last 20 years at least. And one of the things that
+EKS has done this year is we've now checked the box on everything related to IPv6. So we've previously had single
+stack pods and IPv6 clusters. We've had IPv6 management APIs. And now as of a few months ago, we now have IPv6 cluster endpoints. So if you have an IPv6 strategy and you're moving to
+IPv6, you can adopt EKS and know that you have full IPv6 support in every part of the cluster. Additionally, on the networking
+side, we've integrated with Amazon Application
+Recovery Controller. So Route 53 launched
+Application Recovery Controller last year, and what this allows you to do is to have a highly resilient setup where you can automatically shift traffic between AZs in the event of
+a gray or a black AZ failure. So these could be failures
+that we automatically detect and we shift traffic for you, or you can press this big
+red emergency stop button at any time and shift traffic over. And so ARC is managed by Route
+53, so it's managed centrally and a number of other AWS
+services have integrated with ARC. And this allows us to safely shift traffic away and back to the AZ. So one of the things that
+happens in an AZ gray failure, right, is we'll have one
+component that could fail and could cause a performance degradation. And so then a lot of traffic
+may evacuate outta the AZ, and that's fine, we'll go
+and people get woken up, people get on calls, we
+start to fix that issue. But as the AZ begins to recover,
+something that we often see is what we call a thundering herd where everybody says,
+oh, the AZ's recovering, let me shove all my traffic back into it. And usually during that AZ recovery phase is where things can be
+a little bit delicate. And if you slam that AZ
+with traffic right away, then you can have additional degradations and additional failovers. So very small problems can
+cascade into very long problems, and short outages can
+cascade into longer outages. So Amazon Application Recovery Controller, it doesn't just help you evacuate traffic and keep your applications running when you have an AZ outage issue, it also helps us slowly shift
+your traffic back into the AZ so that that AZ doesn't fall over again and we can fully recover from
+the incident a lot faster. And also available now. Part of our integration with AWS, we talked about integrations with AWS is allowing customers to have
+full access to the cloud. And so our AWS controllers for Kubernetes is a project that we've been building over the last few years, that allows you to have
+cloud native control and define AWS resources
+directly from the Kubernetes API. Over the last year, we've
+launched 20 new services in GA. We've rebuilt the pipelines
+to rapidly build services out of Amazon SDKs, and we now
+think that this is something that we're seeing more
+and more customers use in order to manage their AWS resources alongside their Kubernetes resources. But as ACK has become more popular and we've had more service coverage, we've had customers tell us that, hey, it's really hard to orchestrate
+all these things together because I may not just want a
+single S3 bucket, for example, I may want a suite of
+different capabilities. And so we've recently introduced
+the Kube Resource Operator or KRO, and KRO allows you to actually abstract multiple
+Kubernetes resources together and write abstractions and
+publish them to clusters using Common Expression Language or CEL. And this is a really
+simple YAML based language that lets you define a set of AWS and Kube resources together, and then publish that as an
+abstraction to the cluster and program against that
+abstraction using a CRD. So for example, you can define what a Kubernetes deployment looks like or what a web service
+looks like at your company, and you can put that into the cluster as a controller using KRO, and then have your development
+teams program against it. It's a really exciting project that's now available on GitHub and Alpha. We plan to develop this more
+and more over the next year. Okay, so one thing about
+AWS is that we are global. And a big announcement from EKS is that we are now covered in
+every single global region, and we have a presence in
+every single geographic reason, availability zone, and local zone. And so one of the things that
+our customers we found is that they're running in
+all these different modes. They're running from
+Amazon EKS in the region, down to the local zone,
+down to the outpost, down to EKS anywhere. And one of the things
+that we are really excited to announce this week at ReInvent is Amazon EKS Hybrid Nodes. So our customers were running Amazon EKS, anywhere in the data center, and they told us that
+they wanted something that was a little bit more managed. And so with Amazon EKS Hybrid Nodes, you can now use your existing on-premises or Edge Compute to connect that back to an Amazon EKS control plane
+that's running in the region and manage everything consistently. So you can extend that control plane out to the data center and
+out to your Edge compute and manage it in a consistent environment. And all the higher level
+integrations from AWS, from observability to add-ons work seamlessly with Hybrid Nodes. And so the architecture
+looks a little bit like this. I have my CLI tool, I
+can install this manually or scripted across all
+my on-premises nodes. And when that CLI is installed,
+there's a small little agent that runs and the agent
+bootstraps the Kubelet and other components onto that node and connects it up to
+the Amazon EKS cluster. And so then in the cloud, that
+node shows up in the console and also in the API server,
+just like any other instance. You can see its attributes and you can start to
+schedule workloads onto it. So we think Hybrid Nodes
+is gonna be heavily adopted for people in enterprise
+modernization, machine learning, financial services, media streaming, manufacturing, IT apps, all
+sorts of different places. And we're really, really excited about how Hybrid Nodes is being used. And we've been talking
+to customers all week about their plans to adopt Hybrid Nodes. But obviously we also
+have the cloud, right? And one of the best parts
+of AWS is the breadth and the depth of compute
+options, that are offered at AWS. And one of the things that
+we wanted to do for customers was to make it easier to
+go from create cluster to run application. And so this week we're really excited to announce the launch of EKS Auto Mode. Auto Mode is a major evolution for how to run production ready
+Kubernetes in the cloud. And it's also a fulfillment
+of our vision for how Kubernetes should
+operate in the cloud. So with Auto Mode, you can provision
+application ready clusters, pre-configured with all the
+capabilities that you need and best practice from AWS. Auto Mode reduces the time that it takes to launch new workloads,
+allowing you to get new products or modernize applications
+into production faster. And so, typically what
+we'd see with customers when they were using
+Kubernetes before Auto Mode, is they would choose how
+to create the cluster, for example, using infrastructure as code, and then they would,
+consider the type of compute that they needed to
+run their applications. Do they want to use EC2 or Fargate? What instance types should be used? Then they'd think about
+cluster capabilities, and then they'd have a number
+of plugins and all this stuff, and they'd have to
+provision all these things and wire these things together. With Auto Mode, all of
+that is managed for you. So you get the managed control plane. When you put a cluster into Auto Mode, we automatically provision
+and manage the capabilities within the cluster for compute,
+networking and storage. We have EC2 managed
+instances, which are secured and automatically managed instances that run in your account, and we automatically provision everything that's needed in order to run the cluster. So we automatically provision instances and we optimize instances, and keep everything updated
+and healthy for you. And with Auto Mode, this
+means that we can now have one click cluster creation in the Amazon EKS console and CLIs, and you can easily get started with a single click in the console. And like everything else,
+this is available today. Really cool feature that
+was launched as part of Auto Mode, is EKS Node
+Health and Auto Repair, where we're automatically
+looking at the health of nodes, especially GPU instances, and we're repairing
+them and improving them. And this is something that's
+available now with Auto Mode and we'll be looking to
+expand health and auto repair to other functionalities in the future. Cool. So Auto Mode is generally available now, encourage you to check it out. So, one of the things that EKS
+has been heavily adopted for is machine learning, from large language
+foundational model training, robotics development, and
+AI inference at scale, we've seen a lot of
+customers use Amazon EKS. And we've been investing
+in infrastructure features which simplify and accelerate
+machine learning with EKS. So things from node health and auto repair to a set of accelerated AMIs, we are part of the recently
+announced EC2 Ultra Servers. EC2 Ultra Servers works
+natively with Amazon EKS, and also integrating deeply
+with capacity block reservations for compute availability. We've been investing in our integrations for data management with
+the S3 Mountpoint CSI Driver and the EFA Kubernetes device plugins for using elastic fabric
+adapter networking for GPU instances. We've also been helping to streamline Kubernetes' machine learning by investing in native
+OSS frameworks like Ray, and also bringing
+accelerated instant support to Container Insights. So I'm really happy to talk more and more about machine learning on EKS, as we see this grow a lot more, and to go deeper into how
+they're using machine learning, I'd like to welcome
+Hyungtae Kim to the stage, principal software engineer at Snowflake. (audience applauds) - Yeah, thank you. Hello everyone. I'm Hyungtae Kim. I'm one of the engineering
+leads for AI app platforms and infrastructure at Snowflake. Today I'm excited to share with you how we are powering AI
+innovation at scale. You might be familiar with
+our products like Cortex AI, which enables generative AI
+capabilities for our customers, but what you may not be familiar with is the infrastructure story behind it all, specifically how we leverage
+Kubernetes on top of EKS to build a robust foundation
+for these AI services. In this section, I'll share our journey, the challenges that we
+face, and the solutions that we implemented, while
+building this infrastructure. Let me introduce you to Cortex AI, Snowflake's comprehensive Gen AI platform. What makes Cortex special is this ability to handle the full
+spectrum of AI workloads, all powered by Kubernetes
+and on AWS powered by EKS. On the inference side, we've built systems that can scale from zero to thousands of concurrent requests. Whether you're running
+massive batch operations through familiar SQL interfaces, or powering real-time chat applications with sub-second latency requirements, our infrastructure adapts seamlessly. With our training infrastructure, we're not just running
+models, we're building them. Our Arctic family of foundational models represents a significant investment in AI capabilities by requiring. We have models for enterprise use cases from search to document understanding, all requiring intensive
+computational resources that EKS helps us manage efficiently. Beyond foundational models, we support sophisticated
+fine tuning frameworks. This supports everything from
+full parameter fine tuning to more efficient approaches like LoRa, enabling our customers
+to customize their models for their specific needs while maintaining
+performance and reliability. I'll share some of the real challenges we faced building Cortex because they'll probably
+resonate with many of you. We encountered two major
+themes that forced us to rethink our traditional
+infrastructure approach, capacity management and system fragility. First there's capacity. We all know that GPUs
+are scarce and expensive, especially high-end training
+hardware like NVIDIA H100s, but what might surprise you is how does scarcity fundamentally
+change our operations? Take cluster upgrades for example, the traditional blue-green
+deployment approach would require us to temporarily
+double our GPU capacity. Imagine spinning up hundreds
+of P5s just for an upgrade. It's not just cost prohibitive, is often impossible due
+to supply constraints. This forced us to innovate. We had to develop new patterns
+for managing capacity, moving away from the just scale up mindset that worked so well for CPU resources, but the more interesting
+challenge is fragility. AI workloads, especially
+distributed training, have a unique all or
+nothing characteristic. Imagine coordinating a
+distributed training job across thousands of GPUs, and if just one GPU fails,
+the entire job is compromised. Further exacerbating the problem, GPUs and their specialized
+networking infrastructure have a higher failure rate
+than traditional hardware. And here's the architecture
+that powers Cortex. We call this our AI cluster, and it's designed to solve those challenges I just described. The fundamental idea is simple,
+one cluster, one region, all AI workloads, but
+what makes it powerful is how it intelligently manages resources across different workload types, from real-time inference to
+large scale training jobs. Let me walk you through the key components that make this possible. We've organized them
+into two main categories, capacity management and resilience. For capacity management, we built a custom capacity controller that access the brains of
+our resource allocation. Think of it as an intelligent
+traffic controller that knows which resource takes priority. For example, if a
+real-time inference service needs more resources, it can intelligently preempt
+lower priority training jobs. We paired this with the Volcano Scheduler, an open source scheduler
+that handles gain scheduling, which is crucial for coordinating
+distributed training jobs. On the resilience side, we
+developed three key components. First is our node health service. Think of it as a proactive
+diagnostic system. It runs intensive burden validation to ensure all the nodes are healthy. Second, we have a pod janitor. This might sound simple, but Kubernetes can get quite unhappy if we frequently terminate
+workloads on top of nodes and it ensures clean termination and intelligent resubmission of pods. Lastly, we have the Invariant Enforcer. It enforces many properties of the cluster like network discovery and distribute training capabilities. Next, we'll dive into one of
+our most crucial components, the capacity controller. Think of it as a brain that
+orchestrates our GPU resources across different workload types. What you're seeing on screen
+is an actual capacity bucket definition for our Cortex
+inference workloads. Let me break down why this is interesting. Notice how it is marked as high priority. This means when these inference
+services need resources, they get them first. The real magic happens in how we structure these capacity buckets. Each workload type, whether
+it's real-time inference, batch processing, or model training, gets its own bucket with clear boundaries. In this example, you can
+see we specified both P5 and P4 instance types, with
+a minimum of three nodes and shared service stability and room to scale up to
+200 nodes when needed. What makes the system
+powerful is this ability to move nodes between
+buckets intelligently. Think of it as a dynamic resource pools that can ship based on demand, but we can't just grab those randomly when we're dealing with
+distributed training jobs that might be using hundreds of GPUs, we need to be surgical about
+which nodes to take and when. And next, let's talk
+about how we handle one of the trickiest challenges
+in AI infrastructure, hardware reliability. GPUs are incredibly powerful, but they're sensitive pieces of hardware that can develop issues over time. Our node health service
+is our automated guardian that ensures every GPU on our
+fleet is performing optimally. Looking at the diagram,
+you can see the lifecycle of a node in our system. When a new node joins our cluster, it starts in what we call
+the probation period. It's there, but we won't
+let it run workloads yet. We put this set nodes in probation through a comprehensive health check, that includes four critical areas, GPUs, networking, storage, and performance. What makes the system
+particularly clever is how it handles multi-node scenarios. When something goes wrong
+in a distributed work node, finding the problematic
+node can be quite difficult, and you need to take
+a systematic approach. We use pairwise testing to
+isolate problematic nodes. And if a node fails this test, it is automatically
+terminated through AWS APIs. If it succeeds, it joins active fleet. Post validation, if
+any subsequent workload reports a potential failure, it is put back into validation. Next, let me share how EKS has accelerated our AI infrastructure. Instead of getting bogged down in the low level
+complexities, we've been able to focus on what really matters, building innovative AI solutions. First is performance. Through close collaboration with AWS, we've been able to
+optimize the performance of the elastic fiber adapter networking, which is crucial for distributed training. The out of box
+compatibility of the systems is also valuable. The accelerated AMIs come
+with compatible drivers for both GPUs and networking. The accelerated AMIs are also
+compatible out of the box with the latest NVIDIA PyTorch images. Storage is also another area where EKS has simplified our operations. We've implemented a tiered approach. We use FSx for Lustre to provide high performance
+distributed storage for model checkpoints and training data. EBS and EFS provides other
+persistent similarities and S3 serves as a reliable
+archive for data and models. This flexibility allows
+us to optimize performance and cost for each specific use case. Last is in scalability and operations. Remember when GPU capacity challenges that I mentioned earlier? With AWS, we don't need to worry about maintaining our
+own performance buffer because they handle no
+remediation automatically. And for lower tier hardware, like 8 Tons, we can rely on the auto
+scaling capabilities of EKS to manage those workloads. Coming full circle to the
+two critical challenges, we started with, capacity
+management and system fragility, our Snowflake AI cluster has transformed these challenges into strengths. Remember when I mentioned how AI workloads don't typically play well with traditional Kubernetes patterns? Well, we changed that story. In our online inference service
+now can scale dynamically with demand, just like any
+other Kubernetes workload. This is possible because
+our capacity controller intelligently borrows resources from lower priority workloads when needed. We've also solved the thorny
+problem of cluster upgrades. Instead of needing to double
+our expensive GPU capacity for blue-green deployments, we can now orchestrate
+upgrades by priority. We start with training workloads, then smoothly transition our latency sensitive inference services, maximizing uptime while
+minimizing resource requirements. And the fragility challenge,
+our no health service has dramatically reduced the
+impact of hardware failures. When issues occur, and they still do with high performance hardware, they're automatically detected and migrated behind the scenes. And before I hand it back to Nate, let me share some of the
+lessons from our AI journey building this infrastructure. These are the lessons I wish someone had told me when we started. First, embrace the impermeance
+in your workload design. We learn sometimes the hard
+way that treating disruptions as a feature, rather than a bug, leads to more resilient systems by keeping state and Kubernetes small and moving, offloading them to other features like
+Ephemeral Vault, like S3, we can handle no failures
+in capacity gracefully. It's about optimizing for
+recovery, then preventing failure. Second, be strategic
+about hardware management. Those GPU nodes are expensive. And when you find a set of
+good ones, hold onto them, especially if you're on reservations. We save countless debugging hours by implementing rigorous
+validation on node acquisition. Think of it as quality control
+for your infrastructure. Third, automation isn't
+optional, it's essential. Kubernetes can get into interesting states when you're frequently
+terminating instances with active workloads. We build automated systems to monitor and remediate these issues, handling everything from stuck pods to cache synchronization problems. And lastly, here's a practical tip that saves us at least
+one cluster rebuild, plan your network
+infrastructure generously. The H 100 nodes consume a lot of IPs. We're on our eighth
+iteration of our AI cluster in just 18 months. And every iteration we've learned
+something new about scale. And the key lesson here is we've learned to treat our AI infrastructure like a living, breathing system. We need to constantly evolve, and look out for potential issues and be ready to fix that every time. And with that, I'll hand it back to Nate. (audience applauds) - Thanks Hyungtae. That was great. What Hyungtae and the team
+at Snowflake have done is really, really impressive. Using EKS they've accelerated
+the progress of Snowflake. They've taken a core system and evolved it into one of the best in class AI training and inference systems in the world. And they've helped their
+customers manage data at scale all the much better. So, I wanna spend the next
+few minutes that we have here talking about the future of Amazon EKS. So this is something
+that we see across AWS, with sophisticated customers
+that have engineering teams that are dedicated to
+solving the hardest problems in distributed systems
+and machine learning. And these technology companies, these pure technology companies, have a mission to solve
+these hard problems. But we also have customers who need to solve similar problems, but they have a very
+different focus, right? Using Kubernetes to innovate on behalf of their core businesses
+for their customers. And this is a side effect of all these companies
+becoming technology companies, advanced systems like AWS and Kubernetes, they can be engines for success
+across your organization. But at the same time,
+if your mission is not to build these systems,
+but to solve problems that are not technology problems, it can be really difficult
+to use these systems. And it's not that companies that are not pure technology companies are not smart people, it's just
+they have a different focus. And so at a tech conference like ReInvent, it can seem like everybody
+here is a technology company and this is what we're building for. But the reality is that
+most companies in the world are not software technology companies. And most people are solving
+other hard problems, and they want to take advantage
+of this software technology. And so that leaves us with a problem because while we think that every company should use advanced technologies
+to further their mission, lower costs and accelerate innovation, most companies shouldn't have to become pure software
+technology companies to get these benefits. They should be able to
+leverage the tools built by dedicated tech companies and software communities to
+accelerate their innovation, lower cost, and improve
+the quality of goods and services that they
+produce for society. And so, the reason we all
+love conferences like ReInvent is because they give a
+glimpse into the future, the hope that you can have
+this amazing new thing that's here right now, and it's finally actually
+available to use. And this is our second problem, right? Systems like Kubernetes
+we see as the future, but they can be hard to use. They require dedicated effort and expertise to install and operate. And then finally, in the cloud, running these things can require a lot of this time and expertise. And if you're using open
+source technologies, sometimes even more so, so building and properly leveraging OSS can sometimes mean that you need people who understand how to build
+and leverage that OSS, and really quickly they can go from, hey, I found a really cool
+tool that we can install and use at our company, to, we're now a maintainer of that tool. And now, oh, we're a primary
+maintainer of that tool. And now we own that tool, and we never intended to own that tool because that's not our business focus. And look, I don't want to say, discourage people in any way from using open source technology. In fact, I think open source technology is an amazing innovation. Like the idea of open
+source software in general, and that I think that
+all companies like AWS and our customers should
+be contributing to OSS, but a problem that can happen is that at scale, OSS can become expensive. And so this is something that
+we want to help customers with and make it a little bit easier. And so this is a balance, right? How do you keep control and flexibility all the
+way from start to scale? How do you balance this trilema of systems where you want to have scale and control, you wanna have speeds of
+changes and have scale? We see this trilema is
+often you can pick two out of these three things. And we wanna optimize for customers at all of these levels, right? And so our mission with
+EKS is to help kind of grow this triangle a little bit bigger. You'll still have to make
+trade-offs and choices, but we wanna make it a
+little bit more optimized and make those trade-offs a
+little bit less painful, right? And so that's the goal that we have, is to go faster and
+farther together with you. And our strength in AWS is secure, resilient, and scalable operations. Whether you're a software
+technology company or you're in the majority of companies that do something extremely important, our mission is to help
+accelerate your time to value with complex tools that don't require you to become an expert,
+democratize innovation from AWS, our partners in the community, and lower the cost of entry turning CapEx into OpEx for all aspects of the stack. So a few years ago I showed a slide that looked really similar to this, right? This is our journey of Amazon EKS. We started from a hosted control plane, then we introduced managed data planes and with Auto Mode, right? We're making that even more managed now. And then also managed operational tools, also a part of Auto Mode. And while that mission has not changed and the overall strategy
+of EKS has not changed, we found that the needs of our customers have evolved, right? You are all divinely unsatisfied. So let's zoom out a little bit, and there's a lot more
+going on here, right? Like as we showed in the beginning, Kubernetes is a lot more than the cluster. So first of all, most folks don't just run
+a single cluster anymore. They run a lot of clusters. People I speak to run
+at least five, maybe 10, sometimes thousands, across
+hundreds of accounts. And they want to knit them
+those clusters together into a platform with
+centralized management, observability, governance, access control, secrets management and deployments. And they wanna wrap that all
+up in a beautiful package with templates, codified best practices, documentation, run books, everything that their developers and their data scientists
+need to deploy applications to the exact places that they run best. Whether that's across a
+fleet of accelerated TRN2 or NVIDIA GPU instances in the cloud, thousands of Edge locations, or they wanna manage all
+of that seamlessly, right? They wanna manage that
+seamlessly with the help of AWS. And so this is a little bit of a preview into where we're thinking is that this year we have integrated Hybrid, how do we start to bring in more of those platform components? How do we bring in an integrated
+development experience? And so these are our investment priorities for the next few years, right? And this is exactly
+what we're going to do. We're gonna provide optimized experiences for critical workload
+patterns at any scale. We're gonna deepen AWS integrations and tooling for management and efficiency. And our goal is, as we do
+this, to meet your workloads where they are, whether
+those are in the cloud, across multiple regions, in local zones, on-premises in data
+centers, or at the Edge. We also wanna simplify platform building. We want to make it easy to
+have a production grade, Kubernetes based platform on AWS. And finally to accelerate the flywheel of innovation in the community, right? Open source is the engine that
+powers so much of what we do, and we wanna make sure
+that we are able to power that innovation, to have
+new innovation be developed, to be a part of that, and
+then also to bring that to customers so that they
+consume it really easily without having to become deep experts in every single component
+that they wanna run. And so for customers, we weren't gonna automate more things in and around the cluster, natively bring you the
+latest AWS innovations through Kubernetes, and
+ensure compatibility with and support for community projects, which make this Kubernetes
+innovative and powerful. And for partners, because
+we have so many partners that are either here
+today or watching this, we wanna make it easier for you to build on EKS for your
+products and services. We want to give you simple paths that allow you to enable EKS customers and to sell alongside
+AWS to those customers, and provide ongoing guidance, support, and ideas to improve your
+products in our partnership. So, this is a hard talk to give, right? Because it's the future, and it's hard to give a lot of detail about what we're doing, but also know that we're always thinking deeply about what we should do next. So it's a balance between
+how much do we share and how much do we hold back knowing that it might change. Why would it change, right? It would change because our roadmap and our plans are completely based on what we hear from our customers, right? We build everything based
+on customer feedback. If we don't have good data,
+that customers really want what we're building and
+we find it valuable, we simply won't build it. And as we start to build things, we talk to our customers about it, right? We experiment. And if our customers don't
+find it valuable, we change it. We stop it and we go build
+the thing that our customers are asking us to build. So we spent the whole front half of this presentation talking about all the new stuff that came out. Every single one of those has been driven by our customer asks. And for every slide that I showed, there's five other slides
+that never made the cut because they're projects that
+we considered and never built, 'cause as we talked to
+customers about them, we found that maybe they
+just weren't that useful, and we shouldn't go ahead and build them. And so, what this boils down to is that to understand the future of EKS, you have to know that you are
+as big a part of the story as we are, and we're gonna
+keep doing more things that make it easier to make Kubernetes a standard part of your stack. And Kubernetes turned
+10 years old this year and 10 years from now, our mission is to make Kubernetes disappear. And so where are the
+receipts on this, right? Well, we have our
+containers public roadmap. And this is a place where we push things and we post things that
+we're thinking about or working on, where you can
+come and you can submit ideas and converse directly with the team. I went and counted this up 'cause I didn't wanna
+put the slide up here and talk about this amazing thing and say, well, yeah, but no one ever uses it, to date, we've shipped over 400 EKS items on the roadmap since
+we started it in 2018. And over 850 total items
+that have hit this roadmap have been shipped across all
+of our container services. So we encourage you to
+visit this regularly. You can see what other people are saying. You can upvote, you can comment on things that you'd like to see
+or submit your own ideas if you think we can do something better. So EKS issues are on here,
+they're tagged as EKS, but you'll also see issues for other container services as we visit. And we encourage you to submit ideas and join the conversation there as well. If you wanna learn more about Amazon EKS, we have a number of great resources that the team has developed. We have the EKS Best Practices Guide, which was recently updated with best practices for machine learning. We also have the EKS workshop. You may have been able to attend an EKS workshop here at ReInvent. The EKS workshop is our master home for all of these workshops and events. So if you weren't able to make a workshop session at ReInvent, I highly encourage you and
+your team to check this out. And then we have EKS blueprints, which is a set of best
+practice codified examples for how you can deploy complete clusters, and now even platforms using Amazon EKS. And we have blueprints in both Terraform and the AWS CDK. So really appreciate
+everybody coming today. And thank you for spending
+some time to learn about what we're doing with EKS
+from myself and Hyungtae. Thank you. (audience applauds)

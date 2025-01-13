@@ -1,0 +1,367 @@
+- You are here because you're
+building GenAI applications, and you want to better understand
+what's Bedrock is doing, where bedrock is, how bedrock is evolving, and where are we investing our engineering resources towards. Some of you may be evaluating Bedrock against some of the other players, and you want to hear more from your peers as to how they are making
+choices to use Bedrock. For a quick introduction,
+I'm Ritesh Kumar. I'm part of Bedrock go-to-market team. I work with customers to
+understand their GenAI journey, what they are doing to build
+and scale GenAI applications, and how we can help solve using Bedrock. For a quick agenda, I'll touch very quickly upon
+how we are looking at Bedrock, how we are evolving the bedrock journey. And then I'll invite David
+Kerr, who is the Forcura CTO, how they're leveraging at Forcura in their healthcare organization. So David will be presenting his journey and how they're getting
+value out of Bedrock. And then we'll invite Diego, who will be speaking on
+how they are leveraging in the retail organization at Cencosud. And then we'll leave some
+time at the end for some Q&A. In a true Amazon style working backwards, we want to understand first as to what are your requirements. So if I were to look at all the
+themes that we get from you, one of the key areas that
+we are getting as feedback is what model to use. And it goes into multiple
+subthemes, so to speak. The first one is whether I
+should use proprietary models or open source models. The other subtheme we hear
+is, what about custom models? Is it worth customizing the models? And with all these choices,
+how do you quickly evaluate what model should work
+best for my application? So model evaluation becomes key. And customers tend to
+think of three key areas when they evaluating. You have accuracy, you have
+latency, and you have cost. So just those three different parameters. So that's sort of on the model choice. Those are the key themes we are hearing. The next key important aspect
+is no one is building models to get generic answers, right? You are trying to solve a business problem using your corporate data. So how do we make it easy for models to use your corporate data, whether it's through simple
+things like prompt engineering or fine-tuning as the, or even reputable augmented generation? And then how do you get the
+models to execute tasks, not only give like simple answers but how do you make it do
+act or take some actions? When we are sharing the corporate data, data privacy and security
+becomes very important. At Amazon and Bedrock, we made a very important
+fundamental choice when we launched this product is that we will never share the data, we'll never store the data. Your data is your data. This is in contrast to
+some of our cloud peers. We believe that your data should be taken as the highest priority, cannot be shared, cannot be stored, cannot be used. So we'll talk about some
+of the responsible AI, some of those aspects
+that's top of mind for you. And the last area is how do we make sure that we can quickly build
+applications and iterate, working with business users? So we'll touch upon some
+of those key aspects that we are hearing. We'll continue to appreciate the feedback you're giving
+us in this particular area. When we think of Bedrock, a couple of key things we think about is that we really want
+to enable developers to easily build and
+scale GenAI applications. The key key areas, if I were
+to stress our developers, easy and scale. I think those are where
+we want to focus on. So as it relates to models choice, one of the key theme that we
+get is serverless experience, making sure that developers
+don't have to worry about managing the infrastructure,
+scale in, scale out and all those mucking around
+within infrastructure, right? Simple APIs, you can choose model, you can quickly change models,
+and so on and so forth. Giving a true serverless
+experience of Bedrock is focused on that. The other thing we did
+was about a month ago, we did a GA to a feature
+called custom model import. So now you can bring custom
+models in an on-demand fashion. So you don't have to reserve
+24-by-7 infrastructure. You pay for only what you use. So custom model import
+has seen an amazing, positive response from you
+all, so we appreciate that. And finally, from a model
+evaluation perspective, this feature has been around
+for almost a year now, and we recently just announced
+a couple of key areas. One is on LLM as a judge. So you can use different LLMs
+to judge the different models as new models are coming
+in, and so and so forth. The other key area that how do we help to
+do a task evaluation versus just a model evaluation. So we recently launched a RAG evaluation. So it'll evaluate the entire RAG pipeline, and not just the model. So whether it's changing
+the chunking strategy, embedding strategy,
+whatever you want to change, it'll evaluate the entire RAG workflow and not just the model evaluation. So we think that some of these things are adding value to customers
+in terms of the model choice. As we look at making
+it easy for developers to leverage the corporate data, we think in these three
+or four broad terms. The first is prompt management. We recently launched, we
+did AG of prompt management. It allows you to do, manage hundreds of your
+prompts in an easy way. If you want to do AB testing, if you want to revise prompts
+as new models come in, you want to test different prompts. So you can do all of those different tasks in a simple manner. So again, making it easy for developers to try out different prompts. Knowledge bases is a
+very powerful feature, where developers can use a single API instead of managing the
+entire RAG pipeline. And we are allowing custom capability, where customers can customize
+how the models are behaving at every point of the RAG pipeline. So knowledge basis is single API, with the control that the developers have over the RAG pipeline. So we have gotten quite a
+bit of positive feedback on knowledge base. Would love your continued
+feedback on that. As we think about fine-tuning, Bedrock fine-tuning is a single API to easily fine-tune models. Developers like IT. Data scientists in the room would still want to have more control and would like to use
+SageMaker, which is great. And you can bring the models back using custom model import for on-demand pricing back onto Bedrock. And finally, for last six months, seems like every day there's a
+talk about agentic workflows. Next year is going to
+be even more important for agentic workflows. So we are trying to make
+it easy for developers to build agentic workflows. This morning, Matt announced
+multi-agent collaboration, where you can have
+multiple agents collaborate to accomplish complex tasks. We also launched in-line
+agents a couple of days ago, where you can at runtime, give different tools for the agent to act. And then we also launched
+custom orchestrator, where you can use different
+orchestration techniques, like React and Revu, or you can build your own
+orchestration technique to, for agents to act and not
+just give simple answers. When we think from a developer
+experience perspective, one of the key feedback we have gotten is we want to make it easy for
+developers and business users to build deterministic workflows. So what Bedrock Flows does, it just went GA a couple of weeks ago, what it does is that it allows you to leverage the resources, like KB, prompts, agents, et cetera, and you can do a drag and drop and build your own deterministic flows to automate workflows. So that's Bedrock Flows. Bedrock Studio, it has been
+in Preview for a while. What it allows to do is
+to have the developers and the business users
+collaborate in one environment. It has some of the templates, so you can quickly build applications, and then you can quickly
+test out, iterate, with partnering with your business users and launch your your applications. And then from a consumption
+options perspective, we have on-demand,
+provision throughput, batch. We just announced yesterday
+latency-sensitive inferencing. The other thing is cost tagging. So you can tag your app, you can tag your costs
+according to your application. So you can say, "Okay, workload one is using X dollars versus workload two is using Y dollars." So cost tagging. So making it easy for developers
+to build applications, iterate with business users,
+and launch applications. And finally, from a
+responsible AI perspective, as as touched upon, like security and privacy is
+very, very important for us. Your data is your data. We do not want to use that
+data for any other thing. It's secure. We don't store it. You have the full control of the data. From a compliance perspective, we have been very active this year to get Compliance Bedrock compliant. It's FedRAMP high
+compliance, PCI, SOC, GDPR, ISO 42001, we recently
+got, so and so forth. So lots of compliance so that you can use it for
+your specialized verticals. And finally, guardrails allows you to build your own corporate policies. So you can define your
+own corporate policies so that the applications can follow those. So if you're a banking customer, you don't want to have your customers, or LLM give advice on
+trading, as an example. So making sure that you are,
+you can apply the guardrails, appropriate guardrails for
+the appropriate applications. So those are some of the key things that we are focusing from Bedrock. So if I were to summarize, making it easy for developers to build and scale GenAI applications. Four key areas that we are
+focusing on is model choice. Making it easy for you to
+leverage the corporate data so that the application is more meaningful for you and your customers. Making sure that we have
+the right responsible AI, guardrails. We make it easy for you
+to build those guardrails and then have the right
+developer experience. So those are some of the key
+areas we are focusing on. And now I will invite David to share his journey at Forcura. - Thank you, Ritesh. Good afternoon, everybody. My name is David Kerr. I am the chief technology
+officer at for Forcura. Let's get the slide there. There's me, there's my QR code. We're from Sunny Jacksonville, Florida. We were founded in 2012 by
+my boss and our founder, Craig Mandeville. Forcura is a software as a service company that is in the post-acute
+care healthcare space. Post-acute care is the
+care that you receive when you are moving
+from a hospital setting back to normal life. Largely, it's at-home care.
+That's what we're focusing on. It could be things like
+rehabilitation, pain management, nursing care at home, even simple things like
+food preparation or bathing. So there's a lot of services that are in the post-acute care space, but it's a transition from the hospital into post-acute care. I won't go into all of the details here since I assume most of you can read, but the ones that I'm gonna focus on is where we are with regards to scale. So we have 900 plus clients. We are the number one provider in this post-acute care workflow space. And we have over a million
+patients we represent, which is important for me because it means that anything
+that we build has to scale, it has to have the right
+economics, and it has to work. Since we're in healthcare and we're talking about
+the transition of patients from a post-acute care, from acute to post-acute care,
+it has to work all the time. So here are some of the
+challenges within the industry. And, of course, challenges
+mean opportunities for people who are working
+to help make things better for our clients, and I think these are things
+that you'll recognize. You see a lot and you hear a lot about these sorts of challenges across all of healthcare,
+not just in post-acute care, staffing shortages, compressed margins, especially when there's
+reimbursements from Medicare, increased time spent on documentation, because of the regulatory
+requirements are increasing. And the one that is most important that'll lead us right to our
+use case we'll talk about is this last one, critical information frequently
+subsumed by large amounts or less germane information
+in really large documents. So to make the transition
+from acute to post-acute, there's some documentation
+that what they would call the intake coordinator
+has to work through, and they only want some of it. So what that is is that is
+undifferentiated heavy lifting. That's the AI use case,
+undifferentiated heavy lifting. So you want something that's concise. And on average for us, it's 17 pages long, it can go hundreds of pages,
+and it's all different formats. So instead of something concise, you get like the Cheesecake
+Factory menu, this huge thing. It's monstrous. So if you consider the core use cases for generative AI, right, if you're the text
+generation, translation, sentiment analysis, conversational AI, the last one, summarization,
+is really in that wheelhouse. So if you look at
+undifferentiated heavy lifting and summarization, that's our use case, right there for that critical problem. So for this summarization use case, I'll give you this rundown of how we first went through this. We launched our generative
+AI product in 2024. This year in April, it
+was launched on OpenAI. Woo. We're a AWS-native. So we had a lot of
+advantages that were inherent for us being an AWS-native
+shop that we took advantage of that helped us
+significantly in our journey going from the launch in April
+to where we are now in GA. The first was that we
+had a significant amount of help and support from the AI, AWS generative AI Innovation Center. They worked very closely with us, providing a lot of subject matter experts that helped us look at model choice and provided us experts
+in things like scaling and prompt engineering. They much better commercials than OpenAI. It's quite expensive, to be frank. The support was very, very high touch. Our partner, our support
+team, Lavender is her name, I think she slept with her
+laptop right by her bed because I would email and I'd get a response five minutes later. I know who to talk to. So they really helped shepherd us through this entire effort
+to build the best product. And then being AWS-native,
+and Ritesh alluded to this, all of the advantages you get of being within the AWS ecosystem. And for us, I listed identity
+and access management. Since we wanted to control the entitlement to this new product, it's all built in. It also gave us a view over the horizon for the other tools that are
+part of AWS's generative AI and AIML toolkit, SageMaker,
+if you wanna roll your own, and then some of the purpose-driven models like HealthScribe and Comprehend. So because of the support we had, we launched on OpenAI in
+April of 2024 to pilot. Two weeks later, we switched
+models to an Anthropic model. And two weeks after that, we
+switched to another model. It shows you really the decoupled
+powerful nature of Bedrock and the ability to choose
+the best model for your task. So this is the meat and
+potatoes of what we did, right? And if you look at this, the most important thing for us was we want to make all
+of our implementations, whether it be a generative AI product, some other extension of our current stack, service-based and message decoupled. So in this particular case, we have the data that
+comes into our system. If you look at the first two boxes, documents and SQS, that's just input. It's not really specific
+to this implementation. SQS is nice. It's a queuing interface. It can absorb excessive volumes. We have a single consumer. The documents that come
+in are unstructured. So we have a current step function. It's old-fashioned AIML that turns that unstructured document in a structured output. And then from there we really
+turn the whole new offering into a service-based, decoupled service. So it just drops the results of that, the notification onto a Kafka queue, and it puts the data on an S3 bucket. In this particular case, if
+you look at the third box, it's listening for that topic that says, "Now we have the structured data that's been dropped on the S3 queue." It pulls that structure data
+in and it builds the prompt, and it sends the prompt
+request in through Bedrock. It gets the completion back, it stores the completion on an S3 bucket, and it sends out a notification
+on the Kafka stream. It's really nice because
+in this particular case for our implementation, we're using the event of the
+incoming package of documents as the trigger. Since you're using Kafka,
+you could use anything. It could be a click, you know, of your users could click on something. It could be cron job that could
+drop something on the queue. So it's really abstracted
+from both the frequency of what's queuing the
+call into the controller, I call it that box number
+three, and the content. We're using text, but
+with the multimodal models that are offered through Bedrock. It could be anything. It could be an image. It
+could do image analysis. So we really did look
+over the horizon to say, "How could we make this
+controller agnostic to both the model it's using, the content it's pulling
+in, and what it writes out?" It could write out a message that could trigger another
+call to another LLM. So it creates the ability
+to manage workflow and it does it in a
+very abstracted manner, in a very scalable manner. So the results. This first line was unsolicited. We did not ask for input on how
+this worked for our clients, but we got the feedback
+that it was life-changing. This 30% statistic is actually old. It's a bit hackneyed. It's compressed the timelines
+for intake significantly. So if you think of a 17-page document, it's extremely difficult to read. To a summary that pulls
+in the germane data, with a very well engineered prompt, it allows the intake coordinator to make a very fast decision about bringing in a patient on board, and it allows the provider, who's going to give the services, to be able to very quickly
+understand what it is that they are dealing with and be able to provide
+the right level of care. So it took a lot of the
+documentation load out of it. And you can see there, clinicians can now
+prioritize patient's visits based on need, which is
+what they should be doing, spending less time
+sifting through paperwork and they can start care faster. So that goes back to our mission
+of as a healthcare provider in the SaaS space, sorry, not provider, as in the post-acute care space of providing a better patient experience. On the commercial side,
+the uptake has been so good that we've seen the win rate
+when we show the product with the referral summary and without, and we have 2/3 of new clients have licensed the
+referral summary product. So it's been a big success commercially. And you'll find, for anyone
+here who hasn't yet pushed a generative AI product to market, that since you really have an abstraction to this very powerful and capable engine, which is the large language model, you can innovate very quickly because the capabilities
+are just abstracted by what you can put into the prompt, and you can change prompts and generate almost entirely new content and inferences very quickly. So we found that we were able move and go to market much quicker. The future. We're being a little cagey here because we do have competitors who like to copy
+everything, even our colors, but you can use your imagination when you have a summarization use case. You can expand on it. You can make it easier to read. You can change the event that triggers the
+generation of a new summary if you get new documentations
+that get added to that packet. So there are a lot of things that expand that existing use case, and we don't have any lack of input from our client advisory
+board that are things like, you know, it would be great. So they almost spell themselves out once you launch the new product. It's quite exciting. And now I'm gonna pass it
+off to my colleague, Diego, who had a very long journey here. (audience clapping) There you go, mate. - Thank you, David. So first of all, I want to
+apologize because my voice. So I got a flu coming back
+here from Chile, in the plane. So hopefully the voice is gonna be with me up to the end of the presentation, okay? Okay, so I'm gonna talk
+about what Cencosud is doing using Amazon Bedrock. And the idea here is to
+share, like David did, the same journey, talking
+about what our challenges are, what are the main reasons
+why we use Amazon Bedrock, and what we choose to use Amazon Bedrock. And then we are going to
+go directly to the results. Something that is good in retail, and I don't know if
+there's a retail guys here, but we love results. So when I'm going to show you what are the results that we have with the models that we
+implemented and the use cases. So my name is Diego Rebolledo. I'm currently the technology director for all the businesses
+that Cencosud has in Chile. First, before we start with the Amazon Bedrock representation, I want talk about Cencosud first. So Cencosud is one of
+the biggest retailers in South America. It has different businesses, from home improvement,
+improvement businesses, department store businesses, supermarket, but also shopping centers. It has operations in over
+eight different countries, but two of them are not like
+stores or business operations, are more like technology hub in Uruguay and the other one is a
+merchandise office in China. But we also start like a data business like a two or three years ago. Starting in retail media environment and also as a burn through capital that started like investing
+in different startups from the ecosystem. We have more than six years of operation. It's a, let's say, an old
+company located back in Chile. It has more than 120,000 employees. That's a lot, at least for
+me, more than 1,400 stores, and more than 67 shopping centers. So it's a big, big company, and it's something that
+you have to have in mind. Since everything what
+I'm going to show you needs to be thought or
+think in this scenario that need to scale, okay? So starting with the business challenges, we summarized this in these four main
+challenges for Cencosud. Cencosud has something that differentiate with the competitors. That is always put the customer-first. It always has a really high
+focus on customer experience. And that's why personalization
+and customer experience, I would say, the first challenge, offering personalized and
+relevant shopping experiences. So it is something that is
+always in our top priorities. Operational efficiency. Since we are a retail company, operational efficiency
+is always going to be in the top three priorities. So automating things, improving processes, and reducing costs is always
+something that we have in mind. And this is a second like
+main business challenge that we have. Third one is gonna be the insights. So managing all this huge environment with every data point is converted into some kind of a value, given that value related
+to the internal processes or also customer experience
+or customer-facing processes is also important. So insights is gonna be the number three. And the fourth is gonna
+be content generation. And it kind of includes the
+three before I mentioned, since producing high quality and engaging and personalized
+content for the customer. So they can take, like the
+buying decision with good data, with good information
+from all the products that we are offering to them
+is also a priority for us. So given the this context, big company, big retail company operating
+in several countries with a lot of employees
+and different businesses, and the four challenges that I mentioned, I think when you are going to see this, these are reasons why we use to choose or to to work with Amazon Bedrock. You're going to be connecting immediately the things that I mentioned
+with the business challenges. So we summarize the whys
+in these five topics. So first is quickly adapts to the latest innovative generative AI. I think that's something that David and Ritesh also mentioned. Since is a decoupled like
+a framework and platform, you can quickly adapt to anything you have given like a local environment. Also with the services
+that are over there, like offering their
+their models, you know. Second one is Cencosud
+e-commerce or digital platform is 90% over AWS. So the second reason why
+was really important for us to use Bedrock is because
+it's almost native, a native integration between the business and the e-comm ecosystem
+and the Bedrock platform. So that was really quick and
+easy to integrate and to use. The third one is something that sometimes is kind of obvious, but it delivers really,
+really high performance at a low cost. And that's something important for us, trying to save every
+penny, every dollar we can. It's important for everything
+that we do in Cencosud. For reason why we use Bedrock is because it offers high
+availability and scalability, and I think also speak about that, and it's something that we al also see. And so when we choose Bedrock. And the last one, and this is like a direct
+feedback from our teams and developers and data
+scientist is really easy to use and really like easy to
+integrate and to navigate and to work with. So that that's our advise, and like the main reasons
+why we're using Bedrock. So next, you're gonna see like a high level architecture diagram when there's a lot of different components interacting within the,
+in this case, a customer. So when a customer interacts with us and with our environment, we first have have their firewalls so we can like separate
+the malicious intent or the intents that the
+customer are having with us in a proper way. And after that, we also
+start like tagging a lot. So every part that we
+compare or tag something, an intent from a customer, we're going through our knowledge base. This that is the draw in the
+bottom part of the diagram. So every time we are tagging some intent, we are comparing with the
+knowledge bases that we have. So we can start like separating and categorizing all the intents. So we separate two, like
+let's say outliers intents that are the miscellaneous
+one and the malicious ones. So we response, like a specific
+response to those intents. And we don't pass through all
+the flow that is developed, that is built over Bedrock. And the middle one is
+the more important one. So we tag the relevant intents and we store that in an S3 storage and we compare the intent and the tagging that we're
+doing with the knowledge base. So we started like continue
+the flow over the post-sales, pre-sales templates that we
+are having like deployed there. So after that, we can like
+compare the knowledge base with the response that is being generated with the Amazon Bedrock
+environment, you know? What capabilities give
+us these interactions and this flow is we can
+do in bids with RAG, we can do classifications
+and context limitation. We can make image generation
+also and interpretation. So from an image, we can like take out
+descriptions, characteristic, and tagging also in the SKUs
+that we have in the sites. Conversational flows. That's something I'm gonna show you in A POC that we're running now with the supermarket business. Hyper personalizations. So we can like provide recommendations and also like similar
+products to the customers, given this architecture. And last but not least, the
+red team and security testing. So we are providing also
+the security team tools so they can like test the
+solutions that we are building. We have a separate
+security team in Cencosud, so that's important also since
+there's some kind of auditing between the security team and the teams that are
+building the platforms. So let's go directly to the use cases that we are now deploying. Three of them are already in production and being used by our customers. And one of them, the generative
+conversational RAG chatbot is on a POC right now. So it's not deployed into production yet. But if you go through
+the different businesses, you can see the first on
+the left gonna be easy. It is our home improvement business unit. We are using, starting from a image, we're using all the flow and the architecture that I show you to generate all the descriptions, all the characteristics, dimensions, so the customer can, for
+one side, have like proper and quality information from the product that he's
+looking on the website. But also we are reducing
+a lot of time and money in terms of creating the
+descriptions and all the PDPs, the product detail page,
+that we have there. So second one, rating and reviews. There is two main use cases here. So one is put together all
+the ratings and reviews that the customers are
+given to us in the past. So we summarize that and put like a box there
+that you are seeing when we put what the customer says. So we integrate every
+like rating and review, and we put there like a summarized version of all the reviews. And below, you can see
+like the main character, like tagging the main things
+or the products in that case, it's, I can see the
+product, it's a Xbox, right? It's a console. So you can see there that is
+has like some green tagging and yellow tagging below. So those are auto-generated
+tags that came from the reviews that the customers are giving to us. So the third one is a generative
+conversational chatbot. So we can like improve the
+responses that we are having, classifying these intents that I mentioned before
+in the architecture. So we compare the
+intents and we can define and understand what the
+customer wants to achieve in the interaction with us and
+we can give better responses. And in this case, you are seeing that the customers
+wants to cook something, so the chatbot understand the intent, understand what the customer
+wants to cook in this case, and give us an automated
+response, with all the ingredients that he or she's gonna need to cook. And then you can add it just
+really quick to the cart so you can after that
+finish a purchase with us. And the last one, I'm going to show you a bit
+more of the results that we have with the last one. So we have recommendations
+and hyper-personalization. And here, I'm gonna put a zoom in on it. So there's two use cases,
+or two main use cases. The first one in the top is gonna be the similar products. So when you're navigating
+through our websites or app, you're gonna see this feature that displays different products that are similar as the
+one that you're seeing. So basically, when you're looking for a, let's say white meat or chicken meat. So we can show you similar products that are related with that, but not also with the product
+but also with the customer. So we can identify all the products that are going to be similar with the ones that are the customer looking for. And what we are looking with that, it's increased three main KPIs
+that we are now measuring. So first is the click-through rate. So the amount of clicks that
+the customers like give us over the display of
+these similar products. Second one is conversion rate. So for the ones that click it, how many of them are added to the cart? And the last one is component
+like the click-through rate and the conversion rate. How many sales in terms of the weight of those interactions
+has over the total sales? So the numbers that you're seeing there are summarizing of up to
+at the end of October. So you can see an increase of 2.3% of the click-through rate, and conversion rate
+increase from 37% to 55%. And the weight of the sales
+that I was mentioning, at 1.23%. And if you look at the
+second one, the one below, that are complementary products, not similar in the use case in the top. In this case, if you're looking, for example, for some chicken, you can see like complimentary product, a salt, tomatoes, lemons, et cetera. So you can increase the average
+sales that you're buying. In those cases, we're looking for increased the
+amount of the average ticket that the customer has, but also we are measuring
+the click-through rate, the add to cart, and also
+the participation of sales. And if you look at the detail numbers that you have in the bottom right, you're gonna see that in some cases, we have negative results. So then -24. We are always comparing two models. The ones that I show you using Bedrock, and the one we are using
+before with AWS Personalize. So we have a balance in there when there is like a negative, or the results are not
+the ones that we want. We're changing near real time
+that the using of the model. So we can switch between
+the one that we built with the AWS Personalize. So we can use the best one
+in terms of performance. So we change that real quick, and we can get the results
+that I show you in the top. Okay, so given the use
+cases that I show you and the results that I mentioned, I think there is a lot
+to do yet in Cencosud, and not only in the businesses that are more mature in the using of GenAI but also in the entire company. So what's next for us? I will summarize the next steps in five different like
+priorities or topics to work on. So first is improve
+GenAI-based applications. So we have these applications
+that we show you, but we also have more
+builded in different teams across the organization. So the idea is to improve all the first catalog of the applications and then standardizing a bit the models and the way we use it. And that's our first priority. Second one is expand the use of GenAI across the organization. I think that GenAI or all the AI topics are super focused on the tech teams and it's not too much outside those teams. The idea is to start like
+giving use cases and reasons and train people to outside tech so they can use it also
+to improve processes and make more efficient the roles and the work that they had to do. Third one is strengthen the
+data governance and security. We think data governance and
+security as the building blocks to build on on it after that, you know, so I think if you have
+good data, good policies, a good model to interact
+within all the organization and you have deployed that
+over the entire company, you can have better results after when you build applications on it. Fourth, and it's related
+with the one in the middle. So it's improving gene AI literacy and training for the
+associates in Cencosud. Once you start expanding the use of GenAI, you also want to expand
+the literacy and trainings since the idea to like direct the people or to show like a framework
+to define a framework so they can use it. And last but not least, innovation for Cencosud is always be, it's always been like
+a growth topic for us. So we work a lot with the startups. We also invest in startups. We seen that thing,
+that for AI perspective, driving innovation with AI
+is something important also to have in mind. If I need to like put one
+more like important thing or the first priority for us, I think it's gonna be the expanding the use of GenAI across the organization since the benefits are being seen not only in retail in this case but in every part of the organization. So we can put forward the use of GenAI across the entire organization.

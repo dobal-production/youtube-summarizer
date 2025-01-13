@@ -1,0 +1,430 @@
+- Welcome everyone to session "Boost productivity and
+empower revenue teams with Generative AI" My name is Anastasia Pachni Tsitiridou and I'm a Solutions Architect with AWS, and I'm extremely happy to be here today. One of the most exciting
+aspects of my role is collaborating with innovative customers who push the boundaries of technology. Today, I have the privilege
+of sharing the stage with one of these customers. Particularly I'm sharing the stage with Jeroen Minnaert and
+Pieterjan Criel, from Showpad, a leading sales enablement
+platform that is revolutionizing how hundreds of teams streamline
+their selling processes. Our focus today is on
+how Showpad harnesses the power of AWS Generative AI, particularly Amazon BedRock to enhance seller productivity
+and effectiveness. But before we dive in, I would love to get to know a little bit more about you. So by yourself hands, how
+many of you are in sales? How many of you are in marketing? Okay, how many of you are
+in more technical roles like Product Owners? Okay. Developers? Nice. Do we have any architects in the house? Good. At least we have a very diverse audience from like technical perspective. So I'm confident that we'll cover topics that resonate with each of you. So here's what you can expect
+from our session today. We will start by exploring common pitfalls in Generative AI adoption. Then we will discuss
+high potential use cases and best practices we've observed in successful customer implementations. Jeroen will then take us through
+Showpad's journey with AI, highlighting how it's
+driving business value and enhancing user experiences. Then Pieterjan will
+showcase the integration of Generative AI in Showpad's platform, explaining a little bit what
+happens behind the scenes. We will conclude with the
+recap of Best Practices and introduce some valuable AWS resources to support your own AI initiatives. But let's begin with the
+sobering reality check. According to recent surveys, as many as 90% of enterprise pilots fail to transition into
+production environments. The implications of the
+statistics are significant. They represent not just
+substantial financial losses, but also countless hours of effort, resulting in team frustration, difficult conversations, and a potential hit to overall morale. So why do so many projects fail to reach their full potential? When we talk to customers, we
+hear about different things, but eventually we can classify
+them into two main areas. These are technical problems
+and business alignment issues. We can further distill those points into five main ones. On the technical side,
+organizations often struggle with poor data quality, risk management issues, high development and deployment costs and integration difficulties
+with existing systems. From a business perspective, companies frequently
+encounter difficulties in demonstrating the tangible
+value of their AI initiatives. Moreover, misaligned or
+unclear business goals can lead to projects that fail to address core organizational needs or deliver any meaningful impact. Successfully addressing both technical and business challenges is crucial to deliver sustainable
+Generative AI functionality. So we will start by addressing the technical challenges and while I will not delve
+into specific architectures, I will highlight some key
+features of our platform and Amazon BedRock that can help you
+overcome these challenges. If any of these points resonate with you, I highly encourage you to attend some of the more specialized
+talks on these topics throughout the week. So let's address a critical aspect of Generative AI implementations that is managing risks
+and ensuring data quality. These are cornerstones of building trust and delivering value to both
+customers and employees. Here, AWS stands at the forefront
+offering key capabilities that directly tackle these challenges. Our comprehensive suite of data services provides unparalleled flexibility
+to store, manage, govern, and act on your data, ensuring its integrity at every step. When it comes to
+mitigating potential risks, AWS leads the way with the
+most secure cloud platform. Our AI services come with built-in security features including access control, management through identity
+and access management. We've also developed robust tools for compliance, governance,
+responsible AI and privacy, all working in concert
+to safeguard your data and maintain unwavering
+trust in AI developments and deployments. But let's not forget, in the world of AI,
+scalability is paramount. Without it, even the most
+groundbreaking AI solutions remain theoretical. AWS recognizes this critical need and rises to the challenge. We provide a robust
+foundation that empowers you to scale your AI innovations globally, enabling rapid deployment and expansion wherever they're needed. This ensures that your efforts translate into real world impact with tangible value, turning your AI potential
+into a practical reality. Now let's move on to
+another common challenge that is the high cost of developing and deploying Generative AI applications. Here Amazon BedRock offers
+an effective solution with powerful features
+that significantly cut development time, boost collaboration, and provide cost effective
+deployment options tailored to your needs. I would like to highlight
+two game changing features that accelerate development
+and enhance efficiency. The first one is Amazon BedRock Flows and the other one, Amazon
+BedRock Prompt Management. So, picture a visual builder that lets you craft, test and
+deploy workflows with ease. That's Amazon BedRock Flows in a nutshell. It's like a digital canvas where you can seamlessly
+connect foundation models, prompts, and AWS services using an intuitive drag
+and drop interface. So no more wrestling with complex code. It's all visual, making AI development
+accessible to everyone. What's even more exciting is
+the robust safety features built right in. Through integration with
+Amazon BedRock Guardrails, you can automatically
+filter out harmful content or unwanted topics, ensuring your AI remains
+reliable and trustworthy. And when it comes to
+debugging and validation, we've got you covered with
+enhanced reusability features that give you complete visibility into your workflow execution. Now let's turn our attention
+to Prompt Management. This feature is a true efficiency booster, streamlining the entire
+engineering process. It's like having a Swiss Army
+knife for AI development, allowing you to experiment
+with multiple models and configurations effortlessly. So imagine being able to
+compare prompt variations side by side, execute
+prompts automatically for instant testing, and easily version and share prompts for downstream applications. It's not just a feature. We see this as being a complete revolution of AI development efficiency. Okay. Alright. So let's address the
+final technical hurdle that is integrating Generative AI with your existing systems and processes. So to me, this challenge
+can be broken down into two aspects. The first one is that you need to harness the power of your own
+data and connect with various databases and storage systems. For this, Amazon BedRock Knowledge Bases makes this process a breeze. With just a few clicks, you can point to your
+proprietary data sources and the system will take care of the rest, automatically fetching and
+processing your documents. It's compatible with a
+wide array of repositories from Amazon S3 to Confluence, SharePoint, Salesforce, and you can even pull data
+directly from the web. Now, once your content is ingested, Amazon BedRock Knowledge
+Bases works its magic. It intelligently divides your content into manageable text blocks,
+transforms them into embeddings and stores them in the vector
+database of your choice. The entire process is seamlessly managed, handling complex tasks
+like content comparison, failure handling, and encryption without you needing to lift a finger. Now, when it comes to
+vector database options, Amazon BedRock offers you
+the freedom to choose. whether you prefer Amazon
+OpenSearch Serverless, Pinecone Redis Enterprise Cloud, or Amazon, Aurora or MongoDB, you can select the option that best fits with your existing infrastructure. Now, the second challenge
+when we talk about system integration involves
+seamlessly integrating with your existing processes
+and enterprise systems. So essentially, how can we
+unite data and processes to deliver truly
+transformative automation? The answer lies in Amazon BedRock Agents. These agents serve as
+a sophisticated bridge between Generative AI and
+your current processes, effortlessly connecting
+with your company's existing systems and data sources. So envision a virtual assistant capable of executing
+complex multi-step tasks by interacting with your
+enterprise infrastructure. It's not just a distant dream. This is very much a reality
+with Amazon Bedrock Agents. So once configured, an agent
+becomes your AI-powered ally. It swiftly analyzes user requests, automatically calls the necessary APIs and taps into various systems
+to fulfill these requests. This remarkable capability enables fluid interaction between
+your AI and existing processes without the need of extensive overhauls of your current systems. So let's try to bring this
+to life with an example. So imagine a customer reaching out for a refund on a faulty product. In the past, this would
+involve a maze of manual steps across multiple systems. Let's see how this
+process will now look like with Amazon BedRock Agents. First, the agent will skillfully analyze the user request and break it down into
+simple actionable items. With this action plan in place, it can leverage tools like AWS Lambda to tap into various data sources. So in this example, it
+would be the Order database to check the purchase
+details of the specific order and doing that while
+respecting the user boundaries and making sure that
+the user only has access to their own purchase history. With that information,
+it can cross reference it in the company's knowledge
+base, making sure that it aligns with the refund policies. After observing the results, so in our case, everything checks out, it can safely initiate the refund process in the financial system. And then as a final touch, it can even update the
+customer's CRM record and send a personalized confirmation email to the customer. So this elegant AI-driven flow doesn't just reduce manual intervention. It orchestrates a symphony of efficiency. It accelerates processes, ensures unwavering consistency
+in policy applications and seamlessly integrates
+with existing systems. And the result? A harmonious plant of
+operational excellence and elevated customer satisfaction that resonates throughout
+the organization. Now with this, we have
+successfully addressed all of the technical challenges. And while these challenges
+are significant, AWS comprehensive tool set
+offers effective solutions. Now I want us to shift our focus to the business alignment challenges, which often require a
+more strategic approach. The two main business challenges we see is demonstrating tangible business value and aligning AI initiatives
+with clear business objectives. Our observations from
+successful early adopters reveal two key areas, where Generative AI projects consistently move to production. The first one is Product Innovation. This area represents substantial revenue growth opportunities,
+especially for SaaS platforms or products with a tiered pricing model. By integrating AI capabilities, companies can introduce new features or enhance existing ones, creating compelling upsell opportunities. However, here, it's also very crucial to implement precise metering
+and billing strategies to ensure that this innovation positively impacts your bottom line. The second aspect is
+Productivity Enhancement. This aspect directly
+translates to cost savings. By equipping employees
+with Generative AI tools, organizations can significantly
+reduce the time spent on routine tasks, allowing team members to focus on high value activities. So for example, AI-powered
+coding assistance can automate time consuming tasks like documentation
+writing or unit testing, freeing up developers to focus on more engaging
+aspects of their role. We see that by strategically
+focusing on product innovation and productivity enhancement, organizations can effectively demonstrate the business value of
+their Gen-AI initiatives. This approach not only
+drives revenue growth and operational efficiency, but also aligns AI projects
+with clear business objectives, addressing key challenges
+in business alignment. Now, let's explore some best practices of putting AI to work. One of the best practices we've observed is embedding AI into products. This approach is
+important for two reasons. The first one is that it
+drives faster user adoption by not disrupting
+familiar user experiences. And it also simplifies implementation as the embedded functionality
+has strict boundaries and typically doesn't
+depend on customer input. So some practical examples of that. So one approach is creating personalized context-aware content as scale. So imagine summarizing search results right under the search bar, providing users with instant
+tailored information. Another example is offering
+intelligent recommendations and intuitive interfaces to
+enhance user experiences. So for instance, in the
+context of an online retailer that lets customers
+list their own products in their marketplace, you
+can provide functionality like right-clicking to remove background or right-clicking to like enhance the lighting on a photo, making the whole process
+of listing a product much easier for customers. This embedded AI functionalities offer an excellent starting point for integrating Generative
+AI into your products. They're relatively
+straightforward to implement and you can quickly demonstrate value. As you gain experience and confidence, you can progress to more complex tasks. For instance, we might
+embed AI-powered support and self-service features that significantly reduce customer effort. Another avenue is integrating
+AI to handle routine tasks. As we saw earlier in the
+context of an online retailer, it could be automating the refund process for common disputes. We see that by starting small and gradually expanding, you can build a robust AI strategy that enhances user experiences
+and streamlines operations, all while maintaining
+manageable learning care for your team. So, let's now explore how Generative AI can revolutionize internal processes, boost efficiency and trim costs. Many of our customers are
+focusing on internal use cases for personal improvement, and that's for a good reason. Internal deployment provides a safe haven for piloting and experimentation,
+creating an ideal sandbox to demonstrate tangible benefits before venturing into
+customer-facing applications. Moreover, as we already discussed, it's also freeing up your
+team to focus their expertise where it really matters. Here, Generative AI
+stands particularly bright when it comes to unlocking
+the potential of "dark data" so those vast troves of information that have been gathering
+digital dust for years. This technology can breathe
+new life into all data, extracting valuable insights
+that were previously hidden. So picture this. In the healthcare sector, AI is now analyzing years of
+electronic health records, medical imaging data and research papers. This technology is
+uncovering hidden patterns and correlations that could
+lead to early disease detection, personalized treatment plans, or even new drug discoveries. But the magic of Generative AI does not stop at data analysis. While we've touched upon its prowess for software development, its impact spans across different teams. So in Marketing, AI is a game changer, delivering personalized
+quality content at scale. In sales and marketing,
+it is also revolutionizing nurturing leads and
+changing revenue operations thus accelerating the path from prospect to customer. In essence, beginning your
+AI with internal applications offers a strategic advantage. It's a stepping stone that builds trust and confidence in AI capabilities,
+optimizes your processes and also lays the groundwork
+for more ambitious, far reaching AI initiatives in the future. We see that by starting
+small and thinking big, you're setting the stage for transformative AI power
+journey in your organization. By honing on those two pivotal areas, organizations can vividly showcase the value of AI initiatives. This strategic approach
+not only paves the way for a smooth adoption and implementation, but also propels significant advancements in both product offerings
+and operational prowess. So far we've explored the challenges of Generative AI adoption, and discussed some best
+practices for implementing AI in product innovation and
+operational improvement. Now, let's see these principles in action with a real world example. I'm very excited to introduce Showpad, a company that exemplifies
+successful AI implementation. Showpad is a great example of a customer who has effectively
+put AI into production, demonstrating tangible business value through product innovation
+that directly translates to productivity enhancements
+for the end users. Now, Jeroen from Showpad
+will take us on their journey with AI, highlighting how
+it's driving business value and enhancing user experiences. - Alrighty. (audience applauds) Hello everyone, good afternoon. Welcome to re:Invent, it's your first day, I hope for everyone, so welcome, welcome, welcome. My name is Jeroen, I'm
+chief architect at Showpad, and today I'm gonna take you through a bit of our gen-AI journey. But before I do that, I
+have a very quick question for all of you and I wanna
+see a bit of a show of hands. So who here has ever been
+in a situation where they, they were looking to purchase something, they were looking to buy something, but they felt that the seller
+who's on the opposite side really wasn't able to articulate the value of the product
+that they were selling? I see a couple of hands. Ooh man, many hands please. Alright, cool, that's fantastic. Well, not good for the seller, but it's good for the story
+that I'm gonna tell you. 'cause what we see with Showpad is, we see that level of unpreparedness a lot when it comes down to sales reps. And we see that that's
+because of two reasons. On one hand, we see that
+sellers don't have access to the right content,
+they don't have access to the right information,
+the right marketing materials to use in their interactions with buyers. And then on the other hand, they don't have the right
+training and coaching to make them have these
+conversations more effective. And so that leads to really
+shitty buyer experiences, pardon my French, and also therefore missed opportunities and therefore missed revenue. So with Showpad we've built a platform, a platform that brings together marketing, sales and buyers all together. And in that platform we're
+trying to really make sure that those conversations with customers really get to the next level. We do that by providing marketers with the sales content
+management platform, which essentially a very
+big word for giving them a tool to very easily distribute that information to sellers. We give sellers the tools and the coaching to get better at selling. And last but not least,
+we bring those sellers and those buyers together
+in digital deal rooms so that they can have much more interactive collaboration together. Now Showpad's a Belgian company, very proud here to stand in front of you, coming all the way from
+Europe to Las Vegas over here. We're about 400 people. And as we're closing into our $100 million annual recurring revenue mark, we're serving about 1,400
+customers in about 50 countries with one SaaS platform. If you look at a bit of our activity, we have about 6.7 million
+monthly buyer interactions and that leads to 25% improvement in sales and marketing productivity. This probably isn't a surprise, but we're also very avid Amazon customer. We have about 100 Amazon services that we've built Showpad on top of, services like BedRock,
+SageMaker, OpenSearch and Amazon or AWS Lambda. Let's get back to Gen-AI. So when we started our Gen-AI journey, we didn't just wanna focus
+on building a chatbot. We took a couple steps back and we said, okay, look,
+how can we make sure that we really embrace those
+sales-specific use cases? How can we focus on the use
+cases that for a sales rep are very hard to do but
+very easy to verify. And so in 2023, we started with just that. We launched four features, and I'll come back to some
+of those in just a second. We launched four features and brought to our customer
+for the first time. And then 2024 came along
+and we doubled that. We went from four features to eight to make our customers more effective and really help them get more prepared when they're in front of customers. But, this is only the beginning of 2024 and as you all know, it's December. We've reached the end of 2024 and we've now shipped about 15, the clicker works, there we go. 15 Gen-AI features by now. So in just one and a half years time, we went from zero Gen-AI features, all the way to 15 AI-powered features. And we're now in a cadence
+where we're shipping AI-powered features every
+single quarter with Showpad. And it isn't just about
+shipping random features to customers, it's also about shipping value. And we're seeing that value
+being validated in our market by some of the players and some of our customers
+that we're serving. So for example, the
+analysts, they're applauding, some of the responsible introduction of AI that we're doing with our customers. We're seeing better buyer experiences. So we're seeing some of
+our, 83% of our sellers come back to us and tell us that their pitch quality has improved. And last but not least, it's also improving
+those business outcomes. So we're seeing about a 5.5%
+better attainment in quota. So these are all great numbers, awesome to look at, but which features are now
+powering this innovation? So I'm not gonna take you
+through all the 15 features, that would be a bit too much, but I'm gonna take you
+through three features and I'll kind of show you
+how they work in action. So the first one I wanna
+focus on is AI-powered search, an AI-powered search, essentially, exactly what it says it will do. You can type a question in Showpad and next to servicing you the files and marketing content that makes sense. We'll also serve you the
+answer to the question that you're asking, based on all the information
+that we have in Showpad. And we'll serve it to
+you directly in text. We'll give you the sources
+so you can always go back and verify that the answer is correct. We also have our
+AI-generated asset summaries. And this is a very interesting one because just like I mentioned before, we've really focused here on
+that sales specific use case. So instead of giving you just
+a random big text of summary, we've organized this, so it's an FAQ, so that when you're a seller and a customer comes
+to you with a question, you can very quickly go through an FAQ, very quickly, pick the
+answer that fits the question and mail it or communicate
+it to the customer. So let's now actually take
+a look at a bit of a video. So imagine I'm in the life of a sales rep, I'm typing a question. So for example, what is AdminAI? And then here you'll see that
+the AI starts to kick in. We'll see that we'll
+generate a bit of an answer. The answer will come straight
+from the result list here that's being powered by OpenSearch. And then just a few seconds
+we'll see the answer coming up and the sources that are powering that. So we also do a bit of a mapping between the sources and the answer. When we click on one of those results, we can actually go to one of the files and then here you'll see me click on the FAQ, the summary. You can see over here,
+again, it's really fast, but we've structured everything here. So it's very easy to read for a sales rep, very easy to essentially
+copy/paste into an email. Now, it's not only about being prepared, it's also about training and coaching. Because of that, we also
+have something called AI-generated test questions, which allows the manager of a sales rep to very quickly create
+tests, multiple choice tests for a seller to make sure
+that they're always prepared to go to the next meeting. So here in this example
+you can see as well, our solution will essentially create you a multiple choice test with a question, a couple of, one right answer obviously, and then a couple of
+wrong answers as well. So here's a bit of a
+video about that as well. So you'll see here this
+is a bit of the interface for creating that test. So I'll select the file, I'll insert that, I'll take a look at the
+file in just a second. And you'll see me browse
+through this file over here. And then once I've found the piece of text or the piece that I want to
+test myself on, I select that. So I select this, I click Generate, in the background, the AI
+generates both the question, the right answer, and also a couple of very plausible wrong answers as well. 'cause you want the test
+to make sense, right? You want it to be challenging. Alright, and then last but not least, you'll see me now go back to the interface and then here, here's a bit
+of human agency as well. As a human being, you can always edit and change these answers
+if you don't like them. That's always something we think about. All right, so now you might ask yourself, okay, how do we build this? How do we put this together? And for that, I'm gonna invite
+PJ to this stage over here to explain to you a bit
+more about that, thank you. (audience applauds) - Yes, so my name is
+Pieterjan, PJ for short. I'm the engineering manager
+of AI and Search at Showpad. And I'll dive a little
+bit in how do we ship AI, how do you bring value to our customers, but also a nice development
+experience for our engineers. So at high level, that can be brought down to three core entry ingredients. First one is the expertise,
+so upskilling the teams, hiring experience partners, and also the technology
+that we build upon. We want to use technology that exists so we can build value for our customers. Second, an important thing is
+our data and our data access. So we have a data lake,
+we build a data lake, and we have decentralized
+ownership of all the data across the organization so that we have one single source of truth, not only for external data applications, but also for internal data
+applications, data mesh, and of course with the
+proper governance, on top. And then finally, the last
+ingredient is our architecture, making our architecture Cloud native. A lot of commodity in
+there, a lot of reuse teams can use whatever they want, but also needs to be flexible because we have development,
+we have fast experimentation, but we need to bring this
+in production as well. And I'll dive a little bit
+deeper based on the expertise and the architecture in the coming slides. So first, Expertise, creating critical mass to create our data project. So for our teams, we
+wanted to go from zero to a multi-team data organization,
+like you had mentioned, we started from not shipping AI products to now shipping a lot
+of them each quarter. And what was needed for that
+is that we needed to hire but also upskill our teams. We don't want our AI teams to
+be the teams that train models and then like deploy
+them on a test cluster or just write the prompts. We really want them to own
+the feature end to end. So our AI team now not
+only writes the prompts, creates the applications
+or trains the models, but they also own the infrastructure. They create the infrastructure as codes. They monitor everything,
+they deploy everything. They check all the pipelines,
+they do everything. And that means that every
+team can become an AI team. And so we can scale this
+more in our company. The second thing is like
+having a good relationship with our technology vendor. So we have a good relationship
+with the AWS product and solutions architect
+teams here present. That helps us to test things in preview, and making sure we have
+access to the models. We can test them if they
+still work with our prompts, we can really accelerate our development and bring value to our customers. And then last, partners accelerating our knowledge acquisition by working with partners. Our data lake, we created
+together with a partner to make sure we could like, start with AI, having that data lake built
+on the knowledge of others, but also embed that in our company. So Expertise. The second thing is our Architecture from development to production. So I mentioned we want to
+have a great experience for our developers, but we need to get it
+in production as well. So what does development mean? We need rapid experimentation,
+collecting human feedback that is, putting this
+in the hands of our PMs so that they can play a little bit with it and then check if it's what they want. Evaluating technologies. In a prior session I
+had today, I heard that typical life cycle of new
+models is about six months. So you really need to be
+able to check and test and evaluate new technologies, new foundational models when they come in to embed it in your product. On the other hand, we want
+to bring this to production without having to rewrite everything. We also don't want to
+throw it over the fence to another team. We want to make sure we have that in place like that established engineering
+rigor, CI/CD pipelines, systems in place to
+collect human feedback, user feedback, actual unit user feedback, monitoring everything, being able to debug it,
+see where it goes wrong, tracing, all these things. So what did we do for that? For today's AI stack, we
+built a lot of components, reusable components that the team can use, that any team and Showpad can
+use to create AI applications. So the first component
+is foundational models, interacting with foundational
+models, BedRock models, Anthropic, Titan, all these models. We create components for that, that the users and the
+different teams can embed in their applications, and just use without
+having to set things up. Everything is in place,
+the right monitoring, the right tagging, everything. Vector stores, we use OpenSearch for vector stores or storing our vectors,
+scoring vectors, retrieval. That of course means that we
+have to embed a lot of things. So we can embed text,
+we can embed objects, many components to make
+sure that an object, a text, a paragraph can be embedded, and can be reused in a retrieval store, in a knowledge base for later use. Prompts, we saw some life cycles of prompts. You create one prompt, you have to test it
+against a different model. There might be a variation, a version, you need to save them somewhere. If you have a prompt to create a summary, you don't want that on every account. You want to reshare that a little bit. Solutions for that, very important context data. So of course many of us used LLMs and foundations models already, but if you have context, knowledge that they can
+use to create answers or to create an Agentic Flow, for example, you need to inject that as well. So we use a lot of our own APIs and we build components, so that the right context with
+the correct access control, with the correct
+authorization, given the user, can be injected in any AI flow. And then of course everything
+needs to be orchestrated, so that exists as well. All of that, keeping in mind that we want to do AI responsible. So hallucinations is a thing. There are components that
+help us to do fact checking, factuality check, Security and data privacy, any flow will have user access control and authorization embedded. We can inject that down
+and we can trace that so we can follow that. Of course, Cost. Now with AWS BedRock, I think
+that is released very recently You can do an inference profile
+so you can tag invocations and really follow where
+you're spending your money. And of course we need to be
+compliant with all regulations. What does that then look like? Well, everything together
+becomes a layered structure. At the top we have Custom
+agents and BedRock Agents for our Agentic workflow. So combined with an objective
+and tools and knowledge bases, they perform tasks and
+bring value to their users. So, these run on tools
+and knowledge bases. For our tools, we have
+two big kinds of tools. First of all, our platform already exists. Showpad already exists as a platform. We have many APIs, internal
+APIs, and external APIs. Those can easily be wrapped into a tool so that an agent can use them as well, with the permissions of the user, scope-down to what an
+agent is allowed to do. Next to those tools, our APIs, we have also
+Generative AI tools, specific AI workloads that,
+for example, transform text or transform an object
+into something different. And then our knowledge
+bases are also built on what we already have. We have search databases,
+we have data stores, we have retrieval. We made sure that we reused
+what we already have. Those things have the security embedded, they have access control embedded. So it made sense to base all our AI on top of our existing stacks. The one layer below, for
+Showpad, we identified three main patterns that we use for AI, one thing for Generative AI, that is. So one thing is text transformation. So very simple concept, text
+goes in and text comes out, for example, creating
+those test questions. Some text goes in and some text goes out. There's recipe based, that
+is a reusable component that every team can use, make a recipe on what needs
+to happen, make a chain and we can easily deploy that, and that is then part of
+the Showpad ecosystem. A second main architectural
+pattern that we use is our object transformation where you don't have a text to start with, but you might have an object
+like a course or an asset or a marketing file that you want to transform
+in something else. For example, you have a
+PowerPoint presentation and you want to create speaker notes or you have a marketing object and you want to create that summary. So you will transform
+an object into an object that is more or less the same. We call that content fluidity, making the content appear as you need it at the
+time you're using it. And then the final one, a very
+traditional one is the RAG, Retrieval Augmented Generation, having systems in place where
+we can combine user input together with a retrieval system that would help the AI workflow to give an answer or to
+perform a certain task. And given the features that Jeroen showed, we can map those back. So text transformation. We have our AI=generated test questions. A smart composer where you
+quickly type a draft email and we make it nicer for you,
+based on your previous emails. A label rename, people are
+terrible at naming things. Engineers are also
+terrible at naming things, but it is quite important
+to retrieve your documents, so we help you in renaming
+that object transformation, our AI summaries, those FAQs, but also descriptions, specific descriptions
+for finding them back in a sales code management system. So this document is about this, you should use it in that case, like not just a description, but you can combine it with other stuff. And then AI-powered
+search, as you saw a demo are a RAG solution. So, some diagrams for the
+architects in the room, they're rather simplified,
+but let's go through them. So this is the architecture, typical architecture we
+use for Agentic workflows. So the first thing that
+we do when you come in, you have a Generative AI task, there's an API gateway
+that is our account, that's the data science
+and the AI account. And we have an authorizer, specific authorizer, which is the AWS lambda function. That will exchange the user token to scope to the scope access control list actions that the agent can take
+on behalf of the user. So now we have that, we
+can inject that everywhere in our Generative AI workflow. We can inject that in BedRock Agents, we can inject that in
+other lambda functions. BedRock Agents themselves will inject that in the tools that they use. So let's say you have a user task, the BedRock Agents start with that. Okay, reasons we need to
+use a tool to do something. Then an AWS lambda will
+perform that action and bring the result back to BedRock. And that can be one of our APIs, but could also be one
+of those text transform, object transform or
+retrieval tasks that we have. For all of these, we tend to
+use Anthropic Claude 3 models for that, now Sonnet 3.5, but we're using a lot of haiku as well for the things that we want to go faster and are less heavy in
+the outputs that we want. And also important, not
+everything has to be a chat bot. In fact, we only have one little feature that has a chat bot. Everything else, every other agent is actually much more trigger
+based on domain events or schedules and not really user invoked. It's all happening behind the scenes. We can prepare that and we can make sure that the
+user has everything they need when they need it instead of having to
+ask for it themselves. And then the second one,
+this is the last one. We talked quite a bit
+about AI-powered search, so also wanted to show how this one works. And there's some cool
+things in this as well. So the first thing that we do is, Generative AI has a tendency that every problem becomes a nail if Generative AI is a hammer. But we can really combine this
+with classical AI as well. So for our AI-powered search feature, the first thing that really happens is a very small classifier
+model that will check, Should we use AI-powered search or should we just use a regular search? Is it a question, is it not a question? Is it a question we can answer or not? So we have a SageMaker model, a very fast little SageMaker model that will do that initial classification. If there is a yeah, true, let's use AI, we will fetch relevant
+information for that user based on their access control that can help answering that question. And in order to make sure we
+can make the right connections, we're using Amazon VPC Lattice
+to connect all our accounts. Each team has their own account, so the team that creates
+search has an account. The team that creates files and services have their accounts. So we need to combine them in a way, so we are fetching that. So for example, one team
+might have an Amazon EKS and that runs different services. And those services, they
+connect to our data stores. So here, those services
+on behalf of the user will request the context. For example, they have an
+embedding of a question, so they need to check which paragraphs of which documents match. We will score that with
+OpenSearch service. We will get some files back, great. Let's check the metadata
+for all those files, which we have in our relational database. And once we have all that information, we did some filtering. Let's get the actual
+files from a suite so that we can use them to answer the question. And then finally, after some
+filtering, some reducing, doing some factual checks, we will accept the answer
+and send it back to the user. And then we'll go back to
+Anna for some Best Practices. Thanks. (audience applauds) - Great, thank you PJ for
+this insightful demonstration and thank you Jeroen
+for setting the stage. As we approach the
+conclusion of our session, I would like to distill the key insights that we've gained from
+Showpad's experience and other successful AI implementations. These best practices
+will serve as a compass to guide your own AI initiatives. As you begin your journey with AI, harness AI to solve real problems
+that your customers face. This approach ensures that
+your AI implementation delivers tangible value,
+meeting actual needs, rather than merely showcasing technology. As you explore AI's potential, maintain unwavering ethical standards and carefully consider potential impacts. This involves thorough testing,
+safeguarding data privacy, and remaining vigilant about
+potential biases in AI Systems. Seamlessly integrate AI
+to enhance functionality without radically altering how users interact with your product. This strategy facilitates faster adoption as users can leverage new capabilities within a familiar interface. Remember, AI implementation reverberates beyond your customers to your teams. Consider how AI can streamline
+these internal processes boost productivity, and empower
+your staff in their roles. Finally, rather than viewing AI as a one-time implementation,
+position it as a cornerstone for your long-term business strategy. This perspective encompasses
+planning for scalability, continuous refinement, and alignment with overarching
+business objectives. We're here to support your success. On this slide, you'll see
+two valuable resources to help you explore and expand
+your Generative AI journey. First, our AI use case Explorer
+offers an ever-growing list of use cases and implementation guidance. Second, our Generative
+AI innovation center provides an opportunity to
+collaborate with AWS experts bringing these use cases to life. With this, I would like
+to sincerely thank you for attending this session. Hope you have an insightful, enjoyable week here at re:Invent. Thank you and have a great
+rest of the conference. (audience applauds)

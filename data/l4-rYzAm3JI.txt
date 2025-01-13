@@ -1,0 +1,602 @@
+- Right. Good morning. I hope everyone's able to hear, hopefully your headphones
+are on the orange color. If your headphones are not,
+you're probably listening to a different session. It might be an experience
+if you're listening to a different session, but we're up here, so if you can't hear me,
+please raise your hand, but otherwise, gimme a big thumbs up. You look great. Awesome. So this is a bit of a different session, hopefully you've been in
+one of these silent sessions before, but we will be up here
+talking in our natural voice. If you can't hear us, please
+make some motions or something. We don't want to go through
+half the presentation without you hearing us. The other thing I wanna do,
+make it a little interactive. If you like something we're
+saying, or you want to clap, or you wanna show your sort of
+excitement about the product or what we're talking about, we're gonna do this sign together. It's just gonna be sort
+of excited two finger up if you feel like we're going too slow, give us the speed up motion
+if we're going too fast, kinda give us some signals
+to slow down, right? So we just want you to
+get it the most out of it. We're excited to be here. My name's John, I lead the
+product team for App Studio, and I'm excited to talk to
+you today about the product we recently GAd two
+weeks ago, mid-November. We announced a preview in July, and we're excited to talk
+about some new features. We're gonna talk about
+some customer use cases. And joining me today, we have Francois, who's on the product team as well. And then we're really
+excited to talk about a great customer use case and customer story with the NFL. And we're really pleased to
+have Shawn with us today. He's gonna be talking to
+you about why they chose App Studio, what use case they're improving at the NFL using App Studio. And we're excited to dig in. So what are we gonna cover today? Got an action packed agenda. We're gonna tell you more about App Studio and how we got here. What did our customers tell us? What did all of you tell us
+about your friction points, your pain points, and why AWS
+decided to build App Studio. We'll talk about some of the new features. We'll give an overview of
+the product just very short because we wanna spend
+more time talking about that NFL use case and Shawn's great app that he's built, you're actually gonna see some
+screenshots of the real app. You're gonna see how the
+NFL actually uses App Studio in practice today, which is real exciting. And then we have a demo.
+It's not on the agenda slide. I'm not sure how we missed
+that, but we're gonna spend a lot of time today with a demo, and we're gonna generate
+an app in real time. It's fully live, nothing's prerecorded. And we're gonna go through that together so you can see the product,
+you can see the experience, and then we're gonna follow
+up with a roadmap overview so you can see what features are coming, what did we recently launch, and that also gives you an opportunity to give us more feedback and influence the next features
+that we end up building. And then finally, we have some next steps. So if you go halfway through this session and you're so excited
+there's other sessions here at re:Invent that you can
+bookmark in your catalog. There's a deep dive this afternoon. We also have some links to
+getting started tutorials and next step guides at
+the end with QR codes that you can scan and get going. We're really excited.
+Thank you for coming out. I'm gonna hand over to Francoise. He is gonna tell you a little
+bit more about how we got here and we're just gonna jump right in. - Thank you, John. Well, thank
+you for being here today. Why did we build App Studio? I think at heart we were
+talking with a lot of customers and I'm hoping today you can relate to some of those pain points, but who here has fully absorbed
+the backlog of application that your line of business have requested? Probably no one. So I saw a hand somewhere, I'm gonna have to talk
+after the session, I think. But that's the main point
+of frustration today, right? But that's the nature
+of the world we're in, constantly evolving,
+always trying to do better, do different, sometimes
+tackle down new challenges. This requires new tools
+constantly all the time. So obviously the IT department
+of your organization is likely gonna be on the
+receiving hand of that and likely end the end
+up with a bottleneck of applications that need to be built. The second pinpoint we heard
+a lot is developer shortage. Developers are very valuable resources. They don't always come by easily and they are often assigned
+to some of the most high value projects you have in your organization. Most of the time they will be working on customer facing content and solutions. It's the other of things, right? So if you are trying
+to develop applications that are for internal use,
+you're gonna have to fight for those resources and it's really part of
+the challenge that we hear. We also heard customers talking
+about how they feel stuck with the legacy apps. Those applications are hard to refactor, they are huge sometimes, they
+have been there for a while and so they don't feel like
+refactoring those applications would be an easy way if they had to cut them from scratch again. They share the cost of ownership. Building applications as you know, is not really about just
+the building effort. That's probably half of the cost, but it's also about how you
+maintain those applications. You know, security patches,
+updating your code library. All of that adds up a lot. If you're talking to an
+enterprise organization. They have anywhere between
+5,000 to 20,000 applications that are throughout all their departments. This is something that when I say add up becomes a real challenge of time. Finally, what we also heard
+is a lot of leaders are now really looking at more results
+faster, more value sooner. Innovation is something that no longer takes six months to achieve. People needs to be able
+to build proof of concept, and innovate, show what
+tomorrow can be in a span of six weeks, three months. That's what we've heard.
+So they want to get tools that equip their teams to deliver that value a lot sooner than
+they do with traditional code. Now, what happens when those
+teams are exploring solutions? First one is the turn to low-code and rightfully so because if
+you are looking to accelerate a lot of your development effort, low-code will provide those abstractions that can truly accelerate at great pace the output of of your team. Now we also hear from our customers that even though they
+onboard some of those tools, some of them have a very
+steep learning curve. They have various degree of abstractions that target different persona, and some of them require to
+know proprietary languages that they have to learn
+or existing languages, but they don't necessarily
+have that expertise in house. So that's one thing that we've heard. Another one is the scalability and performance of those applications. As I'm sure you all know
+many application do not start at the size that they end up with. So what they often see are
+application built by a small team and that application
+becomes successful, right? And after six months
+you hear about that app that multiple team, 150 people are using. And now it's a critical part
+of the business process. Turns out it's backed by some spreadsheet, and the data model is
+quickly out of control. So a lot of refactoring
+and sometime not scheduled. So those challenges of building the app right from the get go is also something that we hear a lot. For larger organizations, we've also heard a lot about governance. So enabling your
+organization with local tools happens sometimes as a response
+to what we call Shadow 80. Those local tool can literally
+become Shadow 80 themselves. They will enable, especially
+if you are an organization that is say in the tech industry or in the energy sector,
+you're gonna have employees that are some of them have PhD, some of them are actually quite crafty and can build apps themselves. The question becomes,
+where is your data going? How do people access your app? What kind of visibility do you
+have over all the application in your organizations? Those become challenges
+that large organization really suffer from. Finally, we also heard from
+our customers that the cost of scaling those platforms
+to enable thousands of users, for example, becomes
+prohibitive over time. There is subscription
+models most of the time that requires your end users to be enrolled in different tiers. This is not something that at scale proved to be a model that works. So John, can you tell
+us a little bit about, what was the vision when we started this? - Yeah, the real vision
+when we started App Studio was to address those pain points and solve those friction
+points, solve those challenges that customers have
+with existing solutions and not just build
+another low-code offering, but really leverage
+generative AI to transform how applications are built. And so that's what we've done. We built App Studio from the ground up with generative AI at the heart. And that is how we believe we've
+achieved really the fastest way to build enterprise grade applications without requiring pro dev expertise. So if you are a pro dev, that's great, but you probably have a
+lot of of applications that don't require having
+full control of the code base or setting up CICD pipelines or setting up multiple
+stages of deployment targets just to maintain that ops
+panel or that admin tool or that customer support
+toggle switch panel thing that prevents people
+from SSHing into prod. You wanna maintain full control
+of your apps that clients and consumers use and interact with and the apps you ship to the app store, but for all your internal
+business process apps, you wanna remove that operational burden and you want to accelerate
+innovation, you wanna be able to prioritize the delivery
+of those applications. And so that's why we built App Studio. Number one focused around
+that generative AI assistant so that you can not only generate an app and get it going from idea
+to app in under 60 seconds, but now with our GA launch, you can now chat with our assistant and modify your application
+that's already there. So you can use our intuitive
+visual drag and drop tools or you can ask our assistant
+to modify your app for you and you don't have to do all the clicks or all the little manipulations yourself. Second, being backed by AWS
+every app built with App Studio is fully code generated under the scenes. It's a modern full stack
+web application deployed to standard AWS technology and services. Things like CloudFront
+Lambda, S3, dynamoDB, all the apps are serverless, but they're also deployed
+as independent apps. So they're not deployed in
+a multi-tenant run time, they're not interpreted, they're apps just like a
+pro developer would write, but we deploy, scale, maintain, and operate those without any
+of the operational overhead that's traditionally associated
+with those applications. Third, these applications, they're connecting to your
+existing business data, your most important data
+that your company holds. And so security and governance
+are non-negotiables. For administrators of
+your App Studio instance, you can define exactly who, what are the granular
+access control policies when you're connecting to your AWS data sources
+or your other systems. Additionally, if you're
+connecting to third party systems, end users authenticate
+using OAuth as themself. So from an app, if I'm making
+a request to Salesforce or to HubSpot or Twilio, I'm
+doing that as the end user. I'm not doing that as a privileged user, an integration user or anything like that. So I am only seeing the
+data in my app studio app that I would see if I was logging directly into that third party app application. Additionally, things like
+admin, seeing all the apps that are built in your organization, being able to monitor those apps, having builders in those apps also be able to define app level roles,
+really gives you a breadth of control for security and
+governance to meet those needs and those demands that your
+enterprise apps require. And then Francois was alluding to the cost of some of these solutions
+and we're really excited that we're following AWS's
+traditional pricing model of consumption based pricing and billing. And so what that means is
+it's totally free to build, you can log into our building experience, you can enable App Studio,
+you log in, it's totally free to build your app, free
+to use our generative AI to generate an app to modify your apps. And the only thing you
+pay for is the usage time that end users spend in
+your published application. And so if that user uses
+that app for an hour a month, you're gonna pay 25 cents. You're not gonna pay $10 for
+a a monthly user license. If that user doesn't log in, if you don't have any users
+log into your app in a month, you're not gonna pay anything. These apps are serverless, you pay for what you use,
+you don't need to maintain these expensive long-term
+monthly contracts and user licenses. So as I mentioned, we GA and announced the general
+availability two weeks ago, mid-November before that we did a preview. Our customers have built
+some really incredible apps. You'll hear about one of
+them in just a second. But the range of use
+cases really is so broad, it's hard to put on one slide. Just as an example, I'll talk about some of the internal Amazon use cases and then Francois will
+give you a bit more detail on some of his favorites. But within Amazon we have
+25 or so internal teams that have deployed fully
+productionized mission critical business applications
+already built on App Studio, many more tens if not hundreds of apps in development right now. An example is Amazon
+Transportation Services. It's our middle mile carrier. They're essentially all
+of those 18 wheelers that you see on the road,
+the big prime trailers, the big blue ones that
+are on the interstates, those are moving boxes
+from fulfillment centers to sort centers. So fulfillment centers are
+these giant warehouses, where all the shipping containers come, all the boxes get offloaded there, and then they get distributed
+to sortation centers. And then finally they get
+distributed to the nodes or the small endpoints so
+that you get 24 hour delivery or two hour delivery. But essentially these trucks
+are moving these packages and rebalancing packages and inventory from fulfillment
+centers to our sort centers. And previously all the
+employees loading those trucks, managing those trucks, they were doing a manual
+exception process. If they had a surge in boxes
+or a truck didn't show up or they needed a second
+truck for Black Friday or Cyber Monday. That entire process of
+changing capacity allocations was fully manual. They built an app with App
+Studio in a matter of a week or two, deployed it and
+have scaled that up. And now a a 39,000 or so folks
+at Amazon Fulfillment Centers have access to this app
+to request new trucks, to rebalance packages to
+make the package movement between our sites more efficient so that you get your Amazon
+packages even quicker. And for Amazon, the optimization and cost optimization is really high because now we're moving those
+packages more effectively. We have other internal
+teams that are managing internal compliance and
+certificate rotation. We have approval
+processes for media assets and images, all sorts
+of different use cases. So Francois, tell us a little bit more and then excited to hear about the NFL. - Yeah, yeah, thank you. I just noticed that every
+time we speak everything is being transcribed over there. It doesn't always work well with accents. So if things get very confusing here, come see us at the end,
+we'll clarify a thing or two, but yeah, so the way we've
+engineered the platform it's really intended to support a broad variety of use cases. And you'll see that in a
+moment with Shawn's solution. But from like the most classic solution that you will find useful
+for your internal needs, processing claims, all those solutions that require you to
+broad form, gather data, process those through
+automations, securely store data in the appropriate data stores or repository for your documents is always like those are very
+solid use case for App Studio. Managing inventory and equipment, we have several customers
+actually who build solutions like this and
+again, like in minute allow them to quickly put
+together, that's the case of one of our company here
+supporting us Costco shipping that is building a repository
+for their IT assets. So we've seen a really great breadth of different type of
+solution that have been built because you can customize
+the logic quite easily and extend the core functionality
+with code when needed. We can accommodate for more
+complex approval processes. So if you have any type of approval that you need to build
+in your organizations absolutely would be a good fit for it. Our own company is now doing
+its inspection in Bahrain, Singapore, and South
+Africa using App Studio. So we performing those
+inspection in our data centers and all that data is being
+aggregated into Redshift, which QuickSight reports on live. So we were able to switch from a system where the data would
+trickle down over days into our central repository
+to a live reporting of the current state of
+our inspection compliance. That team also build a
+vendor management system. So you can tell there is
+like a great diversity of application that we can build. My favorite personally is this concept of centralized case information. I call it case management,
+but it's essentially the idea to bring data from different
+data sources into a single interface that you can easily navigate to gather all the information
+you need to make a decision on your business process, whatever it is. So those are use cases that you can expect us to in the near future
+being even more impactful on and simplify even more how
+those solutions get stood up. But that's kind of like
+the high avail overview of the kind of things that
+we've built with App Studio. Shawn, you've built your first
+solution with App Studio. Can you tell us a little
+bit about yourself? How, what are you doing at the NFL and what's your background? - Yeah, so I started at the NFL in 2003 when the network started. So we're looking at about 21 years now and I came to the NFL as an artist, broadcast designer, animator, so I guess to put it in your terms, I'm more on the crafty
+camp than the PhD camp, but I found that code really interested me and I found really quickly
+that putting together a little bit of code I could
+make my designs interactive. And then I found the power in automation. So all these years later
+I'm really building out a lot of automations for a
+bunch of different groups, and departments across the NFL. - Okay. And so what
+department are you working with right now? Like where is that solution that you've built helping the most? - Well, we've created a new
+workflow for our headshot process and that really
+covers at least three or four different groups closely, Yeah. - Gotcha, and can you tell us a little bit about historically how
+the NFL has been handling the headshot of those players? So the pictures you see
+on TV or in magazines, how is this process going
+considering that players come in and out and there's
+new season all the time and there's like transfers and so on. Can you tell us more about that? - Yeah, traditionally the
+NFL sends photographers to all thirty two teams
+across the United States. And within a matter of two or three days, we take as many as 3,200
+photos of these players. And once those photos are ready, they push them to like a
+cloud repo that we use. And then at that point our
+photo department gives access to all of our partners
+ABC, NBC, CBS, et cetera. And then they also give
+access to us internally. At that point, a bunch of
+different groups within the NFL will access those images, download them, send them off to different vendors, get them processed by process. I mean they cut out the
+heads, remove the backgrounds, size the head shots, and then crop them based
+on the specs of each group. - It sounds like a lot of manual process, like where did you see
+opportunities for automating, 'cause it's quite precise, right? You're talking about medias, those are not like
+documents or data points. Like what did you have in mind when you looked at that process, what jumped to you as an
+opportunity to improve? - Yeah, so I realized very quickly that there were a lot of redundancies. We had redundancies
+everywhere in the processing, multiple groups downloading and processing with different vendors and they're all identical
+headshots, right? But everybody's processing
+them independently. We also had a redundancy in local storage and it was just a very tedious
+time-consuming process. - Yeah, sounds like
+information was very siloed. Would that be fair to say, is that kind of like
+some of the pain point you were trying to solve? - Yeah, definitely. We're like large, a lot
+of large corporations, the NFL is no different. We're very siloed. So solving this problem
+was a bit difficult, trying to get different
+groups in different areas to talk together and to create a more centralized process. 'cause at the time it
+was very decentralized. - So can you tell us a little bit about like how you got started? Like you saw the opportunity and then you wanted to make an
+impact on your organization. What was the first step you took? - So the first step that
+we took in trying to solve for this problem was to create a custom coded React app. It was web app and this was
+going to allow the users, our artists basically to be
+able to take these images from whatever repository we're
+using the cloud repository or even grab images off our local servers and be able to then transport those images to the backend, like an S3 bucket, and AWS where a lot of the processing would happen there with
+the headshot cut out with like Adobe Photoshop APIs where they would cut them out, and you basically use image
+recognition to then size these players headshots and then crop 'em. And then the artist would
+be able to use that web app to then access those images and download them where
+we would then distribute them to whoever needed them. - Gotcha. And how long, like
+from scoping those requirements to like getting the first prototype of that custom career application,
+how long did that take? - We probably spent all in
+maybe as much as six months trying to get that all
+set and into production. - So we met, I think back in
+September, so a few months ago and we introduced you to App Studio. Can you tell us a little bit
+like what you liked about this? What made you make the switch? What was interesting to you? - Yeah, I think the thing
+that interested me the most and caught my attention
+was just the ability with very little code to
+be able to sort of run up an application very quickly, and get these connections
+to this backend services, with less effort really than hard coding. - Yeah. How was your security team feeling about like you using App Studio? Like were they worried about
+some of the requirements they had or how did that go? - I think that the beautiful
+thing about App Studio versus the original app
+that we started with is that App Studio handles
+a lot of the securities that we would have to go through and a lot of the compliances
+that we would have to go through with our security department and just being able to run up the app and have all of the credentials being taken care of by a
+secrets manager, for example. It was nice. - Yeah. Well, let's have a look at it. So this is the application. Can you walk us through
+what's going on here? Like what are you using
+this interface for? - Yeah, sure. So there's basically two different sections for ingest. We have Photoshelter and that's what this is
+showing all the collections that we have on our photo repo. Once we select a collection,
+we then select a team, go to the next one, and we can see all the players for that team. At this point if we're doing a one-off, we can select one player, but in the beginning of the
+season when we're leading up to like preseason, we'll
+select the entire team. We can literally select a hundred players, push it to our S3 bucket, and it just starts
+processing automatically. This is where we would
+go for our local ingests. So again, if we're doing
+even an action shot, anything that we wanna cut out
+really we can use this for, we can pull things off our
+server, off our desktop, something we've downloaded, you name it. And we can push things
+to S3 from here as well. - So this was like the bulk processing versus the other processing. - Yeah, this would be more
+used probably in season when we're doing just support for shows. - Gotcha. - And then this is the
+post-processing section. So once all the processing has
+taken place in the back end, there's only one job here
+and one player in that job. But theoretically you would
+see during the preseason you'd see 32 different jobs in here, each with a hundred players. - Well it's really interesting. So let's talk a little bit
+about like how the application was architected. - We're seeing two slides
+at the same time, I think. - Gotcha. - Oh, I see. Wait a minute. Yeah, so like I mentioned
+the Okta, the integration, this would be more along the lines of our security department
+where we have to be able to authenticate into this application. And the beautiful thing about App Studio is that like this is
+all taken care of for us because as an enterprise we
+use Okta to log into AWS, we automatically get that connection for the app that we build. And then as far as the backend services that we're using, like the S3 bucket and DynamoDB, the DynamoDB is
+run up very quickly as well. And S3, we store all our images in there while we're processed. - Yeah, so far from just
+quick additional information, when we deploy App Studio, we deploy it alongside
+with Identity Center. If you do not have Identity Center, if you already have Identity Center, we just connect to that instance and therefore we can integrate with whichever IDP you're using. We also deploy an instance of DynamoDB. So if you have data you want to store, all of that is flowing into your account. And that was like one of the key aspect of what we were doing
+is that all the data, the document of images and so on, all of that still has to
+flow into the NFL account. It's the service is managed, we manage the infrastructure, but the access to services
+in the NFL accounts and the flow of data, how
+to reside in those accounts, Adobe and Photoshelter are also accessed in a very secured way. We storing those credentials
+in Secret Manager, resources in like AWS resources are being accessed via
+IM roles and policies. So they can be scoped
+to exactly what you need and give you full control over
+what you decide to expose. So let's summarize a little bit. What Shawn went through
+from accessing AWS services like S3 in his account,
+orchestrating APIs between Adobe and Photoshelter, he was able to do all of this in a single builder interface that allowed him to connect
+security to those services, test his changes in a testing environment, perform those changes in
+a development environment, push them to testing and then promote the result to production. So all of this came out of the box. There was really nothing to set up except accessing the APIs that he was able to get from open specs and then the integration with the SSO and IDD provider was
+one of the requirements from his security team. Today, every single app Shawn will build is going to be natively
+integrated with that setup. Do you have any plan for
+the future with App Studio? Like this is your first application, are you looking forward
+to build something else? - Yeah, I mean it really just
+opens the door for us, right? I think that the next
+thing that we're gonna try and tackle is sort of an
+ongoing production issue that we have where we do Jersey swaps. So the players, when they get traded during the season their photographs might have been taken in a Cowboys jersey and then they get traded
+to Seahawks or something. And we manually do all this for Photoshop, but we're looking at
+Firefly APIs to be able to identify the body parts, the jersey and then be able to
+generatively take a jersey and replace the jersey. - Yeah, so Adobe has been
+releasing brand new API called Firefly. It's quite at the heart
+of this solution here because the cutout of
+those players, the removal of the background, it's all performed with this API that they just released. Shawn, can you tell us you used to use that API previously, they just
+brought some announcements. Can you describe a little bit like what the progress
+has been using those APIs? - Yeah, it's been night and day really, the APIs that we were using
+in our first solution, they did a great job. They cut out the images pretty well, but we had a lot of hands-on
+work that we had to do after the fact, fixing
+edges and stuff like that. And what I'm finding now
+is that if that got us sort of 70% there, the new
+APIs are really removing all the extra pixels on the
+edge of these player cutouts and it's getting us
+probably 98% there now. - Yeah, that's awesome. Well, thank you Shawn so much for sharing those details. This is one example,
+we promised you a demo with live software and John, if you want to take it over and hopefully the internet doesn't net you on this one. (laughs) I'll give you the clicker if you want. - Thank you. And Shawn, thank you. We'll do the golf clap just
+so we don't disturb everyone, but really amazing work. I know, I think it's pretty incredible that they're gonna end up with an app where someone gets traded
+on Sunday afternoon to a different team, Monday night football
+comes, all the television, all the website,
+everything's gonna be updated with that New Jersey
+without even having to send a photographer over to take a picture. So that's pretty cool. So as I'm logging in and just making sure my
+sessions aren't timed out. Raise of hands, who has enabled App Studio and tried it so far? No one. That's amazing. That's so great, right? This is great because
+you're seeing the product, you're getting hands on with it. We're gonna show you some real code or maybe not even real code, just drag and drop environment here. And let's see, I'm just gonna
+hunch over this awkwardly. So we're gonna get going here, I'm gonna switch the presentation and we'll log right into App Studio. Alright, so here we are,
+we're logged into App Studio. This is our off console experience. So, true to our mission of
+really enabling more people to build applications, this is enabled for your AWS
+account from the AWS console. But once it's enabled, it's integrated with your identity scenario,
+your identity provider, and then to administer build and access apps published with App Studio, you use
+your corporate credentials and this is a fully
+off console experience. So even folks without
+access to the AWS console can be admins, can be builders or can access the apps
+that are published here. So I logged in, I landed on the builder hub
+from here I can see all the apps that I've built or apps that
+have been shared with me, I can also create new apps, I
+can learn about the product, I can find tutorials
+and I can get started. Taking a quick detour,
+if you look at the top, we have an admin hub. So if you're an admin, if
+you set up your instance of App Studio, once you get back to your office or your
+home, you may be an admin, for your instance or your
+admins would see this view. So this is speaking to the
+security and governance controls that App Studio offers. You are able to set up roles and connectors so that builders within
+your organization have defined access and defined abilities within the product itself. So for roles, you can see
+that we have app users, admins, builders, and because it's integrated with your IDP, these are using all your
+existing LDAP and AD groups. So you're gonna be able to say, App Studio team can be admins or App Studio engineers can be builders or App Studio XYZ can be app users. And so you can really control from an administration perspective, who is able to do what
+around this product, the second thing is you're
+able to set up connectors. So this is essentially
+a process to pre-approve and set up connectors to
+your existing business data. So what we heard from Shawn
+is that they already have S3, I don't know, did you already have Dynamo or is Dynamo new to track the jobs? - [Shawn] It's new. - [John] Brand new, so showing connecting
+to existing data in S3, connecting to your existing resources and storing net new data,
+you're able to do that. We give you built-in connectors for all the most popular AWS services. The general AWS connector can connect to all 200 plus AWS services, so that's Bedrock and Lambda
+and Textract and Rekognition and everything else that's
+being announced today, Bedrock Agents, that
+will be available here so you can connect to as a way to integrate into your
+App Studio applications. Additionally, just like we
+talked about, connecting to those Adobe APIs and those Photoshelter APIs, you can use the REST API connector, you can upload an open API spec and we have a built-in
+connector for Salesforce along with other third party
+applications coming soon with a more native connector experience. These support a variety of
+authentication mechanisms, including per-user auth so that the users access the applications and the data in those third
+party applications as themself. Alright, so we're gonna go back real quick and back to the builder hub and we're gonna get started building. So I'm gonna hit Create app and then, here I'm gonna
+land in what we call the getting started flow or
+the Cold Start experience, so this is the first time
+you're really interacting with generative AI inside the product. And as a builder, this is
+kind of your first step. And on the right, we have a whole catalog, I think there's 50 or 75 example prompts, some of the most common use cases that our customers have shared with us. We've distilled that into a few sentences to get you started, give you examples of prompts you can click on customize, that'll populate, you can
+hit go, you don't have to type in anything if you want, or in the bottom left, you can type the app that you wanna build. So, traditionally, if we had a mic and a live ability, I'd ask
+for input from a volunteer, but Francois is gonna be the fill in. So, just showing that it's fully live, I'm gonna ask Francois
+what app he wants to build. We're gonna build it live and we're gonna see what we end up with and you're gonna see how fast
+it is just to take an idea, get to a functional app
+in App Studio, preview it, start testing and start iterating on that, really accelerating that time
+from an idea to a real app. - [Francois] Alright, well,
+last time we presented we went for like an HR,
+hiring workflow solution. So let's do something different here. Let's do some IT ticketing system, like a helpdesk type of app so folks can just ask for
+help when they get stuck with the product. - [John] Okay, so I manage an IT helpdesk and I need an app for users to submit repair requests and a dashboard to review the requests with the ability to approve or reject. Anything else you'd like to add? - [Francois] Well, let's stop there. See what our builder
+assistance comes up with and maybe we can make changes based on what we're getting back. - [John] Okay, so I just
+described what Francois said. What's happening now is our
+AI agents are gonna analyze that prompt and we're
+gonna use the knowledge about App studio, we're
+gonna use the knowledge about other use cases, about
+other apps that have been built and we distill that into a
+set of use cases, requirements and data models so that we can build a more
+accurate representation of the app that you're looking for. This is essentially your PRD,
+your product requirements doc that you would generate
+or your project plan that you would create if you were starting a net new project. So I'm gonna expand this just
+so we can take a quick look. So, starting with the use
+cases for helpdesk users, I want to easily submit a repair request, I wanna receive a notification
+when it's approved or rejected, helpdesk, the admins, I wanna view all pending repair
+requests, review, approve, optionally send notifications, user flow to submit repair requests,
+user flow to review requests, and then a data source. And so, an interesting thing
+here is that I didn't connect to any existing data, this data model for these repair requests, this is suggesting essentially
+a new database table. So this is suggesting a
+new database table for me to store those repair requests. And it includes the fields
+and the field types. It's interesting, it's also saying, hey, there's a status column that's needed and here's an enum essentially that represents the status
+of those repair requests. Pretty amazing that this
+granularity of detail was generated from a fairly simple one sentence prompt, which is great starting point. So Francois, anything
+here that you don't like or anything that it's
+missing that you wanna add? Because now what we can do is
+we can describe any changes again in this bottom left and have it refined on this
+outline so that get closer to what we actually want at in the end. - [Francois] Yeah, so I was just looking at the data model here. Could we add just one data
+point to track the assignee, like the whoever is handling the request? - [John] Sure. So I'm gonna say that
+add an additional field on RepairRequest to track the assignee or maybe I'm gonna say the owner. - [Francois] Yeah.
+- [John] Owner of the request. And I'm just gonna end there. So I'm gonna send this in and now this AI set of
+agents is gonna take that refinement prompt, look at the requirements
+that were generated and try to combine and revise. So now you can see this data source, you see owner fields has been added. That's a very simple example. If we had more time, I could ask this, maybe I wanted to split off the status or the approval object
+from the RepairRequest because maybe it's a two-step approval. I could ask it to create
+a whole new database table or a new database model that represents an approval request related to the actual repair itself. So a lot of different
+things that you can do with the refinement, once you're happy with this, Francois- - [Francois] I'm very happy with this. - [John] You're very happy.
+Wow, well, look at that smile. Additionally, you can
+view the app overview. So think of this as your app read-me, really eliminates a lot of
+the documentation effort, if you will, you can copy paste this, put this in a read-me file,
+share this with your team, this will show you the key features that are gonna be part of this app, it's gonna show you the usage and then this is kind of the moment that's pretty pretty amazing. I'm gonna hit Generate app. What it's gonna do, and I'm
+gonna describe this first because it's so fast, is
+our AI assistance here have created what we call a metamodel, essentially that supports
+these requirements. So think of a metamodel as
+almost your CDK definition except for a complete application. And that metamodel is then
+reflected in natural language for you as the human to review and review. But that metamodel gets
+translated into our visual builder and represented as an actual app. Once that's in the builder
+experience, we code generate that so that you can actually
+run and execute the app. So I'm gonna hit generate and you'll see just in a few seconds, we're gonna get this set
+of requirements translated into an app inside of our visual builder. And so I can immediately preview the app or I can immediately edit it. And so this is real time. There was no speeding up of
+this demo, you saw us do it, if I didn't talk to Francois and if he knew what he wanted, we could have done this even faster. But pretty pretty amazing. It still is pretty
+incredible, the capabilities that we're able to offer
+within the product. I hit the preview button. What preview is doing is
+it's taking that metamodel, compiling the app essentially, and then showing it in
+a browser tab running just like it was if it was published. So, a caveat here is that it's
+not exactly perfect, right? Like the goal is not to generate an app that's pixel perfect, complete,
+doesn't require any change, there's still an expectation that you're gonna customize
+this to your need, right? As an example, the homepage
+is SubmitRepairRequest. You might want the
+homepage to be dashboard. So you may do small tweaks to that. The AI can't read your mind quite yet, so you still have to do some manipulation and updates yourself. But pretty amazing that in under 60 seconds
+we got a full CRUT app that has a submission form, it captures a lot of these key details. It's already wired up to a
+DynamoDB table on the backend that's gonna get pushed into your account when you publish this app. And then we have a dashboard that's gonna show all
+these repair requests. So what also happened when
+we generated this application was that we have a another agent that's gonna generate sample data so that I can test this app and actually see how it's
+gonna perform with data that is actually representative. So I don't know about
+you, it's pretty painful to do testing, it's pretty
+painful to generate sample data, it's really painful if you have
+to import that into DynamoDB and deploy it to prod and test and then delete the data. And so we just make that so much easier with this sort of sample data agent. It's one of the first ones we released, but also one of the ones
+that's most helpful. So you can see here, pretty amazing we've got
+a list of these requests. We see some have already been processed, approved, some are rejected. I have capabilities where I
+can view the details of this, so a table with a complete detail view, if I go back here and I scroll over, I can also go to edit from here if maybe I wanna change this to approved, processed, today, at what time is it? We'll say 11:00, I submit this and you can see the full interactivity, sorry, it's computers
+going backwards a bit, but you can now see this
+top row is now approved. We set the process time and you're testing this app
+fully in your browser instantly, and it's what you see is
+what you get experience. So back on our app, one
+thing I noticed is that our metrics cards aren't quite
+displaying the right data, maybe the AI forgot to wire this up, so we're just gonna check that, we're gonna see if maybe there's
+a little bit of a mismatch, but as I change it from
+our visual experience, our visual builder here, you'll see that change reflected in real time in that other tab. So when I'm building, I typically have a bigger screen, I have two windows, one window
+which is my builder screen, the other window is the the real app, and I can just go back and forth, right? It's almost like if anyone used
+Dreamweaver back in the day, but instead of building
+just a static website now, you're building a full app, right? So this is a full stack app. It's using TypeScript
+and SJS under the scenes, it's fully code-generated, again from that metamodel
+that we described before. Inside the builder here,
+just to orient everyone, we kind of have three main modes. So if you look at the top,
+there's pages, automations and data. Pages are either your UI pages, this is the visual experience of your app, middle tab is automations. This represents all the business logic or your APIs of the application. So this is where I would make
+a call to a database to update or create a record. I could send an email from here, I could make an API call, I could call the Photoshelter
+APIs to pull in images to then display within my app. The data tab represents my data model. And so that represents all
+my fields, the data types, how data is related to each other and I can define data queries and I can do that from
+these three different modes. On the left hand side,
+I can see all the pages within my app. You can see, for example,
+ViewRepairRequest. That's not in my navigation menu because you don't really
+wanna see a view page, a detail page from the navigation. The AI was able to understand that and removed it from the
+navigation bar automatically, just as an example of
+what's happening here. So the thing we wanted to
+show was on this dashboard, we were gonna check our metrics cards. So we have pending requests and you can see here,
+it's pretty interesting. So what this did is it
+added these metrics cards, and then on the right hand
+side, this is your configuration for all of the different components. And so you can see this is
+pending requests, it's hooked up to an entity, a database table, and it created a query, but it seems like it
+didn't quite map the status as we expect, right? So there's an input
+parameter to this data query, and so these are pending. So I'm just going to
+help the AI a little bit. I'm gonna add this status in
+here for pending, for approved, I'm gonna add approved and rejected. I'll just make sure that
+this is added there as well. And so when I do that,
+that's now going to, automatically on that
+other tab, be recompiling and show me the updated version. So when I open this dashboard, is now gonna have the
+correct number of items. And it's a little ironic that it forgot to put
+in the status parameter because if I open this data query, again, all of this was generated by the AI assistance, right? So the AI assistant knew for this metric card I need
+to generate a filtered query based on status to show the status count within that particular card. And so it created this data
+query on my database table, it set up the wear clause, and now that I'm passing in,
+approved, rejected, pending, it's gonna get mapped up here and then I'll get the
+appropriate account returned in my metrics card. So really really amazing, I
+think capability from the AI, but also a very intuitive experience here within the visual builder. So, here you can see this is our app. Maybe very simply here,
+I can see, on the right I can add other components to my app. There's different data components, there's generative AI components,
+date components, buttons, texts, anything that you
+wanna add to your app, you can drag them on from the
+right hand component pallet onto your app. So say I wanted to add maybe just a row and I was gonna drag and drop
+the row, the row gets added, I can add new components in this. I can design my layout, I can design and theme it as well. My header and navigation bar. If I wanna change that, make
+the dashboard my homepage, I simply click the configuration
+to make it my homepage. My app reloads. The dashboard's
+now gonna be my homepage. My metrics cards are looking great. I've got a row that I
+can add components to. Maybe the next thing I
+wanna do is customize how this app is looking. I want to match my color palette, and so I may choose dark mode if I am feeling really
+really sort of on the edge or I may just choose a header color. So let's see if I remember
+the Amazon Orange color. I'll set the header color and then you can see within my app, that's gonna immediately
+help with my themeing and styling secondary color. I can select that. That'll change my navigation colors and button colors and things like that. I can really make this
+app look like an app built by my company. I can add a logo, I can add a banner. Very easy to make this
+app look like my own. So, the next thing I wanna
+show we're really excited, we talked a little about
+it, is being able to add and modify your app using generative AI. So I'm on the page of ViewRepairRequest and this is that detail view. So I can see the details
+about a specific request and I might want to add a
+capability of being able to upload repair notes
+associated with this particular request as
+the service technician. And maybe I want to generate a summary of what was in those repair notes so that I can more quickly
+get the summary report back on it, update the status and track how I'm fixing
+these reported problems. So down on the left you
+can see Build with AI. This is our AI assistant.
+It's got some extra prompts. I can click on one of these and just do it or I can describe my own. I can do simple things. I can add buttons, I can
+change the name of buttons. I could add an icon to a component or I can do some pretty complex things such as adding this full capability. So I'm gonna say, add an uploader for repair notes and summarize them. So add an upload for repair notes, which we'll store to S3
+and then summarize them and generate a concise output
+describing the key problems and outcomes. So I'm gonna send this, again, just like our
+getting started experience or the cold start experience, it's gonna analyze the prompt,
+it's gonna analyze the page, it's gonna analyze my app and figure out how do
+I wire in these changes that I've described into my app and make it work where I don't have to go fix all these things or without doing a bunch more work myself. So what the AI agents
+are figuring out is like, how in the world do we make that work? And so it's processing, the
+internet's a little bit slow, so we'll kind of wait for this to process. But you can see, it
+comes back with a plan. So it doesn't just
+immediately modify your app, but it's gonna check with you and confirm. So it's gonna ask, hey,
+I'm gonna add a new section for uploading and summarizing, repair notes include a
+file upload component, add a button to trigger
+summarization, include a markdown to display the summary of repair notes. That sounds really great.
+So I'm gonna hit confirm. And you can see this got added. So it added a row, it
+added a file uploader and a summarize button. And if I look more into
+the details of this, you're gonna see that
+the button is wired up to this automation. And this automation is
+passing in the details of the S3 file. It's gonna pass in the S3
+file that was uploaded, the file name, the bucket, and then in the automation itself, this is that business logic
+or that API that I described. This was generated for
+me. You saw the live demo. This generated a flow which
+is gonna get the S3 object, it's gonna then invoke Bedrock
+via this invoke LLM step, and it's gonna summarize that
+file that was just uploaded. So you can see here I have my inputs, I also have a simple user
+prompt, I can customize this. The AI generated this user prompt for me. So this was super helpful as an expert analyzer in your repair notes provide a concise summary. This seems great. - [Francois] Can you
+show us some more options on like the model that you can use and that's... - [John] So yeah. So on the Invoke LLM, we have all sorts of different models. For my request, I can
+set temperature, max P, I can set a mocked output. I can also choose whether
+these are Claude models or whether these are Titan models. ANOVA models will be
+coming very very soon. So those will be
+available in here as well. But let's just take a look at how that looks in a published app. So this is a site app. I kind of did this last night
+just to make sure we had one that I could show you end-to-end and actually have a summary performed. So this is fully deployed. You can see I have requests
+and pending requests. This is a little bit different. It's not exactly
+Francois's app but similar. So I'm gonna select a file and I'm gonna select my repair notes, and this is gonna upload S3, just upload to S3. I'm gonna summarize, this
+is that same component. The AI assistant added this just like we added that other one. And here you can see we
+have a concise summary. I can now copy-paste this summary and it analyzed this full
+repair notes document and I can either save this into my record, I can update a different system, or I could just have one click or automatically update my row
+based on the output of this. I didn't have to go into other consoles, I didn't have to write prompts of my own, I didn't have to do wiring. Pretty pretty amazing. So I'm gonna switch back
+over to the PowerPoint and then just wrap up super-quick. I know we've got about two minutes, so we're gonna fly through this roadmap, few highlights that we've covered here. We showed about gen AI in published apps. That's what we just demoed, we also demoed themeing and styling, gen AI to modify apps, we showed those in our quick run through, relational data modeling
+will be coming soon for enterprises, faster deployment times, connector configurations,
+sharing controls and org-wide. Error monitoring is also on our roadmap. We're gonna be launching
+more native integrated SaaS and 3P action connectors. So we have Salesforce, we have API, but we're gonna bring in
+more native connectors, making it even easier to
+connect to those endpoints. Additionally, invoking
+APIs for automations, so now you can have
+essentially headless apps or you can have your other
+apps within your enterprise, call your visually defined business logic that we just saw in this demo. Additionally, integration
+with Q business, so being able to integrate generative AI,
+RAG and enterprise search and some of the new
+capabilities with agents, workflows and actions, being able to pull those
+into your App Studio apps. Wanna thank all of you
+for coming out today. Also, huge thank you to our customers. These customers have been
+with us through private beta to preview and now to GA. They've really helped
+us shape the product. It's been a great journey. Shawn, NFL, Deloitte, Adobe have been great partners and these other customers
+along with many many hundreds of others that have helped us get here. Here's a few QR codes. I'm gonna leave these up on the screen. One is a getting started tutorial, the other is a step-by-step
+app building walkthrough. We have a deep dive
+session this afternoon. It's a chalk talk. It's gonna deep dive into more
+JavaScript extension points and Lambda integration
+inside of App Studio so that you can connect to pro-developer, built Lambdas that already exist or you can get developers within your org to help you really customize your app if we don't offer the
+product out of the feature, out of the box, that's at 2:30, I believe searching your app, but with that, thank you very much, we're not able to take questions up here, but Francois, myself,
+Shawn will be at the back and we'd ask if you do have questions, please leave the auditorium,
+leave your headphones here and we'll be able to answer any questions that you might have, kind of,
+at the back of the stadium. Thank you so much. Have a great re:Invent. Thanks for coming out today. (crowd clapping)

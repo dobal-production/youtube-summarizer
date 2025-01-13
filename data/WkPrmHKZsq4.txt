@@ -1,0 +1,472 @@
+- I'm Nirmal Mehta. I'm a principal specialist
+solution architect, and you're in KUB301 session: How to build scalable
+platforms with Amazon EKS. If you're not in the right session, don't know what EKS is,
+you'll learn it here. Stick around, you'll learn some things. Like I mentioned, I'm Nirmal. I'm gonna be joined today
+with Isaac and John. They'll introduce themselves when they come up a little bit later, and we're here to talk to you about this lovely picture. That's it. This is the only slide
+in our presentation. So who here... I can barely see, so... Oh, I'm gonna do this. Who here is a platform engineer? Awesome. Who here is building a platform currently? Why do we need platforms? (audience member faintly speaking) That's right. So, controlling governance, adapting to new things. Who thinks their platform
+looks like this picture? A nice field of dreams. We talk to a lot of customers that are building
+platforms like yourselves, and one thing that is a reoccurring theme is they get abandoned. They're not adopted. Who here has that problem right now? You've built this awesome, nice platform and the developers are a little
+bit hesitant to adopt it. That's what this talk is about today. We're gonna give you guidance around how to think about the platforms
+you're building on EKS and the best practices
+on how to keep it going so that they're not abandoned. But before we get to that,
+why do we need platforms? We need platforms because
+we need to respond to the ever changing
+technology needs and demands. You know, we've gone through
+massive technology shifts, internet, smart phones,
+the scale, you know, the number of objects, the storage, the number of applications,
+the number of nodes even, number of servers. We need platforms to be able to adapt to those technology shifts and what our developers need
+to run their applications. You're probably going through
+something like that right now. Who's had to have a
+meeting with an ML team and like all of a sudden, you gotta integrate machine learning into your application or your platform and support those workloads, right? So as the internet grew, we started to need to have automation. So we went from supporting websites with maybe tens of machines
+and we could handcraft. We adopted things like Chef
+and Puppet to start automating and having some governance
+over those servers. But we never got all the
+way with that automation. And now with these massive applications, we started breaking
+them into microservices, started using containerization, and that started to solve
+some of this control loop, this governance and automation but it came with some additional issues such as an increase in
+complexity, dependencies, and just needing something
+to manage that complexity. So that's why we started
+building these platforms. And we said to ourselves, "If you build it, they will come. The developers will come." Who knows of the "Field of Dreams" movie? All right. So in that movie, a farmer gets visited by a ghost of a baseball
+player in the past and is told if he builds
+this baseball stadium in his field, all these legendary
+baseball players will come. And I think, I was a platform engineer
+before I came over to AWS, and I had that same attitude. Oh, my platform's awesome. It has the best features, it's got the coolest stuff, uses docker and containers. Isn't that cool? And I sat there and I had to, and I thought all these developers, there's no way they wouldn't want to come and use my shiny Kubernetes platform. And I sat there and I sat there and then I
+realized, no one's showing up. No one's showing up to my field of dreams. So why do we keep doing this? We focus, we think it's just about
+the features of the platform and the platforms are abandoned because they don't have
+the right features. But it's not that. It must be something else. When we're talking to customers and we start digging into why
+those platforms don't succeed, we realize that what really
+attracts development teams and your users to a platform is trust. Platforms are abandoned when
+they fail to establish trust. Distrust of the platform to
+evolve to the meeting needs that leads to shadow IT, distrust in delivering the
+services and capabilities that the developer needs, and distrust that the
+system will break frequently and in non-known ways. We know it's trust because we know developers will still choose a previous platform that they have a prediction and know the bottlenecks
+and know the edges. And they continue to use
+those older platforms. So we know that it's trust because they trust that. They're used to it, even if it's ganky, for
+lack of a better term. So, what is trust? Trust is three parts. Logic. If you believe that I
+have rigor in my logic, then you're more likely
+to trust me, right? And hopefully, you will
+demonstrate some logic today in this presentation. If you sense that I'm authentic, then I'm more likely to be trusted. And if you sense that I
+care about your needs, then you're more likely to trust me. So how does this translate
+into a platform perspective? Authenticity, or, yeah, authenticity translates into a collaborative
+shared responsibility, showing we collectively
+care about the outcomes. You know, you build
+you own product mindset for the platform. Logic turns into transparency. Say what you're gonna do and
+do what you're gonna say. Commitment to transparency
+and collaboration. And then empathy turns into reliability. I care about supporting your services and making sure they run well. And I'm here for your needs, your developer needs. So I want to have you keep that in the back of your mind as Isaac and John do the
+rest of the presentation around these three concepts of trust in how to build a scalable platform. Where we see a lot of
+friction is how do we keep that trust level high, but
+also meet the demands of scale? There's a tension there. We can move fast, scale out, but maybe we reduce reliability or not meet the needs immediately. That erodes the trust. So the challenge in building
+these scalable platforms is figuring out a way to meet the scale of the ever evolving technology demands and also keep the trust level high. So I wanna just take a step back. We were talking, preparing
+for this presentation and John told me, "Look, at the end of the day, all my developers care
+about is getting their code into production as fast as possible." We can talk about all these other things. An example in the past is, you know, you might have a monolithic pipeline and the development team is used to that. So they, you know, they're used to doing that
+three to four month deployment in this monolithic app. Now they've broken it
+down into microservices, but they don't trust the new platform to be able to handle
+deploying these microservices. They don't know the friction or it's a higher friction. So they tend to cram all
+those new microservices and the new things they're trying to do into existing pipelines,
+that monolithic pipeline, because they know what
+the bottlenecks are, what the pain points are and they know what the friction is and they know that that might be the way to get to code in production
+as fast as possible in their mind. So I want you to keep that
+in the back of your head when we're going through
+the rest of these details of how to build these platforms
+in the best practices, how to keep that trust level high while also meeting that scale. So Isaac, can you come up and
+tell me how we can do that? - Absolutely. Thank you, Nirmal. So let's dive into what we always do when we think about platform
+engineering and our plans. We always turn to automation. Almost every single year
+for as long as I remember, I've been doing platforms
+for a very, very long time. We're gonna automate things, we're gonna automate more things. And this year, what are we gonna do? We're gonna automate again. And next year, I guarantee
+on your product roadmap for your platform, more automation. We started off with Puppet, moved to Chef, moved to Ansible, now to Terraform. We are constantly automating. But why isn't that we actually get to this point of automation? And if you think about
+like other industries, when was the last time any of
+you have ever been in a bank? I've not been in a bank. I can't even remember the
+last time I was in a bank. They've automated. It started in the eighties with an ATM, an automated teller machine. It's in the name. So other industries have figured this out, but somehow we, as platform engineers and software developers, still haven't figured it out. Why is it that we're still
+automating every year, year after year after year? And I guarantee you,
+we're not gonna get it if we continue doing the
+exact same things over and over again. So let's dive into this. Now, one of the things that
+Nirmal talked about is scale. What changes in our world more
+than anywhere else is scale. The number of developers,
+the number of services. For those who have been
+with AWS for a long time, we started off with EC2 and S3. We now have over 250 different services. We launched a whole bunch of
+new services here at re:Invent. Every single year, our scale grows dramatically and we have to adapt to those changes. So as we grow and we scale, what do we do? We break down things into smaller chunks. And I don't mean just microservices, we think about humans, organizations. So we break down our large platform teams into smaller teams. We might have a networking team and they'll have their own set of pipeline and abstractions you see
+here, authentication. All of that gets put
+into in a stored state. And they deal with networking, right? We also have an infrastructure team. They're gonna be focused on
+standing up EC2 instances, maybe your Kubernetes clusters, right? All of that other baseline
+foundational infrastructure that you need to actually
+run your application. We also will have an observability team. They're gonna be focused on, obviously, bringing up
+observability for your applications for the infrastructure,
+for the networking. And then they have their own pipeline. Compliance will also have
+their own pipeline as well. They'll have their set
+of authentication tools and if we're lucky, they'll be using a lot
+of the similar tools. But unfortunately, what ends up happening is
+everybody sets up their own sets of tools, right? And then finally, finally we can get to
+deploying our application. This is the... When we refer to the platform, when most people think about
+is just this one pipeline, the CI/CD pipeline that we all talk about. That's when we talk about platforms, that's what most people think about. And they don't think about anything left of that dash line, right? But that isn't all. You don't deploy an application
+without any dependencies. You now have to get things
+like databases, right? You need to get S3 buckets, ElastiCache. You have a lot of dependencies that your application needs to depend on. Well, that's a whole nother pipeline. But to make things matter, to make things more complex, there's actually one pipeline that actually nobody really
+talks about but exists. It is a continuous compliance pipeline that runs behind the scenes and makes sure that everything is
+continuously in compliance. Now up until this point, everybody here has been storing
+all of their configuration, everything inside of Git, and then they deploy the pipeline and everything seems to work. That moment that you push
+that deployment pipeline, you push the button and it works. But how do we come up with drift? Well, drift happens because of things like the
+continuous compliance pipeline that runs in the background. It's secret. The developers don't
+know anything about that. So what they think is,
+"I've put something in Git, but then there's
+something else changing it in the background." It'd also be a human being
+actually making changes in the background. So this thing that we've talked about, Git as a source of truth
+is actually not the source of truth. We had one developer, one customer tell us, "Git is not the source of truth; it is the source of hope," because of so much drift
+between our pipelines and what we expect our intended outcome and then the actual outcome, right? And immediately, we start to break trust. All this trust that we build, we go look, put stuff in Git. You'll trust that what you put in Git, will match what's in production. That doesn't actually happen. So immediately, we start to
+break trust with developers. And that's a really important
+thing as Nirmal touched on to being able to gain
+adoption of your system. So let's go back to this. So let's get back to this diagram and what's complicating things? Why can we not actually automate between all of these pipelines? And the answer is human interaction. Now again, we're gonna
+launch a lot of new services, a lot of new features that your developers or you, as a platform
+engineers, are gonna want to integrate into your platform. So what is it gonna take? Well, let's simplify this a little bit. Let's just assume we need a new resource. Well, in order to get that resource into your application or
+be able to provision it, it needs to interact with
+the infrastructure layer. Well, the infrastructure
+layer needs to go back to the developers. And now we're setting up
+meetings, adding Jira tickets, and we're constantly in meetings, just communicating our requirements. Here's what we need,
+here's what we needed. Justification, setting up calendars. This thing, this little feature that
+you might need now turned into weeks of meetings. Well, we also need to
+run it by compliance. We're not gonna just ship
+something into production. There we go. More, more meetings. App developers are now
+talking to compliance. Now the network team, you need
+to have access to it somehow. Network team's involved. More meetings, more
+meetings, more meetings, and more meetings. So the example I gave about
+an ATM machine, right? There's no humans involved. And so what slows us down and what makes it impossible
+for us to automate is pipelines that we're running in the
+interaction between us, the way that we communicate
+with each other, is actually just through meetings. We're never gonna automate that, in this way. It's only just gonna lead
+to more and more meetings, more and more Jira tickets, and more and more waiting and delays. We know that some customers, when we launch new features here at AWS, it takes some over a year
+to actually adopt them due to all of these
+meetings and Jira tickets and waiting for people to do the work. And so what we know is that anything, any improvements outside of the bottleneck are just an illusion. So all these other little things that we're automating around, hey, we're gonna automate
+this little piece, is not actually getting to the core of what actually needs to
+be automated in order for us to be productive as platform engineers. It doesn't build trust because we're constantly just in meetings, talking to each other,
+justifying our needs. So this is the core of
+platform engineering. Why is this a new thing? Why wasn't this here before? We're finally at the breaking point, finally at the breaking
+point of these pipelines. We're finally at the breaking
+point of all these meetings because we reach a large scale. So how do we get around this? Well, we can just borrow what
+the banking industry has done, is just use APIs. The answer is actually rather simple. Getting there is a lot harder. So how do we think about using APIs? Well, instead of thinking about pipelines, things like networking
+or blue-green deployments or you know, getting a
+pipeline to get an RDS database or an S3 bucket, we think of these things in terms of capability and what your capabilities and what your platform
+instead should be doing is exposing this
+capability through an API. Right? APIs are declarative, right? And can be controlled by the
+software behind it, right? When you think about a pipeline, you hit that pipeline button, that's it. It runs once. And hopefully, it doesn't break, but then you start to
+lose control that way. So we gain control by
+moving things behind an API and then we can actually
+start automating things. And the way that teams communicate with each other is no
+longer through meetings. It's through APIs, which
+is a well-established form. So how do we, as platform
+engineers, get there, right? So in this diagram here, we've moved all of those disparate APIs, authentication abstraction
+into a single layer, right? One facade that encapsulates or abstracts out all of
+those complex moving parts behind the scenes so that
+your developers can ship fast and ship things into
+production as fast as possible. All right. So let's go back into our diagram. We still have the same teams. Those teams didn't go anywhere. But we're now thinking in
+terms of software development. We're thinking in terms of APIs and we're building into this platform. And now we've moved more into
+a product mindset, right? So the requests that used to come in and require all of these meetings, we're now prioritizing
+through a product manager. And this product manager is making sure that we're getting to the
+features that we need to as quickly as possible, or the most important features. But there's one challenge
+with this, right? So we've solved some of the problems here in terms of removing
+some of the bottlenecks of communication between teams, but we still have a bottleneck. And this bottleneck is you
+will always have more requests, feature requests from your developers than what your product or your platform engineering
+team can ever handle. And so what are they gonna do when you can't get to all
+of those feature requests? Are they gonna sit
+around and and just wait? No, they're gonna work around you. And many of us know this as Shadow Ops or you know, these rogue teams
+that go build this platform or go end up using a different service without you knowing, work around you because they
+can't actually use the platform and based on their needs. But this isn't what we want. We don't want them working
+around this, right? This is another form of
+us breaking trust, right? This is developers not
+breaking trust with us as platform engineers, right? Eroding trust. It constantly happens. It's all little by little
+breaking this trust. What we really want them
+to do is we want them to extend our platform, right? But we can't get them
+to extend our platform if everything that we do is proprietary and we're writing our own code and building our own documentation, which sometimes we don't
+even get to, right? So how do we cultivate this
+kind of culture, right? This is exactly what
+Nirmal was talking about, collaboration. How do we collaborate with each other? Right, and for those
+who have read the book, "Team Topologies," this is one of the major
+concepts in the book is, we as platform engineers
+and where we are today, we started off in facilitation. The idea of SRE and DevOps was, hey, I will embed a human
+being into your team and they will help you actually
+launch your application. And now for the most part,
+most people are starting to move into this acts as a service, database as a service, platform as a service, Kubernetes as a service, right? All of these containers
+as a service, right? And that'll get you to the
+next level of scalability. But where we need to
+move to is collaboration. So what can we look to to help us collaborate? What other forms in the world, just like in the banking
+example, we used APIs. What other form of
+software can we leverage to actually help us collaborate? So for many here, I'm sure you all use open
+source software, right? Those communities in open source have exhibited
+transparency, collaboration. They earn trust. That's how they get to be so big. There's a huge community. So if we inherit an open
+source framework, right, for our platform, we get to bring along all of that with us: transparency, collaboration, the trust. So what if we use Kubernetes
+as this framework? Now up until this point, I assume many of you have used Kubernetes to deploy containers. And think of it as a container
+orchestration system. From this point on, I'm not gonna talk about
+orchestrating containers. I'm gonna talk about
+strictly as a platform. Even if you never use Kubernetes
+to deploy a container ever, you can still use it as
+your platform layer, right? And why would we want to do that? That seems kind of crazy. But why would we wanna do that? Because it has every foundational aspect of what a platform needs and has an API handler and has RBAC built in, has a mutating admission controller that helps us actually
+control what gets in and out and able to make changes on
+the way into the platform, which is important. As we keep going, we can build in web hook
+controllers, schema validation, have other controllers here that actually integrate with Kubernetes so that we can add our own business logic and our own compliance. But most importantly
+here is we have one place to store state. If you go back to those pipelines, every single one of those
+pipelines stored state in their own different way. And if you're using Terraform, every time you run a pipeline, it creates a new state file, right? That's a different state
+stored somewhere else. And there's no way to really query it. If I wanna understand what is
+the state of my application, I have to go to four or five
+different state stores, right? And that makes it really
+hard to build trust with a developer when they can't actually see
+what's happened in the past. So ETCD serves as our single state store. And instead of capabilities, Kubernetes calls them controllers, right? But in the end of the
+day, every single time that you add a controller or a CRD into your Kubernetes cluster, what are you effectively doing? You're adding a new
+capability to that platform. So if you're using a secrets controller or an API controller, that
+is actually what's happened. You're enabling some new
+behavior or new feature. So how do we extend this further? Okay, you're already doing it. For those who are
+already using Kubernetes, you in fact are already doing this, right? So this isn't necessarily something new, it's just thinking about
+it in a different way. The other reason why we want to use something like
+Kubernetes is the notion of abstractions. Abstractions help hide away complexity. When we think about an API, in fact, that is what's happening, right? We are hiding away that
+complexity behind an API. Again, going back to that
+banking example and APIs, it's not like the bank is asking you if you want to take money from one account and put it into another. They're not asking you
+to tell them the process of how to do that. They just go, "Hey, what do you need?" And the API will handle it. So how do we do this here in Kubernetes? Everybody's very familiar with
+the deployments abstraction. The deployment abstraction
+is actually an abstraction over a replica set, which
+is an abstraction over pods, which is an abstraction over containers. Now, the beauty of Kubernetes is that if you need a new set of functionality, let's say blue-green, would you throw all of this away? Now, you wouldn't throw this away. Instead you would add blue-green and leverage all of the
+abstractions underneath. And so what we call this in software development world
+is composability, right? We're able to actually
+compose a whole bunch of different pieces of functionality and bring it into one, right? And for those who use Argo, there's ability to have blue-green and that's actually all they do. They take replica sets, pods, containers, and build their own blue-green
+abstraction over top of it. All right, so let's extend
+this a little bit further. All right, because remember, developers don't care
+about any of this stuff. They care about their application, they care about their application
+getting into production as quickly as possible, right? So let's build more abstractions. So within Kubernetes, we can build a new abstraction
+called an application, right? That's what they care about. Now, the term application
+can mean something for me in my organization, which will be different than for you all in your organization. So this is just an example. So an application might need an ingress, you might need an S3 bucket and S3 bucket, of
+course, needs IM policies and we're building these
+other abstractions as well and connecting the dots. We have ticketing, usually we use Jira tickets
+or ServiceNow tickets to enforce compliance. So our compliance abstraction is there. But that's not all. We need an environment to deploy to. Are we deploying to dev stage? And that environment needs
+an account, a VPC, a subnet. You might need a Kubernetes cluster. And all of these abstractions
+can live inside of Kubernetes. So if we tie this all
+together, what do we have? We have an application that
+points to an environment that also points to a
+ticketing system to help us with compliance and track changes. We have that application
+that has ingress, buckets, also its own ticketing system to make sure that we're
+enforcing compliance. And this is what a developer
+really cares about. It's just this application,
+this little box, not really so much
+everything underneath it. And so if we recall the pipelines that we had at the very early on, all that communication, all those meetings starts to go away when we start thinking about
+Kubernetes as a platform and start thinking about composability. We're able to just combine
+different components without having to jump
+into these meetings. We've moved away from pipelines and that's what Kubernetes
+helps us to do, right? It simplifies this. Developers care about
+applications not infrastructure. And there's also one other thing here too. You remember that continuous
+compliance pipeline, that secret pipeline
+that runs in the back? You notice that we don't
+have this for Kubernetes? And the reason we don't
+have this for Kubernetes is because we have this
+continuous control loop. That control loop in that continuous compliant is built into the very foundational
+fabric of Kubernetes, right? So the more we leverage Kubernetes
+for our platforms, right, the more trust we have because everything is there,
+the more transparency we have. In fact, actually, when you
+query something in Kubernetes, you have, here's my intended state, here's my actual state,
+all in one API call. And every single API
+call, it returns your spec and then the actual status, right? The other reason why we
+wanna leverage Kubernetes is it has a large
+controller ecosystem, right? You're not doing this on your own. You're leveraging that community that already has a lot of trust, that already has a lot of transparency. There's a number of
+open source controllers that you can use to add functionality. I talked about Argo. You don't need to build your
+own blue-green functionality in automation, use Argo and bring that in and now you have additional
+deployment semantics within inside of your platform. We also just recently launched K-R-O, kro, that helps you build these abstractions on top of ACK, right? Which also represents objects in AWS in a Kubernetes friendly way, right? So there's a huge controller
+ecosystem out there that allows you to develop without or to develop these abstractions
+without you having to code. But of course, at some point,
+you may hit a limitation of what's available and
+you will need to code or you create your own custom controllers and you can do that as well. And now you can start mixing
+and matching and composing. All right. But most importantly, what does this enable
+for your organization? It enables our teams and our human beings to collaborate differently. Again, we're moving away
+from the notion of pipelines and interacting through
+words and Jira tickets, to now putting everything into code and taking each other's components and building something new. So you'll notice on the left hand side, we have app team architects, on the left hand side of this API, where we have database
+architects, security compliance, all writing all of their requirements, again, not into tickets but into a declarative language, right? And Kubernetes allows us to do this. Now the great thing about
+Kubernetes allowing us to do this, right? It's great. You don't have to actually have very many
+worker nodes for this, but you do need a scalable control plane because we are now
+putting a lot of pressure on the control plane as a platform, not just as a component, not just as a container
+orchestration system. And this is where EKS comes in. We have worked over the last seven years to make EKS the most scalable, managed Kubernetes control
+plane on the planet. So if you just use EKS, you're delegating all of that to AWS and now you can just focus
+on building your platform without actually having to
+create a bunch of worker nodes and manage yet another set of APIs in containers somewhere else. We'll do that for you. The other great thing is, of
+course, we already mentioned, you're not on your own, right? We're inviting people to
+the other side of the table behind the curtain. You now get to bring your app developers and your other teams to the left side, but also the community. And lastly, you can now, because you're moving away if you're doing platform engineering and moving away from proprietary code that you're writing on your own or your proprietary platform, you can now have us help you. We have blueprints, we have CNOE, which is our a opinionated
+platform community out there, all putting out a bunch of configuration, a bunch of open source tools to help you build your platform with us. We have specialists that can come in and help you build your tool because if you're building
+it with open source, well, we know how that works. We can see it. That's what the transparency is there. So you're not on your own anymore when you're thinking about platform. You're not, you're collaborating, you're thinking beyond the
+walls of platform engineering, and this is what's gonna help you scale. This is the foundation of
+building that trust, right? We're gonna get... We have to get to the point
+that we're bringing developers and other people behind the curtain of this platform engineering team. Alright, so let's walk through
+what this would look like in practice. So we go back to Git, here in number one, developers are actually pushing
+Git configuration into Git. Two, we have Argo, or a controller monitoring Git to make sure that we have those changes. Argo or any CI/CD system
+that you have in there, we'll then push it to the API server. At this point, by the way, we actually haven't applied
+anything into Kubernetes. There's no changes being made. We have to go first through
+the admission controller and make sure that these
+changes are valid changes, they're good changes,
+they're compliant changes. That gets pushed into ETCD,
+our single state store. This is for, again, for S3 buckets. RDS, this could be for
+your applications, right? All of those abstractions we talked about now have their representation in that CD. That gets put into a tenant name space. We have controllers sitting
+there and listening, reconciling, noticing those changes, going out, reaching out to any API. Now, of course, I talked
+a lot about the AWS API, but you can use this to
+manage other resources, other observability resources. Anything that has an API, we now are communicating with
+it and making those changes. Number seven here is
+getting the status back from those changes. So now we have our intent and
+our status in the same place and we're updating that in that CD. And as we go back down to eight, we have our presentation layer, a single presentation layer that represents our
+networking, our observability, our applications, our history. Everything a developer
+needs to get their job done and get their application into production, they can see it in a
+single presentation layer. And in this example, I'm using Backstage, you could build your own one, you can use another open
+source tool or use a vendor. But it makes it super simple
+now that we have everything behind a single API that
+happens to be Kubernetes but at its core, it's an API. Getting back to that automation. So some of the key takeaways. Build your community and collaborate. Do not think of yourself
+as just this platform team that is a finite set of resources. Think about open source, think about AWS, we're here to help, right? Build a bigger community. Another one is have a product mindset. You still need to make sure that you're being empathetic
+to your developers, you're listening to them, and you're building
+exactly what they need. Abstract away complexity with APIs. This is key, right? When we think about pipelines, what we're really doing is
+exposing that complexity, all of those steps
+directly to the developer, which is not very helpful. And lastly, leverage open
+source for transparency and reduce your undifferentiated
+lifting by leveraging EKS to manage that control plate for you. Now up until this point, Nirmal has been talking about high level. I've been talking a
+little bit lower level, but it's still rather abstract. Next, I'd like to invite
+John Weber from Adobe to talk about how to make
+this an actual reality. He's done this in real life. So, come on stage here, John. Take on over. - Thank you sir. - Thank you. (audience claps) - Welcome to KUB301, how to stop meetings. Thanks so much, Isaac. I'm really excited to share Adobe's story
+with you here today. I don't know how things
+work at your company, but at at Adobe, it could be really hard to get a service out the door. It takes on order a
+month for a new developer to get up and running with
+a new Greenfield service. Not only do they need to write the code, but they probably have
+to create some tickets to get access to observability
+systems or production and wait for humans to go ahead and respond to those tickets. And meanwhile, they actually
+have to write the code, they have to deploy the code, they have to test integrations. And then the humans,
+where the tickets went to, come back and say, "I have no idea what
+you're asking me for." And between bartering of
+what the developer needs, you have to think about
+production readiness. All the monitoring tools,
+are they all set up? Do you have alerts? What is your backup strategy? And are you ready with
+your incident response when something goes wrong? Because it will. I'm part of the developer platforms group and our motto is very simple: help developers write
+better software faster. How do you make this landscape do that so developers can actually
+achieve that outcome? I'm a fan of abstraction and platforms where you need to simplify and in many cases, oversimplify
+for your developers. I'm also a fan of our
+cloud providers like AWS, who could manage all this
+stuff better than I ever could. Where do all of these
+principles intersect? I want to turn your attention to the bottom box labeled, Ethos. At some point in my career, I've probably run every
+customer-facing product that Adobe has to offer. And one of my core challenges
+was around consistency. As I like to say, Adobe is
+inconsistently inconsistent. We would've some technical
+alignment around strategy, hey, we should use a public
+cloud provider like AWS. But then each engineering
+team would go off and make their implementation unique. When every team is able to do that, how do you prevent sprawl? And worst of all, a terrible
+customer experience, which is the last thing
+that any of us want. So at Adobe, we decided to create Ethos and we needed to make a few big bets. Some of them we got right, containers and docker. Some of them we got wrong, Mesos. And so we also needed to give some level of flexibility to our customers. Some of them wanted
+just a turnkey solution where they didn't care about any of the underlying infrastructure and that was CaaS or
+container as a service. We also realized that Kubernetes was where
+the industry was headed and some teams wanted
+to consume native APIs and choose their own
+adventure, as I like to say. And that was our platform as
+a service offering or PaaS. So building on a scalable
+technology foundation like Kubernetes enable
+us to have future pivots, say towards GitOps powered by Argo. Like Nirmal said, I believe developers literally
+care about one thing: "How do I get my code to
+production as quickly as possible? So what are my users interested in and what am I interested in, given we're all part of
+the big Adobe family? So Ethos exposes these capabilities, so developers don't have to
+think about any of this stuff. They don't need to think about how would I run cloud
+infrastructure at scale? They don't need to think
+about how I build a CI/CD, a robust CI/CD pipeline. They certainly don't want
+to think about security and compliance. And of course cost is always top of mind with finite resources like GPUs. And in cases where we
+can provide insights, we also want to think how
+can we absorb that pain from the developer and take action on their behalf. Folks, we are a product team. You may not be able to
+go to Adobe's website and purchase Ethos or your
+favorite e-commerce store, but if you are a customer or a user of Adobe's
+products, you use Ethos. And because I'm a product team, I need to be very much
+aligned with my stakeholders to build trust and respect with them. The first group is our internal customers, our developers. Yes, these folks are customers. One of my early career failures was, I refuse to call these
+folks customers, right? They're colleagues, they're coworkers. I was completely wrong. If you don't consider your
+developers your customers and don't build a level of respect and empathy with them, you will fail. You will fail. So what do your customers need? Clear documentation. A UX makes sense. Low barriers to entry, because they don't want to use
+a system that's hard to use. External customers. Adobe is the dial tone and the fabric for everything that we provide. We're here to achieve and
+enable high quality features and value for all of our end users. AWS. Is AWS able to satisfy the needs of Adobe? Conversely, am I giving the
+right level of feedback to AWS so they can hide and abstract all the way to that ugly complexity
+that I don't want to see? Adobe very much has a soft culture. We love to give a blank canvas
+to our users and unlock them and say, "Hey, go build some
+magic powered by Adobe." We also do that with our developers. And as you can see, when you hand a blank
+canvas over your developers, things could go wrong. So what we had to do is we had to build a grassroots ground game to get them onboard and on site. We started with a platform
+champions program. If you get boots on the ground
+within each development team, if you have advocates and promoters for what you're trying to achieve, and most importantly, if
+they have skin in the game, you're gonna build an incredibly strong and vibrant community. We also have embraced
+an inner source model. You will never have enough resources to do all of the things the
+business is asking you to do. So you need to not only
+scale your technology, but you need to scale how you operate. We have a very well-defined
+open contribution model to Ethos within Adobe. You need to listen to your customers. And we do this through CABs. We sit down with our users regularly and we listen to their pain points and they say, "Hey, you're making my job or my life so much easier." Or they're telling us, "Man, what did you just build for us?" Tough love is okay. Feedback is a gift. This is what we've been able to achieve. This year, we received
+six times the number of contributions outside
+of our organization. 25,000 contributions to Ethos are outside of the Ethos team. 25,000. We have about 1,500
+contributors within Adobe as part of this journey. This is up from 230 last year. Imagine if you had 1,500 extra developers willingly contributing to your code base. It's really amazing. In order to be successful, you need to build a
+culture of accountability. I believe engineers
+acting as product owners, and I mean this in the agile sense, so no offense to my product
+manager friends out there, but every engineering manager needs to be a customer advocate. They should understand and have a vision for what they're building
+and how it should function. They should be having
+continuous conversations with the people that
+they're delivering value to. To quote the great Werner
+Vogels, "You build, you run." Guess who gets to be on
+call at 2:00 AM on a Tuesday when things break? Yep. The people who write the software. And when things go wrong, your developers need to understand and have empathy and share
+some of the pain and burden that your customers are going through. Amazingly, people are highly motivated to fix systemic issues if they continue to get
+woken up every night. Go figure. The developers, the people consuming
+the amazing capabilities that we're building, need to understand the cloud is not free. This stuff costs real money. So we built granular
+dashboards and cost attribution and then we send those teams a bill. And because I care about Adobe's money and they care about Adobe's money, we had to take a pivot and think about how we could
+absorb some of that pain. And we did that through the automatic
+resource configurator or ARC. Raise your hands. Who believes developers
+get container sizing right the first time they deploy production? Anyone? No, okay. That's what I thought. ARC's a really simple system that we built with the
+Adobe research team. When engineers request
+capacity on an Ethos cluster, we deploy the pod along with
+an open policy agent or OPA and we evaluate and give us hooks to be able
+to change their pod spec. Now we deploy workload on a worker that has available capacity and then we record utilization
+metrics through Prometheus and then we store those in a long-term time series
+database like Cortex. Then ARC begins to look at the utilization and then recommends container sizing to the developer via an
+automatic pull request. And once the dev accepts the
+PR and says, "You know what? I may have gotten this wrong," GitOps will do its magic and take over once that gets merged and we go ahead and have
+container sizing solved. Like any service provider, I need to have an enforceable
+contract with my users. I need to set targets, measure them, and hold myself accountable
+to the results and outcomes. I do this by embracing
+service level indicators and service level objectives. By defining my core capabilities, can I deploy? Can I scale? Do I have network connectivity? And then I measure and
+evaluate my performance on a continuous basis. I also fully embrace DKS. Folks, there's no glory running
+Kubernetes on an EC2 node. Right? You have much better things to do. Everybody should be striving
+towards declaring bankruptcy, infrastructure bankruptcy and
+giving this all to Amazon. And when stuff goes wrong and it will, can your team write a high quality RCA? And not only that, would you be comfortable
+publishing externally? You need to set that bar really high. Imagine being customer of service where you could, on demand,
+check my homework in real time to make sure you're getting
+what I promised you. We've been able to do that at Adobe. Here's a sample dashboard that's available to anyone in the company. And in this example,
+we're assessing the health of the egress capability
+for our Ethos cluster. Am I delivering on the
+promise that I've made to ensure outgoing network connectivity for the Kubernetes clusters
+that our team manages? I also care about my customer's
+reliability and uptime. I know that getting observability,
+working is really hard. Agents, collectors, metrics,
+traces, logs, events, and so on and so forth. So we've rallied around open SLO. Folks, this stuff is solved in many cases. You don't need to make your lives harder and figure out how to build
+this stuff on your own, like we initially thought we had to. So all of our applications on
+Ethos are auto instrumented wherever possible. We do need to take a maybe
+a few inputs from a user, like what their target should be. But then our tooling takes over and with the magic on open SLO, we're able to calculate
+error budgets automatically for all of our applications on Ethos. So where are we investing and what are those returns
+on that investment? The main KPI that I look at around operational scaling is
+our cluster-to-operator ratio. And since we've pivoted to EKS and declared infrastructure bankruptcy, I'm happy to tell you that we've scaled our
+operator-to-cluster ratio from 10 to one to 30 to one. We're also looking to retire
+our homegrown solution and embrace GitOps and Argo. And this is way more flexible with newer use cases like generative AI. And lastly, we need to reduce friction. Having less places for
+your developers to go means that they'll be happier
+and they will work faster. We've done that by
+moving all of our portals into one and embracing Backstage. So what are the outcomes of this work? What does this scoreboard show at the end of the fourth quarter? And are we winning? We are winning. Developers are able to deploy
+a full greenfield stack in just a few days rather
+than waiting an entire month. There are less meetings too, by the way. And included in that Greenfield stack is our observability platform, which I'm happy to say has
+driven the time it's taken to detect an incident by over 75%. Cost will continue to be a major theme as we go forward into
+the era of generative AI. And when you're dealing
+with finite resources and expensive ones like GPUs, with Ethos, we were able to
+nail our cost efficiency targets early this year. Finally, building Ethos in
+our internal Adobe platform has made developers much happier because all they care about is, "How do I get to production
+as quickly as possible?" And so if you have happy
+developers, what does that mean? It means that they're more
+productive developers, which means you're gonna
+have happier customers. Thanks for listening. Let me hand it back to Nirmal. He'll take us home. - Thank you.
+(audience claps) Alright, so you've learned, you've seen why building a
+platform on EKS is important and helps you build a
+trustable and scalable system to adapt to ever-changing needs, but you don't need to do it yourself. Check out CNOE. CNOE is our cloud native
+operations excellence, open source, open community. It's... We talk to a lot of customers and customers like Adobe
+got together and they said, instead of all of us trying to figure out, out of the CNCF landscape, which tool we want for observability, which one we want for deployments, let's just create an
+opinionated architecture and then build the tools, an open source tool, to be able to deploy these
+platforms with these opinions. So that's what CNOE is. Check it out. You can leverage it and
+accelerate your platform today. So how do we build attractive platforms? Focus on trust, increase transparency,
+collaboration, and empathy through reliability. Consider your platform as a product that's continuously evolving. Survey, interview your developers, interview the people that you think should
+be using your platform and ask them why they're not coming to it. Abstract the complexity through the controllers
+on EKS or Kubernetes and extend your community
+beyond just your organization to include developers, other stakeholders, AWS, and the open source community. You're not alone. Thanks for coming to our session today. Here's some other sessions
+that are going on in the track, the Kubernetes track, that are related. Some of them have already occurred and the videos will be on
+YouTube if they're breakouts. Check out the CNOE workshop
+on Thursday, tomorrow, if you want to get hands on
+on building an IDP using CNOE. And there was some new
+announcements with new features at KUB201. So you want to check out that talk on some of the new features
+that we're launching in Kubernetes and where
+we're going with EKS. Check out the EKS training. So if you're new to
+Kubernetes, new to EKS, we have a free EKS badge and training. And for our session today,
+please check out this QR code with all the links and resources to help you accelerate
+your platform building. Happy platforming and I hope y'all had a good time. (Nirmal chuckles)
+(audience claps)

@@ -1,0 +1,419 @@
+- All right, welcome everyone. I know this is Tuesday afternoon, you have a lot of choices on the sessions. First of all, thanks for
+coming to this session. Little bit of Easter egg, for those of you who have
+been watching the catalog, you'd noticed the title
+of our session changed. So you signed up for Karpenter, you are getting Karpenter, and then some. My name is Raj. I'm a Principal Solutions Architect for Containers and Serverless at AWS. I've been at AWS for six years and I have helped many
+customers migrate to Kubernetes and Serverless. Today, I'm gonna co-present
+with Sheetal Joshi. - Hello, I'm Sheetal Joshi. I'm a principal SA for
+Containers here at AWS, predominantly working with the EKS and the Kubernetes customers and I'm very excited to
+co-present with Raj here, today. - Excellent.
+- There you go. - Let's get started. Okay, today we're going to talk about how do customers adopt Amazon EKS? And then, of course this is a Karpenter and EKS Auto Mode session. So we'll talk about how do customers scale their applications? And then, we're gonna
+talk about some challenges and how to solve them
+with Karpenter and beyond. And at the end, we are also
+going to share some resources for you to learn more. So if we go back six years, we released Amazon EKS. Kubernetes is awesome. I've been working in
+Kubernetes for a long time, but our customers told us that self-managing the control
+plan is difficult. So that's why Amazon EKS was born. So, EKS is a stable and
+secure way to run Kubernetes and we run fully upstream and certified conformant Kubernetes. All right, so at this point
+you are like EKS is great. I want to get started with EKS. So how do you do that today? First, you create your cluster and what that does is it creates a control plan in AWS account where we make it scalable, highly available, and secure. Next, you want to deploy your workload but not so fast. Before you deploy your workload, you also need to install some
+add-on and controllers, right? So generally, you create
+a managed node group, two or more EC2 instances, and then you install add-ons like ingress controller
+or storage controller and some of the other ones. Okay, at this point you installed all those add-ons and controllers and then you deploy your application. So, you create a managed node
+group and then you deploy and the pod gets deployed there. But of course, this is a scaling session so we have to talk about autoscaling. So, we're like, you know what? This app we made is going great. At this point you install
+something like Cluster Autoscaler and then your pods scale
+across multiple instances. Cluster Autoscaler is great, however, Cluster Autoscaler
+has some challenges. With Cluster Autoscaler, you need to create node groups, either managed or self-managed. And in those node groups, you have to specify what instance families it should be using as
+well as their priority. Also, with Cluster Autoscaler, you need to create Autoscaling Group. Now, Autoscaling group comes, autoscaling group is great, but it comes with some challenges. So for each node group you have to have a separate autoscaling group. If you want your workload to spread it across
+multiple availability zones, you need to create multiple
+autoscaling groups, et cetera. And finally, the AMI selection
+and refresh is cumbersome. For those of you who are running Cluster Autoscaler in production, you know you have to
+manage the launch template, anytime an AMI is changed,
+you have to go change it, run recycle commands, all that stuff. For that reason we created Karpenter. So how does Karpenter work? So first, the pod scales using
+horizontal Pod Autoscaler. Then the pods go pending and with Cluster Autoscaler
+it has the Cluster Autoscaler Autoscaling group, but Karpenter bypasses all of that and it interacts directly with EC2 Fleet. Because it is bypassing all those hops. Karpenter is faster. Also, when we created Karpenter we wanted it to be Kubernetes native and as Kubernetes
+enthusiasts, we love YAML. So you can control the behavior of Karpenter using two YAML files, NodePool and EC2NodeClass. Okay, so let's go back to our process. So instead of Cluster Autoscaler, you install the Karpenter, add-on. Okay, and then your application scale. And now, you do not need to
+have any managed node group. Your instances are coming up faster, things are good. Even though scaling is the
+bread-and-butter of Karpenter. Karpenter does way more than scaling. Karpenter does cost
+optimization out of the box. Karpenter supports diverse workloads including machine learning
+and generative AI. And Karpenter, also helps
+with upgrade and patching. For that reason, Karpenter is the total data plan implementation. Karpenter is made with love at AWS, but we donated it to the
+open-source community and it is one of the CNC projects now under SIG autoscaling. And we are very proud to
+see how Karpenter is growing and how customers like you are contributing to the Karpenter. Okay, so let's start this point. We're like, okay, Raj, Karpenter is great, how do we get started with this? So, we see the journey in
+our customers like this. First, you evaluate the
+features of Karpenter, then you implement it, then you do Day 2 operations, and maybe finally,
+there is some evolution. And throughout this talk, we are going to follow the same process. All right, so let's start
+with the evaluation phase. For your containers to run,
+it requires different things, CPU, memory, storage, et cetera. And, how does it map to
+different EC2 instances? There are many different EC2
+instances that we provide you. The larger the size,
+the larger CPU you get, and then the instance family
+determines CPU to memory ratio. And, we give you a lot of flexibility. We have over 800 different
+instance types to choose from, such as GPUs like P4d, or the latest generation
+custom silicon instances like INF2 or TRN. So first question is, how do I control which EC2s
+does Karpenter spin up? Well, remember we talked
+about the node pool YAML? So this is a sample node pool YAML. Using this node pool YAML, you can control how Karpenter behaves. For example, on the top we are saying, instance family should
+be within c5, m5 and r5. And I'm showing off a little bit here, Not only you can use the operator in, but you can also use not in. So you are like okay,
+use those instance types but do not spin up anything
+which is nano, micro, small or medium whatever,
+depending on your workload. And, we realize it's not easy to choose from 800
+different instance types. So all these fields, if you're
+thinking, Raj, this is great but this is a lot. So you can keep this all empty and AWS will automatically choose the appropriate instance type for you based on your deployment
+pods resource requests. And, we always have those
+sneaky SRE teams who are like, or the sneaky app developers like myself, who I was before. It's like I need lot
+of CPU, lot of memory, and for that reason you can also limit how many EC2 instances this
+node pool can provision. So in the bottom, you could see we have the
+limit of CPU of a hundred. So this node pool will keep
+on provisioning EC2 instances 'til the aggregate amount
+of CPU, which is a hundred. I'm just showing CPU but
+this also works with memory. You can also control things
+like availability zone. For example, you can say, hey, split
+it up within US 2a, 2b, or any specific AZ. Unlike autoscaling group, you do not need to create different node pools for this. Also, you can control
+the architecture type, you can use x86 or Arm, like Graviton, based on your workload. And finally, a lot of you
+want to mix in spot instances. In the bottom, I'm showing that capacity-type
+spot comma on demand. If you specify both spot and on demand, Karpenter will always prioritize spot, but it is intelligent enough to know when the spot capacity is low, it will automatically fall back and create on demand instances. And we all know, for those of us who have given Solutions Architect Associate
+Certification exams, you know the question always comes, what is one thing you need
+to keep in mind with spot? It can go away with
+two-minutes warnings, right? Karpenter handles that two-minute warnings and you do not have to
+do anything yourself. It will spin up a backup
+spot instances for you and cordon and drain
+the terminating instance and move the pods in a rolling deployment fashion. You do not need to install and manage node termination handler. It has built-in spot interruption handler. Okay, moving forward, for those of you who have used real-world production
+workload in Kubernetes, you also need to have
+scheduling constraints. With Karpenter, you can use
+different scheduling constraints like node selectors, node affinity, taints and tolerations, and topology spread. So this is of course, used
+a lot in your project. So let's take a deeper look at this. So let's say, on the left,
+I'm showing a node pool and this node pool spins up a
+spot instance of capacity-type and also architecture-type AMD64, whichever instance this
+node pool provisions, Karpenter will attach
+all these key value pairs as labels to the nodes. So for example, Karpenter
+will put capacity-type, colon spot, Kubernetes.io
+slash architecture colon, AMD64, et cetera. What does that mean? So on the right, I'm showing a sample
+pod specification file, you can use those key value pairs to schedule the pod in specific instances. So in this case, if you deploy this, if the EC2 was already running into, the pods will get scheduled there. If there was no EC2 running, Karpenter will spin up a spot instance to satisfy the scheduling requirements. Karpenter will also attach
+well-known labels to your nodes. You do not need to do anything special. For example, the zone, instance type, operating system, et cetera. So you can use all these fields in your pod specification
+file for scheduling. Okay, you might ask those,
+that's a good start, how about user-defined labels? Karpenter supports that, as well. So in this example on the left, I'm showing how to use
+user-defined annotation, taints and labels in your node pool. And on the right, you
+can reuse those labels, taints and annotations
+to schedule your pod. This is a very, very popular
+way to schedule parts for different applications, right? You can have different node
+pools with different labels and the different teams can
+use those different labels to schedule their workloads. Which brings us to a good question. How many different node
+pools should you define? Well, you have different options. The easiest one is a single node pool. So you put everything in
+a single node pool YAML and then each team, whatever they need, they use those fields to specify and then schedule those pods. The most popular one that
+I see with my customers is multiple node pools, where each team has their
+own separate node pool. One of the big reasons is, maybe one team is running
+expensive GPU EC2s, and remember the limit-fields
+for that node pool, you can limit them to a certain
+amount of CPU or memory. Maybe, there is a noisy neighbor, they need more CPU and memory than others. They need different types of instances. So you can separate the teams
+using separate node pools. Another advanced strategy
+is weighted node pools where you can prioritize
+one node pool before others. When will you use it? If you want to prioritize
+reserved instances or savings plan ahead
+of other instance types. So pretty sure this part
+is a little confusing. So let me give you an example. In this example, I'm
+showing two node pools. The top one has the
+weight 60 on the bottom and see the instance types are c and r. I'm assuming you have
+reserved instance contract for those two instance types. So anytime a pod goes pending, it will use the first node pool, and it'll keep on spinning up instances 'til it reaches the limit, right? Let's say you have
+reserve instance contract for certain number of EC2s. So it'll keep on spinning up EC2 instances 'til the CPU or memory reaches thousand and then the other node
+pool will take over. Oops, let me go back. Then the other node pool will take over and then it'll keep on provisioning different instance types. All right, remember I talked about Karpenter can optimize
+cost out of the box. So at this point your cluster
+is running with Karpenter. Proper instance types are chosen, however, over time your cluster may
+end up looking like this. For worker nodes, the fast worker node nicely utilized and bin packed, the last three, not so much. With Karpenter, you can specify the consolidation policy when empty or underutilized and Karpenter will automatically
+bin pack your pods, terminate the unnecessary instances and saves you a lot of money. However, one feedback we
+got from our customers is this is great, but Karpenter
+runs this simulation and this consolidation
+every 10 seconds or so. So this could be lot of nodes
+coming up and coming down. So for that reason we
+introduced another knob for you to control this behavior. This is included in Karpenter version one. The field is consolidated after. So see on the bottom, I'm showing consolidated after one hour. So even if you're EC2
+instances looking like this, it will wait one more hour
+before it consolidates because you know your workloads the best. If you know some new
+workloads gonna come in after five minutes. So you are telling Karpenter, hey don't touch these EC2 instances, don't consolidate yet. Let's wait for a little bit of time. So let's say one hour passes, no new pod gets added or removed, only after that Karpenter will consolidate and terminate the unused instances. Not only Karpenter can consolidate to the existing instances, Karpenter can also replace
+and right-size instances. So in this case, the
+second and third instance, m5.xlarge, even if you bin pack those
+two pods in one m5.xlarge, there is still an inefficiency. Karpenter is smart enough, in this case it will
+terminate both these m5.xlarge and spin up a m5.large,
+so half the instance size and save you a lot of money. And all this happens out of the box. Now, one question I get
+is, Raj, this is great but you know a lot of critical workloads running in the middle of the day, and I don't want Karpenter to disrupt all these EC2 instances. For that reason, we
+released disruption budget with Karpenter version one. Using this disruption budget, you can specifically control the behavior of this disruption. So let's go through this. In this YAML, so this is part of node pool YAML, the first block says, nodes zero. So that means zero nodes can be disrupted during the schedule Monday
+to Friday from nine o'clock for duration eight hours. So nine o'clock to five o'clock, for the reason, drifted and underutilized. So even if Karpenter can
+consolidate those nodes, it will not touch them Monday
+to Friday working hours. What if they're empty? You are like, you know, empty nodes, I don't care, nothing can be disrupted. So a hundred percent of those
+nodes could be disrupted. Doesn't matter whether it's
+working hours or weekends. Now, the last one says, outside of those working hours, so 10% of the nodes could be disrupted for the reasons, drifted and unutilized. So remember, this is all cumulative. So if I put all this together, that means 0% of the nodes could be disrupted during working hours. A hundred percent of the
+nodes could be disrupted for when they're empty even during working hours and for the nodes outside
+of the working hours for the reasons, drifted
+and underutilized, only 10% of the nodes could
+be disrupted at a time. So I talked about drift. What is drift? So Karpenter is Kubernetes native, and the Kubernetes core principle is, to reconcile between the desired state and the current state. And, Karpenter is no different. So let's say in this case, in the node pool you have a
+reserved instances contract, you are using m5.large. So all the EC2s that this
+node pool spun up is m5.large. Let's say you go and change this m5.large to c5.large. So in this case, the desired
+configuration in the node pool will deviate from the running instance, which is m5.large. So Karpenter will automatically cordon and drain the running m5.large
+spin up a c5.large instance and move over your pods. Okay, so at this point we
+learned about NodePool. NodePool controls the instance family, availability zone,
+budgets, all that stuff. But how about AMI subnet security group? That's what EC2NodeClass does. So for example, you can select which subnets are eligible to launch your EC2. You can attach certain
+security groups to EC2, in this case, the name, my security group. You can select the AMI for EC2 and you can have other
+things like user data, attach tags, define EBS, and more. So, AMI is the important one. So let's take a look. So you can use AMI selector
+to select from different AMIs. Amazon provides you EKS
+optimized AMI out of the box. So to use them, in the EC2NodeClass, you could use something like, alias at the bottle rocket, at the latest. So any EC2 that this Karpenter provisions will run with EKS optimized
+AMI or bottle rocket with the latest version. Similarly, another example
+could be Amazon Linux 2 at the latest. The supported family values
+in alias are al2, al2023, bottle rocket, Windows
+2019 and Windows 2022. Now, you may say latest is great, but what if I want to pin my work nodes to a specific version, and I want to test out the new version, then only go to the latest version. You can do that, as well. So as part of the Karpenter V1, you can pin your work nodes to a specific AMI version, like this. So for this case I'm saying alias bottle rocket at the rate v1.20.5. So all the EC2s that this
+node class will provision will be of this version of bottle rocket. Similarly, Amazon Linux 2
+with the with the version of 2024, July 29th. What about custom AMI? Karpenter supports custom AMI, as well. A lot of my customers uses custom AMI. You can select custom AMI using tag, name, owner, as well as ID. If multiple AMIs are found
+satisfying these conditions, Karpenter will use the latest one. If no AMI is found, no nodes will be provisioned, right? So this part is a little scary. You don't want to, you want to avoid this and you can, once you deploy EC2NodeClass, you can check the status
+fields for this AMI field and it will show if the
+conditions are selecting any AMIs. Okay? So if you have been following the theme, AWS is customer-obsessed. So, we went from okay
+customers self-managing the control plan. So we created EKS, then we were like, okay, EKS is good, how can we make your lives better? Okay, so we created Karpenter. Now, what about after Karpenter? So to talk about that, I'm gonna invite my
+co-presenter, Sheetal, on stage. - Thank you, Raj. That was a great deep-dive into Karpenter and it was cool to see
+how those like, you know, in reality that consolidation and the optimization was
+working, that was really cool. So you work with a lot
+of customers, right? Karpenter and no Karpenter. So what are some of the challenges that you hear from your customers who are actually running
+Karpenter or Cluster Autoscaler? - Yeah, one challenge I hear is, okay, Raj Karpenter is great but there are so many fields in that YAML file, how do I
+select those fields, right? Like, what do I select so that the EC2 instances are
+optimized and right-sized? So likewise, Sheetal, you
+work with a lot of customers, what challenges do you
+see in your conversations? - Well, these applications
+are not lone wolf, right? So they actually depend on
+the core cluster capabilities such as what we call as add-ons. Whether it is part networking
+or the service discovery or the load-balancing capabilities. Along with that, any of
+the user defined add-ons that customers really require to meet their business,
+like you know, requirements and most importantly, the last one here is
+upgrading the clusters and keeping your Kubernetes cluster safe, is the biggest, biggest
+challenge for, I think, most of you who are actually
+attending this session, right? Which actually requires
+a dedicated expertise and the continuous time investment which kind of slows down the innovation that customers are really looking for. So this is great. I think some of you might already be thinking
+like Raj talked about all of the Karpenter details and seems like it addresses the challenges that we just talked about, but what do you think are the challenges beyond Karpenter, Raj? - Yeah, it'll be good like to have some best practice recommendations to run the add-ons, controller, and something
+that's like built-in. What about you, Sheetal? - Yeah, I think these
+management of the add-ons and their versions and the lifecycle of these controllers is a big challenge as well, right? Karpenter doesn't address
+any of those needs and it's a controller by itself. So just managing the Karpenter with all of the best practices is a big challenge for our customers and yet again, I think
+you touched upon it, but ease-of-use and out
+of the box capabilities, how do I get started quickly? I think that's one of the major questions that our customers always ask. - Great. Seems like you
+have answers for this and something up your sleeve so I'll leave you to it on the stage. - Thank you so much, Raj. So without further due, let me introduce you to
+Amazon EKS Auto Mode. So what is it? Amazon EKS Auto Mode, I think, if you are following the news, AWS news, blog post, it's everywhere. So technically, Amazon EKS
+mode is gonna streamline your Kubernetes cluster
+infrastructure management. So, let's dive deep in the next 20 minutes of what actually EKS Auto Mode is and how does it simplify
+application deployment onto Kubernetes clusters. So the first one, when you
+use Amazon EKS Auto Mode, it kind of brings in
+that increased agility and accelerates the innovations by offloading cluster operations to AWS. And, how do we do this? With the introduction of
+the Amazon EKS Auto Mode, EKS is taking on more responsibility under the shared responsibility model beyond the Kubernetes control plane that we have always managed to the Kubernetes data plane, as well. So the next one, it basically improves the performance and maintains the application availability by dynamically scaling
+the compute resources that your applications depend on. And along with that,
+it's secure by default. So what do we mean by secure by default? EKS Auto Mode automatically updates your worker notes and also applies the
+security fixes automatically. So the last one, it
+continuously optimizes the cost with automatic capacity
+planning and dynamic scaling. So, how does it do it? So as you can see here,
+you create a cluster, it's still the same API,
+that doesn't change, it's still Amazon EKS, and when you create a cluster, it includes all of the core capabilities that are basically required for production-ready clusters, right? So you create a cluster, you get managed control plane, the API server and the HCD instances. Along with that, all of these
+core capabilities included alongside. And next, when you
+deploy your applications, it automatically provisions
+cluster infrastructures. So in how does it do? Amazon EKS Auto Mode is built on the principles of Karpenter. So it keeps watching for the applications and when you deploy your applications, it launches the nodes
+looking at the requirements that are specified within
+application manifest, it's dynamically scaled resources as the application scale changes and it continuously optimizes for cost. As you saw, all of the
+optimization principles and the consolidation principles that Raj talked about, still apply here. And the last one, it
+automatically updates the notes and the core cluster capabilities. So let's go back to this slide that Raj talked about, a few seconds ago. So here, how did you deploy
+applications before today? Right? As you can see there
+are multiple steps involved. The step one, you provision control plane, you provision compute, and then you install more add-ons, right? And you monitor your cluster
+for the resource usage and then you manually optimize and update. And starting today, with the EKS Auto Mode deploying applications
+becomes much simpler and all of those steps
+are drastically reduced. So first, you still create a cluster, you provision a control plane and as you can see here EKS Auto Mode, and when you do that, you get a managed control
+plane alongside of it. The controllers that provide
+these managed capabilities which are compute, network, and storage, you get automatically out of the box. As you can see here, all of these controllers now run on an Amazon EKS account in Amazon EKS managed VPCs, you do not have to worry about, you know, provisioning the compute and running these controllers. We automatically take
+care of the lifecycle of these controllers as and when update your
+control plane as well. So the next, now the cluster is ready for you to deploy applications onto. So let's go ahead and
+launch some applications. As you can see here, basically EKS Auto Mode
+automatically launch the nodes and also you will see that
+node basically comes up with all of the node agents, or the Kubernetes agents
+that are really required for these application pods to function. One important distinction. So we do call it as easy to
+manage instances here, right? So this is a special feature
+that we are actually announcing with the launch of the Auto Mode itself, and it is available
+internally for the consumption of services like Amazon EKS. And, you will also see, that these are still EC2 instances which run inside of the customer account. So when you create a cluster, you provide us special AIM policies and the permissions to
+manage the lifecycle of these in instances that are running in your account. So let's double-click, and see how does it look, what do we mean by this
+Amazon EC2 managed instances. So Amazon EKS with Auto
+Mode still gonna continue to make available of these
+specialized armies, right? And with Auto Mode, we do
+actually release new Auto Mode managed armies and Auto Mode supports
+bottle rocket OS by default. And, the armies that you see here, are a variant of the
+upstream bottle rocket army that is available. And on the right-hand-side, the EC2 instance which is
+now an Amazon EC2 instance, you will have to understand the components that are
+inside of it, right? With the launch of the
+Amazon EKS Auto Mode, we are kind of shifting our
+operational model a bit here. So, as you can see, all of these node agents and the Kubernetes agents such as whether it is core DNS, or Q proxy, or a CNI, along with the pod identity, and the node monitoring
+and the CSI node agents all are gonna run as the
+system de -processes. When you create a cluster, when you run cube cut you will get pods, or a nodes, you will not see anything
+within inside of your cluster, it's just an empty cluster. So moving on, another way to understand EKS Auto Mode is understanding the shared
+responsibility model, or looking at it from a
+shared responsibility model. So this is what the shared
+responsibility model looked like previously. Here as you can see,
+AWS remains responsible for all of the global infrastructure along with the foundation services and EKS was responsible for
+the Kubernetes control plane, the API server, and the HCD instances, and customers remained responsible
+for their applications, the availability of their applications, the security monitoring and also the VPC infrastructure
+and cluster configurations. And, along with that,
+you remain responsible for managing the lifecycle
+of these instances along with all of the
+cluster capabilities. And now, with EKS Auto
+Mode, as you can see, Amazon EKS has shifted its
+responsibility drastically, it shifts responsibility
+beyond EKS control plane to also provide the complete management of these cluster EC2 instances and also the cluster capabilities. You, as customers, remain responsible for your application containers, the availability of those and monitoring, hence, allowing you to focus on your innovation rather
+than worrying about the cluster infrastructure. With that, you still
+will have the flexibility to bring in your own VPC infrastructures or the cluster configurations
+such as those RBAs that you configure to provide
+the multi-tenancy requirements and any of the add-ons from the CNC of like, we have like,
+you know, so many add-ons that are available tools. So if you're using any of those, you will still be able to
+run those EKS Auto Mode. With this, we take on more
+of the undifferentiated heavy-lifting, including patching, monitoring, health and repair of the underlying EC2 instances. So let's get like, you know, dive deep into the
+cluster capabilities here, just classifying the cluster capabilities. The first one, compute. As I said, EKS Auto Mode is built on the principles of the Karpenter. So all of the benefits that you get within open-source Karpenter, you will be able to get those with EKS Auto Mode, as well. We run a patch version of
+that Karpenter controller, whenever you provision a cluster, a Karpenter controller is
+already installed, right? So the benefits such
+as compute autoscaling and also the continuous right-sizing, you get it automatically. Bottle rocket OS is what is supported and bottle rocket OS, for
+those of you do not know, it's a container optimized OS, which is secured by default
+with read-only file system. And one important thing to note here, is the third one, which is health,
+monitoring, and auto repair. So, I actually highlighted
+that node repair agent that is running on the
+Amazon EC2 instance, the managed EC2 instance now, right? So it is actually looking
+for the health status and sending the signals
+back to the Auto Mode and Auto Mode node when
+the node is unhealthy and it's gonna replace that
+node with the healthy node. Moving on to the storage, when you create a cluster
+with Auto Mode enabled, you get block store controller that's already installed
+by default, as well. And the final one, the networking. I think networking is like,
+you know, a big challenge for most of you here in the audience and with the launch of EKS Auto Mode, we are gonna simplify
+a lot of those things. All of these controllers, come with the best practices included in the opinionated default. The first one pod networking
+which is gonna be completely managed, which is VPC CNI, by default. So we are making a lot of change. So with Auto Mode for those of you know, today VPC CNI supports a lot
+of configuration options, which is kind of a challenging, right? Customers come to us and
+say what do I configure? I do not understand. So, by default we are gonna configure VPC CNI in a prefix delegation mode and if we do not see a contagious block of IPs it's gonna fall back
+to the secondary IP mode. And along with the part networking, network policies are gonna be supported out of the box, as well. You will get fully-managed
+in cluster service, load balancing the Kubernetes
+service load balancing, and also if you want to
+expose these applications outside of the cluster,
+you'll be able to do so. And the last one, which
+is the cluster DNS, there is a little bit of distinctions that I would like you to know. With the launch of the EKS Auto Mode, the core DNS now runs on every node. So by automatically providing
+you the auto-scaling capabilities of this
+core ENS out of the box. So, if you are wondering
+why I should use Auto Mode or why should I create a
+cluster with Auto Mode enabled, just to summarize the benefits. First, easier and faster to get started, and it provides the fully-managed cluster capabilities, as well, and secure by default by providing OS patching out of the box and
+it is automatically upgraded. So, what do we mean by that here? And I'm gonna talk about in detail towards the end of this session that, whenever you update a control plane, all of the Kubernetes data plane nodes, along with the core cluster capabilities are gonna be upgraded
+automatically, as well. If your workload run on Kubernetes, that should run on Auto Mode. And most importantly, we are not gonna be abstracting any of the EC2 instance
+capabilities away from you. You will still have access to nearly all of the EC2 instance types
+that you are used to today. If you are using a different categories you will be able to do so along with the GPUs and
+the instance capabilities, and they will also have access
+to the silicone innovations that is happening here at AWS, whether it is a Nitro or AWS Graviton which provides the price performance along with energy efficiencies, as well. You will be able to continue to purchase the EC2 instance types however you purchase today, whether it is on demand instances or if you use savings plan, you will be able to use those with Auto Mode as well. And, if you are cost like, you know, very cost sensitive and you
+allow the cost efficiencies that SPOT provides,
+you'll be able to do that with Auto Mode as well. So if you're wondering,
+how do I get started? With the launch of the Auto Mode, we did a little bit facelift to the console AWS EKS
+cluster creation, as well. Now, you get a quick
+configuration options, with, you can now launch EKS
+clusters with a single click. Auto Mode is available for 129 and above, and also an easy toggle options when you go to the console you'll be able to say whether you want to use Auto Mode or not. It comes with all of the
+built in best practices. So what do we really mean
+by built-in best practices? When you create a
+cluster with mode enabled by default, we actually install or deploy two built-in node pools called as general purpose and system. It's again the Karpenter APIs, it supports all of the constructs that Raj talked about as well. And if you are using the
+existing cluster create, whether it's an API, or whether it is a console,
+you will be able to do that mode as well. Or, if you're wondering do
+I have Terraform support? Yes, with the launch, you
+will be able to create or use Terraform with Auto Mode, as well, or if you allow eksctl just to get started you'll be able to do so as well. And one of the important distinctions with Auto Mode is you will be able to, you know, enable Auto Mode in
+an existing cluster as well. Like, you can bring in
+your existing cluster and enable Auto Mode as you can see is just an easy toggle option and start to offload that
+operational responsibility to EKS. So let's get into the
+details of compute portions of the management aspect. So what you see here is out of the box we too provide built-in node pools. First one, is general purpose. So what's the use case of general purpose and why did we really do this? We wanted to provide you
+the simplified getting started experience. Along with that, we wanted
+you to provide support for launching any of the
+general purpose workloads and it comes with a mix
+of on-demand instance type and support for Graviton, as well as x86. So this is how it's gonna look like. As you can see here, we have the consolidation
+turned on by default and the capacity types is on demand and also it comes with a mix
+of CMR instance categories and later instance generation than four, the default node expiry
+is set to 336 hours which is 14 days. Along with that, the
+support for AMD64, as well. So the next one is a system NodePool and why system NodePool? General purpose workloads are great but we do also understand there
+are a lot of other add-ons that you would want to run that you your applications depend on. So system NodePool comes
+with the critical add-ons, no schedule-only, and you'll be able to leverage and use all of the other
+AWS existing add-ons family to run on EKS Auto Mode by leveraging the system NodePool. It supports both AMD and ARM. So as you can see,
+there is a special taint that is added on to the system node pool. Well, these best practices are great opinion defaults are actually encouraging, but how about the flexibility? If you're already running
+self-managed Karpenter, or if you have a varied use cases where you're thinking about
+I need the flexibility and for that you will be able to define your own user-defined
+node pools, as well. So some typical use cases to define these user-defined node pools. Again, accelerated instances,
+whether it is a GPU or a neuro family if you want to use, you'll be able to define those using the user-defined node pools and if you're a spot lover you
+can create your own node pool to use the spot instances, as well. And you want to isolate
+compute for different purposes and teams operation and also tenant isolation due
+to noisy neighbor, as well. These are some of the classic
+use case when you want to create your user defined
+node pools, as well. One of the important distinction here, the general purpose node pool
+and the system node pools are non-editable. Even if you go ahead and edit those, we are immediately gonna reconcile it back to the defaults that we provide. As an example, here, I am creating a separate node pool for my ai-ml team. As you can see, you can
+provide the value inf2 and EKS Auto Mode is intelligent enough when you say a family of inf2, it's gonna actually provision the nodes with all of the capabilities included. What do I really mean by that is? The drivers, the Kubernetes
+plugins are gonna come embedded. Along with that, you will
+still have access to all of the disruption controls, you can still configure those budgets, reasons, the expires, the
+limits, and the weight that Rajdeep talked about. EKSNodeClass. Rajdeep introduced you to EC2NodeClass and with the launch of the Auto Mode we are introducing a new kind class called as EKSNodeClass. What is this node class, right? So in the node class
+basically, you kind of provide, the security groups, as well as the subnets out of the box. Just like you get the node pools, you also get one default node class which actually defaults
+to the cluster subnets and the node security group
+that you have provided when you created a cluster. And this is referenced by
+both general purpose node pool as well as the system node pool
+through the class reference. One important distinction here is EKSNodeClass becomes very simple. There is no AMI selectors because we are gonna be managing the lifecycle of these EC2
+instances for you, completely, and we are gonna be owning those you are no longer required
+to specify any of the AMIs. Enhance security, with again, the bottle rocket OS supports. If you want to bring in
+your own security group and the subnets, you'll be able to do so, by creating a user-defined EKSNodeClass. It includes the network
+configurations such as the source NAT setting and
+also the network policies. You can also specify the formal storage that's gonna be used
+by these EC2 instances. So this is how you define
+the user-defined node class. Here, I'm defining a
+user-defined node class called a team-ai-ml, which is gonna be used by the node pool that I created previously. Again, the strategies for
+defining multiple node pools still apply to EKS auto node, as well. If you want to get started quickly and looking for that simplified
+getting-started experience, you can use the general purpose node pool, or the system node pool, you can use multiple node pools as well, along with those general
+purpose node pool. The general purpose in
+the system node pool come with a default weight of zero. And if you want to
+prioritize your workloads to be handled by your own node pool, you can configure the weights accordingly. So this is great. One of the important, I think, benefits of using Auto Mode is the
+simplified day two operations and also reduced
+operational overhead, right? So let's just understand how does EKS Auto Mode
+handle the automatic updates of the core capabilities, as
+well as, the data plane nodes? It's important to understand the shared responsibility
+model here, right? I think since yesterday I
+have got so many questions. So does it mean Auto Mode is automatically upgrade my control plane? That's, kind of, looks scary to me. It's not. You still, kind of, are responsible for updating your control plane and all of the best practices before you update your
+control plane still applies. We highly encourage you to do the testing in
+your lower environments, run our upgrade insights
+checks to make sure that your applications
+are are still gonna work with the latest version of the Kubernetes. So when we release a new
+version of the Kubernetes, we also publish the recommended
+optimized bottle rocket AMI for each of the version. And when that latest AMI is
+actually, basically released, that's when the action is gonna happen. So before we see how
+the node update works, let's take a look at the
+other distinction factor, which is automatic updates
+of the cluster capabilities with EKS Auto Mode. Here, right? As you can see, Karpenter v1.0 is running and also the EBS storage
+controller, that is 1.34. And Amazon EKS checks
+the controller version and it determines if any of this controller requires an update. Here, the other two controllers did not require any update but however, the network controller, we released a new version of it. Amazon EKS Auto Mode goes ahead and updates only the required controller. Not all the controller
+updates are always necessary and when it updates these controllers it is important to note that these controller
+updates are not blocking. What do we really mean by that? Just like today, when we are updating, like, we do manage the
+updates of the control plane, the API server and the HCD, your application still continues to run. And similarly, while we are
+updating these controllers, your application should
+continue to run, as well. So the next one, how does
+the data plane updates work? It is completely zero touch. You do not have to do anything. Amazon EKS Mode respect
+the disruption budget. It sees that the control
+plane is now updated and it is updated to 1.31. So it goes ahead. It replaces the old worker
+nodes with the latest AMI. Here, you see the old one was replaced with the 1.31 AMI, as well. And it does that, so, by respecting all of
+the disruption budgets, whether it is the node
+pool disruption budgets, or whether it is your
+manifest PO disruption budgets that you have configured, it's done in a rolling deployment fashion. And one thing to note, by default, the general purpose node pool
+comes with a 14-days expiry. However, you can configure
+your user-defined node pools expiry up to 21 days. So it force updates on the 21 day if not already updated, as well. So the final thing, how does security updates are
+hand handled with Auto Mode? Similar concept here, Karpenter drift detection comes into play. Amazon EKS publishes the latest AMI, which includes the waste patches. That might also include
+patching of these agents that are running on the node too. IT district, it again respects
+the disruption budget. It goes ahead and replaces these worker nodes in a rolling
+deployment fashion. As you saw, the old one were replaced with the latest AMI version, as well, against force update of 21 days
+still applies here, as well. So, if you have not
+started using Auto Mode or if you haven't created
+a cluster with Auto Mode, I highly encourage you to
+get started using Auto Mode. Whether, you are new to Kubernetes or EKS, or you would want to accelerate
+your modernization journey, EKS Auto Mode is for you, or you want to offload that
+operational overhead to EKS. Again, do not wait, start to use EKS Auto Mode in production. Auto mode is generally available in all of the commercial region. We will be soon launching
+the support for China, as well as Claude 2. With that, I'm gonna welcome
+back Raj back onto the stage for closing thoughts. - All right, so seems like EKS Auto Mode helps all of you to get started faster, but as a someone who is
+enthusiastic about Karpenter, what's happening with
+open-source Karpenter, Sheetal? - We love Karpenter. We develop that with love here at AWS. We are committed to develop
+Karpenter in the open. It's not going to go anywhere. As you heard, B repeatedly say, Amazon EKS Auto Mode is built on the principles of Karpenter. So any feature that is made
+available in the Karpenter, it's gonna be made available
+in Auto Mode, as well. - That's great to hear. So as you could see, you have a lot of
+flexibility at the same time, if you are someone who is like, okay, how do I get started with EKS? Faster and simpler. EKS
+Auto Mode is the answer. You can create the cluster, you get bunch of
+capabilities out of the box. We manage, and upgrade the add-ons, like Karpenter storage and Ingress and a lot of other features
+that Sheetal talked about. As always, either you use
+EKS, EKS Auto, or Karpenter, it's running fully upstream
+Kubernetes conformant version. With that, I know this
+is a lot of information and this is just the beginning. We have lot more information available throughout different sessions. Sheetal, here, is running
+two builder sessions, one tomorrow, one day after. You can also learn a
+bunch about EKS Auto Mode, you can read the launch blog. She just released a launch
+blog right before this talk. As well as, we have guidance on if you're using cluster autoscaler today, how to migrate to Karpenter v1. With that, we are gonna be here
+for a little bit of question and answer, before we start the Q and A, you wanna move one more forward, Sheetal. Don't forget to complete
+the session survey, if you like this session or if you have not, give us some feedback, we take them seriously. - Thank you so much for
+attending this session. - Thank you.
+(audience clapping)

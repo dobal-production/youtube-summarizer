@@ -1,0 +1,576 @@
+- Good afternoon. Welcome to re:Invent 2024. Three of us are here today to talk to you about "Failing Without Flailing: Lessons We Learned at AWS the Hard Way." My name is Alec Peterson. I'm
+the VP of Resilience at AWS. In addition to resilience, I own Route 53, which is a service I hope many of you use. I'm joined by Becky Weiss, who's a VP and distinguished engineer. She's currently with the IAM team, but she's done tours of
+duty with S3, EC2, DNS, and Professional Services, I think. - [Becky] Yes. - Also joined by Mike Furr, who's a Senior Principal
+Engineer with the EC2 team. So, this talk is actually
+building on a session the three of us gave last year, which was called "Five
+Things We Wish Everyone Knew About Resilience at Scale." This year is basically more things. But the goal of the session is the same, that we hope you're gonna take away some non-obvious learnings about how resilience can look different at scale versus when application
+might be a bit smaller. The topics we're gonna cover today are persistent connections
+that I'm gonna talk about. Becky's gonna talk to us
+about scaling reliably, and Mike's gonna talk to us
+about measuring bottlenecks. So I picked resilience
+and persistent connections 'cause this is a pattern
+that I've seen not only with large scale
+distributed systems at AWS, but I've seen it with
+a lot of customers too. I've seen it often enough that I think it's worth
+really talking about getting the first principles about why persistent connections can have a potentially negative
+impact on resilience. Now, first I'd just like to level set. This is a 300-level session. All probably know this,
+but we're gonna talk about some microservices and I just want to talk about the terms
+that we'll be using. So I'm thinking about a
+horizontally distributed system when I'm talking about a microservice. So this is a logical service made up of multiple discreet building blocks. They could be instances, they could be tasks,
+they could be containers. The system scales up when,
+when it needs more capacity and then scales down when it needs potentially less capacity. So, with that level set done,
+these distributed systems, they generally expect things to fail. The model we're gonna use here
+for this discussion is one, a nice simple one with a front end service that will microservice, that will then use an authentication service to help secure its requests. So you'll have each front end service, instance in that front end
+service, making a connection to each instance in the
+authentication service. Those connections would be
+mediated by a load balancer, maybe a DNS layer or something,
+that's not important. So what happens is when one of the authentication
+services has an issue, the front end detects that through that intermediate mechanism, the front end services stop
+talking to that third service. Now they only talk to
+the two, nice and simple. But something's missing from this picture. This, as I said, this
+is overly simplified. It's missing the actual
+messages themselves. It's missing the service
+actually doing something. So, let's double click into it. In practice, it's a
+little more complicated. When one would first build
+a microservices architecture with this sort of front end and
+authentication architecture, one would have the two
+microservices, you'd have a message in the front end service. You'd say, hey, I need to talk to the authentication service. You'd make a connection. You would send that
+message over the service of the authentication service, and the authentication service would answer it. Nice and simple, right? Except at scale, this gets
+to be kind of expensive. You have this connection overhead, the TCP latency overhead,
+the TLS handshake overhead because we're all encrypting
+our connections now, right? Awesome. And this adds cost and latency. So as your service starts
+to scale, you notice, hey, there's opportunity for us to get some cost improvements. So you would then make
+persistent connections. So instead of making a TCP and TLS connection for every
+request, you would make that connection for the
+first request that comes through, or when the front
+end service first launches, after you, you know, bounce the service. You would then send multiple
+messages across the authentic, the connection to the
+authentication service. Authentication service would handle it. Now you've amortized the cost of that connection across many messages, potentially millions of messages. The cost of the connection
+is now basically free. Celebratory cake. So win-win. But what happens when connections fail? So this is where things
+start to get interesting, because now instead of creating the connection
+every single time and then destroying the
+connection every single time, your service is almost
+certainly just creating the connection once on startup and then assuming the
+connection will still be there. So you send multiple messages
+across the connection. Now, there at some point, it
+could be any point, there's one of the services in the
+authentication service fails. Now those connections fail, and you have these messages that are stuck in a determinate state. So this is a typical pattern that we see. And with a scale like this,
+again, if there's three, if there's three instances on either side, connection establishment might get stuck. So there might be some sort
+of a process that says, oh, just bounce the front end service. Somewhat impactful, but hey, it recovers. You've still got your
+persistent connections. Not a huge deal. But this creates a
+resilience risk in that case, but it's much more at scale. So let's look at a little bit of the math. We wanna think about avail
+availability percentage. I'm gonna define that as
+the percentage of time all system components are online. And in individual, that's gonna be defined by
+the individual component of time raised to the power
+of the number of components. So let's assume every component
+availability is 99.99%. That's actually very good
+for an instance availability, normally it would probably be lower, but that's a good assumption
+for a starting point. So if a system has 10
+components, 99.99% raised to the 10th power, the availability of that system would be 99.9%. But now if you have 10,000 components, that reduces to 36.8%. Now, I know this isn't mathematic, this isn't how it works in practice. This is mathematical, assuming
+every failure is discreet, but you see that you just
+have so many opportunities for things to fail. Now all of a sudden you've got a pretty big resilience problem. And our experience is
+you can actually kind of sleepwalk into these
+sorts of situations and then get to a point
+where the system is just, it's getting worse and worse. And you have, you have this fun, this fundamental issue with
+the reliability of the system, because as the scale increases, you have more opportunity,
+for instance impairment like this sort of situation. But also with more
+instances, you have more of the network in scope. The network could be
+thought of as one of the, one of the largest attributed
+systems on the planet. The network control plane,
+the riding protocols that drive the network are what gives the network the picture of how do I get from point A to point B through every single possible, a pair of destinations? So when the network changes, the briding protocol has
+to go and recalculate that. It doesn't do that for every packet. It does that when the network changes. The more devices in the
+network, the more opportunities for things to go wrong,
+the more chances for there to be interruptions in your connections. Likewise, deployments, right? Deployments can just
+cause things to break. Most of the time when
+something breaks in a system, it's because of a deployment. The more components in the
+system, the more opportunity for a deployment to go wrong,
+the more chances for something to fail, and even load spikes as well. So lots of opportunity
+for resilience risks to manifest when you have this
+sort of state in the system where it depends on the connections and the underlying fabric and the infrastructure not changing. And this leads us to a
+hypothesis that we've come to apply to how we work with our systems and how we talk about
+resilience with our customers. That an application's resilience
+is in part proportional to how often it's recovery
+workflows are executed. And this isn't just about the connections between your, your microservices, right? At any layer of the stack, you could have a resilience event, and the more often you
+execute its recovery work. It's workflow that you
+would do during recovery, the more resilient the
+system will be to scale. So this applies to
+infrastructure replacement. Remember that workflow for
+the, for the failure of that, that authentication service,
+that service, alright, that service is then, is
+then able to better replace, that instance because it
+is doing it all the time. You want to actually have it execute that workflow regularly. Similarly, message bus
+and event bus connections. A lot of distributed
+systems these days use a message bus connection to exchange state between within the distributed system. If that message bus has an issue, if there's some network issue
+that causes the connections to the message bus to
+be impaired, the ability to restart those connections
+is very important. Leader election, again,
+with a distributed system, some of them require a
+leader election algorithm to elect a leader. The more systems you have that can think could possibly
+fail, the more often you may need to execute leader election. It also AZ evacuation, right? That's a class of failure where you could have
+an infrastructure issue where you could need to get
+out of an availability zone. Something that you wanna be
+able to do on a regular basis. And there's all sorts of other things that you want to, you
+can think about as well. - So, so Alec, I thought you were talking about connection reuse. So are you saying that's
+related to risks of resilience? - I am. And this is where it gets
+interesting going back to connection reuse. Because when you think back
+to that earlier architecture, the expensive one with all of the connections being created every time, that was expensive, but it
+was incredibly resilient. But those aren't the
+only two options, right? So the answer here is to
+regularly reestablish connections. So set up a lifetime on your connections so that you don't let
+them live more than say a few minutes, right? You still get the opportunity
+to amortize the cost of that connection over
+potentially hundreds or even thousands of messages depending on how busy your system is. And yet you are forcing your system to get very good at actually
+replacing the connections. So when an actual
+infrastructure event happens, that then means that the process of reestablishing the connections
+is something you're doing all the time and it can be
+seamless to your customers. This approach is something that we apply to elsewhere on our stacks. I mentioned one of the
+services I own is Route 53. The Route 53 authoritative DNS service, it uses a networking
+technology called Anycast that basically decides, unless the network decide
+where to send traffic across the network. We intentionally designed
+the Route 53 network to have the Route 53 pops. Those are the edge locations
+that service the queries to not be particularly
+resilient for each individual. One, I think they have
+multiple routers now, but when we first built that system, each route three pop only had one router. And that was okay because
+we regularly saw events where we had to remove and
+remove things from service just because a router went down or we had to do a deployment
+or something like that. We got very good at putting
+systems into service and taking systems out of service. So it meant that the customer
+experience was transparent. And as we've continued
+to scale the service that has only increased. And as part of why Route 53 is one of the most resilient
+services that we have, because we are regularly
+exercising the recovery workflows. So when something truly
+unexpected happens, we're totally fine, because of the fact that
+the recovery workflow, removing systems from service, we've probably already done it a few times in the past few days. So we know it's good and we
+know the system can tolerate it. So the takeaways that I'd like you to get from this are,
+resilient systems embrace and expect failures at all the layers. One of the most common
+things that we see in terms of customers not embracing this is how they manage connections
+within their applications. And it's important that
+we talk to customers about it in forums like this. 'Cause it's one of the
+things that we don't have as much insight into because we don't see as much of that part of the
+customer's application. We just see the infrastructure.
+We don't necessarily see how the connections are
+managed at a higher level. So think about how you
+manage your connections, but also think about every
+aspect of your system that could potentially be impacted when you have some sort of
+plausible failure scenario. What are the ones that
+keep you up at night? And really focus on making
+those things that you are doing all the time so that you're, so that when the unexpected
+does happen, you're able to recover a lot more quickly. With that, I'd like to
+head it off to Becky. - All right, thanks so much Alec. So I'm gonna drill into one, Alec talked a bit about
+these recovery workflows, and if you do them rarely how they can be these like
+perturbations to the status quo that might put your resilience at risk. I'm gonna drill into one of those that does come up all the
+time, which is scaling. So every good argument begins with a straw man, you know that. So I'm gonna start this one
+with the straw man, how not to be effective in the cloud. Here's how not to be
+effective in the cloud. I'm running an application,
+it's in the cloud, and you know what, it ain't broke, I don't fix it. I just leave these, I just leave these, I leave these servers
+just running forever. I don't replace 'em, I don't scale 'em up, I don't scale down. Here it is, it's running forever. Plants grow out of the data
+center, they actually don't. So you know that, you know that, that actually this is
+the way to, you know, the right way to do it in the cloud. You're here at the
+re:Invent cloud conference. You know the right way to do
+it is kind of more like this. And of course at AWS we have
+services to help you with that. We have auto scaling. You can put a load
+balancer in front of it. You know that this is kind
+of the way it should look. Of course, there's more to it than that. Any application that you
+could possibly be running has, you know, some data associated with it. Well, we're AWS we've got
+you covered here in terms of scaling and availability, and managing the
+resilience of your storage. We have all different
+kinds of, we have storage, We have object and file storage, we have
+relational databases, we have non-relational databases. We've got all kinds of other
+places to put your stick. And the great news is
+that the availability and scaling of those pretty
+much managed for you. Of course, from time to time
+you're gonna find yourself in a situation where
+you're running a service where you actually have state on the host. - [Panelist] Why would
+you wanna do that, Becky? - Yeah, it sounds harder, right? Like this, why would you opt? Well, so this actually has
+some very nice properties, which is why you're
+probably doing it actually. One thing is these hosts, when they receive a
+request from, from a user, from a customer, the data's right there so they don't have to take a
+further dependency that adds, you know, a dependency as well as some latency to the request. If you have a cache on your
+host, you're caching things, you are in this situation. Now of course, when we think about scaling this fleet up,
+it's not just a matter of bringing the new host
+into service, it's actually well getting the data loaded
+onto this host, right? So this host isn't really
+ready to fully serve traffic and perform the way you want. It takes a little bit longer. And I'm gonna make the case to you that when you're in the
+situation, the amount of time that's actually worth, this is actually worth your
+attention and optimization. Here's why. One day, in the cloud, you're running along
+minding your own business, and incomes higher level of
+load than what you had planned for, right? You plan for a certain amount of load, maybe even overprovision
+for it a little bit. But I'm talking about a level of load that's well higher than
+that, and it happens. And you might assume that
+I'm talking about some kind of a DDoS attack or something that's
+actually, actually this, this situation can happen
+when it's good news too. You know, something that you're selling becomes very, very popular. You're getting more traffic
+than you had planned for, and you can sit there and feel sad that you hadn't planned for this level of traffic. But of course, you know,
+while this is happening, your hosts are overloaded,
+they're browning out, maybe they're degraded performance,
+not quite what you want. And how do you get out of this? Because of course you're
+thinking about how to mitigate this situation
+as quickly as possible. That's what we think about in these cases. So, what do you do? Well this, there's this tool in our arsenal which is scaling up. Now like I said, normally you
+try to be over-provisioned but you know, if you're
+getting load that's higher than what you expected, there's
+quite a few circumstances in which scaling up gets you
+out of get, is your get out of jail free or not? You know, get out of jail card and, but of course the amount
+of time it's gonna take to mitigate this thing, you
+gotta load the state onto it. So this seems like
+something to think about. You can't just wish it away. It's a facto, hold that thought. And I'm actually gonna go into, I'm actually gonna tell you a little bit of a story about a time
+when this actually did come to bite us and what we did about it. So the title of this story is, is it a deployment or is it a problem? And I'm gonna talk about
+a, this is a real service that I worked on about 10 years ago. This is the part of EC2 that helps resolve DNS
+queries for customers with EC2 instances. Nowadays in the year 2024 and actually for quite
+some years now, this set of functionalities
+called Route 53 resolver and you could do a lot with it that you couldn't do 10 years ago. Back then it didn't even have a name, it was just DNS and EC2. And so of course we run the
+systems that we run sort of these first hop systems that
+classify the different kind of requests and forward
+them to the right, you know, recur them to the right places so they can get your DNS response. I'm gonna tell you. So one thing I'm going to tell you is I'm taught
+telling you a story from 10 years ago, and because EC2 is at such a
+fundamentally different scale today than it was 10 years ago, practically every system that
+I'm going to mention here, more or less doesn't exist anymore. Either it literally doesn't exist or it's a ship of Theseus type
+thing where we scaled it up so much that it's basically
+a different thing. So I'll tell you a little
+bit about what this did and how we get into
+trouble with deployments. So when a customer
+launches an EC2 instance in their virtual private
+cloud and their VPC, it assume this is a
+publicly routable instance, means it has a public IPv4 address on it, and you'll see that EC2 helpfully
+assigns it this DNS name. And the DNS name you can see quite clearly has that public IP address
+sort of embedded in it. Well this DNS name has
+some kind of interesting and useful properties. So if I'm out here on the internet outside your virtual private cloud, and I resolve that DNS
+name, it resolves to exactly what you think it is and
+this is the right answer because this 52-dot
+public IP address exactly how you should reach this
+instance from the internet through the internet gateway
+in your virtual private cloud. Of course, if I'm sitting inside your VPC at another EC2 instance or bit of compute inside
+your VPC, actually, that is the public IP address
+is not how I would really like to reach that other instance,
+that would require me to go out and go back in. No, your instance actually
+has a private IP address in the network and I
+would like the DNS name, same DNS name for this EC2
+instance to resolve to that. And that is exactly what DNS
+is one of the important things that DNS and EC2 did and
+does for our customers. Okay, so how might that work? Well, so in, you know, imagine we have two EC2 instances, different
+availability zones. So your EC2 instance instance
+number one in the first availability zone when it issues a, when some application makes a DNS query. The first hop is, was to
+these forwarders that had to figure out where the,
+what kind of query is it? Who's asking, what are they asking about? What are we going to do with this? This DNS host was in the same availability zone as the instance. 'cause if you know anything about how we do availability in EC2, we know that we think about it on the zonal level. And there are also, I'm
+showing you one of these, there are many, many, many, many, many of these in the availability zone. And so the query, so the query instance one
+is asking about the DNS name for instance two. And so what kinds of questions does this DNS forwarder need to answer? It needs to say like, well are they asking about someone in the same VPC 'cause I would give it
+a private IP address. If so, what's the private IP address? And that means we're talking about state 'cause think about DNS, you would want state right on
+the host, you want the latency to be really good and the
+availability of DNS is really kind of the availability of the network from our customer's perspective. Okay, so each of our
+many, many, many, many, many DNS hosts has actually
+quite a bit of state on it. What EC2 instances exist? Which VPCs are they in? What are their private IP
+address? That's a lot of state. So where does that state come from? Well that state comes from
+the EC2 control plane. You know, customers launch EC2 instances, change different aspects of their network by calling EC2 APIs. These get stored in the EC2 control plane and then propagate all
+the different places that they're needed in
+order to do the job. So what's going on here
+all the time is customers are changing their EC2
+instances, launching them, terminating them all the time. And these updates is they
+come into the control plane are being propagated to
+all of these DNS hosts. So we got these very, very stateful hosts. Let's talk a little bit more
+about this propagation system. Okay, so we got in any
+given availability zone, we have this service of
+this propagation service, lots of hosts, we've got these
+DNS forwarders, lots and lots and lots and lots and lots of hosts. And again, I'm telling you about the way
+this was designed 10 years ago that worked alright about 10 years ago. And so the way this works
+is each propagation host with a lease space system
+is responsible for a while for pushing updates. You know, updates that come from the customers ultimately to DNS. So, and this is done in
+sort of an incremental, in incremental rounds. So here's an incremental round, we'll push that to the DNS host. We're responsible for, here's another one, here's another one. Alright, you already have a couple of questions here, don't you? Right? I bet your first question is what if one of these hosts that this
+propagator is responsible for? What if it's slow? What's gonna happen now? Well, that round's gonna take longer and while that round is taking longer, the customer's out there
+doing things in EC2, they didn't stop. So the next incremental
+round is gonna be bigger and the slow host is gonna do that slower, and the next one's gonna be bigger. So you see it kind of has
+a little bit of a problem, a little bit of a problem with that. Another thing since you knew
+we were gonna be talking about scaling up is what happens when I bring a new one
+of these into service. And remember these are
+very stateful hosts. So I'm bringing a state,
+a host that's supposed to be stateful into service, but it can't do its job till it has state. So what are we gonna do?
+We bring it into service, everybody else gets an incremental sink. This one gets the whole state. And this state was the state of all EC2 instances in the region. So that number doesn't go down, right? Like that number was
+going up and up and up. That full sink takes a good long time with this new host even if
+it's performing very well. And while we do that, we get a really big
+incremental for next time. So what that means is that means that the lag from a customer
+doing a thing in EC2 to being able to, that being reflected in our DNS data plane in their DNS queries is getting longer. Now here's why that
+matters to our customers. Like I said before, and
+as you probably know, if DNS isn't working, kind of the network's not working,
+regs can't find anything. And so if a customer had launched
+that second EC2 instance, and the first EC2 instance
+was trying to reach it by name and there were a couple
+of other common use cases where that name, something else
+would see name to that name. And so in order to find that instance, that instance might be runnable running, but it's not reachable yet
+because nobody can find it. So that matters to our customers. So when we deploy these hosts, we get a graph like this, right? This is the lag time from of
+course we're measuring this. 'cause if it matters to your customer, you should be measuring it. Matters to our customer, so we're measuring it. Time from launching an EC2 instance to time that the DNS is fully propagated. This is the closed loop
+and you can see that, that the deployment doesn't
+look super clean here, right? It kind of is indistinguishable from a problem, right? This graph also looks like a problem. Now here's the problem with deployments that you can't tell whether
+they're a deployment or a problem is while you're in the middle of the deployment, you don't
+see that, you see this. You don't actually know that the story, you assume the story is gonna end because you know that
+deployments are supposed to look like this and, that's why this is a good
+thing not to normalize. But you don't actually
+know that it's gonna end. This bit us. Here's what happened. So we did a deployment like we normally do and of
+course expecting a graph like that, except there was a little bit of a problem in this deployment. The problem in this
+deployment, actually the sinks were working, the data plane was working, but the data plane
+process failed to restart. So it was still working on,
+still working on stale data. So everything looked good, and we're in the middle of the deployment and the graph looks good, but the problem was that the graph doesn't resolve like it's supposed to. And what that meant is actually
+a very bad thing for us because it meant that
+we had this deployment that was actually a problem and it was causing
+problems for a long time because we didn't have the
+means to tell the difference between a deployment or a problem, right? So we knew after this happened we knew that we needed to fix this, right? And duration of outage is
+absolutely the most important, is absolutely the most important thing to us when we think about, you know, operational
+events we need to make. We know it's important to
+you for them to end quickly. Therefore it's important to us. So what did we do now. I know that each and every one of you sitting
+here has already designed a better propagation system
+than the one I described. Didn't you? I know you, and you know, and I've got great news for
+you, which is that we took all of your suggestions and it's now a completely different service. But this is, you know,
+this is in the moment, we had great ideas for this 10 years ago. But the thing is we had
+just been bitten by this. We saw that is it a deployment or is it a problem is not
+a good state to be in. So what we did actually before we went and designed the whole thing,
+which we later did, we put that host startup time under a microscope, and we made a bunch of
+really local optimizations that aren't even that interesting. We changed kind of the
+local database file, changed a little bit of the
+business logic about how ads and removes are being
+merged into that thing. We got, we actually knew exactly what we needed to beat. Back then, when you
+launched an EC2 instance, it took 30 to 40 seconds for that EC2 instance to be reachable and to have the operating system up and running today, it's much, much faster. But we knew that as long as
+we could get DNS working under that deadline, our customers
+were gonna be fine. So that's what we had to beat. We optimized until we beat it so that our deployments no
+longer look like problems. Our deployments looked like
+things continuing to succeed, which is where you wanna be. So, scaling up host
+startup deployment is sort of a sub case of that. What are some things when
+you have stateful hosts, if you don't like how much
+time it takes to bring, you should look at how much time it takes to bring them in this into service. If you don't like that,
+there's a couple of things to think about. Some very common patterns around AWS that we see our teams do is
+they snapshot their state stored in S3 so they can download
+the snapshot very quickly. Often that's faster than
+synchronizing some series of events from the beginning. Cellular architectures
+can be really helpful here 'cause you can just cap the
+maximum side of the state, and test it, and know exactly
+what you're working with. We've even seen teams that we
+have these operational wins that we send around our organization. I even saw one recently that talked about when they're deploying,
+when they're bringing hosts into service, they even send
+it a bunch of synthetic traffic before they bring it into service so that everything's warmed up, including things you might not think about, like connection pools and all that. And it made their deployments
+a lot less disruptive. Okay, so I just talked
+about paying attention to this one thing,
+measuring the heck out of it and optimizing it. I'd like to invite Mike and he's gonna tell us, he's
+gonna tell us about a lot of things that you need to know about how you measure your stuff. - Alright, thank you Becky. All right, so I've worked on a number of systems over the years, and pretty much every system
+I've ever touched has some kind of scaling bottleneck. If you push it hard enough,
+if you send in enough traffic, eventually something
+somewhere was gonna break. So I wanna talk a little
+bit about how to measure that because, while things
+not being infinitely scalable is okay, what isn't okay and what will cause you
+to flail is if you slam into that bottleneck without realizing it. So like Becky, I'm a big fan
+of stories, so I wanna talk to you about VPC. VPC is a service I worked on for a number of years, and
+like a lot of AWS services, VPC is made up of a control
+plane and a data plane. So the control plane is where you send all of your API traffic. So if you're changing your subnets or if you're modifying
+your VPC route table, those API calls go to a control plane and it's a control plane's job to tell the data plane what to do. And the data plane makes the packets flow on the wire and go to the right places. And so one of the problems that we needed to solve when building VPC is how do we distribute the state from the control planes down to the data planes? We use a fairly standard technique here, which is we use an append-only queue, and this gives us a
+number of nice properties. But one of the properties
+it gives us is that because just like the DNS
+fleet, there's a whole lot of data planes for the the VPC fleet or for the VPC side of EC2 instances. If we send updates down
+in this append only queue, all the data plane nodes can
+read them at their own pace. So the node on the left
+there, it doesn't matter that it's stuck on update
+number four, the rest of the data plane objects can keep going and read the fifth update on on the right. The other thing the control
+plane does is it tries to make the data plane's life easier. So it actually sends down
+some pre-computed state, some state that is just formatted just for the data plane to
+make its life easier. If you come from a database background, this is kinda like a de-normalized view. You're just like you're taking,
+you know, a bunch of logic to take objects that might
+be laid out in one way for customers and you lay them out at a different way for the data plane. So, an example might be a VPC route table. Instead of sending down
+individual route updates, we pre-compute the longest
+prefix matches of all the routes and we send down kind of the final version of the route table down to the data plane. So that works great until
+you start thinking about, well, how do we append to the end of this append normally log. And normally you think that's a really trivial thing to do. You know, you can see there's,
+there's five boxes there and they've all got a
+version number on them or you know, a sequence number on them. So we just pick the next
+sequence, number six and pin it onto the end of the queue. And normally you'd be right. It's that's a pretty
+simple solution to this. But because we're doing this
+pre-computed state step, it's actually a little bit more subtle, because if you have two updates to your VPC route table
+at the same exact moment, and we're doing this
+de normalization trick where we're sending it
+down to the data plane, they both need to know
+about each other, right? Whichever right goes first has to be seen by the second, right, that happens after it. So not a complicated situation. And there's a very standard technique which is use a lock, right? So whoever comes in first gets the lock and then the second API call
+gets the lock afterwards. Of course, as soon as you have a lock, you're gonna have a
+critical section, right? So what do you do while
+you're holding the lock? And so for us, it's pretty simple. So let's keep running with
+our VPC route table example. So if we grab the lock, we say what is the current state
+of the VBC route table? I'm gonna add my new route, I'm gonna recompute the final
+state for the data plane, and then I'm gonna
+append it onto the queue, and then I'm going to release my lock. Now if you've ever done any
+concurrent programming, you know that critical sections are almost always where you look first when you
+have performance problems. And indeed that's oftentimes a place where there can be a bottleneck. But let's walk through
+exactly what that looks like. And so here's a visualization of what it might look like over time. So this magenta box, you can
+think of it as like a unit of time, maybe it's a
+second, maybe it's a minute. And our green box there is the
+time we're holding that lock. So that is our critical section. And so as time moves on,
+anytime an API call arrives through our control plane,
+it acquires this lock. And there might be periods of
+time when there's no API call. So not every single slot of this time period is gonna be taken, but eventually we'll get a second call and there'll be another critical section. And if we get two calls at the same time, remember they're gonna
+collide on this lock, but that's actually just fine. One of them is gonna get it first, the other one will wait just a little bit, and then it'll be able
+to sequence its rights just soon thereafter. And so this pattern works pretty well. You can even imagine like a
+flash mob showing up, right? So just like Becky was saying, a surge of successful traffic might happen. Suddenly a wild collection
+of requests arrive, and they all eventually get sequenced, one after another, just forward in time. If you keep thinking about
+this though, there's a problem. What happens if the rate of arrival of all the requests is faster than we can actually process them? So imagine you built this system, and suddenly you're getting
+more and more traffic and you can only hold
+the locker for so long. What do you think would
+happen if you started to get too many requests? Well, I don't really
+have to think too hard 'cause it actually happened to us. So this is the graph we
+had of when this happened. And so we had a brown out. So the Y-axis here is the number of errors, and I didn't label it, but it's actually not very large. It's a relatively small number of errors. And what the errors are
+coming from is requests that came in, tried to get
+the lock, but then timed out, 'cause they just, they were never given the chance to get the lock. They just, they were unable to acquire it. And the other interesting
+thing about this graph is it actually recovered on its own. We didn't take any explicit action. We were, you know, page
+people were looking at it, we were trying to figure
+out what to do and then it, and then it just recovered on its own. And so, you know, immediately
+all hands on back trying to figure out what happened
+to cause this brownout. And so we had a theory and our theory was, well, we just got the biggest
+flash mob we've seen to date and we just didn't handle it and we didn't have enough headroom to handle that, that flash mob. And as we started to dig more and more look sifting through the logs and figuring out what happened afterwards, we realized we didn't
+quite have the story right? It's a little bit more than that. What we later discovered was that we had actually
+just launched a feature in the recent past. And what the feature did
+was it added a little bit of extra time to that critical section. And so after we had launched this feature, suddenly we had less headroom. And so you can kind of
+see on the top version of this illustration,
+there's some slots there that you could fit some
+more critical sections in. There's not enough room on
+the bottom, they're gone. And so we actually didn't
+have an all time high in terms of request load. What had happened was our critical section had grown and we didn't even know it. So we fixed this problem, you know, we optimized the code
+and we made some changes. But then the immediate
+question was like, well, how do we not get surprised about this? Because this caught us
+by completely off guard. So you can think about
+what metrics might you wanna put in place? Well you're probably gonna
+have metrics on API errors and certainly we did and that's what alerted
+us to this problem. But those are retroactive,
+right? They're reactive. There was already a problem.
+We don't wanna do that. Maybe we wanna measure API latency. So we measure that, but it
+turns out the critical section is actually not the dominant
+time as part of the API call. And so we would actually be lost the noise and it wasn't a very good signal. So we needed a different
+way to measure how close were we to running out of
+headroom for the system? So what we decided to do was,
+let's just measure exactly what this kind of picture
+illustrate, which is like how much of that time can we hold the lock? And so I've drawn some
+kind of dotted line boxes, you can kind of see there's,
+there's seven filled inboxes and three dotted line boxes. And so visually, like seven outta 10 of these slots have been filled up, right? So we kind of had this
+intuition that we're about 70% of the way there to being full. But of course this is a really
+simple illustrative example. In reality, those boxes
+aren't fixed in size. We can't just count them up as a unit, but we can still count them, right? It doesn't matter if
+they're different shapes. If you start posting the amount of time you're holding this
+lock, then you can post a metric and then take the sum of that metric, and know how much of that block of time are we holding at the lock? And so this gives you a sum
+of time, a sum of latency, which is kind of a unusual metric. Not many people put sum of
+latency on their dashboards, but what it's basically
+telling us in this situation is, how much of our time budget have we used holding this lock? And that gives us a proxy to know how close we are to
+hitting our bottleneck. And so now, for this system, and it's evolved over
+the years, but it's still basically the same system, we have a metric even to this
+day that measures this lock. And this is kind of what
+the graph looks like today. So this is the sum of latency graph. You can see kinda the diurnal pattern. So this is several weeks. And what's pretty
+interesting about this graph is, for the first half of the graph, it's relatively flat, right? There's nothing really going
+on there in terms of growth. But then about halfway there or halfway across, it starts to creep up, and we've got a red line on this graph and this red line is not a
+impact line, it's a, hey, we should go fix something line. And so we now have this
+graph, we alarm on it. And it's not a like page a human alarm, it's a add a sprint task
+to our team to go fix this. You know, if you have something similar, maybe you have a cellular architecture, maybe it's building out more cells, maybe it's partitioning your data more, it might be a small optimization that you would make
+while holding this lock. It might be an architectural change, but you now have an early warning system to know when you have to do that instead of while the world is on
+fire and your paging humans. One last thing about this graph is the units can be a little weird. Like what does the sum of of time mean? And so one way to kind of equalize it is if this is
+a one minute data point graph. Then just equal out your measurements or equal out your units. So if you're measuring milliseconds for a one-minute data point,
+then take milliseconds divide by 1,000 to get seconds
+divided by 60 to get minutes. And so now you have the sum
+of time of minutes per minute. And so now the zero
+means you're not holding the lock at all and one
+means you're holding the lock for the entire one minute period. So this technique is actually
+not necessarily novel. And there's this really cool
+equation called Little's law that actually gives a general version of what I've been talking about. And what Little's law
+says is the average amount of concurrency in the
+system, in other words how many things can be happening
+at the same time is equal to the average arrival rate, so how often people show up or a request arrive, times the latency. So if anybody here ate lunch
+today in any of the meal halls, you saw this in action, right? The latency was pretty much constant. You walk in, you walked right
+up to a table, and as more and more people showed
+up, what did they do? They opened up more table,
+they added more concurrency. And so there's this balancing
+act between the two. But I was talking about some of latency, and there's no sum in this equation. So where did that come from? Well, Little's law applies in a bunch of different scenarios, but
+if you think about it in terms of discreet metric points,
+like one minute data points, you can actually make some
+assumptions about the equation. So the arrival rate for how many things arrive in a one minute data point is just the number of data points you had in that minute, right? So it's just N, and then how do you compute the
+average latency of something? You take the total and you divide by the number
+of observations you had. And so those Ns cancel out. And so for discrete time unit,
+like a metric data point, the average concurrency of the
+system is actually just equal to the sum of the latency. And so that means you can
+graph this really easily using existing observability tools. So going back to our visual
+example one more time, you know, we just to kind of walk it through. So we've got, you know, seven blocks here. Let's say each of those takes 0.1 seconds, and this is a one second block. And so now we know that
+if we add them up our, we're at 70% of our bottleneck. Now the concurrency there on
+the left hand side, that's one. And the reasons it's one is because we had this
+exclusive lock, right? Only one thing could run because that's how we built the system. We had this lock in place. But it turns out Little's law
+is actually much more general and it doesn't have to apply to places where you just use an exclusive lock. Let's say you had a worker pool, and you wanted to know how much, how many workers do I need in my pool? And you don't have a great way of measuring the concurrency
+from inside that system. One way you can approach
+this is if you graph the sum of latency of all the tasks
+flowing through the system, you get a minimum or
+you get an average sense of what the concurrency needs to be. So if you see the sum equals 142 seconds of work is done every second,
+142 seconds per second, that means you need at least 142 workers to handle that load. Now of course these are
+averages over that time period. So if it's a one minute data point, that's an average over a minute, so it's probably gonna be much
+higher at the peak of peaks. So you're gonna, you know, obviously be to scale up more than just exactly 142. But it gives you something
+that you can graph over time and you get a sense of like,
+how close am I getting? Like if I just made this feature change, have I reduced my headroom significantly and I need to reevaluate any
+performance optimizations? So I hope you enjoy section. You know, we think a lot
+about scaling cliffs at AWS, and we're always looking out
+for ways to measure them. And there's a bunch of different systems where we use this same technique. We use it in how do we find a place to put your EC2 instances
+when you call run instances? Our EC2 placement algorithm,
+we measure it with this. We have workflow systems, we have, like I said the VPC system. So we use this technique a lot. Anytime you wanna measure just kind of the concurrency going through
+a system, graphing the sum of time is a really easy thing
+to add to your dashboard. And the key thing here again, is you wanna know about your bottlenecks before you reach them. Okay, so I have one last section. We call this the bonus section. We were talking a little bit about what to include in this talk this year and one of the things that we frequently talk about is this desire to always focus on mitigation. And when we have operational events, big or small, near misses or large, we always wanna try to make sure the customer is out of pain as quickly as possible. And there's a few techniques that kind of keep coming up over
+and over again that seem to be pretty universal
+across a lot of our teams that maybe aren't that surprising. If you look at them,
+they'd be like, yeah, okay, that's obvious, but what might
+let not be so obvious is just how useful they are and
+just how often we do them. So I thought let's throw a few of these in these in this talk. So I'm gonna give you three
+quick examples, these kind of kind of quick hits of things that we think almost
+all of our teams at AWS and all of you might benefit from doing for pretty much a wide range of use cases. So the first one here
+is just a metric graph. This graph is showing an error, and this error is something
+that doesn't happen very often. Maybe it's something like in variant deep in your code that you
+post an a metric on when that invariant is violated. But suddenly you wake up today, and that variant has indeed been violated. And so this metric is
+posting an error account. So you start looking at the dashboard and maybe you try to do
+some work to mitigate it. You try to figure out what you
+can do to stop the bleeding, and then you look again at the dashboard. And the question is, have we recovered? So if you look at this graph right now, can you tell at a moment's
+notice, have we recovered? What if I draw it a
+little bit differently? So the difference between these two graphs is very subtle. Well maybe it's not that subtle, it's actually pretty obvious. I guess they have lines
+going down the sides, right? And what that means is that
+when we posting this metric, if it's happy days, if the
+variant isn't violated, we're always posting a zero. We're saying our error count is zero, our error count is zero,
+our error count is zero. And the benefit of that
+is the moment you fix it, you can tell immediately. So the fact that it drops
+down there on the right removes all doubt of maybe the
+metric hasn't propagated yet. Maybe we just don't know. We now know the metric dropped. There's one more benefit
+of doing it this way, which is that you can also throw an alarm on these very easily. So if this is a really rare error, you might not have even
+thought about an alarm or what the right threshold is. But now that it happens,
+maybe you need a day or two to fully root cause
+or get an deployment out. But in the meantime you
+can throw an alarm on it and know immediately if the
+same exact situation were to reoccur, you can reapply
+whatever mitigation you have. And so if you didn't have
+this posting zero benefit, then your metric, your
+alarm wouldn't be able to tell is it fixed or is it,
+has the system gotten worse? And it's no longer posting metrics at all. Like you can't tell those two apart without dropping down zero. Okay, second Chik. So here's another error count. This one is well behaved. It's got good metric etiquette. That's it was posting zeros
+before and now it's popped up. So my question to you is, what is the one action
+you can take immediately to mitigate this impact? - [Panelist] Fix the bug? - No, don't fix the bug. Why would you? No, you want, you wanna fix it now? Seconds, seconds matter. So what would you do? - [Panelist] Roll back. Restart that, good. - Some good suggestion. I heard
+roll back, I heard restart. Lemme show you a slightly different graph and see if your answer changes. So this is a graph with
+some dimensionality to it and the dimensions by instance ID. Kill it, yes. Just by the sheer fact
+that you have a graph with dimensions that are
+match, either an instance ID or a node ID, or an availability zone, you can tell at a moment's
+notice, look at this graph that you have one job to do, get that host outta service,
+get it out of the VIB, get it out of DNS,
+whatever you need to do, nuke it from orbit if you have to. If you do that, you're recovered. Then you can figure out what what caused it. And actually really funny
+story, we were doing a practice session for this talk, this exact event happened with one of our teams and it was super fast. They were just like, oh, this graph, this one host this really
+high C utilization, this take it outta service. And then they figured out
+what was going on afterwards. So it really does pay
+off over and over again. Okay, last trick. There we go. Okay. I'm sure most people in the room have seen a graph like this. This is a memory utilization graph. It is going up into the right
+and that is not a happy graph. So what can you do immediately
+to mitigate this impact? Somebody just said it actually restart. Turn it off and on again. So this technique of turning it off again is so pervasive. We use it all the time. And the thing I wanna drill in is that you should be
+exercising it regularly. And if you, if you do that and you have super high confidence, then as good standard operating procedure, if you get a trouble ticket or some kind of alarm
+going off that has a graph that looks like that, you
+immediately just kick off the restart and then go
+look at other things. It's just like click, click Restart. And then while that's going, however long it's gonna take,
+which should not be too long, I can then go start
+looking at other things that I might be clued into
+what's actually going on. But in those first few
+seconds of, hey, I got a page, or hey, this alarm goes
+off, just restart it. So simple. And we use this all over the place. We use it in when caches
+don't apply, right, when config files don't change. And what, you know, you
+might look at this list and say like, oh, you
+should be testing all those. Yeah, you sure? You sure could. But a lot of times there's
+these weird edge cases. Maybe you had to roll back and the rollback didn't unapply
+the new config properly, or it didn't, you know, it
+cashed the credential in a way that the new version didn't
+do or something like this. And so by just sending out a restart, just bouncing your
+fleet, you're mitigated. You can figure out why, why
+that bug was there later. Just bounce the fleet. Do it all the time. So looking for some cheap chicks to do over your next coffee
+break for your service. Post your, whoops, throw your mic control. No, don't do that. Post zeros, use dimensions. And again, it doesn't have
+to be just instance ID, whatever default boundary
+makes sense for your service. And then bounce first,
+ask questions later. Always look to mitigate. I really hope you enjoyed this session. I'll be down here and maybe out in the hallway afterwards. I'm also on Peer Talk if anybody wants to chat about resiliency
+in the coming days. I've got some availability,
+and thanks so much and please take the survey. (audience applauds)

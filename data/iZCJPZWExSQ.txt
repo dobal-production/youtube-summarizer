@@ -1,0 +1,612 @@
+- All right. Hey, everybody. Nice to see you all here. Thank you so much for
+attending this session. You guys have made it midweek now. It's 5:30. Thank you so much. We're going to make it
+interesting for you guys today. So, my name is Ashish Khare, and I'm joined here with Anant. We both are product managers
+on the Amazon Q business team. Today we will be taking
+you through some features that we launched yesterday
+with Amazon Q that help software providers provide
+more enriching features to their end users. I will be starting off. I should be using a clicker here. I will be starting off. So, we'll talk first about
+what is driving the need for these enriching features? And then we'll get into
+what are the challenges, what makes it so difficult to
+come up with these enriching features when you talk about
+generative AI features and software provider applications? And then we will look at
+how Amazon Q simplifies the process of building these
+amazing generative AI features in software applications. When I say software applications,
+I mean SaaS applications, ISP applications. Anant will be sharing with
+you some examples of what some well-known apps
+that you use today are, how they're leveraging
+Amazon Q to build their enriching features. So that would be interesting as well. So, there would be questions
+at the end of the session. We will step out and then we
+can have question and answer there. Happy to answer questions
+that you might have. So let's get started. So, here's what we are
+seeing in the world today. Employees of organizations, when they have to get their work done, at any given point in time,
+you, myself, all of us, we work through multiple
+applications to get our work done. Typically, on an average,
+users skip across up to, on an average, six applications
+to get their work done. Also, in the process of
+getting the work done, if you look at the overall
+time that they spend in a week to search content across
+applications, that's something like two hours or more. That's a lot of time. Now, why does that happen? Now, that happens because
+the work that we do goes across applications,
+it has a wide context, so there are things that you
+do in different applications. Each of these applications are
+designed to do what they are built for really well, so
+we love these applications. However, these applications
+are not designed to work together so well. They work in silos. Think about a situation,
+let me give an example here. Let's say you're working
+on a demo project, and you need to show it to a customer. Where do you keep this
+information when you're working on this project? I'll give you some examples here. This is not exhaustive, but
+they are just some examples of applications that you work with. You would probably keep
+your tasks in your project management tools. Now, when you are managing
+your task, you're keeping track of what needs to get done, you
+remember that there were some useful conversations that happen in your messaging application,
+whatever you might be using, but that information sits in
+the messaging application. You might have had a conversation
+with your colleagues about some task that was not done
+or some feedback that you had received from the
+customer, that sits in the messaging application. Then you also remember
+that there was a meeting where you all had discussed actions that were to be taken by your team, and therefore you had to track them. Again, when you have figured
+out what needs to happen, you also have those meetings
+scheduled in your calendars. Now think about this. These are all useful
+pieces of information, but they're all sitting
+in different applications. What users would benefit
+from would be an experience where it's the ISV or it's a
+software provider application where the experience varies
+depending on the use case. For example, if you're
+looking for very specific information, you might want
+to get into a Q&A kind of user experience and ask for
+the information that you need. You might want to log into an
+application and proactively get the information that's
+useful for you for that moment, for that project, for that day. So there are different kinds
+of user experiences that you might need. Then you want information or
+insights in these applications, in the application that you're in. Those insights should
+be across applications so that you have the understanding
+of the overall context of your work, not specific to the data
+which is in that application. And then you also want these
+insights in your preferred app. Now, it shouldn't be one
+specific app, it could be the app that you prefer, and therefore,
+these features should be available where you are. Now, why is it so difficult to
+come up with these features? There are challenges to it. First of all, the app that you're in may
+not have the overall context of the work. If you're talking about
+projects, it may have the project task, but it may not
+have the conversations that you had with your colleagues,
+with your customer. Similarly, it might not have
+the context of the specific emails that you have received. And therefore, that lack of
+full context is one of the challenges. Let's say even if your
+application knows where your data resides, building those
+integrations into these applications and bringing that data into
+the app that you want to work with in a way where the
+application understands what authorizations you have
+so that the insights that are generated by generative AI
+of the large language models takes into account what
+you are authorized to see, and therefore gives you
+the insights based on those credentials or those authorizations. It's hard to do all that. Because you need to do,
+as a software provider, you need to do it at scale
+for millions of users. And therefore, it's very
+important for enterprise customers to have that trust that
+this is being done with the enterprise grade security and privacy. This has to be done with
+enterprise compliance needs. And therefore, it's hard. If I were to put a structure
+to the problem and how, if you were to go to
+build these applications, what are the kind of things,
+what are the layers of the applications that you need to think about, I would put them in these four layers. You would see these four
+layers come again and again in the presentation because we
+want to show you how Amazon Q helps you address various
+elements of these layers. So, let's say you were to build
+cross-app aware application. What you would have to do,
+starting from the bottom most layer, is that you would
+have to first figure out integrations across these
+applications so that you can get the data that you
+need in the application where it's needed. Now, every application has its own schema. So, when you're pulling that
+data in, you have to build that integration with the
+understanding of what's coming in. Then you've got to normalize that data. You have to normalize that
+data so that it can be put in a vector store or in an index
+where it can be easily then retrieved and then made
+available to your preferred large language model. All of this has to be done
+in the ISV user experience. You do not want more
+applications to solve the problem of working with multiple
+applications, and therefore, it has to be done seamlessly
+within the user experience that you already work with. Now, this is where I
+introduce Amazon Q features, that we launched, that help
+you address the various layers when you build across application features in your application. First of all, Amazon Q embedded. This gives you as a software
+provider the ability to embed the Amazon Q
+experience, the same Amazon Q experience that you have been
+using, in your application so that customers can have
+a generative AI assistant in your application where you
+don't have to go and build it from scratch. You basically take the Amazon
+Q experience and embed it as is with ability to
+customize the user experience so that it matches with
+your brand awareness. We'll talk more about that. That's the first one. The second one is Amazon Q index. This is where if you've
+already built your application generative AI features, or
+you're already building one, and you want to make sure
+that the insights that you're generating takes into account
+the data which is already there in your application,
+but also want to bring in data from other applications. Amazon Q index gives you
+access to the cross application data that Amazon Q has in its
+index, but making it available to you through an API so that
+you can simply make a call to the API, get relevant
+content and then use it to generate more enriching insights through your application. We will go into more detail
+from this point onwards. I will cover up the details
+of Amazon Q embedded and then Anant will come
+and talk to you about how Amazon Q index is being
+used by various ISVs. So, how do you think about these features that I just talked about? So, think about it this
+way, I'll start from the top and then go below. So, think about the abstractions
+that you need when you're working on building features. In many use cases, what would
+happen is that you might have public data, let's say
+you have documentation for your product and you
+want a Q&A capability on that documentation so that your
+customers may come and ask questions about how to use your product, how to configure your product,
+or so many various questions that they might have. These are questions that
+multiple users might have. It's not user specific, it could be applicable to multiple users, And therefore, in those
+situations, you just simply want to embed a Q&A experience
+in your application, pointing to the data sources
+like public documentation that I just mentioned. In such situations you're
+embedding Q with the ability to customize the user
+experience, the colors, the user interface piece to it. The second part would be
+where, and as I go lower in the diagram here, you want
+to build a generative AI assistant experience, but you
+want to keep control of the user experience. You want to keep control of
+the user interface that you already have. You do not want to embed Q as is. There could be many reasons for it. You might have a certain
+flow in your application, therefore you want to control
+that flow, and then invoke the chat experience. Or it could be that you want
+to bring in additional data elements that you want to
+plug into the experience. So therefore, you would
+want to use the APIs for it. So this is where Amazon
+Key provides you with APIs so that you can, within
+your user experience, leverage the Amazon Q APIs
+to build the chat experience. And in the third case,
+when we go lower most, this is where you already
+have your, let's say generative AI assistant or
+your building one already, you have the flow outlined. What you want to do now
+is find a way to bring in cross app data into the flow
+of your generative AI assistant application. In that case, this is where
+we give you access an API where you can make a call to Amazon Q, get relevant content and
+then take it and feed it to your rag layer, or use
+it as a phase research API, and then basically use the
+API to enrich the application that you're building. Now let's take a look
+at how that helps you, and then I'll get into the specifics of the embedded experience. So, by using these APIs
+and by using the embedding experience, you're basically
+creating a generative experience which is
+aware of the user's data across applications. It's built in a very secure way. It ensures the privacy and
+the security of the data. You can embed the
+experience if you want to, or you could continue to
+use your user experience and embed Amazon Q into that experience. Now let's get into the specifics of what, sorry, before I get there. There are multiple integrations
+that we offer today as a part of Amazon Q. So effectively, you
+could bring in data from multiple applications
+that are listed here. We will keep adding to this list. And if you are a software
+pro provider who wants to get added to this list, please
+reach out to the Amazon Q team. We will share a QR code at
+the end of the presentation. That's also one of the ways for
+you, as a software provider, to reach out to us so that
+we can create an integration and have it available for end customers. So, let's look at Amazon
+Q embedded experience. There are two ways, as I
+said, in which you do that. One is when you embed
+Amazon Q as is with ability to modify the user interface. And we'll talk more about
+how that looks like. I have examples of it. Or else you could simply
+keep your user experience and call the Amazon Q APIs. So, in this case, this is an
+example where you are working with the topmost layer where
+it's your user interface and you are embedding Q, which
+is why you see the Q logo in the topmost layer there. You can customize the user interface. It's Q, but you can actually
+make it look like your application. It works with the colors,
+with your brand positioning and all that. So it basically works to make
+it seamlessly become a part of your application. Users stay in your own application because the Q&A is embedded in your application. The users stay always in your application. They do not go out to another application. Let me give an example
+of what it looks like. So here's an example. This is how, when Amazon Q is embedded in a customer application, it looks like. You do see Q logo there,
+but that's an example. You could replace that
+with your company logo and all of that, we can
+do the customizations. But that becomes a seamless
+part of your application. Again, as I said before,
+you would use this kind of an interface, or this option
+to basically point customers in use cases where there's
+public data, you want customers to come in and have answers
+to the questions they have about your product or about
+documentation that is publicly available. But they want an easy way to
+get access to the information or get answers to the questions fast. So, this is how a number
+of customers are using Amazon Q today already. Another example, the second
+one where software providers are continuing to use their
+user experience and building with Amazon Q to fit into
+their user experience. This is where they start
+working with the Amazon Q APIs. So think about a case where,
+and I'll give you an example in the next slide that you
+will see, Miro uses Amazon Q to help their end users
+work with Miro Canvas so that they can create ideas faster, all within the Miro
+Canvas user experience. So, what I have next is a video
+of Miro where you would see an experience where a user in Miro Canvas wants to work on a product
+ideation framework, so has a product idea, they want to generate a product idea. So there is a template for
+product ideation in Miro already. Because Miro has integrated with Amazon Q, which integrates with the users, other enterprise applications, all that the user needs to
+do to start is to basically generate the ideas using the
+template that already exists in Miro. So Miro would populate
+that template for the user. So now, effectively, for the user, the starting point is
+not a blank template, the starting point is a
+series of ideas in a template which is already populated for the user. So here's the video that I'm
+going to play for you now. So the user is in Miro Canvas, they generate insights. This is when they basically put in their idea, what they want to generate
+the product idea on. And at this point, Miro
+calls Amazon Q APIs, where Amazon Q then's
+response with the information from across applications
+based on the query. The user then is able to
+convert those ideas into cards, which is basically a visual
+representation of all the information that they need. Users love to work with Miro
+because of the ease of visual representation of the
+information that they work with. So therefore, within the
+same user experience, now they have access to the information that they have in other
+enterprise applications that they use. In this experience, they did
+not have to leave the Miro user experience. They stayed in the Miro app,
+and they have a template which has all the ideas
+and the related content, and they also have Miro
+cards, the information visually represented
+that they can start with. What would've taken them
+hours to do, or even longer, has taken them seconds. And now they have a starting
+point which gives them an advantage. All right. To summarize what you just
+saw with the VR experience is that there is an integration
+in the ISV application itself. This could be any application. So, if it's your application,
+all you would have to do is basically work with the APIs,
+and we'll be happy to share with you the documentation
+linked again at the end of it, where you could then start
+working on building these integrations so that your
+application can have a similar experience for your end users. And I've said before, this
+could be a question and answer experience, or it could
+be a dashboard experience, or the experience that you just saw. Going further. Just to summarize on what you
+just saw before I hand it over to Anant. Amazon Q business basically
+has the integrations to various enterprise
+applications that end customers, your end customers use today. Amazon Q puts that in a retrieval format in a nice Q Amazon Q index through which you can
+pull that information and make it available to your LLM, to your preferred LLM. If you're working with
+Amazon Q embedded experience, Amazon Q takes the
+information from across apps, works with an LLM and gives
+you the generated insights. If you're working with the
+Amazon Q index directly, which Anant is going to talk about next, then you will see that you
+can take that information and feed it to an LLM of your choice. And that's how you would
+generate more enriching applications. Alright, if you have any more
+questions about embedded, I'll take them at the end of the session. I would now hand it over to Anant. - Thanks, Ashish. So Amazon Q index is the
+second offering of our new capabilities for software providers. And when we think about
+Amazon Q business today, it is viewed as the most powerful
+assistant for enterprises. Enterprises can connect
+their data sources, they can build an assistant
+and help their employees be much more productive
+on a day-to-day basis. But as Ashish mentioned at
+the top, we all use multiple applications, and so, when
+we started talking to our ISV customers, the main
+thing they're saying is, "We want access to that data." "We want a way to help
+build richer experiences, but we want the flexibility
+to be able to maintain our existing LLM architecture, our LLM models that we've built, and ultimately allow us to
+launch capabilities faster that use cross app experiences." So, we're super happy to
+announce the Amazon Q index, which launched yesterday,
+is generally available. And it allows ISVs to really
+solve this use case for them to build much more richer
+experiences with cross app data. So when we think about this
+capability and how it differs from the Amazon Q embedded
+experience, the Amazon Q index really focuses on these bottom two layers. It provides a managed offering
+that allows you to have access to over 40 applications
+that your customers are creating, that index that
+they're building on behalf of themselves. And now that they've already built it with Amazon Q Business, they can now
+provide it to the respective ISVs that they do to get work done. So we'll walk through
+a few examples later, but you'll notice that
+in experiences like Zoom for meetings, Asana
+for project management, and even Miro are starting
+to use this cross app index as a way to build net new
+experiences that reimagine what they've done in the past. Now the way that ISVs can
+use that data is through a brand new API that we launch
+called Search Relevant Content. So, let's talk a little bit
+more about what this API actually does. First, it allows ISVs or end
+users to actually provide a query and retrieve
+information from that index. We support keyword search, semantic search and hybrid search. So if you have different use
+cases, we allow customers to customize which type
+of query they want to do, and receive data from
+that connected index. And it allows you to think
+about search use cases, it allows you to think about
+more complex queries that may be happening where semantic
+relationships are really important. You can imagine us asking
+about what are project risks associated with my ACME project? Right now if you could
+asked that question, what do we have to do today? We have to go to five
+different applications, try to figure out that information. We're context switching,
+we're app switching, we're wasting a lot of time. And application providers
+understand that their users are being less engaged because
+their end users have to switch from application to application. So what do we actually now do
+with Search Relevant Content? In that same scenario, an ISV
+can now pull their own data that they have in their application
+and get all the relevant ACME content. But now, through the Search
+Relative Content API, they can also call a
+customer's index and retrieve Slack messages from the product
+manager and the engineering lead talking about ACME, or
+it's an email conversation with leadership talking about
+upcoming launch schedules or risk, potentially. But all of that now is combined. You have the ISVs own data
+plus these third party datas, and now it's collectively sent
+to the LLM of their choice and generates a much more
+contextualized response that allows those end users
+to be much more engaged in that application. And the key thing we did
+when we built this capability is really around flexibility. And Ashish mentioned it,
+but it's really important to reiterate. We know that a ton of our ISVs
+have built on Amazon Bedrock, they're using the latest LLMs,
+but we also know that a lot of ISVs didn't start on Bedrock, and we know that some of
+their customers are starting to think about bring your
+own models, and how they can bring their own LLMs
+to these applications. The ability for us to basically
+manage up just the index portion of this but provide
+the flexibility for each ISV to manage their own LLMs or
+use whatever LLM they prefer allows them to have that
+flexibility and support all of their customer needs. So, what is the benefit
+ultimately for end customers? Now you can build, as an
+ISV, build much more richer experiences that keep
+your end users engaged. Ultimately, that leads
+to better satisfaction, retention and eventually
+new customer acquisition, retention, et cetera. So there's a ton of opportunity
+here when we think about how do we expand beyond the
+existing experiences we have. But I want to show you guys
+now some really cool examples of actual ISVs who have started
+building and integrating with Amazon Q index and how
+they're starting to reimagine everyday experiences that we've seen, but now with cross app data. So Zoom is one of the initial
+ISVs we've been working with who's really taken a
+grasp of Amazon Q index. They've built and launched
+Zoom AI Companion, which is more of an interactive
+Q&A experience that allows their end users to
+interact with their data. Now we can think of a lot
+of use cases that Zoom is thinking about. They support chat, they support calendars, of course virtual meetings. What's really cool about
+Zoom AI Companion is it lives in all of those aspects
+within their application. So what we're going to
+see in this video is a common scenario that we all go through. Imagine you get tapped on the
+shoulder to join a meeting in five minutes and
+you're asked to prepare, and you don't know what to do. Now, with Zoom AI Companion
+and Amazon Q index, we can make that experience
+much more seamless than before. So, imagine Alfred here
+who's getting ready, he just gets a meeting on his
+calendar about Project Nexus. He has no idea what this is about. What does he do? What's the best way for
+him to get prepared? So he's going to now add Zoom
+AI Companion powered by Q and ask what is the current
+status of Project Nexus. He gets a brief summary
+that says, "It's on track, but there might be some risks." And now because of Q, he
+actually has context from Google Docs and Confluence
+also powering that experience. But he probably wants more details. What exactly are the risks? What is the project timeline
+that's coming from Confluence? And so, he can ask Zoom AI
+Companion, "Give me a summary of all that information,"
+and Zoom AI Companion can bring out that information
+and actually refer and source additional resources that
+weren't there before. It's a really powerful
+tool if you think about it. Because it allows end users
+to actually now stay within their workflow, stay within
+their app that they're using and start to get updated
+information from other applications. And you're seeing on the screen
+too, if I want to click in and actually see what is
+happening in Confluence, they can look at those
+references and actually go see that information for a deeper dive. It really now makes meeting
+preparation, for example, one minute tops as opposed
+to having to navigate to all three of those different
+applications to find that. And from an end user perspective,
+it's a huge time saver. Like I mentioned, Coom
+is doing more than just meeting preparation. Of course their biggest
+offering that we are most familiar with is around meetings. Imagine you're running late to a meeting, you use Zoom AI Companion
+to understand what is this meeting about? What are we talking about? Can I get caught up? And so, what's really cool
+now with the Q index is, depending on the conversation,
+depending on the topics, you can now start to get
+additional context in that meeting in real time. It allows those meetings
+to be much more productive. Say you're talking about a proposal. Well, rather than trying
+to multitask and go find that proposal, we can now use
+Zoom AI Companion to bring that to you in the context of the meeting, and allows that conversation
+to keep flowing over time. So, we're really excited to
+continue working with Zoom. We think about how do we help
+surface the right information across all their different
+experiences using Q. Asana's the next one. And Asana's a work management
+enterprise platform. And really, it's focused on
+how do we help you do work? How do you identify who's doing what? What's the right time
+to actually get it done? What's next? What are the risks? And it's really a great tool
+for cross-functional project management as well. Asana AI has a ton of features
+that they're using right now to build generative AI
+experiences for their customers. One of the first ones that
+they're thinking about is their smart chat. So you can imagine a Q&A
+experience very similar to Zoom, but in the context of a
+project management application. You're asking questions
+around how did work get done? What are the risks
+associated with this project? And so, what you'll see in
+this next video demo here is an individual, Stephanie. Stephanie just came back from vacation, she had a nice long break, she
+has no idea what's happening because her boss told her to check off and she's having a good time. But she came back, she's
+like, "What happened with my project? What are the things I need to know?" Imagine now just asking Asana
+smart chat, and being able to understand what are some of
+the decisions that were made, and what are the conversations
+that are happening outside of Asana to make sure that I
+have the latest information? So she can start to ask questions
+on, "Hey, do we decide on what the brand colors are for
+this new marketing rebrand?" And you can see the response
+now has some context from Asana, but also brings
+in decisions and conversations from documents as well as Slack
+messages that allows her now to be up to date with what happened. It's the same situation as Zoom. She's doing that in a matter of seconds, as opposed to having
+to go catch up on each individual application. So imagine this world now
+where you're building much more richer, personalized
+contextual responses in your applications that allows your
+end users to be much more satisfied in those experiences. And we're really excited. Again, similar to Zoom, Asana AI has a ton of different features. And I think we've been most
+commonly using Q&A experiences when it comes to generative AI. It's a very common, very easy thing to do. But what's really cool about
+what Asana is thinking about is it goes beyond just a Q&A experience. They're thinking about simple
+ways to summarize projects, statuses or send email
+reports that can all benefit from cross app data. I was listening to Alex Hood,
+the Chief Product Officer at Asana earlier today, and
+the way that he talks about their capabilities is
+he wants an AI teammate. Imagine having a teammate
+that is powered by your cross app data, that's
+following you across the entire application or in your
+preferred application, and making sure that whenever
+you're interacting with the app you have the right
+information to actually get work done. It's a really powerful concept,
+but you have to have the right information in order for
+that LLM or the generative AI experience to ultimately provide value. And lastly, I want to go back to Miro. So what Ashish showed was
+a really powerful tool of the ability to use some
+of our chat APIs in Miro. Miro is actually thinking
+about this in two ways. They want to think about
+the chat APIs to power those templates or those very common use cases. Things that have a
+predefined task or goal, but that's not always
+going to be the case. There's going to be more
+differentiated experiences. Things that require much
+more careful curation of data in order for you to extract
+out the value of what the experience is. And so, what Miro is doing
+is also looking at the Search Relevant Content API
+and figuring out what are net new experiences that they
+can build using that API so that when their end users
+have a different use case, they can start to also
+benefit from cross app data. So it's a concept called collections. And collections is really
+a way for them to bring in information into this
+knowledge powered canvas. Its a centralized canvas
+of data across all these different applications. And so, what they're
+doing is actually asking, find some resources, find some information across all the different
+applications that are powered by this Q index. And you can see that
+they're adding content, they can drag and drop
+content into this canvas, and it's kind of like a live prompt. Think of it as like a LLM
+prompt where you're saying, "I want this resource, not that resource." And you can actually do
+things like generate content based on what's on this canvas. So it's really powerful
+if you think about it, because the Q aspect is
+bringing all of the data and relevant information
+into the Miro Canvas, and then they're using
+Miro AI to build and extend on top of it. You're creating net new
+content because you have all the right information in one place. But what's powerful is that
+you can start somewhere, and think, "Hey, I actually
+don't think I want this resource," or "I need more resources." And I can actually update the output. So it's really this live
+editing, live collaboration. And when you have four or
+five people probably all from different functions all
+talking about the same thing, you have this very clean,
+succinct way now of being able to curate what type of
+information is actually needed to power and get the
+desired output you want. So, I think again, it's
+really cool to see this and. It's the chat APIs that
+are available or the Amazon Q embedded can solve
+for very common use cases. But if you're thinking
+about how do we continue to differentiate ourselves
+past a Q&A experience or past more complex scenarios
+and use cases as well, the Search Relative Content
+API can help you with that type of curation of data to make
+sure you have the right information powering your AI. So, let's think about actually customers. How they onboard. So, if you have an ISV,
+you've already built your integration, you've
+thinking about Q index more broadly, what are the
+ways that your customers actually get onboarded onto it? We have two different
+experiences that I'll go over, but this is the first one. And really, it's around
+taking the customers who have already built this index and
+allowing them to grant ISVs access to their index. And it's really important
+from that matter is because it allows enterprises now
+to keep their data in one single spot. They've created the index already, they've configured which
+data sources they want, they allowed and refreshed
+that data as much as they want to, but it
+allows them now to say Zoom or Asana or Mira
+or whatever applications that enterprise uses, you
+also have access to this data. And when they grant access
+to that data, now that ISV can call the Search Relative Content API to retrieve data from that
+index and then power their AI experiences. The second opportunity or
+second way, ultimately that ISVs can onboard customers is
+more of a managed experience themselves. So if you think about ISVs who
+want to build the across app experiences and then
+quickly onboard customers, they can actually build that
+index on behalf of customers. And that really is less
+effort for the customer, 'cause at that point all they
+really have to provide is the cross app credentials to connect
+their Slack, their Google, their Microsoft and more. And the ISV will manage that
+on behalf of the customer and allows them to get
+going for the same pattern and using the Search Relative
+Content API to retrieve data. Now, like before, this
+is an and it's not an or. And the reason is the first
+experience is really common for AWS customers. We have thousands of customers
+already using Q Business today. The ability for them to quickly
+onboard and extend access to an ISV in a few
+clicks is very important. But we know that ISVs support
+a diverse set of customers. Some are going to be AWS customers, and some are not going to be. So in this scenario, you
+actually allow ISVs to build and manage and onboard all customers. It doesn't have to be just
+a subset of AWS customers. So it makes that investment,
+it makes that time, it makes that experience much
+more easy when you can say, "I'm building a net new experience, and I can sell and onboard
+to 100% of my customers." So when it comes to that top
+line growth, that opportunity to actually extend or build
+net new revenue streams, this is the way that allows
+ISVs to have that flexibility to do so. So, let's recap some of the
+key things that we talked about today. First and foremost, we talked
+about the top line growth. The ability to onboard all
+customers is a value prop that we allow ISVs that
+flexibility to make sure that they're supporting
+all of their customers. But most importantly, when we
+think about Amazon Q embedded and Q index, we allow now
+ISVs to harness the power of Q to either build net new
+generative AI assistants or enrich existing AI experiences. And that allows you guys to
+think about less overhead from managing all of the
+infrastructure, the auth, the connectors, everything
+else associated with building an assistant; that entire
+stack that we keep showing, all of that can be done
+in just a few steps now. Second, when we think about
+the UI component of this, you guys know your customers best. You know what type of use cases they want, you know what their pain points are. Our goal is to help enable
+application developers to build the right experiences
+that's going to keep your customers engaged. And that's why you see
+things like Amazon Q embedded having UI components
+that you can customize, and the Amazon Q index
+being more of a data play. It allows you to ultimately
+keep your existing experience, but add and supplement
+relevant data to make those experiences more broad. Third, when we think about the
+value for your bottom line. Not having to build and
+manage integrations, worry about auth, worry
+about ISV throttling, all these painful points
+when it comes to building and managing integrations,
+we can now help you eliminate all of that overhead. It allows you now to focus your
+resources on the right types of innovation, rather than
+building and having to manage that yourselves. And so, that allows your
+resource to be much more focused at the end of the day. And from a security perspective,
+throughout all of our capabilities, it still maintains
+the exact same standards as Amazon Q Business. We intentionally are building
+this experience where IT admins or customers have
+to grant access to ISVs to make sure that they're aware
+of what data is being sent to which ISV, and allows them
+to control who sees what. Each IT admin can grant and
+select which ISV they want, and they can select
+individual data sources. So, if I only want to share
+three of my five data sources with Zoom, but four of my
+five data sources with Asana, every enterprise customer
+has that control. So we always have the
+enterprise and control of their own data. Furthermore, those IT admins
+can actually select which users get access to each experience. So, if I only want a marketing
+team or if I want a finance team to use certain tools,
+I can also configure that as part of these
+capabilities more broadly. And lastly, when we think about
+just improving the quality of AI results. So, the one thing that I
+wanted to touch on with the Search Relative Content API
+is the ability to filter data. So, while enterprises can give
+you access and select which data sources you can access,
+you may not still want everything. You may want date, time
+filters that give you the most recent data from the index. Or you may only want data
+from one or two applications. And ultimately, that allows you
+to help curate very specific use cases and very specific
+experiences for your end users. And you can help minimize
+the amount of noise that you get back from the index,
+potentially, as well. So that helps you control the
+quality ultimately of this output and then also make
+sure those relevant contextual personalized experiences are still there with user level data. And the user level data
+piece is also very important. So like Q Business, the IT
+admin always provides the data, but we always go down to
+the user level access. So, that means as an
+individual, whatever data you're returning, that individual
+has to have access to it. We don't want to show
+unauthorized users' data that they're not supposed to see. So all of the goodness of Q
+Business still is relevant and still flows through
+all of these capabilities with application developers. All right, so how do we get started? What are the steps for
+both of these capabilities? Amazon Q embedded is
+pretty straightforward. If you guys have used
+Amazon Q Business today, it's largely the exact same steps. You're going to create your
+Q business application, you're going to connect your
+data sources using one of the many connectors that we offer. And the net new experience
+that we're offering is that ability, again, to customize that UI. It's a very simple few clicks. You can add a logo, you
+can change your colors, you can add a welcome message, et cetera. There's a ton of ways to
+actually make this look and feel like your application
+itself, so that when your end users are coming to your
+webpage or your application, it looks like it's your assistant. And then from there
+you're just embedding it into your application. The Q index is a little bit different. The first step we have
+is more of a signup step. We want ISVs to sign up and
+get access to these cross app APIs that we're offering,
+and it's intentional. We're going taking this step
+where enterprise customers are going to be giving or
+granting access to their data to ISVs. The reason we have the sign
+up stage, we want to do a light verification. We don't want to make bad
+actors trying to get access to data. So we talk with these ISVs
+to make sure that they are who they are, and then we'll
+grant them access to onboard and use the cross app index
+to ultimately integrate into their generative AI features. We'll work with you, we'll talk
+about what are the different use cases, how we can help support you, and we'll continue to build
+this cross app program with you, and you can scale further
+across all your customers. And then lastly, once those
+integrations are done, we'll work with your customers
+to ultimately onboard them, get them to grant you
+access to their index, or they provide you the credentials
+and you have the ability now to go launch the new capabilities. I want to say thank you guys. I know it's a Wednesday afternoon. I appreciate you guys all
+coming out for the session. I hope you're really excited. There's a ton of here. You've seen all of the examples
+from all the different ISVs on how they're thinking about
+building net new experiences. Your virtual meetings won't be the same. Your project management
+apps won't be the same. And it's really exciting to
+see that this is going to be a lot of opportunity as this
+thing continues to evolve. And we're hoping you're
+inspired to start building the net new applications
+in your app as well. We're going to take some
+time to answer any questions that you may have. But again, I appreciate you
+guys coming and I hope you have a great rest of your re:Invent. (audience applauding)

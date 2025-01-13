@@ -1,0 +1,359 @@
+- Hello, and welcome. My name is Zoe Schagrin, and I lead product and engineering teams in Amazon Q Business. Later in the presentation, Miguel Sanchez will also
+be joining me on stage, from Principal Financial,
+to talk about their journey with generative AI and Amazon Q Business. So it's day three of re:Invent. Hopefully you've had a
+great session so far, and so I thought we could get
+started with a little game to kick things off. And that game is called "Is It AI?" So I'll describe how we'll play. I'm gonna show a video, or, excuse me, I'm gonna
+show an image on the screen, and you'll have a moment to decide if you think it's created
+by a human or generative AI. And I'd love if you can raise your hands if you think it's generative AI. Let's have a little fun. Okay, so here is our first question. So earlier today, Dilip
+Kumar gave an innovation talk talking about business
+breakthroughs with Amazon Q. If you weren't able to make that session, luckily we have a quick summary that talks about some of
+the key talking points from that presentation. So raise your hand if you
+think it's generative AI. Keep your hand down if
+you think it's human. Okay, I see some hands. And this one is generative AI. Question two, here is a What's New post that talks about the
+recent browser extension that we released for Amazon Q Business. Hands? Okay, see some hands. And this one is human. Question number three,
+this is our last one. So here are a series of charts and graphs that show details on a
+company's sales data. Is it generative AI or human? Love it. And this one is generative AI. So thank you for playing along with me. I thought this would be fun. Again, I know we've had a great session, but it's been a long couple
+of days here as well. So I think at this point, we all know that generative AI has the power to transform
+the way that we work. And in fact, 94% of executives believe that it will change their company within the next five years. But I wanna take a moment to
+talk about some of the ways that generative AI is changing
+the way that I do work and my team does work today. So at Amazon, we write a lot of documents, we read a lot of documents. It's really the way that we communicate. And now I use Q to preread
+all of my documents. So the way that I start out a meeting is I start by reading Q's summary. It helps me understand the context, it helps me dig into the recommendations, and then I find that it makes
+our meetings more productive because I know exactly
+where I wanna go deep from a discussion standpoint, what are those hotly debated topics, those issues that I
+really want to dig into. In addition, we leverage
+Q to standardize the way that we take notes coming out of meetings so that the action items are clear and can be followed up on. My team uses Q to brainstorm
+ideas, to test hypotheses, and we also use Q to automate our monthly
+business review summaries. And what we've found is
+that for an assistant to be really useful at work, it does have to know an
+organization's business context and its users, and it must be secure. But many of today's assistants
+can't be easily personalized, and they don't meet the data security and privacy requirements that most of the customers
+that I talk to have. And that's why we invented
+Amazon Q Business. It's the most capable
+generative AI-powered assistant for finding information,
+gaining those key insights, and taking action at work. So with Q, it's really easy to bring together all of that information that business users have
+typically struggled with finding, and it empowers employees to be more productive, efficient,
+prepared than ever before. And Q Business was built
+for the enterprise, so we provide more than
+40 prebuilt connectors to popular enterprise applications
+and data repositories. And Q Business is secure and private by default. So at AWS, we really do believe that your data is your differentiator, and we respect that, so with Q, we don't train
+our underlying models with customer data. In addition, Q respects
+existing access controls, so if a user doesn't
+have access to a document outside of Q, they can't access
+that document in Q either. In addition, we make it easy for administrators to apply guardrails to ensure that the
+responses that Q provides reflect your brand voice. So since launch at re:Invent last year, we've innovated and worked
+with companies of all sizes and across all industries
+to help their employees be more efficient,
+prepared, and productive. But what I'm particularly excited about is some of the incredible
+business results and outcomes that we've seen from
+many of these companies through Amazon Q, so I wanna talk about just a
+couple of those examples today. The first example is from Bayer AG. They're one of the largest pharmaceutical and biomedical companies in the world, and they have a large
+team of data scientists that are part of their Decision
+Science Ecosystem platform. And so this group is focused on addressing food
+scarcity, sustainability, and I can't think of a more
+important area of innovation. And what they were really
+struggling with was documentation. So they had multiple
+different repositories, they had documentation
+that was out of date, it was hard to find, and so they implemented Amazon Q Business to help with this challenge. So they did a couple things. First, they brought all of
+the information together. Then they created a process that automatically published updates as their developers and data
+scientists made updates. They also created an async process that allowed them to continuously improve and check the quality
+of their documentation. As a result of this, they've
+made it significantly easier to onboard new employees. So, for example, they've reduced employee
+onboarding time by up to 70% and increased employee
+productivity by up to 30%. In addition, Smartsheet helps
+businesses plan, capture, track, automate, and
+report on work at scale. So they have over 3,300 employees, and what they found was that
+they had information, answers, it was locked away in training courses, in online wiki pages, and across all of these different places. And then they had these various
+all-employee Slack channels where employees were asking questions, and sometimes they would get answers back, sometimes they wouldn't. Sometimes the answers were
+accurate, sometimes they weren't. And so they used Q Business to
+help address that challenge. And so now employees
+can ask their @AskMe bot any question in Slack and
+receive a real-time answer back. Their CEO also uses Q Business to brainstorm ideas and get answers without interrupting
+his employees' workflow. And they were able to do all
+of this and more in weeks without a single line of code. I also wanna talk about Deriv, which is one of the world's
+largest online marketplaces. So they had 25 years' worth of data, and it was scattered across Google Docs, Google Drive, and GitHub, and they used Amazon Q Business to really unify that information. They're using it across
+customer service, marketing, and recruiting use cases. And what they've found is that it transformed
+the way that they work. So it significantly streamlined how they create marketing campaigns. It also reduced recruiting
+task times by 50%, which is pretty amazing to see. So while we've seen some pretty
+powerful business outcomes from you all, from our customers, we've been working hard
+to innovate even faster. And at Amazon, we always work backwards from you all, from our customers, so the things that we're
+talking about today and that we have launched over the preceeding weeks and months have really come as a direct
+result of the feedback, the collaboration that we've had with you all, our customers. And I wanna talk about
+a couple of key themes that we've heard from you all. The first theme is that you
+want faster time to value, so you wanna be able to really
+innovate using generative AI and deliver business value from day one. The second key theme that we
+heard was how important it was not to have another siloed
+business application, but rather to ensure that
+across all of the places that your users and your
+employees are doing work that they can access real-time
+generative AI assistants to take action, to get
+answers, to generate content. The third theme that we heard was the importance of
+continuous business value, how important it is to be able to use your
+data to gain insight and drive better business
+outcomes and decision-making. So I wanna talk about that first theme around faster time to value. So one of the things that we heard was that you wanna be
+able to give your users the power of generative AI even before you've connected
+all of your company data. So now we've made it easy for employees and users of Q Business to securely upload their own documents, to create targeted content, and also to leverage general knowledge to get answers, to brainstorm
+ideas, and to ask questions. In addition, while we heard that you all love the efficiency
+that Q Business provides, whether it's using your own
+documents, company data, or even general knowledge, we also heard that a
+lot of the information that employees, business users need is locked away in structured data, so in data lakes, databases, spreadsheets, et cetera. And so now we've made it easy
+to bring all of that data, all of that business context into Q to provide real-time answers. So now, again, you can
+access structured data from databases, data
+lakes, data warehouses, all from within one user interface. And not only does Q provide a
+response in natural language, but it also provides a
+rich data visualization so that you can get the
+context around the data, and you can also use that information to easily align with stakeholders
+and communicate outwards. So think about how powerful that is to have all the information that you need to make a business decision
+at your fingertips. In addition, we also heard that you wanna be able to experiment with new generative AI
+use cases even faster, so now we've delivered a new simplified onboarding guide that allows you to create
+a generative AI assistant in three simple clicks. So let's take a moment and see what this looks like in action. - [Narrator] John is a new
+financial advisor at Any Company. He oversees a large portfolio of clients. John uses multiple applications to deliver great client
+experiences, conduct meetings, and provide important business updates. Nikki is a business operations
+manager at Any Company and is responsible for the implementation of Amazon Q Business for John's
+team of financial advisors. Any Company Financial
+adopted Amazon Q Business so that they can leverage generative AI to help them increase
+employee productivity, increase satisfaction,
+and surface key insights across their business. Let's dive into one example which will help John and his team be highly productive throughout their day. John is in his first few weeks, and it's been a great
+onboarding experience. He has everything he
+needs at his fingertips with his personalized assistant. This is a very different experience from his previous company, where John was frustrated with
+how manual and tedious it was trying to find information. Now it's easy for him to find the latest product
+information, customer documents, or even important internal
+employee documents. Not only is it easy for
+John to find information, but he can also create
+personalized materials for his customers simply by
+leveraging his personal files. This makes the experience feel like it was built just for him. This helps him be more productive and creative for his clients. John often needs important insights about his client accounts. He is not as highly proficient in certain skills, such as SQL, and does not feel confident
+building custom reports in all the different
+applications Any Company uses. With Amazon Q Business, insights are right at his fingertips, all through a conversational experience. In John's previous company, he
+would have had to wait weeks and work with many different teams to get these kind of insights
+from multiple systems. As John ramps, his peers and leaders love how data-driven and thorough
+his business updates are, and they've asked him to help scale this to the rest of his team. John can scale this through
+his Amazon Q experience. He can templatize the way
+he creates business updates and share them with his team members, improving the overall
+effectiveness of his team, surfacing critical updates that result in insights for the business. Now it's easier than ever for
+Amazon Q Business customers to set up highly personalized
+experiences for their teams. Nikki is a longtime team member of Any Company's business operations team. She helps set up Any Company's
+business applications, and she's creating a new use case for the generative AI assistant. Setting up Amazon Q Business is easy. In just a few clicks, Nikki can create an Amazon Q assistant that helps accelerate
+her team's productivity. After creating the assistant, Nikki needs to ensure that
+it leverages data sources from the various data repositories
+that Any Company uses. With 40-plus prebuilt connectors, it's easy for Nikki to set this up without a single line of code or requirement to leverage a developer. And just like that, Amazon Q Business is ready to accelerate the
+productivity of employees and deliver great outcomes to
+employees and their clients. (gentle music) - So let's talk about what you saw. Throughout the experience, John was able to leverage the
+out-of-the-box user interface that Q Business provides. He was able to upload his own documents to create targeted
+content for his customers. In addition, when he had a
+question about his portfolio, he was able to leverage structured and unstructured data insights to get the answers he
+needed to do his job. In addition, because this is a report that John regularly runs and information that he
+regularly needs access to, he was also able to leverage Q Apps, which is a feature of Q Business that we launched over the summer. So you can think of Q
+Apps as a no-code way to fully automate repeatable common tasks. And so because this is something that, again, John does regularly, he created a Q App so that with one click, he can regularly get
+that same report back. But his team also needs access
+to the same information, so John went ahead and shared
+his Q App with his entire team through the Q Apps library so that they could also take advantage of that same automation. In addition, Nikki was able to create a new Q Business assistant
+in three simple clicks. So all she had to do was she added her name of her assistant, she added her users, and
+she was off and running. And then she could easily
+connect her company data using 40-plus prebuilt connectors, so she didn't have to do
+complex integration work to make sure that her team had access to the
+information that they needed. So we talked about how we're
+accelerating time to value. I also wanna touch on how we're ensuring that we don't deliver another
+siloed business application, but we infuse Amazon Q Business throughout the places
+that your users do work. So most business users often use six or even eight
+different business applications. So they're often moving between different communication tools, homegrown applications,
+purpose-built applications, and some of that can be challenging. And so now we've made it simpler than ever to reduce the number of applications that you have to move between. So we've brought Q into the places where your users are doing work through managed extensions
+and embedded capabilities. So now you can access Q
+through the browser extension, can summarize a document
+that you're reading, ISVs can fully embed Q
+into their applications, and with a new cross-app API, we also make it easy to share
+the index that Q provides across different applications. So regardless of where your users move, they can still get access
+to the same insights, company information, and answers across the places where
+they're doing work. In addition, we also heard that it's more important than ever for your users to be able
+to go one step further and take action, so we now provide 50-plus
+prebuilt action connectors so that from within Q Business, you can create a new
+opportunity in Salesforce, you can update an opportunity, you can create an issue in
+Zendesk or in ServiceNow, you can see what your
+current incidents are, and you can even take action
+from within PagerDuty. So now it's easier than ever to make sure that you've
+completed your end-to-end workflow and taken that last-mile
+step of completing an action. What we also heard is that many companies
+are starting to rethink even more complex workflow
+automation capabilities in an era of intelligent agents, and so coming soon, we have
+a new series of capabilities to help fully automate even
+the most complex workflows. So many traditional legacy
+automation capabilities, they're fairly complex to implement, so often they take months, you have to bring in teams of consultants, and then even once
+you've implemented them, they tend to be fairly brittle. So if, for example, a source application or a website that you're
+using changes, a button moves, the automation can break. And so now, with Q's capabilities,
+we do several things. One, we've drastically
+simplified the process to create a new complex automation. So I'm talking about the things
+that span multiple teams, departments, users, and applications. So to create a new workflow, you can upload an existing SOP, standard operating procedure document, you can take a video or even describe the
+process in natural language, and Q will create a guided workflow plan, which you can then easily
+edit, modify, and customize. And then Q uses a series
+of advanced agents to ensure that the workflow
+successfully completes, so even if, again, a button
+moves, an application changes, Q can seamlessly navigate
+around that change. And we also provide the governance, the observability that you'd
+expect from an AWS service. So let's take a moment and see what this looks like in action. - [Narrator] For
+applications like his CRM, his project management tool
+for tracking major projects and many different
+productivity applications. Amazon Q is available in all
+of these different experiences, ensuring that John can access
+Amazon Q Business anywhere. For example, instead of spending hours reading through long wikis to understand Any
+Company's unique processes, he can easily see quick summaries and get up to speed in minutes. Any Company also uses
+other popular applications as John manages his work. Embedded generative AI
+surfaces contextual information within his favorite business
+applications, such as Asana. In this example, John
+is managing deliverables for a critical project in Asana, and he has surfaced important
+information in the moment. Now that John is done
+updating his project plan, he wants to ensure this
+information is updated where Any Company tracks
+customer information. With Amazon Q Business, John can do this directly
+from the assistant. John is done updating his project plan and wants to ensure this milestone gets captured in Any Company's CRM. Nikki is excited to see
+how productive and happy this experience is making her team. The feedback has been great so far. Recently, John made a suggestion for how he would like to see standard business operating procedures integrated into the process
+and help drive more efficiency. - Okay, I had to pause
+there for just a moment because I really want you to pay attention to what comes next. We talked about how simple it is to create a new workflow automation. Take a look at how, again,
+using natural language, a standard operating procedure, or even a video of the process, you can now fully automate even
+the most complex workflows. Take a look. - [Narrator] User workflows are, it will be easy to automate them without development resources. This makes accommodating
+John's request simple. Nikki can create automated workflows that reflect Any Company's
+standard operating procedures. She can do this by using prompts, existing documents and SOPs,
+and assets she already has, like videos and images. Coming soon, workflow
+automation is a few clicks away. - So let's talk about what you saw. So first, John was able to
+leverage managed extensions and specifically the browser extension to summarize a document. In addition, he was
+also able to leverage Q from within Asana. So not only was he able to
+access support and assistance, but Q also had all of the
+context from his company available to him from within Asana, so that state that John
+has travels with him across the applications
+where he's doing work. In addition, with 50-plus
+out-of-the-box actions, it was easy for John to take
+action from within his CRM, so he could easily update an opportunity and ensure that had the latest information after the work that he
+had completed in Asana. We also talked about new
+workflow automation capabilities. So in this instance, Nikki was asked to fully
+automate a new workflow, and it was easy for her to do that using workflow automation capabilities that we have coming soon. So, again, with the intelligent agents, the process could seamlessly be completed even if source data was changing. Just pretty amazing to see. So the third theme that I
+wanna talk a little bit about is really how we're helping
+ensure continuous business value and better business
+outcomes through Amazon Q. So we now provide a prebuilt
+out-of-the-box dashboard so you can easily visualize your data and how your users are interacting
+with Amazon Q Business. You can see key trends and insights, and you can also continuously
+improve your data because it helps you see where
+your users are interacting, where they're having an
+issue with the content, where content may be out of date so that you can make
+continuous improvements. In addition, earlier in the presentation, we talked a little bit
+about bringing structured and unstructured data together. Well, we're now bringing the
+power of Amazon Q Business into Amazon QuickSight, our unified business intelligence service for the enterprise. So now we provide context-aware Q&A so you can easily create
+AI-powered dashboards. You can really begin to interact with your data, gain insights. And with AI-powered executive summaries and AI-powered storytelling, not only can you gain those key insights, but you can also use it
+to help drive alignment on a business decision, to educate your stakeholders
+and your leadership team on your company's data. But sometimes you have a business problem where you're not even
+sure what question to ask. So you're not sure what the problem is, but you feel like there's
+something you need to dig into, there's analysis that you have to do. And so now we've delivered a new set of in-depth analysis capabilities where you can ask a question
+using natural language or state a problem. So you could say, "Why
+did my sales decline?" Or, "Help me test different price points and how they're going to
+impact profitability." And Q will walk you through a
+guided, step-by-step workflow to help complete the complex
+analysis that you need. So you can use it for hypothesis testing. It will help you find the
+data to do that analysis and then guide you through, step by step, how to get to an answer. So let's take a moment and see what this looks like in action - [Narrator] Set of dashboards
+that help her understand and measure productivity
+gains from Amazon Q Business and also help her understand
+and increase accuracy to improve results over time. And even better, as Nikki
+analyzes her team's performance, she uses Amazon Q to do
+comparisons across the team. During this interaction, she
+has a link to a dashboard visualizing key business insights. Any Company uses Amazon QuickSight as their business intelligence solution to surface insights
+about their organization. Nikki is able to use
+Amazon Q to ask questions, automate her work, and create
+executive-level stories. This includes deep analysis of her data, which requires data points from many different types
+of sources and applications. Previously, this type of work
+was manual and error-prone. Now Amazon Q Business automates this where her data already is. All of these built-in capabilities help increase productivity and demonstrate the value
+she brings to the business. (gentle upbeat music) - Okay, so let's talk about what you saw. So first, Nikki leveraged
+the out-of-the-box prebuilt analytics
+dashboard that Q provides to understand how her users are engaging with Amazon Q Business. She used it to continuously improve the source data that she had, the documents, repositories,
+and information that her team was leveraging. In addition, she also leveraged
+Amazon Q and QuickSight to start to dig into her data to understand what was
+happening at a macro level across her team and organization. And then when she wanted to go deeper to really dig into a
+key business question, she was able to leverage
+new scenarios capabilities to walk step by step through
+analytical opportunities, challenges, and hypothesis testing to get to the answer that she needed, all assisted by Amazon Q. So I'd like to welcome Miguel Sanchez from Principal Financial on stage to talk about their journey
+with Amazon Q Business. - Can you hear me? Good. Good afternoon. Thanks,
+Zoe, for having me here. I'm Miguel Sanchez, analytics director at
+Principal Financial Group. And today, I'm excited to share our story of securing innovation
+through Amazon Q Business. As you will see, our experience demonstrates
+that financial institutions can embrace cutting-edge AI capabilities while maintaining the
+strict security standards our industry demands. Our journey with Amazon Q
+Business has fundamentally changed how we approach knowledge management and employment enablement, all while strengthening
+our security posture. At Principal, our
+mission is helping people build better lives through
+financial security. Throughout our history, we
+have embraced innovation while maintaining our commitment
+to security and trust. As we move forward with generative AI, this balance between
+innovation and security becomes even more critical. We have learned that these
+are not competing priorities. They are complementary forces that drive sustainable transformation. Let me share some context about Principal. For 145 years, we've been helping people and businesses reach
+their financial goals. Today, we serve 68 million customers, manage 700 billion in assets, and operate in 17 countries, with 20,000 employees worldwide. This scale means our technology decisions must be thoughtful and
+secure from day one. Each implementation affects
+millions of customers and thousands of employees, which is why security and
+innovation must work hand in hand. Let me share the challenges that we faced with our knowledge management. Our knowledge resources were scattered across multiple platforms, SharePoint, OneNote, and
+various internal systems. The fragmentation meant our employees struggled to find and use
+critical information efficiently. Our onboarding process
+for complex business areas was taking a significant amount of time for employees to reach full proficiency. We needed to reduce this timeline to remain competitive in
+today's fast-moving environment. Adding to these challenges, we discovered teams were starting to explore public large
+language models, or LLMs, creating potential security risks in our regulated environment. So why did we choose Amazon Q Business for our generative AI solution? Let me share our key considerations. First, it provides a one-stop shop for retrieval-augmented
+generation, or RAG, as a service. This was crucial as it allow
+us to leverage AI capabilities while maintaining control of
+our proprietary information. The productivity gains were compelling. Imagine reducing processes
+that took hours to minutes while maintaining accuracy and security. As a full enterprise solution,
+it seamlessly integrates with our existing systems and workflows. Most importantly, the
+security enhancements align perfectly with our
+regulated environment, providing enterprise-grade
+security controls that protect our sensitive information without compromising functionality. Let me show you a solution overview on how we are using Amazon
+Q Business in practice. Here, you can see our
+virtual assistant interface. What makes this powerful is its ability to handle multiple
+document formats securely. Watch as we upload an
+internal PDF document. All of this happens within
+our secure environment with built-in user authentication
+and permission controls. While the assistant processes
+this request for summary, which typically takes just a few seconds, let me highlight that the platform validates user permissions
+and access rights for each information source. This ensures we maintain security while delivering quick results. The summary you see now includes key points from the document with options to copy
+results, provide feedback, and validate accuracy. The platform also identifies relevant source documents for reference. Now let's look at how it handles our preconfigured knowledge base. We have connected it to
+a SharePoint repository containing over 8,000 documents. This allows our teams to quickly navigate and find information that previously would have
+taken hours to locate, all while maintaining
+our security standards. Now, let me share our results. The impact has been significant
+in several key areas. We are seeing significant time savings, with an average of 20 to
+30 hours saved per task. This is particularly impressive considering that we started
+with knowledge bases that were only about 70% organized. But here is a key lesson we learned. Don't wait to perfect conditions. We moved forward, and while improving our
+data quality to 90%, we were already delivering
+significant business value. Our user adoption has been strong, with 800 users across the enterprise actively using the platform. This rapid adoption shows that when you provide
+secure and efficient tools, teams will embrace them. Most importantly, we have
+enhanced our security posture. By providing a secure
+alternative to public LLMs, we have eliminated potential
+data exposure risks while maintaining the
+productivity benefits of AI technology. These results validate our approach to balancing innovation with security in a highly regulated environment. Looking ahead, we have
+three strategic initiatives for expanding our Amazon
+Q Business implementation. First, we are focused on scaling
+enterprise-wide adoption. This means expanding beyond
+our current user base to reach more teams and
+departments across Principal, ensuring that the benefits we have seen in our initial implementation can be realized throughout
+the organization. Second, we are enhancing
+operational integration by connecting Amazon Q Business with additional knowledge bases
+and operational platforms. This will create a more comprehensive and interconnected knowledge ecosystem, making it easier for teams to
+access and utilize information across all our systems. Finally, we are enabling
+intelligent automation to take our implementation
+to the next level. This involves developing
+advanced use cases that will help automate routine
+tasks, streamline workflows, and create more efficient
+processes across the organization. Each of these initiatives
+builds on our key learning: start with what you have,
+and improve as you go. We are excited about
+the possibilities ahead while maintaining our commitment
+to security and compliance. Thank you. So, Zoe. - Thank you so much. They gave me a microphone, so hopefully that'll do the trick. Thank you, Miguel. It was great to hear about your story with Amazon Q Business, and I can't wait to see what you do next. Whoops. Okay, so we've talked
+about a lot of capabilities that Amazon Q Business provides, and you can see the array of
+use cases that we support, from sales, marketing, product management, and human resources. And often, customers ask me, what is the best way to get started? And what I usually recommend
+is just start with a use case. Really think about what
+matters to your organization, and identify those two to three use cases that really are critical to pain points that you need to solve from
+what's core to your business. Once you've identified those use cases, it's also important to
+identify success criteria. So what's the KPI that you
+will use to measure success? How do you know if
+you've moved the needle? And then once you have
+your use cases identified and your KPIs, get started. So, again, with Q Business, it's easy to do a POC, a proof of concept, and just get going. So, again, we've talked about a broad array of capabilities today, and Amazon Q offers many
+capabilities that make it easy to discover new
+information, gain insights, and take action to drive
+better business decisions. If you're interested in
+diving a little bit deeper, we also have two sessions
+scheduled for tomorrow. The first is how Principal
+Financial improved productivity with Amazon Q Business. That session will go deeper into the how. You heard some of the what today. Tomorrow will be more focused on the how they got to those results. In addition, we also have
+a Chalk Talk scheduled on understanding deep security controls within Amazon Q Business that I know will be a
+great session as well. And my last ask for you all is I'd really appreciate
+if you can take a moment and fill out the survey in
+your mobile application. We do use the feedback. It really helps us make sure we're delivering the right
+sessions and content for you all. And I just wanna say a huge
+thank you for joining me today, and I hope you have a great re:Invent. Thank you so much. (attendees applaud)

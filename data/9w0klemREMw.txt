@@ -1,0 +1,343 @@
+(attendees chattering) - Hello everybody. I hope you've been having
+a fantastic day so far. I have certainly been enjoying my day and I'm so forward to talking to you all about Amazon Q Business. Before we go down with
+the topic at hand today, let's do a small thought exercise. How many of you, in your
+day-to-day work life, have spent time more than you needed to, to really find answers
+to very simple questions? How many vacation days do I have left remaining for this year? How many tickets, high
+priority, are assigned to me? Say more, right? Like, tell me the case number
+for the incident I opened with this customer name. Furthermore, think of how
+much time you are spending context switching between various tasks and doing the same task repeatedly, across various tools
+and various data sources in your organization. I'm sure all of your answers
+to that thought exercise are that you are spending
+much, much more time than you would like to. If you are one of those persons, you've landed at the right spots today, and you are gonna be
+talking about Q Business with me and Naveen from Life360. So today's session, we will focus on how to
+boost employee productivity using Amazon Q Business. So we'll start with an
+overview of Amazon Q Business, dive deeper into some of the features, the key features for Amazon Q Business, and then most of the time, though, we'll spend hearing from one
+of our key customers, Life360, on how they used Amazon Q Business to boost employee productivity
+for their organizations. So let's start with what
+is Amazon Q Business. So Amazon Q Business is AWS's generative AI-powered assistant. It helps make your organizational
+data more accessible, it helps users get answers to questions, generate content, such
+as marketing materials, and take actions in
+third-party applications like Salesforce and Zendesk and JIRA. Amazon Q Business is built with security and privacy
+at the heart of it. This makes it much, much
+easier for customers to adopt generative AI safely. Amazon Q Business maintains
+access control to all your data. So if it doesn't have access, they will not have access to
+it, even inside of Q Business. So how do we do all of this, right? So, key topics for that are, first of all, it unites across your data sources by connecting to various
+enterprise data sources, such as Microsoft Exchange,
+Gmail, Salesforce, JIRA, SharePoint, intranets, wikis, et cetera. It also connects to Amazon
+simple storage service, such as S3, et cetera. Then it searches all of the
+data, summarizes findings, and gives answers to the customers. It's also available wherever you work. So yes, you can access it
+from its own web application. You can also access it from within applications such as Slack, because it is embedded
+into those applications. You can also access it
+directly from your web browser via its browser extensions. So it's ubiquitous, and you can access it
+from anywhere you want. It also has industry-leading performance in our internal benchmarking results. Further, going much more
+deeper into some of these, which what I just touched upon,
+from a connector standpoint. So how does Amazon Q Business
+really is able to give answers to all these questions? So first, it needs access
+to all that data, right? And the data could be stored in various third-party
+applications and data sources. So Q Business provides over 40
+popular enterprise connectors and document repositories. Some of the major ones are S3, Salesforce, Google Drive, Microsoft
+365, ServiceNow, Gmail, Slack, Atlassian, Zendesk. There are many more, and I'm
+going to go into that later. Next, it delivers quick,
+accurate, and relevant answers to all your business questions. So when the user asks the questions, it retrieves the relevant content
+from all the indexed data, looking into the permissions
+that the user has, and then generates the
+response with the references. It respects existing access controls. This is going back to if the users don't have
+access to that data outside the queue, they're not gonna have
+it inside the queue. So during its retrieval,
+it does look at permissions and is very aware of those. Further, every organization
+has different levels of what they want their end users to get answers for, and not, because everybody has their own standards, their legal standards, and
+their guardrails in place. So with Q Business, administrators can easily apply guardrails to customize and control the
+responses your end user sees. So if you don't want certain
+topics or certain words, such as competitor or legal
+or security, et cetera, you could block those
+in either the query path or the response path. Next, Amazon Q Business
+also executes actions on behalf of the user. So it not only helps
+the user find answers, you could just say, "Create the ticket with
+all the information above." It'll create that ticket, it'll send something for your review. And after that last, but not the least, it streamlines daily tasks with user-created
+lightweight applications. This is something we call Amazon Q Apps, which I will dive deeper into, but if you observe that a bunch of users are doing a set of repeated
+tasks, you know, every time, you can just say, "Create me a Q App so that I don't have to give
+the same set, same prompts, over and over again." And we'll dive into that. So how do customers really use Q Business and build generative AI
+experiences with Q Business? So first and foremost
+what customers would do is they would connect Q Business to a set of their enterprise data sources. So off the 40-plus built-in connectors, you can choose whichever ones you want to connect your
+Q Business application to, and then you'll say, "Here
+are the top data sources that I want the application
+to have access to." Once connected, what Q
+Business does by itself, because it is a fully managed
+application, remember, it crawls the data, along with crawling the data, it crawls the document permissions, it ingests the data, and then it ingests all
+the document permissions, it indexes it, and we create the index, and that is the
+fundamental building block, which allows the end-users to get the answers that
+they're looking for. This entire pipeline that I just explained is also very well known. We call it a fully managed retrieval-augmented generation pipeline. So that's what we take
+away the heavy lifting to do all of this for the customer. And then once the index is set up, the Q Business application, the end user gives a query, and immediately the system
+retrieves the relevant content, taking into account the user permissions, combines the responses, and for every sentence in the response, there's a reference back to
+the document or the web link that has a citation And then the user can go forth their way, or they can have much more dialogue, and engage in a dialogue
+and have a conversation. Q Business will understand the
+context and know the history, and then it engages in that conversation. So then next, let's dive deeper into some of the key
+features of Q Business. First, I spoke a lot about connectors, which are a fundamental
+differentiation for Q Business, because without them Q Business cannot have access to the data and it cannot give you all the answers that you're looking for. So like I said, we have
+40-plus connectors, and this is ever growing, because this is a huge area of investment. So today it's 40-plus, tomorrow it'll be something else, and the next year it'll be many more. So right now, our latest
+connector is Slack, and we have two others
+that are in preview, which are Google Drive and Asana. So, why are these connectors so important? What is so great about them, right? So as you're all aware, data, which is in all
+of these applications you're seeing on the screen, is scattered across enterprise systems, and oftentimes it's in silos. Now, creating a personal digital assistant means being able to connect
+to these data sources, crawl and ingest the data,
+with the permissions, for all the knowledge
+workers in your organization, building these native connectors that respect access controls, while maintaining sync
+schedules, and is not trivial, and it requires a hell
+of a lot of expertise with ongoing maintenance. So Q's native connector framework takes away all this
+undifferentiated heavy lifting from the customers, and we do all the heavy
+lifting on our end. So from your side, you just tell Q to point the right data source, and, voila, things are all set up. So Amazon Q Business connectors. We also do periodic sync scheduling. So once you point it to the connector, you can say ingest it every hour, ingest it every day, you can tell about, you can say how often you wanna
+update from your data source flowing into the Q Business application. And when it does those sync scheduling, and it does the syncs, it ingests the data, the
+changes to your data, the changes to metadata, because a lot of times answers
+are in metadata permissions, and then it chunks them into
+the right sizes for accuracy, and it builds them into the semantic index that powers Q Business. So most importantly, another feature that we have
+in the connector framework is something we call index boosting. So every customer and every organization knows which documents they want to boost for certain applications. If you have a legal application, sometimes you want to
+boost a certain data source that has a lot of legal contracts in your enterprise knowledge base. So in that scenario,
+administrators can say, "Please boost these data
+sources for this application." So that index boosting is some feature we've
+seen many customers use. So that way you customize which data source you give weight to during the retrieval and the
+response generation phases. So that's about connectors. Now let's go deeper
+into the next use case, or the next feature that
+Q Business provides, which is very search-centric. So in search, from an
+end-user perspective, all the user is trying
+to do is get answers, and accurate and referenceable answers to many of their questions. So in here, what we allow in Q Business is the end user can get answers directly from enterprise data, or they can get answers from
+the LLM's world knowledge, because you just want some
+general knowledge questions. Then you also get the
+citations or the references, so that you can click on the references and you're taken to
+those specific web links in your wikis, your intranet sites, and you can glance over
+the information yourself. Then Q Business also maintains the conversation history and context so that we carry forward the conversation, and not every chat is like a new, every message in your chat
+box is not a new message, because that's something, it's a very annoying experience otherwise. And like we spoke about boosting, you can get the answers
+from the documents you want, and we can apply guardrails so
+that you can block out words, you can block out words in
+the response in the query. You can not answer certain questions for certain topics, example. So you're like safe-creating a safe haven for your Q Business application. And this we've seen a lot of
+our customers use as well. Now, one of the latest features we have is many customers told us that, "Hey, I want to use Q
+Business to get answers, but I just want to do it
+right from where I am." So very quickly you can
+install and download the browser extension for Q Business into the browser of your choice. And then once you're in that webpage, Q Business understands the webpage, and you can just start chatting
+with that webpage directly. And then in that same
+webpage you can upload files, PowerPoints, Word documents,
+Google documents, PDFs, you can upload them to Q
+Business chat interface directly, and you can tell Q
+Business, at that point, use these webpages and these files for your context of giving me the answers. So you can very well control where you're getting your answers from. Next, as you're aware, everything with AWS is
+about safety and security, and so like we said,
+you can use Q Business with the identity provider of your choice, because we allow you to continue
+using identity providers such as Okta, and then you use IAM Federation
+to federate into Q Business, so that you're not repeating the entire identity setup process. You can also use AWS IAM's
+Identity Center if you choose so, so we respect both
+forms of authentication. Then we also are integrated
+with AWS PrivateLink, so that you can access Amazon Q Business securely inside your VPC environment within your VPC endpoint. We also support FIPS, Federal Information
+Processing Standard endpoints for highly-regulated workloads. We integrated with CloudTrail so that you can monitor all the activities logged, and can go in and you can
+audit and get traceability of everything your users are trying to do. And then we have topics and
+guardrails that I touched upon, but that's super important, so that's why you'll see me
+repeating it in every slide. And then you can block
+words, you can block phrases, you have a pre-canned response
+that we give to customers. We say, "Sorry, I cannot, I'm not authorized to
+answer that question," or, "Sorry, I don't have an answer." So there's certain pre-canned responses, and there's more to come on that on the roadmap for next year. Then let's move to the third feature, which is more about actions. Yes, nice, I like getting
+answers to questions, et cetera, but I now have to act on all
+of that information, right? That's where we have what we call plugins, and there are two flavors of plugins. One is what we call
+commonly a built-in plugin, and another called a custom plugin. With built-in plugin, today, Q Business supports
+four built-in plugins so that you, from the chat interface, select which plugin you
+want to take an action in, and you just say, "Create me a ticket," and it'll create the ticket. So there we have inbuilt integrations, like on the data sources side, we have inbuilt integrations
+on the actions side as well. And then with custom plugins, because we know that we may
+not satisfy everyone's needs, and you may have very niche
+needs for certain applications. In that we provide the
+framework of custom plugins where you can define your
+own Open API specification, bring it to Q Business, and upload it to define
+your custom application as a custom plugin, so that when the end user is in the Q Business interface, they not only see the data
+sources you've enabled, they see the plugins you have enabled, which are native, which
+we offer ourselves, but they also can see the custom plugins that you have enabled. So they know that they can
+take actions and get answers from across a variety of
+enterprise applications. Now, last but not least, there's a ton that we do with automation, and here is where Amazon
+Q Apps comes into play. Sometimes you have observed, for example, in my work, we do something called a
+weekly business review. It's a pretty same set of tasks that everybody has to do every week. We get the business
+metrics, we dump it in, we get the roadmap, et cetera, et cetera, and we pull together this doc. So when you have such a
+repeated set of tasks, which is pulling data
+from the same sources, doing the same action, creating
+content in the same format, instead of every team member having to go and figure out
+what prompt to give Q Business, and then having to
+converse with Q Business, we have created what we call Q Apps. So a team leader, one
+user, or one employee can go and automate this entire thing. They figure it out and they say, "Automate, create me a Q App with this," and immediately an app is created, and then they can share it with some of their other
+team members or employees. And the next time other users want to perform the same
+set of actions or tasks, they just use the Q App. So that way it saves
+incredible amounts of time, and it boosts productivity
+really, really high. We have seen a lot of
+that with our customers. So that's how you would
+just generate a Q App. You can even build a Q
+App in natural language. You can use a conversation
+history and say, "Build a Q App using my
+conversation history." There's a very low-code tool
+builder for Q Apps as well. So this is about Q Business. Now coming to how some
+of our major customers, and what use cases they have
+used Q Business so far, right? One, customer or IT support. For example, here what we've seen is many customers reduced
+their IT resolution time to frequently asked questions, and some of these support queries, because Q Business was
+retrieving accurate information from their enterprise's knowledge base. Risk and compliance. A lot of the time customers are like, "Yes, I found that, but I want to know what is the
+latest policy and procedure that complies with my
+industry, my company's, you know, my company's standards," right? Because everybody can create
+a wiki in an organization, et cetera, but what is the POR, the
+place of record, right? In that scenario, we have
+observed that risk and compliance people be adhering to
+their company practices by just finding that
+information immediately. That has improved a lot as well. Knowledge management assistance. In this one, we've observed that it reduced the time and effort that customers took to resolve issues, and because it improves the
+quality and the consistency of information, because you clean your data once, you index it once, you ingest it once, the syncs are scheduled once, and any number of departments
+in your organization can make use of that entire RAD pipeline. So they've observed that it
+increases a lot of efficiency, and they don't have to duplicate data and do all of this cleansing, specifically for different apps. Then human resources is one
+where we have seen new hires, a very standard set of procedures. You gotta do this, boom, boom, boom, and we've seen that it has
+reduced extensively the time to onboard new hires. Last but not least, operations, because a lot of the times
+people, shop floor workers, people who are working with equipment and trying to troubleshoot
+a machinery, et cetera, they're all using the same set of manuals, but they're looking
+through their documentation or their computer, and oftentimes they may not
+have access to these computers, or they'll have just access to a very few, and they have to find these answers. Instead of that, they just ask a question
+in natural language, and they get the answer. So it has greatly increased, reduced operations
+maintenance time as well. So now let's talk about... That's from me, and
+that's about Q Business, but now I would like to welcome one of our key customers, Life360. We have Naveen join us, because I'm sure you're waiting to hear from how they used Q Business to boost employee productivity. Over to Naveen. - Woo-hoo, what a difference
+a couple of years can make if you're in Genea space. I'm sure you're all excited about all the recent advancements, either in this that's
+already announced recently, or coming in the next couple of days. Hi everyone, my name is Naveen, working as Director of Cloud Operations, heading Platform Tooling and
+Infrastructure at Life360. Normally, I would like
+to ask a few questions. One of my favorite questions is, this is a speaker session,
+but I'll try here. How many of you have
+heard of Life360 or Tile? Okay, not bad, not bad. Generally I would've asked, what are the interesting use cases? We are seeing an interesting
+switch with our use case among the next generation
+of college-going kids. Earlier, parents used
+to kind of force kids to use the Life360. Nowadays we're seeing a switch trend where kids are asking parents
+to enroll for their safety, and pets and things. Today I'm gonna talk about how Life360 uses Amazon Q Business, why we use Q, and what are the problems
+we're trying to solve? Life360's mission is to keep people close
+to the one they love, and we do it by offering
+a holistic solution across people, pets, and things. Life360 is built for families
+with safety at the forefront. At a glance, we serve about 77 million
+global monthly active users across 170-plus countries and with a penetration of 14% in the U.S. That means one in eight families
+in the U.S. use Life360. Around 360 billion miles are driven with Life360 Crash Detection, and about 49 billion safe
+arrival notifications are delivered to families every year. I can truly say that our
+work literally saves lives by alerting families
+about their loved ones and sending ambulances if there
+is an unfortunate accident. Today's context, I would like
+to dig into two key themes and core pillars of Life360 platform, scale and trust, employee experience. Scale and trust. Obviously, we would like to
+support all the user growth and make sure our
+mission-critical features work for everyone, whenever
+the need, without fail. We wanna make sure our end
+users and our edge is protected from security, legal, and
+compliance point of view. From an employee experience point of view, we talk about a key aspect as the company grows and scales. We no longer are a company five years back or eight years back. Our teams have increased, have dedicated focus areas, each team has now dedicated focus areas, and unlike the all-hands-on-deck approach for project delivery during earlier days, we have more features and more scale needs that we need to address. This translates into three core areas. We need to be reliable, scalable for our end-user experience, and we need to have high velocity for our own internal
+engineering experience. I would consider reliability and velocity as two sides of the same coin, right? Over the years, we've
+been doing pretty good with reliability and scalability aspects. The growth numbers talk about us, and, all the people, how many
+services that we provide, prove that, with our super
+-talented engineering team, in collaboration with our AWS partners, using best practices. Recently we started doubling
+down on the velocity aspect. You know what they say
+in the Silicon Valley, and you've all heard, "Move
+fast and break things." We would like to move fast, but not at the cost of breaking things, because as I mentioned, there's a lot of mission-critical
+safety features at play. So, how do we bring some
+of that velocity aspect, at the same time keeping
+the stability and scale. What's the problem? What aspects of velocity or employee productivity
+and tooling do I care for at Life360? How did that lead us
+to Q and similar tools? These are the four items
+I've kind of noted. I wanna believe that none of this is a new problem for anyone here, any company with people, which face people growth
+and team scale, right? They must have gone through
+at least one, if not more, of these pain points. As far as a knowledge-based search tool, I'd like to find a company where all the documentation is up to date. Any place that you have worked so far where you get best
+up-to-date documentation. We engineers, we like to build things, and then, you know, documentation
+comes second nature to us. It's generally spread across all the tools that we use, right? And there's no lack of
+tools that we are using. Slack, GitHub, Google
+Docs, Sheets, name it. There's more spread in the
+last two years with SaaS. Second, wouldn't it be nice if I have information
+retrieval personalized to me? Personalization of information
+and its availability is another key problem area to know. This is also one of the next
+frontiers of Gen AI space, where you mix availability of knowledge, cater to your context,
+cater to your needs. We all know about developer productivity. I've been to a couple of
+engineering leadership conferences over the last two years. If you see, the majority of 60 to 70% of
+vendors in the conferences are focusing on selling something
+on developer productivity. All the leaders are talking about, "How can I make my employees,
+engineers, efficient," right? Most of the time, about 50% of request
+tasks that engineers talk, engineer to engineer, are repeated. They can be mostly avoided, right? Neither the requester nor the responder enjoy those contact switches. Lastly, HR tooling. Another victim of documentation,
+or lack of process, is the onboarding of a new employee. I still remember back in the
+days when I joined a company, 100 folks in a big conference room with big booklets for two years. I think it's time to break
+that and make it again, bring some of that
+personalized context-sensitive, it's not the same for an SRE engineer versus an engineering manager
+to go through the same stuff. And information can be
+made available on demand, doesn't need to be dumped at once so that we need to recover. Why did we go with Amazon Q Business? You know, the first thing being
+the nature of our product, trust is foremost, as I mentioned, scale and trust, scale the second part, the trust is the most
+important for our customers and it's a no-brainer from
+the aspect of data privacy, security, and compliance. We wanna make sure our end
+user's data is safe and secure, and the access is not misrepresented. And in terms of ease of use and setup, if you make products, they come, is an old way of saying things. You know, we wanna build
+products or capabilities that the end users want to use. So we need to take
+whatever tooling we build to be able to use by the
+developers and take them, right, make it so easy to use, UX need to meet the employer. Relevance tuning, as I mentioned, is one of the core features. I'll give an example of use case, by going back to the documentation. Somebody asked a question,
+let's say using the tool, and the answer is not there, because documentation is not updated. Now, another engineer comes and answers, and now the tool has the information, and the next person, if he
+comes in the five minutes, can the answer be provided
+with the latest information, or latest standard. So that relevancy tuning can be done by using a boosting doc
+attribute of recent updates. That's an interesting feature
+that we started using. And, you know, single data, single tool, single entry point for
+varied data sources. We'll touch more on this later. How did we go about with our adoption? We built to solve the main use case of knowledge-based research, we built an internal bot
+assistant, called Cloud Companion, using the Q, and we also added a few Q apps towards it. All the information that
+everyone in the company is available through that single place, be it Slack agent or be it web browser, or the Chrome extension
+that recently is announced. In terms of developer productivity, we tuned the bot, and trained with cloud
+engineering best practices, ADRs, documents, and repositories. Our engineers next took
+it to the next step. This is very, if you think of AWS, we think okay, this is
+more relevant to cloud, and sounds easy, but looking at this, our
+mobile engineers got excited and they took it to the next step. They identified a challenge
+with mobile development. Most of you might have heard Figma, where product designers do the specs, and a Q app was developed internally to convert Figma into
+Swift UI code for iOS. I'll cover more details in the
+next coming slides of that. Last but not the least, HR tooling. After the success with
+the engineering teams, the HR team saw the potential here, and they worked with us to
+build an onboarding buddy, which kind of using Q App, and that helps all their wiki
+training material, and all, giving into, "Hey, you are into this role, here is what you can do with it." And each engineer, or each employee, can pick whichever step he is in and come back two days
+later and can restart. So this is more experimenting
+with onboarding buddy, which has been an
+interesting use case for us. I'll go through a couple of examples. That screen share screenshots how we did, and this one is an example of a developer using the Cloud Companion, using a Slack agent integration. It's one of our complex use cases. The use case is, "How can I enable a WAF
+rule to block traffic?" This is in production and it
+can break our edge traffic. This answer is achieved by combining information
+from multiple sources. Slack, the key, and the best practice of
+critical cloud component. TLDR. This showcases the confidence
+of developer community on Q for business tooling inside a RAQ. This is the one I was mentioning about, about Figma to Swift code converter. The challenge was a
+lot of time is invested in converting the UI spec
+to codify the design, and our team use leverage Q App. If you see there are three
+sections on the left side, left corner of the screen
+is provided an input, JSON input of the Figma. You can export from Figma, convert it, and see the middle section where the code is generated using the Q app that our team has built. And on the right side, it's the UX that's corresponding to the... I'm sure this is a small
+piece bit of complexity, but it's a pretty interesting use case that engineers came up by themselves when they saw the potential of Q. Icing on the cake, this won on our company's
+internal hackathon award recently, a few months back. So how are our early results based on targets that we have? You know, we are investing
+time into the Q App, obviously, we need to know
+what's our definition of success, and be able to see how
+we are able to success. Internally came up with a measure called Meantime to Knowledge, in the lines of, if you've heard already MTTR, MTTD, in the
+incident response times. This measures recency and
+accuracy of a particular item from the knowledge base
+available to the employees. At a high level, to recap, our main goals originally were
+to reduce context switching, reduce meetings, and provide personalization. And this is not just limited to the engineering organization, multiple organizations in the company. As you see the early results, this is at 20%, 15 to 20% adoption, we're just starting to grow. We kind of low-ball estimate, this is one hour per week per employee, and that kind of translated into savings of two engineers per month. I wanted to stress here that
+at this is a period of time where it's hard for estimating what's the productivity
+or what's the gains, ROI, as a lot of the teams and engineers are still kind of going
+through the adoption and experimenting. So please be aware of, you know, these things will get better in the next coming months and quarters across the industry, not just us. What's next for us? These are a few things that
+we are already working in, which are not yet done, but they're all in
+progress among other areas. Amazon Q for program management. Our TPM program management group has come and came up with
+interesting use cases of picking up how do they
+integrate Jira with QuickSight, then can provide the aspect of
+personalized program updates or project updates without... Again, the core aim is to eliminate some of the context-switching
+Slack messaging disturbances, right? Another interesting area, we are bullish on MTTR reduction. Obviously, nobody wants
+to spend a lot of time in understanding what's the
+root cause of an incident. By leveraging Q with other AWS products of incident-trusted advisor, and the ADRs, you have a rich history of being able assistant
+immediately available to you, telling, hey, this is a
+particular type of incident you can do this area. A lot of the times, you know, the on-call incident management teams, they still rely on some
+of the personal memory, or personal best practices
+somebody has to translate. Third one, developer productivity. We do continue, we are
+aggressively investing in this. An example is a Swift UI
+code generation is done, now we wanna shift left and do invest in test
+generation, and more. Through the last few months, since the inception of integrating Q, we went through some challenges. I do think these challenges are relevant for not just Life360, but anyone adopting some of these tools in mid to large-size organizations. Adoption is really important
+to have a strategy ahead, and you need to understand
+who is the best org best fit here, right? First, we worked with engineering, and then especially cloud,
+'cause they're more savvy. At this point of time, they're more day-to-day can benefit that. And then once their needs are solved, we worked with mobile, we worked with HR, now the product team is excited. So initial success is critical
+for the adoption, right? There's so many tools available. If you think about the
+fast-pace evolution there, there are tons of tools, AI tools, in the last three, four
+months I can think of, like at the beginning of year, very few, but if you can see now every
+employee has free trial for a lot of AI tools, different products and major
+versions are being released, if not every month, every quarter. Key here is to provide the guardrails in terms of your data IT privacy policies, and let the team find
+their own supercharged gen AI use cases. For example, one of our engineers
+came up with, hey, FinOps, how can we enable, how can we answer some of the questions when a person is developing code? You know, what's the impact
+on the service overall in terms of cost management? So exciting use cases, but just be careful about
+how you want to adopt. You know, the more diverse, like, you need to provide the guardrails, the more diverse and divergent, it becomes a bit, managing-wise, complex, from an org point of view. Engagement, as I mentioned, hackathons are a great way. The key is to create engagement
+and excitement, right? The last one is the
+special interest for me. We all know Genea has limitations. It doesn't solve all problems. So we need to be clearly aware of that, super critical to identify
+the right use cases and have a clear definition of success, or definition of done. In this case, we did our own user surveys
+at the very beginning. "Hey, what particular use
+cases do you care about? What do you mean by, what makes you use this product?" Right? Like, what's your question? What is the answer you're expecting? And at that, that's super helpful later in two, three months when we are evaluating what's the results or what tuning we have to do. I would like to conclude
+by sharing with a quote from my VP of Product, who
+joined Life360 earlier this year, a few months back. Underscoring, you know,
+the knowledge-based utility of Amazon Q. During his onboarding, not just onboarding, I think, he is a big fan, he became a big fan. Like, we are a fully remote company. It's hard to get FaceTime. So this helped him, this is a strong success story
+I would consider internally. I hope you find some of these use cases and learnings useful. Good luck with your Genea journey. Handing off to Sai. - Thanks a lot, Naveen, and I hope all of you found how Life360 used Amazon Q Business in their organization useful, and as a starting point for your journey with Amazon Q Business. So, there's a very simple way. Like I said, it is a
+fully-managed application, so there's really very less
+setup work that you have to do. So if you scan that, you'll
+go to our documentation, and it's the simplest and
+easiest way to get started. And the product team is always here. Our AWS teams are here to help you. Your account teams are here to help you. So please do reach out, try
+out Q Business and Q Apps. And we're gonna stay around
+here for a few questions. So please feel free to stop by, and both Naveen and me will be right here. Thank you so much for listening in today. Thank you. - Thank you all. (audience applauding)

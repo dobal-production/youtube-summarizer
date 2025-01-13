@@ -1,0 +1,457 @@
+- Hey everybody, good afternoon and thanks for
+coming down to our session. Awesome to see you all showing up and joining the session today. As the slide says, we are gonna dive deep into a
+very specific SaaS topic today about adding the
+federated identity support into multi-tenant SaaS environments. My name is Dhammika Sriyananda. And joining with me on stage today is my colleague Toby Buckley. We both are senior architects here at AWS. We are a part of the team
+called AWS SaaS Factory. And our team, as the name says, helps with the customers and partners to build, migrate, modernize
+their multi-tenant solutions on AWS. Now, whenever the customers
+are reaching us out asking the help to build
+their SaaS solutions, one of the first things
+that we would discuss is about how do you manage
+your users and their identities to provide these identity operations in the SaaS application. Now, most often we'll just go ahead and help them to implement the standard SaaS identity workflows where we centrally manage
+the tenants, tenant users, and the identities within
+the SaaS application. Now this way, the SaaS provider
+will have a better control to not only to manage these
+identities within the SaaS app, but to provide the identity
+operations as well, such as authentication
+authorization to the end users. Today we are gonna take
+this into one step further and see how we can add
+the federated identities to the SaaS applications so that you as SaaS providers now can onboard the
+tenants with their own IdPs so they can single sign on
+to your SaaS applications. I hope that's what you came here as well. And this is gonna be a
+level 300 discussion, so might not be having time to write the code or doing the demos, but we'll be diving deep into the design principles
+architectural patterns, and the implementation details about adding the federation
+into the SaaS applications. And we'll see how a couple of
+different federation protocols will be implemented by taking
+Amazon Cognito as an example. Now, before getting into
+the federation discussion, I really wanna take some time to dive deep into the standard SaaS identity patterns and the fundamentals because they will still be
+valid and highly applicable for the federation story as well. Now at high level, we know that SaaS applications can be seen into two main components, application plane being the
+having the business logic, microservices and databases and all. We also have the SaaS control plane that provides the shared
+services to the SaaS providers to be able to operate the
+SaaS applications efficiently. One of the core features
+of the SaaS control plane would be that it'll provide the seamless tenant
+onboarding capabilities so that we can onboard the tenants, and then we ask them to create the users in the SaaS application. Now, for that, we generally have a centralized
+SaaS identity provider within the SaaS application so that it will help us to securely manage and operate these user identities within the SaaS application. So we can provide the identity operations like authentication and
+authorization to them. Now, if you look at the
+exact dataset that we need from the tenant users to create the profiles
+inside that SaaS IdP, there are two main data types in there. We generally ask to
+provide the user attributes from the tenant users such as username, password, and the rest of the identity details. And while they are creating
+their profiles in the SaaS IdP, we also want to inject the tenant ID and the tenant context into that as well. So in other words, any tenant user that we would create in the SaaS IdP, will have the both user identity and the tenant identity together, which we call the SaaS identity. And that will help us to
+uniquely identify these users within the SaaS application. So the primary objective
+of this design would be that we can pass the SaaS industry back to the tenant users when they get authenticated successfully so that they can use it to interact with the SaaS
+application efficiently. Now, there are multiple
+ways of implementing this, but if your SaaS IdP supports the token based
+identity operations, we can easily leverage something
+like adjacent web token to represent the SaaS
+identity of the users and then issue these tokens to them so they can actually use these token to efficiently work with
+the SaaS application. Now these tokens are
+generally being managed completely by the SaaS IdP. And they have the security
+in-built by default, for example. They are encrypted and they have a TTL, they're getting expired
+up sometime as well. Now, this token based implementation in terms of the identity will immensely help us to automate the downstream communication of these tenant users with
+the SaaS application as well. Now, let's take an example. For example here I have
+a SaaS application. I got this Cognito as my SaaS IdP. And I've got one tenant onboarded. And I've got John who's one
+of the users of that tenant already been created the profile... Already been created on Amazon Cognito. Now, when John try to
+access the SaaS application, if there is no valid session
+available at this stage, SaaS app will ask Cognito
+to authenticate John, right? There are multiple ways of doing that, but at the low level, it'll be the oauth2/authorize endpoint that we'll be calling to
+Cognito to get this thing done. Why? Because Cognito is an OpenID
+Connect implementation that has been built on top of
+oauth2 specification, right? So you will see that we'll be using a
+lot of oauth2 endpoints whenever we want to work with Cognito in terms of identity operations. Now at this stage, Cognito
+will show up a login page. I have leveraged the hosted UI, which is the Cognito
+managed front-end interface for us to kind of get the tenant users for the authentication. And then John will enter
+the username and password that he created. And then Cognito will
+do the authentication. Upon successful authentication, Cognito will return back
+to the SaaS application with an authorization code. So now SaaS app can ask for the tokens using the oauth2/authorized
+standard endpoint by passing the authorization code. So Cognito will take the SaaS identity that is inside of the John, and then convert that
+into one of the tokens, and then pass the standard
+ID token, access token, and the refresh token back to the SaaS application. Now, based on how I have
+developed the SaaS application, I can represent the SaaS identity of John either on the ID token
+or the access token. Now here as an example, I have leveraged the ID token to represent the SaaS identity of John, where I can find the user details and the tenant details of John in terms of custom attributes. Now, when I have this, I can
+easily send this across... I can easily send this as an HTTP header with all the API calls that John will make as downstream communication
+with the SaaS application. So that will help to, for all the microservices to get the token by default and so they can crack it
+open and access the details, user details of John and the tenant ID and the
+tenant details as well for all the tenantry operations. Now this way we can
+bring a lot of automation to the these downstream workflows because of this token
+based authentication. Now, if you look at what
+Cognito design is at this stage, there are a few things
+that the SaaS provider has to be responsible of. One of the things would be
+to define the user schema, which means like what are the
+user attributes that we need to have a user created in the SaaS IdP, and then map them to the
+oauth2 attributes in Cognito, and then create what are the
+custom attributes that we need to represent the SaaS identity. So based on that, the Cognito will go ahead
+and create the users as and when the tenant
+users are to be onboarded. And on top of that, we will create one or more app clients, which are the entry
+points to the tenant users to connect to the user pool for identity operations
+such as authentication. And also we have a Cognito domain that is nothing but a unique
+URL that we can provide to the user pool that will help us to bring the hosted UI and the oauth2 endpoints
+into the life as well. And beyond that, there are so much of other
+configurations that are out there for the SaaS providers within user pool for the configuration
+based on the SaaS use case. Now, as you can see, in this standard SaaS identity model, SaaS provider is centrally managing the users and the identities within the SaaS application. So there's better control that we have to provide the identity operations, and also token based automation to the downstream communication as well. But what if the tenants really
+do not want the SaaS provider to manage the identities
+of their employees? For example, there could be some tenants who don't encourage their
+employees to going out and signing up for the third
+party SaaS applications, creating the profiles and providing the usernames and password, primarily because it
+could be security reasons, vulnerabilities and
+company policies as well. Now instead of that, they will leverage the corporate ID piece within the organization and provide the single
+sign-on capabilities for all the corporate applications. Now, that's a great way to kind of manage
+identities of the employees within the organization. For example, if John, as one of the employees left the company, all the IT team has to do is to go ahead and
+invalidate them from the IdP, and then John will lose
+all the corporate access for the applications, right? However, if John had gone ahead and signed up for the SaaS
+application separately, there'll be a lot of
+undifferentiated lifting that the IT team had to do to remove those access. So that is not a security best,
+best, best practice either. So one of the major requests from these kind of tenants
+or the organizations to the SaaS providers has been that let's not go through the
+standard identity flow, but can we integrate our corporate IdP with your SaaS application so our employees can
+directly single sign-on and then consume the SaaS app accordingly. And that is the biggest motivation for us to think about adding
+the federated identity support into the SaaS application. Now, with the federation, I got the SaaS application here, I got the control plane, the tenants like tenant one and two, they're coming with
+their corporate ID piece to be onboarded. I still need to provide the seamless onboarding here for them. But after onboarding, the difference is that they
+will not create their users on the SaaS application or
+SaaS IdP like previously. Instead of that they will consume their
+corporate IdP to authenticate, and then use the SaaS
+application accordingly. I still need the SaaS IdP though, the Cognito in this case, in order to manage the federation details and also the federation workflow as well. Now, the question is, can I only have the federation and build a successful SaaS business? Most likely, no, because there could be tenants who don't have the federated... There could be tenants who don't have the
+corporate IdPs at this stage and who don't need the
+single sign-on capabilities. So those tenants should still go the
+standard IdP workflows. And also we see that the SaaS providers who are having this federation will consider the federation
+as a premium feature of the SaaS application, and make it available only
+for the higher order tenants. So the lower tier tenants, like basic, free or freemium tenants still need to go through
+the basic identity workflow. So you've got to have both federation and the standard identity
+workflows most likely. Now, just to get some understanding about how the federation works, how the single sign-on works
+with the SaaS application, let's go through an example here. I have a SaaS application with the Amazon Cognito as my SaaS IdP. I got tenant one with
+their own corporate IdP. I have onboarded tenant one
+with the federation support. Now with that, when tenant one users try to
+access the SaaS application, and if there is no valid
+session available at this stage, Cognito will try to authenticate and then realize that these users have not been created in Cognito, so cannot be authenticated. Instead of that, there are some set of
+configurations saying to me that they should be federated and I have all the configurations
+in Cognito to do that. So there'll be a client side
+redirection of these requests back to their corporate IdP. Now all of a sudden the user will see the
+normal usual login page from their corporate IdP that he might be seeing every day. And then that will allow him to add the login or domain
+username and the password. Upon successful authentication, corporate IdP will return the
+request back to the Cognito. Again, we are a client side redirection. And Cognito can validate that. If the authentication is okay and if the authorization is okay as well, the user will be allowed to
+access the SaaS application. Now as you can see, we are trying to connect the
+two worlds of trust entities in a very much asynchronous way, the SaaS IdP and the corporate IdPs. And this is only the high level workflow, and Toby is gonna walk us through the implementation details on these and how do you instrument
+the SaaS control plane in order to get this working out. Now, it's also interesting to know what is happening inside Cognito so that we can have a quick comparison with the previous standard
+SaaS identity workflow as well. Now, there are two main
+difference in Cognito when you have the federation in place. As I mentioned earlier, federated tenants are not
+creating their users in SaaS IdP, they don't have to because they would leverage
+their own IdP to authenticate. However, as a part of
+the federation workflow, these users will anyway be created in Cognito or in SaaS IdP automatically, and we call them proxy users and they have only the
+user details with them, and those user details will entirely be managed by
+respective corporate IdPs. In other words, SaaS provider has nothing to do with these user details because they are
+automatically being created. The second difference is that I need to have an entity
+within the user pool to manage the federation details for that. User pools are giving a feature called federated identity providers in which I can have the very much protocol
+specific configuration. For each and every tenant
+who need the federation, I'm gonna have a dedicated federated IdP within the user pool that will contain the
+federation related configuration that will help me to do the
+federation workflow as well. Now, at this stage we
+know for a SaaS provider we have a challenge of managing
+this asynchronous workflow in order to facilitate the federation. Like beyond that, there are a few more challenges that they need to think about as well. One of the things would
+be, as I mentioned earlier, most of the time the federation and the
+standard identity workflow, both should be coexisted
+in the SaaS application. And your SaaS IdP should
+support both ideally and that will make your life much easier. And also you will see that there are multiple
+different identity protocols out there as well. And you as a SaaS provider
+will have absolutely no control what kind of protocol that your tenants will be using, right? That's a pretty much domain driven decision from them actually. So all what you can do is to kind of instrument
+your control plane to be able to kind of onboard the tenants as and when they come based on their identity protocol. We mentioned about the SaaS
+identity concept earlier. And then we mentioned that
+any user that you create or that have in the SaaS IdP will need to have the SaaS identity so that you can automate the
+workflows downstream, right? But the federated users
+only have the user identity. So we've got to find a way to inject the tenant ID and
+the tenant context into them to have the similar automation when they wanna work with
+the SaaS application. So that is one of the challenges. And the compliance and the regulations is a great discussion to have if you wanna have the federation implemented in your SaaS application, especially if your SaaS app is spanning into multiple
+countries or regions. So that... And when you have the data residency or data
+sovereignty regulations in place, you may need to, for example, bring in in-country Cognito
+instance for those countries. So you still have a
+centralized SaaS control pan, but those users will be redirected to their own Cognito instance to federate without crossing the boundary. So that kind of a design discussions must be taken prior to the federation so that will help for having a bit implementation
+of the federation in the SaaS application. Cost and quotas will
+be interesting as well. Usually for all the IdPs, they have different numbers
+for quotas and the cost compared to the identity operations. And finally, how do you
+automate this whole process to be able to get the seamless experience for the tenants and their users to implement the federation
+in the SaaS application would be one of the challenges as well. Now, we mentioned that there are multiple
+federation protocols out there. And today we wanna dive
+deep into a couple of them. OpenID Connect, we roughly mentioned about this earlier. It's an identity layer
+on top of the oauth2, Cognito being one of the example. And there's a whole bunch of
+partner solutions like Okta that support OIDC. And then we have SAML 2.0 that's been around quite a while. That helps to simplify
+the user authentication using XML assertions and active directory being the example. Now, if you look at the
+Cognito management console, you will see that you can also
+create the social providers. The social providers are... Is a kind of abstraction layer
+that Cognito provides you to easily create the social identities, which means that if your tenants are
+supporting social identities, now you can integrate them as federated identities
+in your SaaS application using social providers. All right. So now we've discussed
+about the federation and the challenges, and we've talked about the high level the asynchronous workflow as a challenge as well, and now let's getting into
+the implementation part. Now, there are two main areas to discuss when it comes to the implementation. How do you handle the tenant onboarding
+part with federation? And what are the additional
+instrumentation that you need to support the single
+sign-on with the users? Let's start with onboarding. So as an example, I
+have a SaaS application with Cognito as a SaaS IdP. And I have a tenant one with their own IdP to be integrated with the
+federation to the SaaS app. One of the first things I would need to do is to create what you
+call an integration app in tenant one IdP. Now this integration app is nothing but an entry point to Cognito to forward the users
+coming from tenant one for the federation. Now, for us to successfully
+create the integration app, it'll require the callback
+URL or the SSO URL based on the protocol
+of the tenant one IdP. Now, Cognito can only
+provide these two URL after the tenant one has
+been properly onboarded to the SaaS application. The reason for that is based on the nature of the tenant one, for example, if the tenant
+one is a premium tier tenant, I might end up creating
+a new user pool for them that will have a different
+callback SSO URL. So basically I cannot
+provide this URL upfront because of that complication. So as the first step, tenant one should have been onboarded to the SaaS application, but in order to successfully
+onboard the tenant one, the Cognito will demand to have
+the integration app configs. Now, as you can see there's
+a circular dependency here. And that is the challenge that we are having as SaaS providers to manage this dependency and see how we can provide this seamless experience to the tenants who are getting onboarded
+with the federation. Now, I'll go through a couple
+of different workflows. And I'm not saying that
+these are the only ways that we can solve this problem, just to get some perspective in order to provide
+the seamless experience for the tenant onboarding
+with the federation. Now, in the first workflow I got tenant one with the OIDC IdP. This flow works totally fine with SAML, I'm taking OIDC as an example. And then from the SaaS standpoint, I have a standard public landing page with the tiering strategy through which I would expect
+to onboard all the tenants, including the ones with the federation. Now in this example, in this flow, I would assume that this tenant one would have not created the integration map before the tenant onboarding happens. So because of that, they would just try to onboard as a normal tenant, usual tenant, assuming that the federation configuration can be done down the line. So from the SaaS standpoint, I would have a registration
+microservice in my control plan to accept this request. And then the details, I would get the admin details
+and the company details like a normal tenant onboarding request. As the first thing I will go ahead and create a
+tenant ID for the new tenant, and then I would have a
+user management microservice that would do the... That would work with the Amazon Cognito and then create the bits that
+I need for the new tenant. So assume that the tenant
+one is on the premium tier, I'm gonna go ahead and
+create a new user pool, and then configure that to
+make it ready for tenant one. And then I'm gonna make
+the tenant one admin or the user who onboarded the tenant one, I'll make that user as an
+admin of that particular tenant in the SaaS application as well. Now, so far, there is no federation involved. This is a hundred percent non-federated, usual tenant onboarding workflow. Now, at this stage, as you know the Cognito domain, we can derive the callback URL that I can pass to the
+tenant one as a notification along with the tenant admin URL. So this tenant admin URL will refer to the typical
+tenant admin panel that we have in our SaaS applications where we allow the tenant administrators to conduct any admin operations. So at this stage, tenant one now can go ahead and create the OpenID Connect integration app because they have the
+callback URL I passed. And they finish that side
+of the configuration, and then extract out the configs
+that the Cognito will need to finish the federation setup. Those are the app client ID, client secret, and the issuer URL. And then the tenant one admin is actually an admin of
+that particular tenant so that she can log into
+the tenant admin panel and enter that URL. So that will help us to create the OpenID Connect provider in Cognito by completing the entire workflow. Now as you can see, it's a two step process here
+in the tenant onboarding. A little bit asynchronous, but it provides a seamless experience for the tenants or for the SaaS provider to have like some level of automation in the tenant onboarding flow for the tenants to be onboarded
+with the federation support. Now, at this stage, when the tenant one users try to access the SaaS application, Cognito will know that
+they need to be federated because of the OpenID Connect provider. And they will be directed
+to the tenant one IdP over OpenID Connect protocol. And from there onwards,
+the federation can happen. Now, if you look at the OpenID
+Connect provider over here, that has nothing but the details or the configs that were
+provided by the tenant one admin. And these are all the details that a Cognito will need to know to handle the federation
+of the tenant one users. Now, that's the flow number one. So in the case of the flow number two, I have tenant two, I have taken the SAML as
+an example in this flow. And the difference is that tenant two would have created the SAML integration app upfront. Of course with some placeholder values for the configs that they
+don't know at this stage. And then as a part of
+the onboarding request, they will send the details or the configs that the Cognito will need to create the federation flow completely. So for the SAML protocol, all what Cognito needs is the metadata URL that has been provided from the SAML integration
+app of tenant two, right? So I have that request from the... Research in microservice. And then usually I'll... As usual I'll just go ahead
+and create the tenant ID. And then in the user
+management microservice, I would create a user pool, configure it. I don't need to create
+admin user right now because I can straight away go ahead and create the SAML provider because I know the SAML
+metadata URL at this stage pointing this tenant to IdP. And that's it, that's all the configs from the
+SaaS application standpoint. And then I can derive the
+SSO URL and the SP entity ID. Those are the two configs that tenant two will need to finish the SAML integration
+app configs at that site. So I'm gonna pass them as a notification so they can go ahead and finish the tenant two configuration. Now, as you can see, these are just two example workflows so that you can consider providing some level of seamless
+experience with the onboarding by handling the circular
+dependency that we have. So idea would be that recommendation would be just
+select one of the workflows either out of these two
+or something beyond that without compromising the core
+value proposition of SaaS that will help you to provide seamless, frictionless
+onboarding experience even with the federation. Now, at this stage, it's important to have
+a look at this Cognito and then see what are the different multi-tenant aspect of Cognito implementation
+with the federation setup. To talk about that and dive us deeper into the
+remaining part of the session, I'll invite Toby stage. - Thanks Dhammika. Great. So as Dhammika said, before we get into kind of the flow of how all the federation works, I did wanna take a moment and talk a little bit about
+just the design of Cognito as it relates to your architecture. So if you've ever heard or
+read content from satisfactory, you've probably heard the
+terms "pooled" and "siloed." It's terms we often use for
+describing tenant resources. In the pooled case, we're sharing resources
+across all of our tenants. And in the siloed case, we're dedicating resources
+to those tenants. The forces that kind of... That act upon you to kind of
+figure out which one to do is really primarily business driven. You could argue that in a siloed case you might have more isolation, but maybe operationally difficult. But in a pooled case, maybe it's a little simpler
+but it's maybe not as isolated. The same rules apply here. Just like you might have a
+separate DynamoDB per tenant or you might mix tenants
+within a DynamoDB. Just wanted to point out that the same rules for
+siloed and pooled resources apply in Cognito. Just wanted to point
+out that for this talk, I'll be primarily focused
+on the pooled model. So a lot of the stuff we'll see here is gonna be focused on pooled. That said, we'll look
+at siloed in a second, it's not a whole heck of a lot different. So from a design perspective, you're gonna have the user pool, obviously one user pool
+for all your tenants. We're gonna start with this app client. Now, the app client, we've seen this a few times before, I just wanted to point out that this is the thing that
+we're guarding access against. This is the thing that
+we're protecting, right? In our case, it's a SaaS application. Now, if you've ever written a web app when you're using oauth or OIDC, you've probably noticed the client ID. That's the ID, right? That's the thing that we're protecting. So in this case, we've got
+one and only one SaaS app. And we advocate generally
+that that's a good idea, that you don't want to have
+multiple deployments per tenant 'cause that gets a little unwieldy. So having a single SaaS app, all your tenants are coming through here. So let's take a look at
+what that looks like. So as Dhammika said, as part
+of our onboarding process, we're gonna have to
+create a federated IdP. In this case we're creating an OIDC one. As you can see by the settings there in those little blue boxes,
+might be a little small, but Okta's coming through. So when those tenant one users
+come through this federation, Cognito will create those
+users in a group for us. That group we could apply
+tenant specific I am policies to if we wanted to. So that's nice. It's not just a flat list of users across all of our user pools or across that user pool, right? It is grouping it for us, so that's nice. Just like in the second case here, we've got tenant two that's using it, the social provider Facebook,
+they're coming through. Again, we've got Facebook
+specific configuration that we've stored in that IdP. And it's coming through
+the same app client. Again, we've got another group
+that's storing those users. Now the thing that's kind
+of interesting about this and thing I'll point out is that from a configuration perspective, remember the client ID
+and maybe the issuer URL and authority or whatever
+you have inside your web app, it's pointing to this app client, but we've got two different
+tenants that are hitting it. And so this presents an
+interesting challenge in that how do we possibly
+resolve the federated IdP when they log in, right? And I'm gonna just pose
+that question for now. I'm not gonna answer it, but I'll just let you
+sit on that for a second, we'll come back to that. But this is the pooled model, right? So all of our users in a single user pool. Now, again, you might use
+this in the basic tier case or something like that. If we wanted to do something
+a little more exotic where we had a user pool for tenant, maybe your tenants just don't have an appetite for living in the same user
+pool as other tenants, right? That's perfectly valid. Or maybe they need different MFA or recovery requirements
+or whatever it is, that configuration set
+at the app pool level or at the user pool level, in which case it forces our hand, we need a different user pool. From a Cognito perspective,
+everything stays the same. The thing that I would point out is that we now have two
+different app clients. So two different app clients implies two different configurations. So if you have a single web app like I would advocate in the past or like in the previous slide, then what that forces you to do is resolve those configuration items at runtime more or less, right? So you now have to figure out, okay, tenant one is authenticating. What's its client ID? What's its user pool? That kind of stuff. So definitely doable, and we have some reference
+architectures out there that kind of make... That do that. So if you're interested in that, hit me up afterwards and
+we could talk about that. So that's the silo model, just pointing out that these
+are two valid, valid cases. So with that out of the way, let's talk about what the flows look like. So here's the OIDC flow. We've seen this slide. Dhammika presented something
+like this very similar except we were doing
+user pool authentication. In this case we've got tenant user. Again, no session. We don't have a cookie, we don't have no
+authentication information so we know we need to
+authenticate this person. It hits Cognito. Notice there we're hitting
+the oauth2/authorize endpoint. You're gonna see that API
+over and over and over again, this is kind of core to Cognito. Cognito looks at the client ID and says, oh, I see this
+one needs to be fed. I don't have any information
+to authenticate this person so I need to defer. So I'm gonna go out to this third party, this OIDC IdP. At this point, our John Doe is looking at
+the login screen for his IdP. He's gonna log in and it will basically call
+another authorized endpoint because we're doing OIDC, remember? And assuming we've passed the
+authentication, the challenge, then the OIDC will
+redirect us back to Cognito to this IdP response. You probably saw that in Dhammika's talk or Dhammika's portion earlier. So we get the oauth2 response. And at this point Cognito says, yep, he's authenticated, let's create what we call a
+proxy user, a shadow user, some kind of basically
+an echo of the real user. The source of truth is still
+over on the third party IdP. But Cognito is creating a
+kind of a version of that user in our user pool. And once that happens, we
+do the normal 302 redirect, and then we're exchanging
+that code for tokens. And then we're getting tokens and we're right back to where we were, but just now federated. From a SAML perspective,
+very much the same. The thing I will point out is notice that we're still doing the oauth2/authorize endpoint, right? So from a Cognito... From our app's perspective, we only have to know
+about oauth2/authorize, we don't have to know about
+SAML or anything else. Now, Cognito sees that, looks up the client ID and realizes that it has to go over here to do the SAML authentication. It does that, but now
+it's a little different. It's not the same OIDC
+or authorize endpoint, now we're doing SAML stuff, right? And this is all XML based with certificates and
+the whole nine yards. The good news is your app
+doesn't have to worry about that, Cognito's handling that for you. So we get the authentication. John logs into the site, we've passed the authentication challenge. We get a SAML assertion back, and we create the user and user pool, and then we're right back
+to tokens like before. So I guess the takeaway from this, and this is something
+that I didn't realize for probably about a
+year working in Cognito, is that Cognito really
+is a federation hub, and if that wasn't obvious to... Maybe it was obvious to
+everybody, but not me, in that your app only has to deal with
+OIDC and oauth, right? From that perspective. It doesn't ever have to deal with any of the weird
+protocols, which is nice, 'cause I don't even know
+if there are SAML libraries for most web apps. There might be, but OIDC and oauth are
+obviously really well supported and well understood in the web app space. So it's nice from an app dev perspective. Taking a look real quick at
+what those groups look like. As I said, once we
+create those proxy users, here's a screenshot
+right out of the console. The console actually did update. So this might not reflect reality, but this is a reality minus a week or so. You'll see here at the top, Bob and Sally are coming through
+this provider, Okta OIDC. I'll just point out
+that this name Okta OIDC was just poorly chosen by me. There's nothing magic about it, it is actually Okta OIDC, a string that I picked
+that has nothing to do... There's nothing secret here. But we see Bob and Sally coming through. Cognito actually names those users as they come through federation, Okta OIDC underscore some string. And it also deposits
+those users into a group that kind of correlates
+to the user pool ID as well as the federation. You see that we have
+another group down there called Okta SAML, again, chosen by me, that is a group for SAML federated users. Okay. So the one challenge
+that Dhammika pointed out was that our tenants or our customers want to manage the
+lifecycle of their users. And we've seen how federation
+can do that, and that's great, but the challenge I would present now is that we've got
+federation that's external that is the source of truth for our users, but how do we possibly map that to our source of truth, right? So in other words, if we have a user that's living in Okta, that might be Bob Smith, but is say first name and surname, and we have last name, right? How do we reconcile the differences? Well, we do that by way of mapping. So this actually happens
+on both the outgoing side, so on the Okta side. So when we create that integration app, most IdPs are gonna
+have the ability to take whatever the version of
+reality is on their side and map it to some standard,
+in this case it's OIDC. And then also on the receiving side, so on the Okta side, oh sorry, on the Cognito side. We'll take those standard OIDC attributes and map those to our user attributes. So we do have the ability to
+kind of normalize, if you will, their version to our version. And again, they're the source of truth. And the same thing holds true of SAML. So it now it's XML based and there's a bunch of schemas
+involved and whatever else, but it's still the same thing, right? The other problem though
+that Dhammika alluded to is that we still need
+the tenant ID, right? And if our tenants are out there, they shouldn't even know what
+their tenant ID is, right? We know what it is, but they don't. So how do we resolve that? Well, just as is the
+case with most things, if you need code in the
+sky, you call Lambda, right? So Cognito has this version or this notion of Lambda triggers, which are basically lifecycle events inside the Cognito workflow. This is a screenshot of the docs right off the webpage there. That QR code will take you there. We suggest using the post confirmation
+Lambda trigger which... And the reason for that is because it's only gonna get called when the user's created. The other one, we've had customers ask us, why not the pre-token
+generation or whatever? Well, if what you're doing
+is looking up a tenant ID for basically attaching to the user when it comes in through the federation, you don't necessarily need
+to do that every time, right? The tenant ID shouldn't change very often. So we're just going to... We're gonna call it once. If you did have something more exotic or you needed to call it more frequently, then knock yourself out. Look at all of those triggers. You can click through each of them and they'll tell you
+when they should be used and why they should be used. Pretty rich stuff that
+could be happening here in terms of workflows, if you look at the custom
+authentication flows. In fact, I just looked
+at the Cognito console right before this talk. And a lot of this is already baked in, they're making this more first class. But passwordless and pass keys and all of that kind of stuff could be handled with
+Cognito triggers and Cognito. So definitely check that out. Let's take a look at what that looks like. So here's just another simple example, we've seen this a million times. We realize we have to federate, we do, we're about ready to create
+the user, which we do, but now we've got a trigger
+hooked up to the user pool. That trigger gets called
+with a strongly typed event. We'll look at a sample of
+that code here in a second. And in this case, I'm just
+calling just an example, right? I'm taking some incoming data and I'm looking up it in DynamoDB and I'm finding the tenant ID and I'm gonna make an SDK call, I'm gonna update the tenant with that ID and then we're back to issuing tokens. And then as tokens would have
+that ID as a custom claim. Now the thing I wanted to point out is that Dhammika at the beginning was talking about making
+sure that your user schema, what we're calling the schema
+has this stuff in it, right? If you're wanting to
+track these attributes, make sure that you've done that when you're creating your
+users in the user pool because if you don't, if
+you haven't, this will fail. If it doesn't have a slot to kind of put the data
+in, it's not gonna work. Here's a version of that. It's obviously not production code, but this is a bridge
+version of that trigger. You can see, as I mentioned,
+it is strongly typed, so we do have a post
+confirmation trigger event, this is TypeScript. That trigger event has luckily
+everything we need to do... Most everything we need to
+do the SDK call I mentioned, with the exception of our tenant ID. So how do we get that? You could see here that I've got some fake
+methods off screen somewhere that's maybe taking the email address, cracking off the domain and looking up the tenant
+ID based on a domain. And then finally we assemble an input and we call the admin update
+user attributes command with the SDK and we're off and running. So now let's talk about the problem I presented
+at the very beginning. You've got one app client, you've got multiple IdPs hooked up to it. How do you possibly resolve at runtime what that looks like, right? If you do nothing, this is what you'll see. And that's not great, right? You don't necessarily want to... You don't want your users seeing that. This is again, a current
+minus one week screenshot of what this looks like in terms of the app client
+and the Cognito console. You can see that in this case, our app client has hooked up Cognito user pool authentication,
+and that's this guy. And we've also hooked up SAML federation as well as OIDC federation. So that's not ideal. We wouldn't want necessarily, especially if we had a
+hundred federated identity, I don't even know how this
+screen would render in that case, it probably wouldn't be pretty. But in any event, we probably
+wanna bypass if we can. And the good news is we can, so what does that look like? So here we are again from... We've seen the screen again, we need to federate. This time though, we're adding another little attribute to our authorized call. IdP underscore identifier, and we're passing it some token, we'll look at what that is in second. But what this does, it lets Cognito find a provider, right? It does this lookup based on
+this token that we pass it. This case we see it's Azure AD, we're probably gonna do SAML. So it dynamically picks that provider and then dynamically authenticates based on that provider's protocol. And now we're back to
+tokens and we're happy. So what are the... This QR code is gonna link you to the docs that'll talk about the other parameters you could pass the oauth2/authorize. IdP identifier, we already mentioned that. Again, the top is a screenshot of your federated identity provider when you create it inside your user pool. In this case, there is
+a field in that provider that is called identifiers. If you pass it some string and you provide that string
+on your authorize call, then you'll get... Then Cognito will pick that
+for you, which is good. Alternatively, you could pass
+the name of the provider. Remember I had Okta OIDC as the name of one of those providers, I had Okta SAML, here's we got SaaS Company SAML. You pass the name as
+identity underscore provider, Cognito will pick that
+one for you as well. You could pass either or, you don't have to pass them both. And some bonus content; there's another parameter if we pass login, hint and
+give it some email address. In the case of user pool authentication, it'll actually feed that
+user to the user pool or to the login name for that. And it'll also do the same thing in the case of OIDC or Google. So if you're using the
+Google provider or OIDC, you'll get that fed in there as well. And if you're using SAML or any of the other providers, the other social providers, you can do it, you'd
+have to check the docs. It's a little more involved, it's not as straightforward as this one. All right, so what are
+some things to consider with this federation? One; we are kind of looking through this and thinking a little bit more
+about the Cognito triggers and what are some things that
+SaaS providers might face as they kind of go through this. One of the things that occurred to us is that if you have an IdP, a SaaS IdP, let's say a million users in it. And those users try to come
+through the federation, there's nothing to stop them, right? Cognito will gladly mint
+every user in your user pool and it'll just do so
+until whatever, right? There's no stop of it. But you might as a SaaS provider want to handle that via entitlements or tiers or something like that. So this is a little thing we dreamed up that might be handled with a trigger. So again, we've seen this doc, this slide a lot. We federate. Instead of creating the user now we're calling this
+pre-authentication trigger. And what this will do was kind of give us an
+out if we wanted to. So we might check the
+entitlements for this tenant. We might say are you under a hundred users or have you kind of crossed
+some threshold or whatever? Assuming we've passed whatever that business
+logic in that Lambda is, then we successfully do it, we mint the tokens and off we go. But it also gives us the ability to say, nope, sorry, you've
+exceeded your entitlements, or I'm gonna call it support,
+or whatever the case may be. So I guess the point here is not so much that handling entitlements is the important thing. The point is that with
+Cognito and these triggers, there's not a scenario
+that I could dream up that you can't get handled, right? So that's just a really rich
+gap closer, if you will, for taking care of all of
+these one-off situations you might face as a SaaS provider. So some considerations
+with federating incognito. At least for me, maybe
+kind of a selfish point is that when I understood... When I really looked at Cognito from an oauth2 and OIDC perspective, it really kind of cleared things up. Admittedly our docs aren't great. If you are facing that same problem, like think through it from an
+oauth2 and OIDC perspective, I think it'll be a little clearer. Quotas, both resource quotas and
+limits are in effect. So make sure you plan for
+those in your architecture. The docs there are gonna link
+you right to those quotas. Certain number of user pools per region, certain number of app
+clients per user pool, that kind of thing. The price for federation does go up a bit. So when I last, and again,
+this is all subject to change so don't quote me on this, but I think it was like half a penny per like monthly active user
+for non-federated users, and like a penny and a
+half per federated user. So again, still on an order
+of pennies and not dollars, still a great value. Cognito's I mean cheaper than a lot of the stuff we see out there. And then lastly, user pools are really the
+center of this experience. This doesn't have identity pools at all. If you're confused by what the
+difference is, I understand. (laughs) User pools are really
+about user registration and making sure of the
+lifecycle and tracking that. Identity pools are more
+about short-lived credentials for like getting your web
+app or your mobile app as three access or something, right? So not really at play here at all. And that's it, we're
+coming to the end here. So federation, obviously
+some more moving parts. If you've avoided it up to this point, you should take another look. It's not that hard, it's
+pretty easy with Cognito. And it's all automatable
+as we saw with Dhammika. Cognito's a federation hub, I kind of beat that drum already. Triggers for customization, I can't express how
+helpful and handy this is. There's a lot of stuff
+you could do in Lambda with a combination of these two. We've looked at how we could reconcile the differences in users, their source of truth
+with our source of truth. We used mapping to do that. And we could automatically
+pick the federated IdP, so we don't have to kind of
+see that big ugly screen, which is nice. And then lastly, we just
+suggest that you always, regardless of the mode that you're in, whether you're federated or unfederated, just make sure that you make that a... This is more of a SaaS kind of knit than it is federated identity. Just make sure that
+your onboarding process is as frictionless as possible, right? Like that's gonna get your users to value you as quickly as possible. And that's it. I would just ask that you please, please,
+please give us a survey. Hit the like and subscribe
+button, all of that stuff. This is how we really
+shape our next year's talk. So if there's something
+that you loved or hated or you want to see, please leave it in a survey. We look at that and we plan our
+next year session with that, so it's very, very, very
+helpful information for us.

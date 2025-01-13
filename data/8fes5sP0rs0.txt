@@ -1,0 +1,539 @@
+- Hello, everybody, and
+welcome to the session. My name is Federica Ciuffo. I'm Italian, but I live
+in Spain, in Madrid. So happy to see you
+all here today with us. And today with me is also Sai Vennam. - Hey, everyone. Sai here. I'm a container specialist at AWS. I'm based out of Austin, Texas, but originally I'm from India and excited to talk to you guys about networking strategies
+for Kubernetes today. This is a 400-level talk, but I'll just give you a quick heads-up that we're gonna start at
+smaller levels of complexity and kind of build up as we
+get to the end of the session. Let's go ahead and get started. - Yeah, and actually we
+have built the agenda with all the interactions
+that we have with customer during this 2024 as we are
+both container specialists, so we have a lot of conversation around Kubernetes networking. And so we wanted to highlight the most interesting customer interaction that we had during the year and also the, you know,
+most-asked questions. And to make this, what, session, a little bit more interactive. We have translated
+those customer questions and topics into requirements
+of an application. This will be the rental store application, and today, well, we will
+take, do a little bit of role play, Sai and I. So I will be a cloud architect who is responsible of
+architecting the clouds and also Kubernetes clusters
+to run this application, while Sai- - Yeah, I'm gonna be the
+cluster operator, right? So I can say that with most of the people that I've talked to at sessions today, I'm guessing a lot of
+you in the audience today are on a platform team at your company operating Kubernetes clusters, and I hope to kind of
+emulate that role today. So Federica's gonna give me requirements. She's gonna come from a position of being a really
+well-versed cloud architect, and she's gonna be giving me demands that I have to fulfill
+as the platform team. So that's kind of the back and
+forth we're gonna try to do. - Yeah, so we'll put our hats on. - All right. - And so we, Sai, we have
+different requirements for our application. The first thing that I want to do is actually to simplify your life and make it easier to
+simplify cluster operations, so let's streamline that
+as much as possible, as well as our application
+is an external application, so our customer will be able to actually access it externally. So we will see how to do that together. And we also need some,
+let's say we want to improve their resiliency in general,
+in particular of the network, but also based on the
+findings that we find, we also want to be able to
+observe this architecture and this application
+at each time in a more, in a way that doesn't really
+burden my application teams, which are, well, spending a
+lot of time into observing but without a really
+clear way of how to do so with many microservices. We also have some requirements
+from security teams, so we need to enforce that. And we want to be able to
+take a different approach as to tackle those
+disruptions within the cluster when we make new updates, for example. For example, we have to update the cluster each three months and things like this. So all of these operations
+that can be disruptive, right now, we are doing it with the in-place upgrades, et cetera, but we want to have a
+deeper look into something that could be a little
+bit less disruptive, like blue-greens in that sense. But before diving deeper into that, I think, Sai, I already
+sent you the application, so if we can take a look. - Yeah, let's take a look at the application really quickly here. So I'm gonna switch this
+to my computer here, and as a heads-up, okay, that's, the wrong screen is being shared there. So give us just one second.
+Let's see what's going on here. - Yeah, so in the meantime, let's review what we want to do in that sense. But well, let me review
+how we are gonna deploy the application where actually we live while Sai reviews where
+he has the application. So in that sense, our organization has
+different business units, and each business unit
+has a dedicated account. Also, we have some
+on-premises data centers that we need to take into consideration. And everything is actually
+connected with Transit Gateway. There is also, well, some direct connects and et cetera for the environment. So I think we got the application, right? - Yes, we got it. Perfect timing, all right, excellent. So let me make this a little bit bigger. So we were saying that
+we had the local version of the application up and running. So Federica's team has
+basically built containers on their local machines, and to do so, they've built a version of this retail store sample application that runs locally without
+running on the cloud. And let's just see what that looks like by running a quick command here
+to start up the application. All right, we're gonna set
+the MySQL password, pass, and then do a docker-compose up. And I think this is a great way to work with containers locally. You can see what it did there was download the container images, and what it's doing is it's starting up the application now locally, and in a few seconds
+here, it's fully started. And let's actually go
+to our local host here to access the application. Boom, there we go. This is our beautiful retail
+store sample application running locally. But while this is great for development, it kind of enables iterative
+development very quickly with containers on your local machine, we need a way to run
+this in the cloud, right? So that's kind of the next step here. - Yeah, exactly, and
+actually what we will need is to have a replica of this application in each and every VPC in the environment that is dedicated to the retail account. The application that Sai just showed is made up of different
+decoupled components, and we have some
+infrastructure dependencies. We have seen the MySQL there. And so let's go right into it. The first thing that we want
+to do is to simplify your life, and actually thinking about
+the Kubernetes architecture, there are a lot of networking components that we need to configure
+and take into consideration, not only the control plane and the different components
+that talk to each other, but also how are we gonna bring together control plane and data plane. Within the data plane also, some very core networking components that we need to take into consideration, and our cluster needs to
+be configured with that to be able to use those. For example, we have
+kube-proxy, CoreDNS, the CNI, so a lot of things, and
+we want to simplify that, and this is actually
+where Amazon EKS can help. And so, Sai, do you want
+to take this one and so- - Yeah, absolutely. So let's talk a little
+bit about Amazon EKS. And you guys might be wondering, "Sai, this is a networking talk. Why are we talking about EKS?" Believe me, I'm getting to it. So Amazon EKS is really
+just managed Kubernetes. It's not our special
+version of Kubernetes. It's open source, upstream,
+conformant Kubernetes that we help manage for you. Now, when we first launched
+Amazon EKS, you know, about six years ago now, the
+focus was on helping customers by managing the control plane. So you kind of saw there
+with that very neat animation the capabilities that
+we're managing for you with the control plane. But we're taking this a step further, and I think all of you know what I'm about to talk about here, but it was an announcement
+that we released just earlier this week. Now Amazon EKS is helping customers manage parts of the data plane as well. So essentially what Auto
+Mode enables customers to do is have EKS clusters that are ready for production use cases out of the box. All of these components
+that you as platform teams, me as a platform operator
+had to manage on my own are now managed for you. And the scope and the purview
+of Auto Mode is, you know, is continuing to increase. You can check out the road map. A lot of it is public on GitHub. And so critically, so
+where Auto Mode fits in with networking is that a number of key networking components are managed for you in Auto Mode. Let's dive into these really quickly. For one, the VPC CNI is
+gonna be managed for you now. So this is the, you know,
+the one that's by default set up with every EKS cluster but no longer managed by
+you in your data plane. We handle it for you. That means when you
+upgrade your control plane, those add-ons are
+upgraded for you as well. This means less cognitive overload of managing different
+components of your data plane. In addition, CoreDNS out of
+the box as well as kube-proxy, these are all gonna be
+kind of managed for you. In fact, there's actually
+one more thing here that's gonna be managed for you, the application Load
+Balancer Controller as well, which would be coming out of the box with all EKS Auto Mode clusters. So put all of that together, and essentially what
+you have is Amazon EKS managing more capabilities for you in the control plane and data plane. But Federica, you've looked
+into a little bit about CNIs. Can you explain your requirements
+and why you wanna use this CNI versus maybe some other ones? - Yeah, exactly, so we are going to, for the Amazon VPC CNI actually, because it simplifies a bit how can we do Kubernetes within AWS. Effectively, the Amazon VPC
+CNI, it's deeply integrated with the underlying
+network that is Amazon VPC, and thus it assigns IPs
+from Amazon VPC to pods. And this is great for
+us because it enables us to take advantage of all the
+good things of Amazon VPC. Like for example, we can do security. We can do also observability
+with VPC flow logs. Also the CNI is highly customizable. That is, we can really fit the CNI and change all the specs to our needs. And this is great for us. Also, we need to consider
+there are other alternate CNIs that are compatible with
+EKS but not supported. What does that mean? That it is recommended to have support from the vendor of the CNI of your choice. But we are gonna stick with this CNI, and actually I love how the all of these, well, Amazon EKS, then on top of that, Auto Mode helps your life and
+your team to really streamline and take that heavy
+lifting out of your team and lets AWS handle this. - Yeah, I'm glad that you're
+okay with using the VPC CNI, 'cause that makes my life easier. It's integrated into the AWS
+ecosystem as a platform team, less things for me to
+worry about managing. - And actually you mentioned
+before about load balancer, Load Balancer Controller. So this is actually tied
+to our next requirement, and our next requirement,
+I want my customers to be able to access my application. Now, great what Sai just showed us that he was running locally,
+but this is not what we need. So we need something more. And when we are thinking about
+how to access application from outside the cluster
+to our backend pods, we always need some Kubernetes objects, that is, ingress and service resources, ingress resources
+operating at the Layer 7, application layer, and
+service resources operating at the network transport layer. But we need something more. We need some infrastructure
+piece that help us to let that, let's say, traffic from
+outside the classroom inside the classroom. And that piece usually is
+a proxy, a load balancer. So in AWS, there is a native way to do so by using the AWS Load Balancer Controller. And I'm very excited
+about the capabilities of AWS Load Balancer Controller, because again, I want to
+simplify my team's work with operating with Kubernetes on AWS. The AWS Load Balancer
+Controller automatically deploys an application load balancer
+with ingress resources, and a service, with service resources, it automatically deploys
+a network load balancer, so native AWS load
+balancers that actually have all the ability and reliability,
+scalability, et cetera, but in particular, not only
+supporting in Auto Mode, as we were saying before,
+but in particular, I want to dive deeper
+into what it can do for us at Layer 7, because if you think about it, we are actually using an
+application load balancer. The application load balancer itself is a Layer 7 load balancer. So what does this mean? So all the capabilities,
+all the Layer 7 processing happens at a load balancer layer, that is, can be offloaded from, you know, the configuration that
+your application teams and my application teams need
+to do to the load balancer. For example, certificates,
+it can be offloaded to the load balancer, and
+then it can also be managed by AWS certificate management,
+so a certificate manager that it is actually deeply integrated with AWS Load Balancer Controller itself. And we can take advantage
+of all those integration between the AWS Load Balancer and the security and
+natural suite within AWS. And this is great for us
+because it simplifies our life. Additionally, there is
+another way you could, you know, deploy or
+handle ingress traffic, that is, use a third-party
+ingress controller. You can see here that now the processing, the layers in processing and features shifts from being a responsibility
+of the load balancer to being the responsibility
+of the controller itself. And this is key because, for example, where before we could offload
+the SSR certificate management to the load balancer, now
+we need to supply that to the ingress controller. And this is essentially very different. Another thing that is different and adds a little bit more management is that you are handling
+only ingress resources. So if you need to handle
+service resources, you will need an additional controller, a service controller. With EKS, this used to
+be very transparent to do with the in-tree load balancer controller or service controller, but
+that has not gone away. It's still there, but we are only pushing, let's say, updates. There are essential
+security updates to it. So what it is actually recommended again for handling the service
+deployment of load balancers is again, the AWS Load
+Balancer Controller. Funny enough, if you're
+using an ingress controller, you will still need the AWS
+Load Balancer Controller to deploy the load balancer that is in front of the ingress
+controller of your choice. So Sai, I am, we have gone
+through the differences and so what we can do with the
+AWS Load Balancer Controller, third-party controllers, but can we see it in
+action with my application? That would be amazing. - Let's do it. So we're gonna get into
+our first kind of real demo that Docker composed one,
+not a real demo really, but here we're gonna jump
+into actually exposing an application using an
+application load balancer that's Layer 7-based load balancing. And just very quickly I wanna say here that I love this diagram because you can kind of see how, you know, when you create an ingress resource, obviously it gives you more
+advanced path-based routing that operates at the Layer 7 level. You can create those with
+custom ingress controllers or the AWS Load Balancer Controller. And at the Layer 4 level, if
+you wanna get a load balance for each individual service, you can do so with the
+network load balancers that are also kind of, you can create with the AWS Load Balancer Controller. All right, so let's go
+ahead and get into this. So in my EKS cluster here,
+we've basically deployed all of, oh, I can tell the internet connection's already a little bit, we're
+gonna get all the pods in the cluster, but in this cluster, we've already deployed the containers for the retail sample
+application that we have today. And critically, you can see here that we've also deployed the
+AWS Load Balancer Controller. By the way, if you were
+to run this command in an Auto Mode cluster,
+you wouldn't see those pods, 'cause those, the Load Balancer Controller is managed for you. But since I'm running on a
+standard cluster, not Auto Mode, this is something that
+I had to install myself. And then obviously when
+I upgrade the cluster, I would also have to handle upgrading the Load Balancer Controller itself. Okay, once that controller is installed, essentially what Kubernetes
+is now able to do is anytime an ingress resource is created or a service with the type load balancer, the controller kicks in. It says, "Oh, I know what to do now," and in the backend, it's
+gonna start creating resources for us in AWS, and it's
+deeply integrated, right? A lot of things happening,
+especially if you're doing, you know, custom domains
+and you have certs and that kind of thing. There's a lot going on in the
+backend with Route 53 and ACM, you know, certificate
+authority and all of that that the Load Balancer
+Controller will handle for you. So I did create an ingress resource, so I'm gonna run get
+Ingress in all namespaces, and there we go. We can see fairly straightforward here that we have an ingress,
+it has an address. We'll copy it and access
+it, but before I do that, I do wanna quickly show you
+what's in that ingress yaml. And this is really
+critical here to understand how specifying an ingress works, because you can kind of
+see a few things here. Notably, there's annotations, and these tell the application
+load balancer controller, ALB, that we're creating for this ingress something that's internet
+facing, not internal only. So we want public
+internet access for this. We want the target type to be IP mode, and the other option is instance mode. I won't get into this in in
+too much depth right now, but I'll share some resources
+for how you can dive deeper into the reason why we
+provide both options. In addition, a health check
+path so that the target group knows whether it's healthy or not. And then the other critical piece here is the service it's
+actually routing to, right? So if I do a quick get
+svc in the UI namespace, what I'll see is the UI
+service here, port 80, and that's essentially
+what we're routing to with that ingress. Okay, last thing I wanna call out here, 'cause I've gotten this
+question a lot this week, the question is, with Auto Mode, do you have to do anything special to use the AWS managed version of the Load Balancer Controller versus the one that's just
+running in your cluster with non-Auto Mode clusters? And by the way, since
+you can add Auto Mode to your existing
+clusters, this is critical for how you're gonna migrate to the AWS managed
+version of the controller. Essentially, you'll notice here there's an ingress class name. So when you wanna use the
+Auto Mode managed version of the controller,
+essentially what you'll do is you'll create a new ingress class that specifies that you
+want ingress resources to be handled by that controller instead. This makes it really seamless
+for you to migrate clusters to Auto Mode because you
+simply need to install that new ingress class and then
+switch the kind of ingresses that you have to the new ingress class. And then you can, you know, remove the load balancer
+controller from your cluster. You no longer need to manage it. Okay, now that we've seen all that, I'm gonna pray a little
+bit to the demo gods of the internet is all work, actually, that loaded perfectly
+fast, thank you. (chuckles) So you can see here that the application running in the cloud in Kubernetes fronted by an ingress resource, so application load balancing. All right, guys, I promise
+you we are starting at a lower level of complexity,
+and we're gonna bump it up as we kind of go through the presentation. So with this demo, I'm gonna
+pass it back to you, Federica, and let's get into some more fun stuff. - PowerPoint, yeah,
+and actually thank you, because this is our first requirements. Again, we wanted to
+start simple for my teams that are adopting Kubernetes
+clusters with Amazon EKS, and there are a lot of things
+that you can also do with, you know, adding certificates
+to this domain and et cetera. So thank you, Sai, for
+showing us how we can, how could we can do this, but
+we have other requirements. So let's see this. So with my teams, we
+have a lot of problems when it comes to network resiliency, because as long as we
+are already following all the best practices, spreading pods across availability zones with topology spread constraints,
+we are also deploying a lot of reliability built-in mechanism within the applications. But for us, it is really difficult to test disaster recovery scenarios. So one thing that can help us to do that is actually the new
+integration of Amazon EKS with ARC, Amazon Recovery Controller. And this makes easy for us to test and recover from a recovery scenario because we don't have to wait for the health checks
+on the services to fail. But actually our controller will signals that the AZ is down, and so the targets, the endpoints that are
+in the affected zone will automatically be
+deregistered from the service. And this is great for us.
+- So Federica, I've gotta ask, so I don't
+know what ARC is just yet, so you gotta tell me, why do we need ARC when the whole reason
+we're using Kubernetes is because when pods are unhealthy, they automatically stop
+getting traffic routed to them? So what's the point of using ARC? - The problem is that
+there is a delay to it, so we need to wait for
+those health checks to fail, and then the targets will be deregistered. That will be a lot of problems. So ARC shorten that time because automatically in AWS API, they signals that as soon as
+there is an AZ, let's say, failure, and this is automatically done. It is true that my team responsibility will also be to make that
+application resilient. - Okay, so essentially while
+Kubernetes could detect that the pods are unhealthy
+and stop routing traffic to it, it takes a little while because
+essentially the health check has to fail, the readiness probes, the health probes, and then it happens, so this could impact your customers. But here, you know, essentially
+we're improving availability by making it a little bit faster where the second there's an AZ issue, we'll just zonal shift
+that traffic, right? - Correct.
+- Awesome. - And also it's very interesting for us, the thing that we can
+test those scenarios, even if there isn't a real AZ failure, so. About testing those scenarios, I mentioned that my teams
+actually have built a lot on the application to ensure reliability. And it has been a long work because first we need to observe where bottlenecks or
+potential failures are. Then you need to implement
+within the application. Then there is application
+aid that is using an application coding
+language, programming language, another with another programming language. So it's kind of a mess for us. And I was looking from an
+architectural perspective for a way for us to unify those operation and take that burden away
+from my application teams. So maybe in the ecosystem, the most-used way to do so
+is adopting service meshes. And real quick, what's a service mesh? So in the most common
+architecture for service mesh, you take a proxy, you put it next to your application containers. You do that for each application container within the cluster, and
+you create basically a new layer that is made
+off of all of those proxies, and you push to that layer
+the advanced network security and network observability responsibility. Thus you are decopying that from the application business logic that still will be
+handled by the developers. Too, those other things
+that are now unified with only one programming language because you will be
+using that actually proxy for each and every application. So it makes my life easier, makes my application life easier, and it is very powerful. If you look at the capabilities and what service meshes bring to us, all of the things that we
+want to do are actually there. We want to be able to
+observe, for example, tracing requests, understand
+what bottlenecks are, and then we want to be able to implement those reliability features,
+not within the application but within the service mesh. Also security feature to it
+where I have a lot of requests from my security team around, for example, mutual TLS and securing
+the workloads, et cetera. So that's a really big ask, although service meshes also
+come with some challenges. - Right, Federica, I love the fact that you covered all the advantages, but you're kind of leaving out the part of me as the
+operator having to manage all the challenges of
+running a service mesh. And you know, traditionally
+the kind of service meshes we're talking about
+here, things like Istio that work off of the sidecar model, right? And so the challenges, well, some of them are gonna be things like resource
+efficiency issues, right? So when sidecars are not being
+utilized to max efficiency, or you know, the fact that
+sidecars need to scale up with every pod as they scale
+up, this can be challenging. In addition, just installing the sidecars into a cluster is not so easy. It requires the pods be restarted because every time you add the sidecar, the pod needs to go
+through a restart cycle. That's not great either. In addition, additional points of failure, security boundaries, these are all things that as the platform team I
+need to be thinking about. And of course, I do wanna implement organizational best
+practices at the same time because as the platform
+team, I've been told all service-to-service
+communication has to be encrypted, has to go over mutual TLS,
+so we need some solution. So I like the idea of using a service mesh because you know, Federica's
+team doesn't have to instrument each single application
+with all of the things that we need for observability security. We can add it as a layer on top, which removes complexity from her team. Adds a little bit to mine, but I think we have an approach
+to this, Istio Ambient Mesh. So essentially Istio Ambient Mesh, what it's gonna do is enable us to get the same advantages of Istio in a traditional sidecar model but without the sidecars,
+and the way it does this is by essentially encrypting traffic between services into a ztunnel proxy. This particular protocol that it uses, it's an Istio-specific term called HBONE, HTTP-Based Overlay Network Environment. So when you break that apart,
+it's not that complicated. It's an environment that
+overlays on top of your network, and it's based on HTTP. And the interesting thing about this is that essentially what it'll do is make it so that all of the traffic going between your services
+now goes through this ztunnel. That enables us to have
+mutual TLS out of the box. No pods need to be restarted. The traffic goes from
+working at a network layer, working in your network, to going through the ztunnel, right? So that happens as kind
+of a switch that flips, and to show that, I want
+to actually jump to a demo. And by the way, I know that you saw a bit about waypoint proxies as well. I'll get to that in a second. That's for Layer 7 capabilities. We're gonna focus on Layer 4. That's IP addresses,
+Layer 4 authorization. Think IPs and ports rather than fully qualified domain names, PATs, domains, that kind of thing. Okay, so let's take a look
+at my cluster environment. I'm gonna use K9s, and
+if you don't use this, I highly recommend it. It's a great way to step
+through your clusters, see what's running, that kind of thing. And in this cluster,
+oh, yeah, the internet's a little bit slow here, but there we go. We can see that I've
+already installed Istio. Now, this is a non-disruptive
+activity, by the way. It's kinda like a Helm chart. You just install into the cluster. These pods get started, and you can see that it comes with some
+observability tools like Grafana, Prometheus, Kiali, Jaeger, and the control plane for Istio as well, as well as an ingress gateway for how traffic gets routed
+through Istio instead. Okay, and you can see that, yeah, these pods haven't been restarted actually in the last 26 days. And so real quick, let's take a look. There's a helpful command
+that istioctl exposes for us called ztunnel-config workloads. And this is all the
+workloads in our cluster, and we can see that right
+now, that protocol is TCP, and that essentially telling us it's not going over the HBONE protocol. We don't have that mutual
+TLS enabled just yet. And to enable that, we simply need to, this is really cool in my opinion, label the default namespace
+with this annotation, just with this label rather. We set the data plane mode
+to ambient, and that's it. Now the traffic is gonna start going through the HBONE proxy. So we'll run that istioctl command again, and there we go. Now all those workloads
+that were TCP before are now going over the HBONE protocol. Can ignore these. There are some admin
+control plane-type services. Those don't need to be changed. But for our actual application workloads, they're going over HBONE, and let me just get
+the services real quick so I can access it. I'm gonna grab the one for
+the Istio ingress gateway. Apologize, it's a little hard to read, but I'm just gonna grab the Istio piece. And so remember, our
+applications weren't restarted. I need to do a couple of
+cache list reloads here just to hit the application
+here, but there we go. We access our application. Pod-to-pod communication is
+happening with mutual TLS. No downtime, no pod restarts. We have Ambient Mesh
+enabled in our cluster. But when we think about Istio, we don't just use Istio for mutual TLS. That seems like a bit of an overkill. We get a lot of other advantages
+with Istio as well, right? So observability is one
+of the critical ones. So I would love to show you how to enable observability
+capabilities as well. So very quickly, just jumping
+back to the slides here, with ztunnel, we have this
+mutual TLS out of the box. We have Layer 4 authorization policies that we can implement as well. Istio is great for the
+Layer 7 capabilities, right, so more advanced traffic
+routing and that kind of thing. So with a waypoint, essentially what we do is we have traffic that now goes through the separate waypoint that's
+running on the cluster, and this is what's gonna
+give Istio the ability to do Layer 7 capabilities
+and really rich observability. In fact, we're also gonna do a demo of chaos engineering here in a minute. Another popular use case for why you would want this waypoint for Layer 7 capabilities
+is canary deployments. Let's say you have a new
+feature that you wanna roll out to a subset of your users,
+maybe users on Firefox or users on a mobile phone. All of that becomes just a flip that we can switch at the network layer. The app teams don't need to
+necessarily change any code. We can do that at the network
+layer, that overlay layer. It's really powerful stuff. Let's take a look at what that looks like. We're gonna jump back to my machine here, and to enable the waypoint, let me make this a little bit
+easier for you all to see. Okay, to apply the waypoint,
+essentially what I'll do is run this istioctl helper command that applies the waypoint
+in the default namespace, and that's it. Again, no pods are restarting because this just starts a new pod, and we'll get deployments in the cluster, and we can see that we seven seconds ago started this new waypoint, and now we should have
+observability in our application. I'm just gonna refresh this a couple times to make sure we have some logs, metrics kind of flowing
+through the application and that kind of thing. Maybe we'll add a pocket
+watch to our card, and we'll hit the checkout button. Okay, awesome. That should be enough. Now we're gonna go back
+to our command line and run handy istioctl dashboard kiali. Kiali is an open source
+kind of observability tool helping us see exactly
+how our application looks. Let's make sure we're
+looking at like the last, you know, three hours of data. Okay, that's really hard to read. That's not very interesting to me. So let me start cleaning this up a bit. So I'm gonna hide unknown
+nodes. I want an app graph. I'm gonna go here. Oh,
+already looking better. I'm gonna go here, I'm going to enable some of these things here. I'm gonna get rid of service nodes. I'm gonna do traffic
+animations, waypoint proxies. And there we go, so you can already see a lot more that we can see here. Let's disable TCP traffic, 'cause I don't wanna see like
+Prometheus stuff going on. And boom, there we go. We can now see kind of a visual layout of our application architecture. I didn't complete a checkout, so that's why this line is black, because we don't have
+mutual TLS for this pod, 'cause I didn't actually
+do a checkout process. But you can see right here
+that it's showing traffic for the other pods that were activated when I was clicking around
+in that sample application. Click into one of these, and
+you can see that, you know, the traffic from UI to carts
+has mutual TLS enabled. So pretty cool stuff, in my opinion. In fact, I can even jump
+into things like carts and see exactly what
+application is talking to what, and I might notice here
+that hey, one of my services is talking to a service that it shouldn't, and I could use Istio to
+implement an authorization or network policy to prevent
+access between services that maybe shouldn't be
+talking to one another, right, limiting blast radius, implementing better security practices. Okay, so what did we see here? We saw with Istio Ambient Mesh, without ever restarting any of our pods, any of our applications, we
+got Layer 4 capabilities, mutual TLS enabled,
+and we were able to get some great observability
+out of this as well. I mentioned I wanted to do a
+chaos engineering demo for you. So let's talk about that real quick. So in the gateway that I
+deployed into this cluster, which is really straightforward,
+I'm basically, you know, it's kind of like that ingress resource that I showed earlier. It's just the Istio way of doing it. I've exposed the UI service, and for that UI service,
+let's insert a fault. So about 75% of the time, it's gonna fail. And I haven't applied this yet, so let's just make sure I'm
+still hitting the application. Yep, all is good. But now
+let's apply this new gateway. It should say configured
+to virtualservice. There we go, configured. And now 75% of the time
+this should fail. Boom. All right, so we hit that fault already. This is really chaos
+engineering at its finest. It's seeing how your application
+would respond to failures. So we could also do things like maybe implement a
+retry policy on failure and see if our application
+responds correctly. Let's keep hitting this a few times, 'cause 25% of the time it should work. Wow, that's crazy. Six, I
+should not go gambling today. All right, that's seven times
+for it to actually work. And we can already see
+that there's some issues with the like cache
+invalidation that's going on. So I feel like we already
+uncovered a bug, right? So maybe when there's a fault we should deal with the
+cache a little better so users don't end up seeing
+a page like this, really- - [Federica] Something for
+my teams to think about. - [Sai] Exactly, exactly. So
+what do you think, Federica? Oops, we don't need that. Let's jump to the slides. - Yeah.
+- Yeah. - I think this is exactly
+what we are looking for, actually, Sai, so thank
+you for showing that. I love the fact that really easily we can have mutant TLS in the cluster. That's a very big ask from
+security teams, et cetera. So definitely also like all the things that we can do in terms of observability and implementing new
+things that will enhance the reliability of our
+applications with Istio Ambient. But I also want to put
+you on the spot here. So is there any limitation that we should be aware
+about for Istio Ambient? - So there is a limitation here. When we first started
+implementing Ambient Mesh with this sample, this application, what we saw was that one of the services didn't mesh well with Ambient
+mode, no pun intended. Essentially what we saw
+was that one of the pods uses the MySQL protocol to
+access our persistence layer, and that protocol didn't
+play nicely with the ztunnel. It's like, well, what do we do here? Well, there's a really
+great thing that we can do, which shows kind of the
+flexibility of Ambient Mesh. Essentially what we did, and
+I'll pull up K9s again here, my terminal UI, and dig into
+that catalog deployment. And I did cheat here a little bit, and you'll notice that in this pod, we have two containers running. And just to show you what
+that second container is, it's an Envoy proxy. There we go, so
+essentially what we've done for just this catalog
+service is enable a sidecar. And so yes, for this
+pod, I had to restart it. And you might have noticed when I ran that ztunnel config
+workloads command first, there was one service that was already on the HBONE protocol. That was my little cheat. So beforehand, I had
+set up that pod already with the sidecar, and so that really shows how flexible Ambient Mesh
+can be for certain workloads that don't work on that HBONE
+protocol, that ztunnel proxy. Essentially what you do is in
+the deployment configuration for just that one catalog service, right, that catalog service, we add this label,
+sidecar injection is true. And so for that one pod we have a sidecar, and in fact in Kiali, it showed it as well that for that one pod we
+had a sidecar enabled. And you know, I think we can even show that really quickly here, going here. Okay, let's reset this
+back to what it was before. All right, here we go, so
+looking at the catalog, that little icon right there, that tells us that it had a sidecar in it. So okay, awesome. We saw how, you know,
+for certain workloads that maybe don't work great
+with that ztunnel proxy, we can just stick a sidecar
+on it and get going. - Amazing, thank you. And this
+is exactly what we look for. And also I like that for
+my teams, including you, we can go from a no service mesh state to a, let's say, secure
+layer service mesh state to a fully fledged one
+without needing to adopt the full Layer 7 capabilities right away. So that's amazing as well. And also I wanted to circle,
+go back a little bit. We talked a lot about ingresses before, and actually, ingresses, well, are great, but those are limited. Ingresses are limited. To do advanced network staff with ingress, you need to do a lot of annotations, customer resource definitions. So, and actually the Kubernetes ecosystem is not adding new features to ingresses. So this will be the
+same also going forward. The evolution, though, of ingress, that is the Kubernetes Gateway API has all those capabilities, and all the new features are added to the Kubernetes Gateway API. The Gateway API tries to solve all of the challenges that
+you had with ingresses and takes all the lessons
+learned from service meshes. And funny enough, this
+Gateway API is the one that we are using for the
+Layer 7, Istio Ambient. So the ecosystem in general
+is going for a rapid adoption towards the Kubernetes Gateway API. Finally we have one API
+that everybody can use so that we don't have,
+when we want to move from, for example, service mesh to the other or an ingress specification to the other, we needed to, like, for example, for the ingress controllers,
+many different annotations. The migration to one ingress controller to the other was very difficult. Now with the Gateway API,
+since we have the same spec, this will be easier. So other things that you
+can do with the Gateway API, first of all, you can
+do all that you could do with the ingress API obviously. So you can handle ingress
+traffic, but you can also handle, and you can obviously do more, all of that you could
+do with the annotations, now it's embedded within the API again. Then you can do service-to-service
+with the Gamma project. And now in the last KubeCon,
+we also have seen applications of the Kubernetes Gateway
+API for egress traffic. So that's amazing because we have one API to handle all these use cases and scenario and to unify Kubernetes
+networking, really. Another thing that I, specific topic that you can also tackle
+with Kubernetes Gateway API that I wanted to dive deeper is actually blue-green
+scenarios across clusters. So for example, as I explained before, my teams are spending a
+lot of time in, you know, doing cluster upgrades, for example, and we are doing the
+in-place upgrades right now, but we wanted to explore
+how it would look like to do blue-greens, for example,
+for better reliability. We want to be able to roll back if needed. We want to do canary
+deployments to the new versions, so all of these things, and
+looking at the ecosystem, we said, "Okay, we need
+to do multicluster then. Which are the options for us?" We have adopted the Istio Ambient, but multicluster is still not
+supported for Istio Ambient. And in general, thinking about how you approach multicluster, with Istio or a service mesh in general, well, there are multiple considerations that we need to do as architects. For example, we need to think about how we are gonna set up the control plane. Are we gonna externalize the control plane to manage the clusters? Are we gonna set it up in
+a high-availability mode? Other things that we need to consider is to then we need to share API permissions across the clusters. Then there is encryption
+and tenancy boundaries. Then again, we also need to take care of trust between meshes. So if it was difficult
+before to, you know, start with service meshes,
+adding multiple clusters to the mesh adds a very big
+layer of complexity to it. So I told you that this can be also done with a Kubernetes Gateway API. So different approach is using
+the Kubernetes Gateway API, and you do that coupling
+it with another set of APIs to APIs in general that are the multicluster services API, ServiceInput and ServiceExport
+that enable you to do that, let's say, multicluster that
+we need but in an easier way, with a Kubernetes native way. And within AWS, we do implement
+the Kubernetes Gateway API and the multicluster services API with Amazon VPC Lattice as infrastructure. So like, for example, we
+have seen before the ingress, with the ingress controller
+that implemented load balancers, now we see the Kubernetes
+Gateway API with its controller that implements Amazon
+VPC Lattice resources. And real quick, what
+Amazon VPC Lattice is, so first of all, Amazon VPC
+Lattice is a network service just like Transit Gateway,
+just like VPC Peering, but it operates at a different layer, the Layer 7 of the OSI model, unlike Transit Gateway,
+unlike VPC Peering. And it enabled us to connect
+applications across VPCs and accounts without the
+need of those services just by using Amazon VPC Lattice. It also implements an AWS
+native approach to security. And another nice thing is
+that not only can we have traffic across multiple clusters using the Kubernetes Gateway API and Amazon VPC Lattice, but
+also with Amazon VPC Lattice, you could have a single URL that sends some part of
+the traffic to, let's say, a service within Amazon EC2 and a service that is
+either in Kubernetes, or for example, ECS or Lambda. And this is very compelling to us because we also have some,
+well, legacy workloads still running on institute that
+we would like to modernize. And there is effectively many challenges, but network is one of them. So these simplifies for that a lot for us. - Yeah, absolutely, we're really excited about the Gateway API. It's really this thing
+that the whole community and cloud providers are
+kind of centering around. Of course, the Gateway
+API is an open source upstream Kubernetes thing, right, like the evolution of ingress. And so cloud providers,
+especially like AWS, are creating controllers like
+the Gateway API controller that Federica covered on the past slide to be able to implement some
+of those resources in AWS, and VPC Lattice really hooks
+into that really nicely with that Gateway API controller. So instead of creating ingresses and kind of ingress APIs and services, it's kind of a new approach
+with gateways and HTTP routes. And I think we're really
+gonna see the community and customers kind of
+move to this new approach because of the number of
+advantages that it offers, that one that I'll say
+is, you know, being able to route to targets
+outside of the cluster, whether it's another cluster or maybe Lambda, maybe
+ECS, whatever you have, and in addition kind of
+all of the capabilities that Federica had covered here that become available as well. So today I wanna quickly summarize what we talked about, right? So we started with simplifying
+cluster operations. We talked about our choice with Amazon EKS to run our container-based applications. We talked about how it uses VPC CNI for pod-to-pod networking
+kind of integrated into the platform, and
+especially with Auto Mode. You know, even for a lot of
+the demos that I showed today, that would've been streamlined because I would no longer have to manage some of those components like
+the Load Balancer Controller, VPC CNI, CoreDNS, they're managed for me. And when we upgrade clusters, those are also upgraded for us. And of course that means,
+you know, with Auto Mode, there's other components
+that are managed as well, things like Karpenter. You don't have to worry about
+dedicated compute to run that, those resources either, no
+dedicated node for Karpenter, no dedicated nodes for
+your networking components. Kind of moving on here,
+we talked a little bit about exposing applications
+externally, right, using the Load Balancer Controller. We talked about creating ALBs,
+application load balancers, at the Layer 7 using the
+Load Balancer Controller. And at the Layer 4 level,
+we talked about creating individual NLBs by creating
+services of type load balancer. Kind of further moving down here, we talked a bit about
+using Istio Ambient Mesh, enabling us to have Layer 4 and Layer 7 authorization policies, Layer 7 advanced routing,
+mutual TLS out of the box without disrupting applications and as well as that interoperability with using sidecars when you need them for specific workloads. And lastly, we kind of talked
+a bit about VPC Lattice and the new Gateway API,
+the Kubernetes Gateway API, how it's enabling customers to move and evolve to this new
+version of networking and how VPC Lattice being a VPC capability in Amazon helps support that. Okay, a lot of you might be wondering how can you continue to
+learn these things at home? Well, by the way, that first demo I did, that ingress demo that I did, was actually based on EKS Workshop. So that same environment that I showed you with VS Code in the cloud, you can spin that up for yourself. So I highly recommend
+going through EKS Workshop to learn at your own pace. In fact, I can very
+quickly just show one thing for you on eksworkshop.com. Some of the things that you'll notice here in the Fundamentals section, if we go to Exposing applications, the same thing that we
+showed with ingress, you can actually set up an
+environment for yourself and go through it yourself. We talk about things like the
+multiple ingress patterns, so what happens when you create
+multiple ingress resources but you want them fronted by a single ALB. We also talk about IP
+mode versus instance mode for load balancers as well. So EKS Workshop, a great way, self-paced, to kind of learn everything about EKS. And I really, truly believe that, because there's quite
+a bit of content here, and we're constantly updating it. One thing I'll say is that
+if you don't wanna spin it up in your own account,
+you can also reach out to your AWS account manager
+to request an EKS Workshop. And in that QR code, there's
+gonna be a form as well that you can fill out,
+and we'll reach out to you to help get you set up
+with an EKS Workshop. Also, EKS's Best Practices Guide, now integrated into the AWS Docs, a great place to learn about
+best practices for networking. I know Federica and her
+team spent a lot of time making a ton of updates to
+the best practices guide so that it's always kind of the latest kind of optimized setup for
+networking that we recommend. And you can get a badge as well if you kind of go through
+one of our courses. All right, that's all
+we have for you today. Thank you so much for
+attending our session. - Thank you.
+(audience applauding)

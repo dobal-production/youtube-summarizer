@@ -1,0 +1,562 @@
+- Hey everyone, my name is Micah Hausler. You are at Kube 315:
+Securing Kubernetes Workloads in Amazon EKS. I'm a principal software engineer at AWS. I work on Kubernetes, Kubernetes security, I've contribute to upstream Kubernetes, I'm on the Kubernetes security committee, so we take in security
+reports and evaluate them, and then issue fixes Kubernetes. - And I'm George John. I'm a product manager
+with Amazon EKS team. I'm very excited to be here, and thank you all for taking
+the time to join us today. - Am I on? Sure. - Oh, okay.
+- [Micah] Great. - So for today's session, we thought we'll take
+a different approach. We are gonna look at how you
+can secure your workloads running in Amazon EKS from
+a few different layers. So first, we'll take a
+look at the big picture. We look at the controls that are available to you at a cluster level. So we look at what are, how you can secure
+access into the cluster, we look at how you can assign permissions to applications running in the cluster so it can access AWS resources outside. So things like S3 Bucket, DynamoDB, how you can securely set that up, and finally, in the
+first section, we look at how you can use the various AWS services in the security space, and how those integrate with Amazon EKS. And then we'll dive a little bit deeper, we'll go into the infrastructure layer. So by infrastructure here, I'm referring to the EC2 instances, the working notes that you run in the cluster. And we'll also look at the,
+some of the networking VPC, and what are the controls and
+mechanisms available for you to secure the infrastructure layer. And then finally, we'll jump
+into the application layer. We'll talk about the best
+practices, some of the controls to secure your images and pods that make up your application. So one thing I wanna call out
+is that, in today's session, our focus is really on
+EKS and AWS controls and capabilities that
+are available to you. But at the end of the session,
+we'll share a resource, namely the EKS Best Practices Guide that talks about the
+Kubernetes capabilities and tools that are available so that you get the full picture in terms of how you can secure or cluster. So with that, let's get started. So over the last few years, we have seen a massive uptick
+in adoption of Kubernetes. As per the 2023 Cloud Native
+Computing Foundation's annual survey, 84% of the
+respondents are using Kubernetes, either in production, or evaluating it. And this is something we
+are seeing at Amazon EKS. Every year, we have customers
+running tens of millions of clusters, and this number keeps growing. And when we launched
+EKS over six years ago, it was really in response
+to customer feedback that managing Kubernetes at scale is hard. You know, customers were spending
+a lot of time monitoring, scaling, managing the
+Kubernetes control plane, and they want something, they
+want a native to integrate with various AWS services. And since then, EKS has emerged as a
+most trusted way for you to run Kubernetes in AWS. Now we remove the
+undifferentiated heavy lifting of not just managing the
+Kubernetes control plane, but VARIOUS aspects of the cluster. For AWS and EKS, security
+is the highest priority. Now when we, as always,
+operating securely in the cloud is a shared responsibility. AWS takes responsibility for
+the security of the cloud, and you as a customer takes responsibility for security in the cloud. So here you can see at the bottom, three layers are all
+managed by AWS and EKS. So things like the Kubernetes
+clusters control plane, the infrastructure it runs on,
+the regions, the local zones, some of the foundational services, the control plane leverages, like the compute storage networking, and the actual Kubernetes
+bits, like the API server that runs in the control
+plane, that CD database. All that is our responsibility. We patch, we scale, we manage, we make sure it's available and resilient. And the layers about it are
+really the EC2 instances and the worker nodes that run in your VPC. Things like, whether the operating system that runs on the EC2,
+whether it's patched, whether it's monitored,
+whether you're looking at the health of it. Some of the cluster
+capabilities like auto scaling, and even the Kubernetes
+pieces that, the binaries that run on the worker
+node, like the kubelet, or the container runtime. All that is your responsibility. But AWS and EKS offers
+you various tools like, there are multiple capabilities
+like security groups on pods, subnets, private
+endpoint access, EKS add-ons, EKS-optimized AMI's, all of
+which will make it easy for you to secure your data plane, your VPC, and the things that run there, but at the end of the day,
+it's still your responsibility. Now that we have covered
+some of the basics, let's jump into the first layer. So first we look at, like I said, the cluster level controls. When we launched EKS, we wanted to offer a Kubernetes native wave for authenticating into the cluster. So what we did is, we have this config map called AWS-AUTH, where you can define the
+mapping of IM principals to Kubernetes permissions. Now this approach had some trade-offs. You know, on one hand it is good because you can use IAM, you don't need to maintain a separate identity provider, and you get all the benefits of IAM, like multi-factor authentication, the auditing with
+CloudTrail logs, and so on. But on the other hand, now you had to deal with different set of APIs
+to create an EKS cluster with all the permissions. For example, you would use EKS
+APIs to create the cluster, and then you have to
+move to Kubernetes APIs to provision the mapping
+and set up the config map. This meant that automating, or using infrastructure as code
+tools to bootstrap a cluster with the required permissions is hard. Another challenge with the
+config map experience was, it was a little bit brittle. Like if you make a typo in the config map, or you don't follow
+the exact format there, you could accidentally
+lock your users out. And there were behaviors like, when you create the IAM
+identity that is used to create the EKS cluster, automatically gets super user access. Now this was something which, was behavior which many
+customers didn't like. So to address these, soon
+after re:Invent last year, so Mike and I were on stage
+last year, we talked about it as something that's coming out. It came out as a feature
+soon after re:Invent, called Cluster Access Management. What Cluster Access Management does is that it kind of unifies the APIs. So no longer you're switching between EKS and Kubernetes APIs. Instead, you can just use EKS
+APIs to create the cluster, set up the permissions, you
+have cluster ready to go. And it simplified the configuration, so users and other AWS
+services that needed access to the EKS, the whole setup
+was much more simpler now. And finally, it gave you granular control. So, if you remember the
+scenario I mentioned before, now with Cluster Access
+management, you are able to revoke the permissions
+granted automatically to the IAM principal
+that creates a cluster. There is a link to the blog at the bottom. If you are interested in
+learning more about it, please take a look. We strongly encourage you to take a look at Cluster
+Access Management. For EKS, that is the future,
+that is where we are heading. All the new features, all the
+capabilities will be built on Cluster Access Management. And if you have an existing cluster that's using the older
+AWS-AUTH config map, we strongly encourage you to move. There is a simple, easy way
+to migrate from one to the... From config map to
+Cluster Access Management. Let's look at the actual
+flow behind the scenes. So first, you would be integrating with... Or interfacing with IAM to
+create the IAM principal, whether it's a role or user. And then you would be
+interfacing with the new APIs that were introduced
+as part of the feature. The same functionality is
+also available on the console. So you can either use EKS
+console, or you can use the APIs, and then you would be
+creating two main entities. First one is access entry. So access entry would
+associate with the IAM identity you created in the previous step, and then you create an access policy and define, use access policy
+to specify the permissions that the access entry has. So once the first two steps are done, you have pretty much set up the feature. The Cluster Access Management feature. And then let's say you
+have a user who's trying to access the API server. What happens is implicitly,
+AWS STS is called, either by IAM Authenticator,
+or the CLI get token operation. And when the request
+lands in the control plane on the API server, we have a web hook which intercepts the request,
+looks at the STS token, tries to find the user identity
+associated with the token, and then if it doesn't
+matching with the access entry, if that succeeds,
+authentication is complete. The next is authorization. For authorization, there
+is a series of authorizers that we look at, and then
+if the user identity maps with the access entry and access policy, the authorization is also allowed, and then the request can flow In. Cluster access management
+is available both through APIs and console, so
+you have the flexibility there. Alright, so the first
+part I talked about is how can you set up
+access into the cluster? Now we will move on to, you have an application
+running in the cluster, most likely you might need
+to access an AWS resource, and you could have a
+Kubernetes application that need to access S3 bucket. It could be DynamoDB table,
+it could be any AWS resource. How do you make sure you
+assign the right permissions to the application? So one option we had previously,
+and it's still available, is called IAM Roles For Service Account. In short, it's called IRSA. So we launched IRSA in 2019. IRSA enabled you to grant
+granular AWS permissions to pods. So you could have multiple pods belonging to multiple applications all running on the same EC2 instance, but have effectively
+different set of permissions. Now this was launched
+in 2019, like I said, and our goal was to make sure IRSA works across the different
+Kubernetes deployment models we support in AWS. So we wanted IRSA to work
+with EKS, manage those in the cloud, EKS Anywhere, self-managed, Kubernetes clusters on EC2
+instance, Red Hat, OpenShift, service for AWS. ROSA in short. So we build IRSA by not
+taking a direct dependency on any of the EKS APIs. We leveraged some of the
+foundational services like IAM, but that had some trade-offs. One was, now that we are
+depending on IAM for IRSA, you had to create an
+IAM, or OIDC provider. Now this was a privilege operation. We heard from some customers,
+especially customers in regulated regulated industries, that the cluster administrator
+doesn't have IAM permissions. So now it means that the
+cluster administrator has to reach out to identity... Sorry, IAM administrator. There's a lot of back
+and forth to set up IRSA, which was not really user friendly. The other one was the scoping. So when you create, when you use a role, or when you create a role for use in IRSA, you typically have to bound that role, or specify, what are the clusters that can assume this role? Now it means that if you wanna use a role in a new cluster later on, you
+have to go back to IAM role, keep updating the trust policy, or if you wanna rework
+a role from a cluster, you have to go back to
+the roles trust policy and keep playing with it. And finally, there are some
+limitations in terms of how many clusters can a role be used with. And to address these,
+at re:Invent last year, we launched the feature
+called Pod Identity. So Pod Identity simplifies trust. Pod Identity enables you to create a role that can be assumed by
+EKS service as a whole. So previously, when you create a role, you specify the clusters
+that it could assume, and now with Pod Identity,
+you can just specify that AWS service can assume it. So it doesn't matter which
+cluster you're using, but you also have the ability
+if you wanna lock it down to a few clusters, you
+have that ability as well. It offers new capabilities like attribute based access control by supporting IAM role session tags, so it enables reuse of policies
+and roles across clusters. And finally, you are able
+to now create clusters with all the required
+permissions in one go. And there is a link to
+a blog at the bottom if you are interested in
+learning more about Pod Identity. So one thing I wanna emphasize is that, like I said, Cluster Access
+Management is the future for the previous talk, the
+first part of this talk, I said AWS-AUTH config map is older way, but here, IRSA is not the older way. We will support both. We have no plans to deprecate IRSA. IRSA would continue to exist
+along with Pod Identity. Pod Identity is purpose
+built for EKS managed service in the cloud. It doesn't work with EKS Anywhere, or self-managed Kubernetes
+clusters on EC2. So it's all about giving you more options. Depending on your use case and needs, you can pick the solution
+that best fits your needs. Alright, let's look at the flow. For Pod Identity, a prerequisite is that you need to run
+the Pod Identity agent, as a (indistinct). So it needs to be run, be
+running on all worker nodes. So here, let's take a
+very simple scenario. Let's say you wanna deploy an application to your cluster that needs
+to access an S3 bucket. It could be any AWS resource, I'm just using S3 as
+a simple example here. The first thing is, you
+would be interfacing with, or using IAM to create an IAM role. An IAM role has two
+parts: a permission policy and a trust policy. A permission policy is
+where you're specifying, this can access S3. So in our case, we want the application to be able to access S3, the permission policy
+would have the permissions for it to access S3. And then you have the trust policy. This is where Pod Identity
+is different from IRSA. The trust policy for
+Pod Identity specifies that this role can be
+assumed by EKS's service. So we have a new service
+principal we introduced, and that's a one time step. It doesn't matter
+whether this role is used on cluster A or B, or a C in
+the future, it will just work, and it's a one time step you have to do. And after that, what you do is you create, use the Pod Identity APIs. Again, you can use the
+console if you want, but there is a operation called Create Pod Identity Association, which is how you map the IAM role that you previously created
+with the service account. So one good thing here is
+that that service account, the Kubernetes service
+account, need not exist at that point in time. It can be something you
+create in the future. The good thing about that is, if you are a cluster administrator, you wanna set up the cluster
+with all the permissions, so when the app dev teams comes in later, that cluster is ready to go for them, you can pre-create the
+Pod Identity Association with all the mappings ahead of time. Now these are the two things you do to set up Pod Identity. The feature. And then let's say later on, you have app dev team is
+deploying their application, a pod is spun up. When we detect that this
+pod has a service account associated with it, which
+was previously mapped through the Pod Identity
+Association, we have a web hook that intercepts a request,
+and will mutate the pod spec. And we'll add couple of
+environment variables, well known environment
+variables to the pod spec. So when AWS SDK comes up, it knows these environment variables. It would mount these, it would fetch the service account token that's mounted to the pod. It'll make a call to
+the Pod Identity agent, pass the token, the service account token. And then the Pod Identity agent
+would then call assumed role for Pod Identity, which is a
+new API we introduced as part of the Pod Identity API. And this API would then validate
+the service account token that was passed. If it is validated, it returns
+a temporary AWS credential, which is then injected into the pod. And then the application
+can use that AWS credential to access S3. All right, so what's new in Pod Identity since the launch at re:Invent last year? Pod Identity is now available
+in all commercial AWS regions, and China, as well as
+the US GovCloud regions. We open source the agent itself. So when we launched, it was
+only available as an EKS add-on. We got feedback from customers
+that they wanna deploy it as a helm shot, or wanna
+bake it into their own AMI and create a custom AMI. So the agent is now open sourced. And the last one is, we introduced
+support for Pod Identity and EKS add-ons. So add-ons are operational software that you can run in the cluster. And these software
+usually needs permissions, AWS permissions to access AWS resources. Previously, the only way
+you could set that up was through IRSA, but now Pod
+Identity is also available, which greatly simplifies
+the add-on setup experience. Alright, so now let's move
+on to some of the controls that are available for you to
+identify an alert on issues. The first thing is looking
+at the access, the requests that are coming into
+the API server itself. So when you create an EKS cluster, you get a cluster endpoint, which is basically the API server that's running in the control plane. All the requests coming into
+the API server are logged in the control plane audit log, and they are made available in CloudWatch. This is an opt-in, or
+something you have to enable. But once you enable control plane logging, the logs will automatically
+flow to CloudWatch. Now it being in CloudWatch means that you can use things
+like CloudWatch log inside to further analyze it. At the end of the presentation, we'll share the security best practices. Within that, there's a section
+called Detective Controls, and there are some pre-built
+CloudWatch log insights (indistinct) we have found to be useful. So that is something you
+wanna probably take a look at after the presentation. The other benefit of it
+being in CloudWatch is that you can set up alarms. So if you wanna detect
+increase in 403 forbidden or unauthorized access, you're now able to kind of alert yourself
+to those situations. Alright, so next one is, so previously we looked
+at, looking at the requests that are coming into the API
+server endpoint of the cluster. This is about looking at the requests that are coming into the EKS API. So here, EKS API is, the EKS
+service APIs that you use to create cluster delete,
+cluster update, cluster, all of those EKS APIs, not Kubernetes APIs. All of those are logged in CloudTrail, and along with CloudTrail
+logs and CloudTrail insights, you're able to analyze them. And finally, we have Amazon detective. So all VPC flow logs, if you wanna analyze or visualize them, you
+can use Amazon detective, which is integrated with EKS. Next is encryption. So with some of the
+native AWS storage options like EBS, EFS, FSx for luster, is supported in EKS. You can encrypt at rest with
+either AWS managed keys, or you can bring your own keys. Along with that, some of the
+secret sensitive information that's stored in the Kubernetes
+cluster is typically stored in the Kubernetes secretS object. EKS gives you the ability to
+encrypt a secret subject either with a key that is the AWS
+Key Management Service office, or you can bring your own key to KMS, and then use that to encrypt it. And with the keys being in
+KMS, you get the ability, you get the benefit of automatic
+rotation offered by KMS. So what are some of the
+other cluster scoped controls that are available to you? The first one is the
+Kubernetes cluster endpoint. So here by, when I say
+Kubernetes cluster endpoint, I'm referring to the API server endpoint that's available in every cluster. By default, it's in a public mode, meaning that any traffic
+originating from your VPC, if it has to reach out to the API server. Let's say your worker
+nodes need to reach out to the API server. The traffic leaves the VPC, it remains an Amazon network, and then comes back to the API server. But if you, let's say you wanna
+make it completely private so that traffic always remains in VPC, you have the option to
+configure the endpoint to be in a private mode. The next one is the other
+API, which is the EKS APIs. So today, again, if you have a need where any traffic originating
+from your VPC should hit the EKS APIs through a private endpoint, or in a private manner, there
+is AWS private link that, this feature I think we
+launched a year or so ago. So you can leverage AWS
+private link with EKS service to kind of get that private connectivity. The next one is use manage
+components whenever you can. So EKS add-ons, EKS Optimized
+Amazon Machine Images, or AMIs. These are something we
+take responsibility for. We always are looking for issues. If there are vulnerabilities,
+it is on us to go patch it, and make a new version available. And then there are APIs
+that you can leverage to apply those to your cluster. So when possible, you
+leverage managed components. The last one here is using security hub for scanning your cluster. Security hubs has, I think
+around eight predefined checks to look at the security
+state of your cluster. So, you know, that is
+something you can also look to get an idea of how your cluster is from a security standpoint. Alright, with that, let me invite Micah. - Thanks George. So next, the next section is around infrastructure
+scoped security controls. So, as George talked about, we kind of are separating
+cluster from from infrastructure. So by infrastructure, we really mean where does your containers run? And the first thing that
+we're really excited to talk about is EKS Auto Mode. This was just launched yesterday, so you're getting the fresh stuff. EKS Auto Mode is a new
+feature of EKS that helps you to automate your entire
+Kubernetes cluster infrastructure. So with Auto Mode, AWS
+takes responsibility for creating and deploying nodes. You only have to create your pods. What this really allows you
+to do is improve performance, and optimize resources. Using Carpenter, which
+is an open source project that we created, we manage
+that completely for you, and we will create the
+nodes that are required for the pods you define. If you define a pod that
+requires X amount of memory, Y amount of CPU in a specific AWS zone, we'll create it there. Similarly, as you scale up a,
+say a Kubernetes deployment and add more replicas, we
+will create the best type of EC2 node for you. Similarly, we will also consolidate and find the best type of nodes for the workloads that you have running. This really simplifies the
+management of your cluster. You don't have to think
+about creating a node group, which zones do you wanna create it in? You just have to use the Kubernetes API to create a configuration
+for EKS Auto Mode. And also this really reduces the operational overhead required. You don't have to think about
+updating the machine images that AWS is responsible for creating and making available to
+you, you just use the nodes. Nodes have a max lifetime of 21 days, so even if you have a workload that's running more than 21 days, that node will get
+recycled, and gracefully, your application will get recreated onto another node that's the
+latest Amazon machine image, with the latest security patches, and so it's always up to date. This really helps you
+increase your own agility, and accelerate your own innovation because you're not having
+to spend time trying to keep all your nodes up to date. You really get to offload all of these offer operations to AWS. This also just really helps
+you improve the performance and availability of your application. As I said before, it's graceful restarts. Graceful migration of of nodes. So you don't have to think about what sort of scaling policies you have to apply to an auto scaling group. This will do it for you. And finally, this really
+does help you optimize costs by automating the capacity
+planning and dynamic scaling. You don't have to go say,
+okay, what kind of node, what's the best type of node
+that I need for my workload? We'll determine that based on the requests in your Kubernetes pod. So this, as George shared earlier, we have a shared responsibility model. And with EKS Auto Mode,
+this changes a little bit. In the previous example, if you're using EKS managed noDE groups, there's more of the
+responsibility that's on you. In this model, all that's on you is really
+maintaining the security of your containers, and
+your VPC infrastructure, and any add-ons that you install on top. There's a number of add-ons that are automatically
+included with EKS Auto Mode. Things like the kubelet, the
+container networking interface, the kube proxy, and some CSI drivers. Those are automatically maintained by us. But other add-ons, those are still on you, but there's just a whole lot
+less that you have to manage. Another aspect to talk about in terms of the cluster security is really about cluster network security. So you have applications
+running on containers and pods in your cluster, right? There's two main configurations
+that you have here. The first is to take advantage of Kubernetes networking policy. So this is part of
+Kubernetes as the interface, and then powered by the AWS VPC container
+network interface or CNI plugin. You can define rules in the
+Kubernetes API that say, I wanna let pods in this
+network namespace talk to pods in this other network namespace. You get very granular
+control over pod labels, or even at the pod label level, and L seven. So, what host name, or what TCP port. That is enforced on the host. So it's using EBPF in the EKS VPC CNI. Other, if you're using
+a different CNI plugin with a different enforcement layer that might be using a
+different technology. But that's enforced on the host. The other method is with security groups. So these are the same security
+groups you know and love, with EC2, but they can be
+applied to your Kubernetes pods. So each pod in Kubernetes that uses an elastic network interface, or an ENI that gets attached
+to your EC2 instance, and EC2 security group per
+pod attaches a security group to that pod's network interface. So this lets you use an off host mechanism that can't be modified on
+the host to control what app, what network calls a pod can make. And included is a link where
+you can read more about that. As George mentioned, there's
+some detective controls that you can do with CloudTrail. Another form of detective controls more around the infrastructure
+layer are around GuardDuty. So GuardDuty has some
+really great integrations with Amazon EKS. The first integration that
+we built with GuardDuty was for audit log protection. So Kubernetes has an audit log,
+Kubernetes is an API server. It emits an audit log for every request that's made against it. So audit log includes things
+like if you create a pod, it tells you the pod name,
+which user created the pod, other metadata about the pod. And all this goes to a central log. You can turn it on,
+send it to your account, but with GuardDuty, you
+can also have that log sent to GuardDuty for your cluster. GuardDuty uses machine
+learning, it also uses quite a bit of like
+rules that we've observed from known attack patterns. And I interface, we interface
+with the GuardDuty team a lot to say, here's new things
+that are coming in Kubernetes, here's new things we should
+look for configurate, either misconfiguration,
+or attack patterns. And so GuardDuty will send you an alert if it detects either a
+mis-configuration, if you, say you accidentally configure anonymous, so unauthenticated users to
+the Kubernetes API as admin. I've seen it before,
+it's awful, don't do it. But if you did it, you would get an alert from GuardDuty saying, hey, this happened, you should go remediate this. And same for a bunch of
+other known attack patterns. So that's a really, really
+great protection mechanism. You can enable at your
+account level to say, I want this for all my clusters. Second is Amazon GuardDuty's
+Detective controls is with runtime protection. So Amazon GuardDuty also
+has an agent based mode where they will deploy
+through EKS add-ons, an agent onto every host, to
+look for known attack patterns, whether that's through
+file to file changes, or other known heuristics
+on the node to look for malicious attack patterns
+that wouldn't show up in the Kubernetes audit log, but could be seen in,
+say, the Linux audit log. So that's another great control. Again, you can turn that on at the account level, or at
+the AWS organizational level for your account, to just make
+it enabled on all clusters. A few other infrastructure
+scope security controls that we just recommend for
+customers, are to restrict and minimize access to your
+instances using AWS SSM. So if you're used to spinning
+up a VM, if you ever pointed and clicked through the AWS
+console your first time, you probably used SSH right? Everyone's sort of familiar with SSH. Generating SSH keys, get your
+(indistinct) on your instance, and then opening a port
+on your security group, and getting an IP address, and, right? Connecting to your host. That is... When you've done that, I
+would not be surprised, and you can be ashamed, it's okay, to have set the incoming
+security group rule to allow anywhere in the world, because I don't wanna go look up my IP. What if I'm at home, and my IP changes? Or if I'm at office and I
+have a floating IP, right? You might set it to the whole world. That's not great, but you
+might've done it right? You don't wanna do that in production. And so with AWS systems
+manager, you can turn off SSH, and enable SSM to access your hosts, and the SSM agent connects
+back to the SSM service. And with SSM session manager,
+you can log into your instance through SSM without
+needing that open port. So it's a great security control that's not necessarily unique to EKS, but just a best practice
+that we really recommend, because it really can save you from having mis-configured an open port to the world. You just don't need to do
+that for something like SSH. There's all kinds of internet bots and everything scanning, you know, the global IP space looking for, what's listening on port 22? And you don't wanna be hit there. Additionally, we recommend
+using a container optimized OS. So we have the Amazon EKS optimized AMIs, those are using Amazon Linux. And then we also have Bottle Rocket, which using the same
+kernel with Amazon Linux, but using a more hardened container, only container first OS. EKS Auto Mode actually uses
+Bottle Rocket under the hood. But bottle rocket is a
+much more locked down OS that doesn't have, it's
+not a general purpose OS, it doesn't have a package manager. So you can't keep packages up to date, you don't have to keep
+packages up to date. You get a new... You create a new instance
+when you need a new package, or to get a security patch. And then finally, we also recommend just verifying your
+configuration of your cluster using the CIS benchmark. We have an EKS specific CIS benchmark that lets you verify the
+configuration of your cluster, making sure you have things like, if you don't want public access
+to your cluster turned on, you can have that turned off. Making sure that you
+have all the other APIs that we've talked about, like
+Cluster Access Management, making sure that you're no
+longer using config map mode. You can use the CIS benchmark
+with open source tools like Kube-Bench to validate
+your configuration here. And finally, the final
+section here is really to zoom in to the application
+scope security controls of your cluster. So, as we mentioned, pod
+security is kind of one of those things that you need
+to pay attention to, right? So one of the best mechanisms
+for this is really using either entry Kubernetes
+Pod Security Standards, or some out external pod security, so policy-as-code solution. There's open source
+solutions like Kyverno, or Open Policy Agent Gatekeeper, or others out there that
+help you enforce some of your security standards as code. Some of the best, just to
+hit some highlights here, there's a whole slew of them. Again, we'll have a link later to the EKS Security Best
+Practices Guide with these. But a few ones we just
+really wanna call out because these are just so critical, is limit the privilegeD containers. And I'm specifically using
+the word "limit" here, because sometimes people think they should never have
+privileged containers. And if you're not familiar
+with privileged containers, if you ever run docker command line, you have a dash dash privilege flag. When you run privilege, that
+gives a container access to all kinds of Linux devices, and privilege escalations on the host, so that can do management of the host. Sometimes that's necessary. So when we say limit, we don't mean eliminate
+privileged containers. For example, the AWS VPC CNI needs to set up network namespaces so that pods can have their
+own network on a host. That needs to be privileged. There are things like the, or the CSI, the Container
+Storage Interface agents for EBS, or for EFS, or several of the other
+Amazon integrations. Those might need to be
+privileged, and that's okay. But what we do encourage
+you to do is limit that. So if you have an application
+that's serving web traffic, probably does not need to be privileged, so don't make that privileged. Similarly, if you have an application that's running on your
+cluster, that is, again, take this web serving traffic example, that's never gonna talk
+to the Kubernetes API, disable service account token mounts. By default, Kubernetes
+mounts a token into every pod so that it can talk to the
+API server and authenticate. It doesn't have any
+permissions by default, but it's there as an
+authentication mechanism. If you don't need it, turn it off, right? Similarly, restrict use of host path. It's just one of those things that, if you don't need, turn it off. There's all kinds of CVEs in the past, whether that's in container
+D in Kubernetes itself, or runC, the container runtime agent, that have centered around host mounts. So if you don't need them, turn them off. And then finally, just as you
+build your container images, when you define that, whether
+it's in your docker file, or however you're defining
+your container image, or actually, not in your docker file, but actually in your pod
+configuration, if your pod, say again, we'll take
+the web traffic example. If the the pod never has to write, or the application in your
+pod never has to write to the file system,
+consider switching that to a read-only file
+system in your container. That eliminates a whole
+slew of attack vectors that your application could
+potentially be vulnerable to, and you just don't even
+have to worry about. Another aspect that we like to think about is just image security. So your images that
+you're running are pulling from somewhere, probably Amazon
+ECR, maybe somewhere else. We highly, highly recommend scanning these for vulnerabilities regularly. So with Amazon ECR, you can use the native
+Amazon Inspector integration and get scans of your image and reports if there are secure security
+vulnerabilities found in your application, whether
+that's in the system packages, or there's some support for
+language packages as well. Also, when you're using
+ECR, if you don't need ECR to be coming from outside
+of your VPC, you can use ECR with private link. You can lock down so that
+your image can only come over private link. That's a great, great control
+that we've seen customers use. And finally, similar to
+the read-only file system, this is more of a thing that you have to configure in your container
+definition when you build it, but configure your image
+to use a non root user. It's sort of a default if
+you're ever, use a docker file when you build, it just
+uses the root user. If you're listening, if you, again, if you have a web container
+that's listening on whatever port it is, it
+doesn't necessarily need to be running as root. And so you can change
+that to a non root user. That, again, just reduces
+the permissions that that Linux process has when
+it runs in your cluster, so that it has much less likelihood of, if there's a security
+event, of having permissions to escalate and do things
+that you don't want it to do. The next part I wanna
+talk about is something that we're pretty excited about. So this is pretty new. So Kubernetes has built in authorization. If you've ever used Kubernetes, you've probably configured RBAC, or role-based access control. And you've probably written an
+RBAC policy to allow some pod to manage things in your cluster, or maybe a human to manage
+things in your cluster, right? If you've ever written an RBAC pol- How? Quick show of hands. How many of you have ever
+written an RBAC policy? Okay, good, good. We got a lot of people here. Okay, so if you've ever
+written an RBAC policy, you've probably come into some
+of the limitations of this. It's worked great in
+Kubernetes for the last, like eight years or so. But the more and more that
+we've heard from customers, we're seeing some of the
+limitations of RBAC come into play. If you've ever written
+an RBAC policy, you know that it's allow only. You can't do a denial. So if you wanna allow, say
+you're a platform team, you wanna allow a developer
+or group of developers to manage some deployments in the cluster, but you don't want them
+to manage deployments or daemon sets in the
+kube system namespace. That's becomes really painful
+as a platform administrator because you have to create a
+RBAC policy in every namespace for those developers. If you create a Kubernetes cluster role, you have to give it
+either every permission on every namespace, or just
+specifically named namespaces. There's no conditions. That becomes really painful. So there's no conditions
+and there's no denials. Cedar is a access control language and runtime evaluation
+engine that's open source, built by AWS. It was launched several
+years ago at re:Invent. There's also a managed service for this, Amazon Verified Permissions. But Cedar can be used for, actually even your own applications. You can define what kind
+of actions can be permitted by who, and on what resources. So over the last few months, we've built and then open sourced a new prototype for re-imagined Kubernetes
+authorization using Cedar. And it's on GitHub, so
+you can see the link here. You can actually download
+it and try it out. We're gonna show a demo here in a second, but I wanna show just kind of
+quickly what this looks like. So if you've never seen
+Cedar code, that's okay. Cedar is very, very easy to read. Cedar policies have basically three or... Well, three parts we'll call 'em. You have effect. So in this policy, this
+is a contrived policy that doesn't do anything
+'cause there's not, it's not actually used, but
+just to show you kind of what can be done with Cedar. There's an effect, so a permit or forbid. This is a permit policy. Then you have the main
+section of the policy where you have principal,
+action, and resource. You define what principal
+this policy applies to, you can define what
+action, or set of actions that this policy applies to. So I'm saying here,
+principal is a custom user. Not a specific one, but just
+that's the type of principal. The action is in the
+list of "get" or "list". So it can be either a
+get or a list action. And then the resources,
+some custom resource type that I've allowed. But it's now has something
+that you can't do in Kubernetes RBAC. It has a condition. We have this when clause. We're only gonna allow
+this policy to take effect when a principal is in a specific group. And so we have a custom
+group type we've defined, and an identifier for that group. So maybe it's a name. And then one other part
+to this condition is that the resource has some field on it, and that field must equal cool value. And then finally, there's a
+syntactic sugar called an... That's another condition on Cedar policies called an "unless" clause, that negate when this policy applies. It makes it a bit simpler
+than having to write, and, or, not, equals
+to in your when clause. You can just add an unless clause as well. So we're gonna, this
+policy will all take effect with the when, unless resource dot co- My kind attribute equals "secret". So if that attribute equals "secret", this whole policy doesn't apply. So that's just a really
+quick walkthrough of Cedar. Now we're gonna do a really quick demo of what this looks like. Alright, so I wanna
+show you a few policies that I've written here ahead of time. So, and then we're gonna walk through and kind of see how this works. So the first policy I've written
+is a authorization policy. It allows a principal
+that's a Kubernetes user to do an action. And so that act, the actions
+that it can do are create, and these are just Kubernetes
+verbs, create, list, watch, update, patch, and delete. And then the resources it can act on are Kubernetes resources. So if you've ever, again, if you've ever written an RBAC policy, there's non-resource URLs like metrics, liveness checks, and
+then there's resources. So any secret pod, config map,
+CRD, those are all resources. So we're gonna say, okay,
+this acts on resources. But this only applies
+when the principal name is sample user. The resource being acted
+on is a namespace resource. So this excludes resources
+that don't have a namespace like node, validating
+admission configuration, a number of other Kubernetes types. The namespace name is default. The API group is empty,
+which is the core API group where pods, config maps and
+everything live and Kubernetes. And the API resource is config map. So we're gonna allow the sample user to basically do all these
+verbs on config map. So that's our authorization policy. This looks sort of similar
+to what you could actually do almost all of this in RBAC, right? It's permit, so it's not a forbid, and all of these expressions
+could be modeled in RBAC. Now we're gonna do something
+a little bit different. So we're gonna add a second
+policy that's a forbid clause. We're gonna forbid users that are in the group requires labels. So Kubernetes users are in groups. They are forbidden from
+listing and watching any Kubernetes resource, unless the request has a label selector. So if you've ever listed
+Kubernetes resources like pods, or any other resource, you
+can do with Kube Cuddle. Kube cuddle dash L for a label selector. Key equals value. You can specify keys and values. So in this example, we're
+gonna forbid all requests, unless there's a label
+selector where key owner equals the requester's name. This is something you can't do in RBAC. This is attribute based access control. So we've now restricted some of those verbs that we saw above. The next policy is not just
+Kubernetes authorization, but Kubernetes admission. So Kubernetes admission is
+another part of Kubernetes where you can restrict
+mutations to resources. So creates, deletes, updates. So again, we're gonna apply this to users in the requires label group. They are forbidden from creating, updating or deleting any resource, period. Unless that resource has metadata. That metadata, so if you've ever configured
+a Kubernetes resource, it has metadata object in
+the object meta and labels. And one of those labels is
+"owner is principal name". So you can no longer,
+we're gonna forbid users and requires labels from
+creating any, or updating, or deleting any resource
+unless they're the owner of it. And then finally, we're gonna
+do a similar forbid on update, but we're gonna prevent overriding. So when you get an admission
+request for an update, you get two resources. You get the new state and the old state. We don't wanna let someone
+overwrite a resource that they didn't already own. So we're gonna forbid, if the old object metadata
+didn't have owner is name, we're gonna forbid that. Okay? So that's our policy. So I've already created this in a local Kubernetes
+and docker kind cluster, and we're gonna walk through
+what that actually looks like. Okay, so I have a kube config
+here that I've written, that is a sample user. And I'm using the Kubernetes
+client call Kube cuddle off, who am I? And this is just gonna return
+back, "What user are you?" What groups are you in? So I'm the sample user, I'm
+in the group sample group, requires labels that we saw in our policy, and a system authenticated. I wanna as admin, so I'm the
+admin of the the cluster, not as that other kube config. I wanna create a config map
+just for display purposes here. Okay, so I created a config
+map called "other config". It is gonna have the,
+just the key and value foo bar, right? It doesn't need any data. We're gonna label that
+config map we just created with the owner, some user. So not our sample user,
+just some other user. Now we're gonna just get config maps that exist and show their labels. So there's three. There's kube root CA that's already there. That's created
+automatically by Kubernetes, it doesn't have any labels. We have this other config
+owned by some user. We have this test config
+owned by the name default. Okay? So none of these are
+owned by our sample user. As our sample user, if we
+try to kube cuddle get CM or config map, we're
+gonna get a forbidden. And we're not only gonna get
+a forbid, we're gonna see what policy denied that request. So you can see here that the policy label
+enforcement policy one on line 21 column one forbid this request. So I now know, okay, I'm forbidden, and I know which policy
+forbid me from doing this. If I wanna try to label, so
+I wanna update an existing, that other config, and add
+the stage equals test label, I'm gonna get forbidden from
+that because I don't own it. If I want to create a config
+map as my sample user, and I try to do that, again from literal where K one equals V one, but I don't have any label
+on this config map I'm trying to create, again, I'm gonna get denied. This is a admission denial. You can see admission webhook denied this. So, so far this is pretty effective. So what if we, how do we actually
+do something as this user? Okay, so here's a sample config map. I have it locally in a file
+called "sample-config". Notice that it has a label, and the label is owner equals sample user. It just has some dummy
+data of stage equal test. So what happens if we
+actually try to create this as the sample user? Okay, let's try it. It succeeds. This is great, right? This is what we actually want. And then as the sample user,
+if we wanna list config maps, so get config maps with a label selector, remember we tried it before
+without a label selector. We do it with a label
+selector, it succeeds, but we can only see the one we own. We can't see any else. So that's our short demo here. The few things to note
+about Cedar is that Cedar is really at this point a prototype. We wanna hear more from you. If you would like this
+integrated in into EKS, we would love to hear about it. You can go ahead, download it, try it out. It's all open source. And yeah, again, we would love to hear what you like, what you don't like, what you'd like to see about this. But for now, this is
+an open source project that we're really excited about, and wanna get more
+information on from you. Finally, a few resources. As we mentioned throughout the talk, we have an EKS best practices guide. This is on the AWS documentation. There's a QR code here. So you can really read more
+about these best practices that we've mentioned here, as well as just Kubernetes specific ones that aren't specific to AWS or EKS, but just Kubernetes in general. We have the EKS workshop,
+which is a great guided tour of, if you're new to
+Kubernetes, new to EKS, and you wanna learn how
+to create an EKS cluster, it's a great guided tour
+of creating a cluster, configuring it, installing
+applications on it, like monitoring stacks, and other add-ons. It's really, really helpful. And then also we have EKS
+blueprints that we provide. These are sample
+configurations for Terraform and AWS CDK to help
+you get up and running, and started very quickly with EKS. Finally, we also have a public roadmap. So if you go to GitHub
+on the AWS organization, the containers roadmap,
+there's a link here. You can see a list of
+feature requests by by users, or issues that we've opened to say, hey, this is something we're thinking about, we want user feedback on,
+you can upvote features that you want in EKS there, or
+tell us about your use case. We want to hear about it. There's one for Cedar
+integration into EKS. So if you want, if you like
+that, if you want that, plus one that, but you can
+also subscribe to updates. So you'll get notified when
+features are in development, or when they actually ship. We use this actually. Our product managers use this
+all the time to gauge, okay, what's the most popular issue? You could all go see it. You can sort by plus ones to see what's the most requested feature for EKS? And with that, thank you,
+appreciate your time today. George and I'll be
+available after the talk for Q and A outside. Thank you, and have a
+great week at re:Invent. - Thank you. (crowd clapping)

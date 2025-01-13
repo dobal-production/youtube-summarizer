@@ -1,0 +1,546 @@
+- Welcome to the session. This is "KUB310, Amazon EKS for edge and hybrid use cases." My name is Eric Chapman. I'm a Senior Product Manager
+on the Amazon EKS team focused on hybrid and edge. And I'm here today with my
+colleague Gokul Chandra, who's a Container Specialist
+Solutions Architect, focused on bringing our EKS
+hybrid and edge solutions to customers in the telco vertical. Today, we're gonna dive deep on how the Amazon Elastic
+Kubernetes Service, or EKS, can help alleviate some of the challenges faced by customers running
+with a hybrid strategy; that is deploying workloads at the edge and on-premises, as well as running on AWS. We're gonna start by laying out some of the common challenges faced by customers running
+across environments. We'll lay out how
+standardization can help, and why more and more customers
+continue to turn Kubernetes as their standard platform, and what challenges
+remain once they do so. We'll lay out what we're
+doing on the Amazon EKS team to help make it simpler, more
+efficient, and more consistent to deploy Kubernetes
+across your environments. We'll review architectures
+and best practices for each of our EKS hybrid solutions. And we'll close with how
+you can learn more about EKS during re:Invent and thereafter. Let's start with a scenario that brings in many of the reasons that our customers opt for a hybrid approach to begin with, and the challenges that
+arise once they do. Say you're a platform engineering manager at an enterprise with
+multiple business lines. You've standardized your cloud
+operations on Kubernetes, running EKS on AWS; and many of your applications
+are cloud native, integrating with AWS services for networking, storage and databases. However, you still have a large suite of applications that run on-prem and will continue to run
+on-prem for the near future. Some of these are tightly integrated with legacy technologies
+that are gonna be difficult to extract and pull into the cloud. Others require compute running in close physical proximity to end systems, or need to run at the edge
+for high performance latency. Other applications still handle highly sensitive customer data and face strict data
+residency requirements. These applications run
+on different systems with different operational models and different skillset requirements, leading to unscalable
+silos across your teams. Instead of focusing on
+improving platform performance or adding capabilities for your platform that can help your
+development teams innovate, your team spends too much time manually patching and
+maintaining underlying systems just to maintain platform
+stability and business continuity. You know that if you could offload some of the undifferentiated
+overhead work, operational work that your team does, you could free your teams
+to focus on innovating in ways that help improve
+developer experiences and ultimately improve experiences
+for your end customers. With your applications
+running on different systems with various integrations, there are multiple technology stacks that you need to support. Supporting multiple technology stacks, such technology sprawl leads
+to several other challenges. For one, it hinders your
+ability to innovate rapidly for your development teams, and it limits the ROI of
+each individual improvement, as improvements to one technology stack aren't inherited by the others. The difficulty in making changes quickly arises from a proliferation
+of manual processes, out-of-date versions, and strict coupling
+with other dependencies. Furthermore, each technology stack requires different skillsets that don't necessarily
+translate across environments and you've had to expand your team just to maintain your
+platform in steady state. You think that if you could standardize on a single platform, you'd unlock your team's
+ability to innovate. With the explosion of popularity, and popularity of Kubernetes in the cloud, we see more and more customers that are running across
+on-prem and cloud environments standardizing on Kubernetes, integrating with consistent
+tooling wherever they run. Say you chose Kubernetes as your container management
+platform in the cloud to ensure high availability and scalability of your
+mission-critical applications. The open and extensible
+nature of Kubernetes stimulated the development of
+a healthy ecosystem of tooling and innovative practices like GitOps that your teams can readily adopt. And as Kubernetes is an
+open source standard, you could run it across your environments wherever your applications need to run. In fact, let's say many
+of your application teams running on-prem have
+adopted Kubernetes already. And while you've seen some of the benefits of such standardization, operational overhead continues to hinder your team's ability to innovate. While your development resources
+have become more fungible across your environments
+given this standardization, there remains a very steep learning curve for those tasked with administering your Kubernetes clusters. Maybe you underestimated the complexity of managing the Kubernetes
+control planes themselves, keeping your clusters healthy, rotating certificates on a timely basis, and making sure DHCP
+IP leases don't expire. It's also been more challenging
+than you've expected to continually scale up and
+scale down your control planes as your workloads scale
+across your fleet of clusters. These are many of the same challenges that led you to choose EKS in the cloud, and many reasons that
+customers running across clouds opt for managed Kubernetes solutions. EKS manages tens of millions
+of clusters on an annual basis and we continue to see rapid adoption with 33% year over year growth in the number of clusters managed. Our goal on the AWS Kubernetes team is to make the operational
+aspects of running Kubernetes an afterthought for our customers
+wherever they need to run. And since the introduction of
+EKS on AWS Outposts in 2019, one point of focus for the EKS team is on how we could bring
+EKS into hybrid environments to provide the benefits
+of a managed service and to enable you to establish
+operational consistency across your environments. I'm sure many of you know
+but for those that don't, AWS Outposts is AWS managed infrastructure that extends AWS services into your data center or colo facility, including EC2 for compute, S3 and EBS for storage and VPC for networking. EKS has been available on Outposts since Outposts' general
+availability in 2019. And given the availability of these other AWS services on Outpost and Kubernetes control plane managed for you in the cloud by EKS, running EKS nodes on Outpost is gonna provide the most
+consistent experience with running EKS nodes in region, and the tightest integration with AWS. We've seen Outpost customers adopt EKS for use cases like
+general purpose automation and use cases that require
+local data processing such as banking or real money gaming, just to name a few use cases. Customers love the operational
+consistency that they get when they run EKS on Outpost as compared to running EKS in the region. Now at any given point, many
+customers aren't in a position to refresh their
+on-premises infrastructure. And so, to meet customers where they are, in 2021, we launched Amazon EKS Anywhere. EKS Anywhere provides AWS supported Kubernetes management software that simplifies the
+infrastructure provisioning and lifecycle management process for clusters running on
+customer managed hardware and virtualized and
+bare-metal environments. EKSA is a fully customer managed solution with infrastructure providers,
+Kubernetes' components, and operating systems
+tested and supported by AWS. An EKSA subscription also
+comes with AWS support for a curated set of add-on packages that extend core Kubernetes functionality for load balancing, ingress
+monitoring and more. EKSA is especially popular with customers that have stricter requirements around their on-premises networking or need to operate in
+locations with disconnected, disrupted, intermittent and
+limited network connectivity. Such use cases include telco applications that need to run on bare-metal
+at the far network edge, financial services apps that face stricter networking and regulatory requirements, and applications run by
+travel and hospitality firms, operating cruise ships that may not have internet connectivity for
+days or weeks at a time. We've enhanced EKS
+Anywhere for compatibility with key telco ISV solutions. And in a couple of slides here, Gokul is gonna run us
+through the architecture that one of our large telco customers uses to run their 5G O-RAN workload on EKSA. So customers really love
+that they could continue to run on their own hardware
+when they choose EKSA, take advantage of the investment they've already made on-prem. And customers really love
+that with EKS on Outpost, they get the Kubernetes control plane managed for them in the cloud by EKS. In speaking with dozens
+and dozens of customers, it became clear to us that
+there is a need for a solution that would enable customers to continue to run on their existing hardware without requiring them to
+manage the control plane. And that's why we're so excited on Sunday to announce the general
+availability of EKS Hybrid Nodes. A new EKS feature that enables you to run Kubernetes nodes
+on your existing hardware and attach it to the EKS control
+plane running in the cloud. EKS Hybrid Nodes creates a more consistent operating experience between running EKS in the
+cloud and running on-prem. And with Hybrid Nodes, we take on the operational responsibility for managing the Kubernetes control plane while allowing you to continue running your workloads on-prem, taking advantage of that on-prem hardware investment you've already made. Now you can conserve
+your on-premises capacity strictly for your application workloads. And like with EKS in the cloud, you don't have to worry about scaling up and down your
+Kubernetes control planes. That's all managed for you by EKS. EKS Hybrid Nodes is the
+best choice for customers whose on-prem or edge
+locations can network with AWS, and we think it's going
+to be the best choice and the sweet spot for
+most hybrid customers. We expect that Hybrid
+Nodes will be especially popular for distributed edge use cases like media streaming and manufacturing, as well as general
+enterprise modernization. And many of the same use cases customers use EKS on Outpost for today. EKS Hybrid Nodes, or EKS clusters with Hybrid Nodes rather, can also run cloud nodes
+in a single cluster, opening the door for AI and ML use cases that use GPUs on-prem and in the cloud to bolster their training capacity or for inference bursting. I'm extremely excited to talk to you more about EKS Hybrid Nodes and I hope you're excited to
+learn more about the details. But before we get there, I'm
+gonna hand it off to Gokul who's gonna dive deeper for us on EKS on Outposts and EKS Anywhere. - Thank you, Eric. So let's talk about how AWS Outposts today can supercharge your
+on-premises infrastructure with Amazon EKS. So, customers usually deploy Kubernetes clusters and pods on premises in order to reduce the latency and also enhance the security. And there are multiple other use cases where the hybrid capacity is not a requirement but a mandate. So whether extending your cluster to your on-premises
+environment from the cloud or even managing your
+hybrid compute capacity or hybrid computing platform design, so AWS Outpost covers you
+for all those use cases. When it comes to deploying Amazon EKS clusters on AWS Outpost, we support two deployment options here. The first one is the extended clusters where you can start by creating the EKS cloud-based control plane in the same way that you do with the regional-based clusters. Then you deploy the cluster nodes, which are the Kubernetes nodes, which host your actual workloads
+within the hybrid model like on the AWS Outpost
+rack that is shipped and connected back to the region
+from your own data center. And this is called the
+extended cluster approach. But with this approach, what
+you will be getting here is the same managed
+Kubernetes control plane, which is completely managed by AWS, and an integrated experience
+with other ecosystem of services that are
+available today in the region. So the second model is the local clusters. So this is aimed at specific use cases where we have listened to our customers, where some of our customers
+have their environments or deployment setting where they can have the unreliable network connectivity. Means they might have disruptions
+because of so many reasons because of the placement
+of the data centers in the penultimate regions of a metro or even in an isolated environment where they have issues with the continuous network availability, where it is required for the
+AWS Outposts with EKS to run. So this is where we introduced the second deployment option called local clusters, which enables customers to still continue their Kubernetes-based operations even during the course of disconnects. So with this model, what EKS does is, it deploys a local control
+plane, the EKS control plane, on your AWS Outpost rack itself. And during the course of
+disconnect to the region for the EKS control plane
+that we manage in the region, still the customers can continue to manage the Kubernetes-based operations without having any kind of
+disruptions to their workloads. So this is aimed at
+specific use cases as said, while local clusters can provide
+this extended functionality where customers can still
+continue to run their workloads without any kind of disruptions. Extended clusters, the first option, remains the recommended
+option from the AWS end because it provides a more integrated and a managed experience to the customers, where the Kubernetes control plane is completely managed by AWS. And also, there are multiple
+ecosystem of services that are available within the cloud where customers can directly use them to enhance their overall portfolio or their overall workload portfolio too. So, let us see how the
+architecture is laid out for the extended clusters
+that we have just discussed. So customers start by
+ordering an Outpost rack. And this AWS Outpost rack will be shipped to customers' own data center that gets connected back to the region using a service link approach. And service link in turn
+uses a direct connect service that is offered by AWS. And this connectivity
+provides a high throughput secure connectivity back to the region from your Outpost environment. Then customers can create the VPC, the networking. Like when it comes to networking, the networks are created
+in a similar fashion what they do today with
+the region-based approach. They can create a VPC with
+multiple subnets spanning across multiple availability
+zones within the region. Now the difference that
+makes like with AWS Outposts is that with AWS Outposts registered to your own account and placed within your data center, the same VPC that has been
+created within the region can be extended to this Outpost rack. Means you can create multiple
+subnets within the same VPC, selecting your Outposts
+as the availability zone. So this enables the
+extendability of the network from the cloud to your own data center using the constructs
+that we enable seamlessly with AWS Outposts. So once you have this
+networking layout established, you can create the EKS
+control plane the same way that you do with the
+cloud-based clusters today. So here, it's important to note that the EKS control plane is
+created in the region, and the control plane anchors
+to the region-based subnets using Cross-Account ENI architecture where the EKS control plane
+is completely managed by AWS. So this gets anchored to the
+subnets within the same VPC that you have extended to
+the Outpost infrastructure. And once you have the control
+plane deployed the same way as you do with any other
+regional based clusters today, then you have an extended approach like with everything
+that gets from the cloud to your Outpost environment. So here, once you have this whole infrastructure with EKS control plane, then you start by creating
+self-managed node groups within the same Outpost subnets that you have extended to
+your own infrastructure that is positioned
+within your data centers. So it's important to note that that EKS control plane can be created with the
+region-based subnets, but your actual Kubernetes nodes will be running within the subnets that are positioned in
+the Outpost environment. So the self-managed node group, which is a Kubernetes node group which constitutes multiple nodes, technically these are the EC2 instances because AWS Outpost rack
+has multiple services that are offered today as
+part of the AWS portfolio where you can run your EC2 instances which are your Kubernetes
+nodes technically on your own environment
+like without having to rely on the region-based EC2 services. So this enables the customers to deploy your actual workloads running
+on the Kubernetes nodes, which are positioned on the Outpost rack, which in turn is positioned
+within your own data center. So, usually when you
+deploy the applications within this Outpost environment, definitely you might
+have another environment or portfolio with full set of applications that you have already been running within your own data center environments. So we provide a construct
+called local gateway where local gateway access the gateway to enable the communication
+between the applications that are running on this EKS environment to talk to your own
+applications running on any other data center infrastructure
+that you already have. So it enables seamless connectivity so that you can stitch the
+application connectivity that is running on Outposts with your own infrastructure components that are running within your data center. Now so far, we have discussed how customers can leverage AWS Outposts, that is, AWS provided
+and managed hardware; and deploy EKS clusters on them so that you can extend
+your application portfolio from cloud to your own data center. But what if customers want
+to run the applications on their own hardware? Technically the COTS-based
+hardware that they have procured. Or many customers have made
+significant investments in their data center hardware where they already have this hardware sitting in their own data centers. Or the second thing important
+aspect to discuss here about the requirements may be is like, what if a customer wants
+to deploy the clusters in a completely isolated environment? When we say completely isolated, they don't want to have a
+region-based connectivity or they don't want any
+internet connectivity going out of their environments. That is where EKS Anywhere
+comes into picture. So EKS Anywhere enables
+customers to deploy Kubernetes clusters on their
+own COTS-based hardware or existing virtualized environments that they are already managing
+such as VMware, CloudStack. So this enables to deploy
+clusters with the same consistency as you see with the
+region-based KS clusters. So this is about EKS Anywhere. Now let us see how EKS Anywhere
+architecture looks like. So it's a complete stack of components that form up the full
+stack of EKS Anywhere as a consistent Kubernetes
+platform that is provided by AWS. So the first one is the
+infrastructure providers, right? Even before going here, we have to emphasize on the fact that EKS Anywhere is designed based on the Cluster API foundations. So Cluster API is a Kubernetes
+sub-project that standardizes and simplifies the cluster
+lifecycle management. So EKS Anywhere inherits a
+lot of different architectural patterns from Cluster API,
+in short called as CAPI, across the community. So, the infrastructure providers means EKS Anywhere can be deployed on all these options that we show here. So it can be deployed
+on bare-metal servers where you can completely
+use your bare-metal servers to deploy the EKS Anywhere
+clusters on top of them. Especially with bare-metal approach, we not only support deploying clusters but we have also taken the
+undifferentiated heavy lifting of imaging and managing the service to using a Tinkerbell component. So Tinkerbell is a open source project where AWS heavily contributed
+to this particular project to make it Kubernetes native
+or cloud native in general. And the second set of
+infrastructure providers are your virtualized environments. What it means is that, if you already have
+your VMware environments or CloudStack environments, you can use this existing
+virtualized layer which manages the virtual machines and you can deploy EKS
+Anywhere on top of them. Where we provide the full set of capabilities for the customers to have an end-to-end experience with a seamless automated
+approach of creating clusters on top of your virtualized environments. And also, we do support
+our partner environments such as Nutanix. And also we do have a
+full set of capabilities to deploy EKS Anywhere clusters on Snow, which is our edge-based device like which is provided by AWS. So these are the infrastructure providers where EKS Anywhere can be deployed on. The next layer is the
+Kubernetes distribution. So the Kubernetes distribution that is being used with EKS Anywhere is called the EKS Distro, which is the EKS
+distribution of Kubernetes. And one important thing
+to note here is that this is the same Kubernetes distribution that is used across the board. Means it is now powering millions
+of clusters in the region where already customers are
+using it at a production scale. So what exactly this distribution provides or enables users is to
+just like rely on AWS, where AWS holds the responsibility in maintaining the security patching and also building the base images for coming up with this distribution so that you're ready to go
+deploying these clusters without having to worry
+about spending cycles on the security patching, CVE analysis, vulnerability analysis and all. So this is the EKS distribution which is called the EKS Distro. Next comes the layer of
+cluster lifecycle management and cluster operations, and also the CNI, which is the Container
+Networking Interface, which provides the baseline connectivity for your pods and services that run on top of your Kubernetes environment. So, EKS Anywhere comes packaged
+with a set of controllers that enables seamless operations to create, delete, upgrade,
+update, add, delete nodes. And all these operations
+are provided by the set of controllers that comes
+packaged with EKS Anywhere. And, on the other hand, the packaged or the main CNI, or I mean the supported CNI
+with EKS Anywhere, is Cilium. So there is a very big
+differentiation factor here. If the people here are familiar with how EKS works in the region, we have AWS VPC CNI that provides flat networking
+model within the region. But with EKS Anywhere, as said, this is a completely and isolated option that runs within your own data center. We cannot use AWS VPC CNI, as similar to the other
+option we have just discussed; that is the EKS on Outposts. Still EKS on Outposts
+uses the VPC construct. So we use VPC CNI for Kubernetes. But with EKS Anywhere, because it's completely out of AWS control and it is positioned within
+the customer's own data center, on your own hardware, and you will be utilizing
+your own network there, so that is where we package Cilium as the go-to CNI with EKS Anywhere. Next comes the layer of the
+operations and tooling, right? See, just creating EKS clusters
+or Kubernetes environments is not alone enough to
+run your full-fledged application portfolio. You need certain set of tools or tooling that has to be deployed on
+your Kubernetes environments to carry out multiple
+activities that are required for your end applications to
+be available for the end users. So, for example, it can
+be the load balances, it can be the ingress, it can be your image registries. So all these tooling are needed. And what we heard from
+our customers is, like, if they're consuming this directly from the upstream communities, they have to rely on the
+community-based support. Or the second model is,
+if any of these components are available through our partner network or from some enterprise vendor, they have to go to that
+particular enterprise vendor to get the support for
+these particular components. So that is where we came up with something called Curated Packages where we enable customers to
+use some pre-curated packages which are like designed
+and also defined by AWS, where AWS holds the responsibility of managing these components too on your Kubernetes environments. For example, let us take
+Harbor, Emissary, MetalLB; all these are very well-known open source community based projects. So whenever you use Curated Packages, you don't have to worry
+about maintaining them and also maintaining
+the version capabilities and also compatibility with the specific Kubernetes version that
+you are running on. And AWS provides the full-fledged support in managing these particular add-ons on top of the EKS environments. So that is the value that we have provided with Curated Packages. And another important aspect here is that, so from the security perspective, if you are using a specific
+add-on on Kubernetes and if it has some kind
+of security vulnerability, today, if you're consuming it directly from open source or upstream, you have to wait on the community to enable you with a patched version. But that is not the case
+with Curated Packages that are available with EKS Anywhere, where AWS holds the responsibility and also provides the full-fledged support for any of these add-ons that are available in the portfolio. And AWS is responsible for managing the code of all these add-ons too. So that is the Curated Package layer that comes with EKS Anywhere. Next, you can create and
+manage EKS clusters today in a few different ways, right? So the first model is eksctl CLI. So, we provide a
+comprehensive CLI mechanism. And here it's very important to note, like if people are familiar here with how EKS clusters
+in the region operate, we have a consistent API endpoint, where it acts as a vending
+machine for Kubernetes clusters. And you can directly
+call this API endpoint with AWS CLI or infrastructure
+as a code tooling, which in turn triggers the creation of EKS clusters in the region. But that is not the case
+with EKS Anywhere, right? Because it's sitting
+in your own data center and it's operated by the customer. So that is where we provide
+the same consistent experience using a comprehensive set of CLI options that are available with eksctl CLI. So eksctl CLI used to be our approach of creating clusters within
+the region from start. And eksctl CLI, we added an
+extension called Anywhere which provides the capabilities to operate and manage clusters within
+your own environments. So the same set of tooling but we integrated or extended the approach to even control the clusters
+and manage the clusters on-premises on your own hardware. The second option is Terraform, right? If you're a fan of the infrastructure as a code like tooling, we provide a custom
+Terraform operator provider, for creating and managing
+EKS Anywhere clusters. The third approach, which
+is our recommended approach, where we briefly discussed about how EKS Anywhere inherits
+a lot of different architectural patterns from CAPI. So we recommend this approach where you can completely
+manage your clusters with a GitOps-based fashion, having the whole cluster configuration stored in a Git repository. And with EKS Anywhere, one of the packages
+include Flux Controller. Flux Controller is a prominent
+GitOps-based controller that is available in the community. And we started supporting it and we contribute to the Flux Controller so that it gets packaged with EKS Anywhere and you can use a GitOps-based approach for your infrastructure. Again, reiterating over this point, we are not talking about the GitOps-based approach for managing your applications, but managing the infrastructure itself can be done using GitOps. So these are the three different ways that you can use for
+creating the clusters. Next comes the region-based connectivity. As we alluded to multiple
+different deployment options and also we discussed about how EKS Anywhere is completely different and it can be air-gapped and isolated without having to rely on the
+region-based connectivity, still, if the customer
+is interested in using any of the managed
+services within the cloud, they can have optional
+connectivity back to the region. So there are common use cases that we have seen among customers, right? For example, if they want to use a central single-pane observability
+dashboard mechanism for thousands of EKS clusters today, so they can use the
+Amazon-managed Prometheus, Amazon-managed Grafana that
+is available in the region, so they can still have the optional cloud-based connectivity
+with EKS Anywhere. Now, the deployment topologies. So, EKS Anywhere supports two different deployment topologies, right? And as the standardized
+CAPI procedure involves having a workload and
+a management cluster, the same approach is
+available with EKS Anywhere where you can use a single
+cluster-based option where customers are free to use the single deployment option, managing singleton clusters, which will be provisioned
+with all the controllers on top of this cluster, which can manage the cluster itself. For example, when I say
+managing the cluster itself, if you want to add nodes, delete
+nodes, upgrade the cluster, all the controllers are
+available on the same cluster. The second approach is
+the management cluster and workload cluster approach, right? What it does is, you will have a central management cluster with a full set of controllers that are responsible
+for creating, updating and managing the lifecycle
+of the clusters, or deployed. And using this management
+cluster as the endpoint, you can create and operate a
+fleet of workload clusters. So the workload clusters are the clusters where the end user workloads are deployed. As you can see, a clear-cut
+differentiation here between the management cluster
+and the workload cluster, you see that the controllers
+that are deployed on the management cluster are absent on the workload clusters, providing the resources that are required for your end applications, not consuming any resources for the cluster lifecycle
+operations itself. So this is how you can manage
+a fleet of workload clusters with a management cluster. We usually recommend customers having more than three EKS Anywhere
+clusters to have this approach. So it provides a very concrete governance when managing the clusters and also the single-pane observability of the whole cluster portfolio within your data center environment. Now, the declarative options and the cellular cluster management, which is very important for
+customers running hundreds of Kubernetes clusters in their
+environments today, right? So, the interface that you use to create your EKS Anywhere clusters is a very simple YAML-based configuration. This is the configuration file where you define the
+cluster specifications that include the name, the network name, and also the number of control plane nodes that it has to create, and the worker node configurations. Everything goes into this
+YAML-based configuration. And as we just discussed,
+the GitOps-based approach paired with the management
+cluster topology, you can have a cellular
+management approach where you can use a
+specific management cluster to operate a fleet of workload clusters in a GitOps approach, where the management
+cluster access the sync and then it realizes
+all the configurations that you have provided
+through a Git source to create and operate
+multiple workload clusters. Lastly, the deployment options, right? So, when we reached out to customers, each customer has their
+unique set of requirements when creating a Kubernetes cluster. We cannot always force them
+to create a multi-node cluster because there might be conditions where they're resource-constrained. So that is where we support
+different deployment options. The first one being
+the multi-node approach where each node will be
+acting as a control plane or a data plane node. Or the second one is the colocated master and the worker nodes where you can have three nodes with masters, high available masters; and also the worker node can
+be running on the same machine. The third option is a single-node approach where you can run the entire
+EKS Anywhere environment or EKS Anywhere cluster on
+a single bare-metal node. So these are different deployment options we support with EKS Anywhere today. And particularly, we want to emphasize or introduce you to a specific use case where EKS Anywhere enabled a
+Japanese-based telco customer to deploy their nationwide open radio access network
+architecture across Japan, almost serving 90 million subscribers. And this particular
+topology where EKS Anywhere is used as the container
+access service option constitutes almost 15,000
+different cell sites with more than 35,000 bare-metal servers, like including all the sites
+that we have seen just now. So, with this particular approach, NTT DOCOMO is able to stretch
+their cloud-based pattern from the region to the
+penultimate regions, including the cell towers and cell sites. So, how exactly EKS Anywhere
+enable the NTT DOCOMO? So NTT DOCOMO, as any other telco operator
+in the market today, has a stretched topology. Means they have AWS regions, regional data centers, edge sites, and also cell sites. So what is the differentiation
+factor here, right? So region, region is a cloud-based model. And then coming to regional sites, regional sites are standard data centers which have enough capacity
+to host multi-node clusters. And edge sites are
+resource-constraint environments where they cannot operate
+a lot of different options like when it comes to
+having a set of hardware. And when coming to the cell sites, these are the most edge
+sites in a cell topology where they can only host
+single-node clusters because the cell sites can only host a specific set of hardware
+under them, like or in them. So this is the stretch topology that is usually seen
+with our telco customers. And connecting these particular topologies was made easy for NTT DOCOMO with our Direct Connect
+approach that we already have where they can connect the
+region to until the cell site with the direct connectivity approach or Direct Connect service that
+we have in the AWS portfolio that provides consistent,
+reliable and secure connectivity from the region to even the
+edge site or applications and also for the infrastructure. So the connectivity is not
+just for the infrastructure, but the same backbone can be
+used for the applications too. So with cellular management
+of EKS Anywhere clusters that what we have seen earlier, NTT DOCOMO is able to create and manage multiple workload clusters with a management cluster
+sitting in the regional site. And there are different
+topologies that they have used because regional sites
+have enough capacity to host multi-node clusters. They use a workload cluster
+sitting in the regional site to create and operate
+multiple workload clusters. And the regional data
+center is used to host the management cluster
+that can operate and deploy multiple workload clusters
+in the edge sites. So this stretch topology and also the cellular cluster management enabled DOCOMO to deploy
+their full-fledged container access service platform starting from the region
+to the edge sites. In the region, the EKS
+service is always available. And NTT DOCOMO is one
+of the first customer where it paired up with NEC, which is their core and RAN provider, the ISP vendor that
+provides the core and RAN, to certify their workloads
+on graviton in the region. So they're hosting the 5G
+core in the region and RAN which constitutes the
+DU, the Distributed Unit, and the centralized unit on
+the EKS Anywhere environments stretching from regional
+sites to the edge sites. So with this particular approach, NTT DOCOMO was able to deploy
+different set of applications starting from the cloud to the region. For example, the edge sites will comprise of the distributed unit
+and the centralized unit. The RAN intelligent controllers are deployed in the regional sites, and the main 5G core components
+are deployed in the region. So, let us end the EKS Anywhere topic like with a few best practices, right? So whatever deployment we choose, we provide a set of
+deployment best practices. So the same applies for EKS Anywhere too, even if it is managed within
+your own data centers. The first one is using the GitOps-based cluster management approach where you can store the
+whole cluster configuration as a code in the GitOps repository and can sync the cluster
+management and creation. And the second one is
+using the curated packages where you can use the
+AWS-provided Curated Packages to manage all your add-ons that gets deployed on
+EKS Anywhere clusters. The cluster upgrades with EKS Anywhere, the CLI and also the
+GitOps-based approach, we support different
+types of upgrade patterns. It can be rolling upgrades
+or in place upgrades where you can just upgrade
+the Kubernetes version running on top of your hardware or a full-fledged rolling upgrade, which also patches the OS that is running on top of your hardware. So you can use the existing mechanisms to upgrade your clusters. The LDAP and also OIDC for
+security based authentication, you can integrate EKS Anywhere with your existing LDAP infrastructure that is available within
+your data center environment. Lastly, as the Cilium is the package CNI that is available with EKS Anywhere, you can use the eBPF security that is available with
+the network policies that is provided by Cilium to
+protect your East/West traffic that is within your cluster so that you can use a
+full-fledged capabilities that are provided by Cilium to secure your workload communication, between port to port or
+service to port communications. So now, let me hand it over back to Eric, who will be introducing the
+newest deployment option, the EKS Hybrid Nodes. - Thanks, Gokul. All right, so years of running EKS on Outposts and EKS Anywhere and learning from our customers gave us the conviction that managing the
+Kubernetes control planes for clusters running on
+customer-managed hardware would represent a meaningful step toward alleviating the
+undifferentiated heavy lift of running Kubernetes on-premises. With EKS Hybrid Nodes, you attach on-premises
+and edge infrastructure running in your environment to the EKS control plane
+running in the cloud, enabling you to retain
+your workloads on-prem while offloading control plane management responsibility to Amazon. You'll continue using Amazon EKS features like EKS add-ons, EKS Pod Identities, cluster access management,
+cluster insights, and extended Kubernetes version support. And now, you can rely on AWS' expertise in managing, securing, scaling
+up Kubernetes control planes to reduce your operational overhead, conserve your on-prem capacity by hosting your Kubernetes
+control plane in the cloud, and establish operational consistency across your on-prem
+and cloud environments. So, how does it work? With EKS Hybrid Nodes, your EKS control plane continues
+to run in the AWS region with the same APIs, tooling and features that you're accustomed to
+when you run EKS in the cloud. Your on-premises worker nodes are physical or virtual
+machines that you manage. With this bring-your-own
+infrastructure approach, EKS is not calling
+infrastructure provider APIs to provision node capacity on your behalf. Instead, with Hybrid Nodes, you'll reuse the tooling and systems that you've established
+on-prem to provision capacity. So to enable your on-prem and edge devices to connect to the EKS
+control plane in the cloud, we've adapted the tooling that we use to initialize the EKS
+optimized Amazon Linux AMIs so as to accommodate
+the connection of nodes running on customer-managed hardware to the EKS control plane. The resulting hybrid node
+CLI utility called nodeadm installs the components
+needed for your on-prem hosts to run as Kubernetes nodes and connect, authenticate to the EKS control plane, including the kubelet, containerd, and the AWS IAM Authenticator. Running the nodeadm init command bootstraps your nodes by configuring the installed artifacts to join your EKS control
+plane in the cloud. All right, let's take a brief detour to learn a little bit more about nodeadm before coming back to
+wrap up our overview. So you'll run nodeadm on each
+of your on-premises hosts to simplify the installation,
+configuration, registration, upgrading and uninstallation
+of your Hybrid Nodes. We enhanced nodeadm to work
+with arbitrary infrastructure and select operating systems. And we integrated it
+with AWS Systems Manager and AWS IAM Roles Anywhere to streamline the process of authenticating your on-prem nodes to the Kubernetes cluster, the EKS control plane
+running in the cloud. To automate the initialization of your Hybrid Nodes to your EKS cluster, we recommend including nodeadm in your golden operating system images configured to run at host startup for your ISOs, OVAs or
+other image formats. Now coming back to our overview, to join your cluster, your EKS Hybrid Nodes assume
+an EKS Hybrid Nodes IAM role that you'll create on your AWS account. This is similar to the EKS
+nodes IAM role you use today. For your EKS Hybrid Nodes
+to assume this role, they'll obtain temporary credentials either using an AWS systems
+manager hybrid activation or AWS IAM Roles Anywhere. Systems Manager is a simpler solution and we generally recommend it for Hybrid Nodes authentication. Unless you already have
+public key infrastructure with your own private
+certificate authority and certificates established on-prem, in which case IAM Roles
+Anywhere is a good choice. You'll also need consistent
+private connectivity from your on-prem or edge
+environment into the AWS region. We expect that AWS Direct Connect, AWS Site-to-Site VPN or a customer-managed VPN solution will be the most common technologies that our customers use to
+establish this connection. Direct Connect is often preferred when consistent high
+performance latency is required. Although AWS Site-to-Site
+VPN doesn't require the installation of
+physical networking hardware and can be a good choice,
+a cost-effective choice, for deployments that don't require as much network consistency. So how are responsibilities shared between AWS and EKS
+Hybrid Nodes customers? AWS, of course, continues to manage the AWS services that run in the region, including the EKS control plane, your identity and observability services and the ECR container registry. A subset of EKS add-ons
+are supported by Amazon as compatible with Hybrid Nodes, including kube-proxy, CoreDNS, the ADOT and CloudWatch
+observability agents, the Pod Identity agent, and the CSI snapshot controller. You'll be responsible for
+managing the components that run on-prem in your environment, including your on-prem
+storage solution, networking, and the operating systems
+that run your Hybrid Nodes. AWS supports the integration of the Cilium and Calico CNI drivers when
+you run them with Hybrid Nodes. And AWS supports the basic features of those drivers with Hybrid Nodes, including for overlay networking,
+IP address management, and dynamic PodIP advertising using the Border Gateway Protocol, or BGP. AWS supports select operating
+systems with Hybrid Nodes and supports the integration
+of those operating systems but you'll retain responsibility for managing the operating system, patching it, and maintaining it. EKS Hybrid Nodes is compatible
+with Ubuntu and RHEL for bare-metal and
+virtualized environments, and with Amazon Linux 2023 for virtualized environments alone. Now let's run through how traffic routes across your environment
+between the EKS control plane and your on-prem nodes and pods. Without configuring your EKS
+cluster for Hybrid Nodes, your control plane wouldn't
+know how to reach the node and PodIP addresses running
+in your environment. To account for this, when you create a Hybrid
+Nodes-enabled EKS cluster, you pass in a RemoteNodeNetwork CIDR range and a remote pod network CIDR range. The RemoteNodeNetwork CIDR is used for kubectl exec,
+logs, and port forwarding; and the remote pod network CIDR is used if your control
+plane needs to reach webhooks running in your environment. These new parameters alert
+the EKS control plane that these IP addresses can be reached by forwarding traffic
+into your cluster VPC. These CIDR ranges can't
+overlap with each other, they can't overlap with
+the cluster VPC CIDR range, and they can't overlap
+with the EKS service CIDR. As of today, only new
+EKS clusters are capable of handling this remote
+networking configuration. And as such, today, only new
+clusters can run Hybrid Nodes, although we plan to enable
+existing EKS clusters to run Hybrid Nodes in the future. So traffic routes from your
+control plane into your VPC over the Elastic Network
+Interfaces or ENIs, that EKS creates on your subnets when you create your cluster. This is the same mechanism that EKS uses for control plane to cloud
+node communication today. And in order for data to
+make it into your data center and into your environment
+once it's in your VPC, you need to add rules to
+your VPC routing table for traffic out to your node and pod CIDRs set to transit over a gateway that you'll create and
+attach on your account. This will typically either
+be a virtual private gateway, which is better suited
+for small and medium-sized deployments and simpler network typologies or an AWS transit gateway, which is generally recommended for larger, more complex networks. So the data then flows out of your gateway over your private connection that's either your Direct
+Connect or your Site-to-Site VPN and into your environment. The firewall rules
+protecting your data center, your edge location, need to enable
+bi-directional communication between the EKS control
+plane running in the cloud and your Hybrid Nodes running on-prem. And you'll also need
+to add forwarding rules to your on-prem routing table for your hybrid node and pod CIDRs. As pods are ephemeral, their IP addresses
+change fairly frequently. So it's recommended that
+you dynamically advertise PodIP addresses to your on-prem router if you're making your
+pods routable using BGP, which is supported for
+both Cilium and Calico. You also need to ensure that those ENI, those EKS cluster ENI security groups allow for bi-directional communication between the control plane
+and your on-prem environment. We're really excited to see how
+you all use EKS Hybrid Nodes and where you derive the most value. One of our beta customers, Darktrace, highlighted the cross-environment
+operational consistency that the solution provides. Darktrace offers an AI-based
+cybersecurity platform that learns patterns
+specific to each customer to provide for robust threat
+protection and response. Darktrace uses Kubernetes
+on-prem to provide their teams with a consistent deployment environment, taking advantage of Kubernetes
+tooling for observability application scaling and disaster recovery. And instead of creating
+cross-site clusters and administering their
+control plane themselves, Darktrace decided to use EKS Hybrid Nodes to unify Kubernetes management with EKS, driving higher scalability,
+availability and efficiency. Now, let's touch on some EKS
+Hybrid Nodes best practices. To automate node bootstrap, include nodeadm in your
+golden operating system images and optionally set it
+to run at host startup as a systemd service. To limit latency between the control plane and your environment,
+create your EKS cluster in the region that's closest
+to your hybrid location, to your data center or
+to your edge location. For best performance, we
+recommend minimum bandwidth of 100 megabits per second. and maximum roundtrip
+latency of 200 milliseconds. Although these parameters
+really depend on your use case, how you're using Hybrid Nodes. And it's very much recommended that you perform your own network testing. Factors like image size and
+how many nodes you're running very much impact latency, so work closely with
+your networking teams. Next, leverage AWS services
+by utilizing compatible EKS add-ons for monitoring,
+logging and identity management. And one thing I didn't
+mention about nodeadm is that it creates a label
+on each of your Hybrid Nodes. That's compute-type equals hybrid. You can use this label to target workloads at or away from your Hybrid Nodes when you're using mixed mode clusters that include both Hybrid
+Nodes and cloud nodes in a single cluster. And lastly, and most important,
+probably most importantly, throughout the process of getting
+started with Hybrid Nodes, work very closely with your
+networking and security teams to ensure your firewall rules
+and your security groups allow the bi-directional
+communication that's required from your on-prem or edge
+locations into the AWS region for the control plane
+and other AWS services that you might want to
+integrate with Hybrid Nodes. All right, before we go, let's touch on a simple decision tree for how you could decide
+which EKS hybrid solution best meets your needs,
+best suits your use case. So you have to ask yourself
+a couple of questions. First, do I already have
+AWS Outposts running on-prem or am I considering an
+infrastructure refresh? If the answer to this question is yes, then running EKS on Outpost is gonna provide the most
+consistent experience with running EKS nodes in the cloud and the tightest integration with AWS. If your answer is no, ask yourself, do I need an air-gapped environment? Do I need an air-gap solution? If you don't, then EKS Hybrid Nodes is gonna provide you with the most value by offloading responsibility for control plane management to AWS while allowing you to continue to run on your existing hardware. If you do need an air-gapped solution, then EKS Anywhere is gonna
+be the best choice for you. Now, how can you learn more about EKS through the rest of
+re:Invent and thereafter? First, go and attend these
+other amazing sessions on the Kubernetes track. At KUB402, you're gonna learn
+about various architectures for building and deploying
+workloads on Amazon EKS with Amazon ECR and automations. KUB320 is gonna focus on how organizations build petabyte scale data
+processing pipelines on EKS. And at KUB201, you'll hear from Amazon
+Kubernetes product leadership about the latest
+innovations and strategies for building platforms and applications with Kubernetes faster. We also encourage you to attend sessions on the hybrid and edge
+track such as HYB301. And if you're interested in a session that you can't attend in person, footage for most sessions
+will be available on YouTube within a couple of days of
+those sessions taking place, specifically for breakout sessions. After re:Invent, you can continue
+your EKS learning journey by taking the EKS workshop, working through the EKS
+best practices guide. Please take a look at the EKS
+Hybrid Nodes documentation. The team spent a ton of work on it and there's a ton of
+great content out there. You can also review session materials for AWS re:Invent sessions
+at this QR code and URL here. This slide deck materials for this session are gonna be available at this QR code and at this GitHub URL. Give you a second to take
+photos if you want to. All right, so thank you very
+much for attending the session. I hope you got a lot out of it, I hope you learned a thing or two. As you continue your journey modernizing your on-prem infrastructure, please don't hesitate to
+reach out to me or Gokul. Our email addresses are
+up on the screen here. And we also encourage
+you to please complete the session survey in
+the mobile application. It helps us see how we're doing and how we can do better
+for future sessions.

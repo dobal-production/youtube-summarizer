@@ -1,0 +1,575 @@
+- Okay, good morning. Welcome to KUB314. We're gonna talk about how to
+run Gen AI workloads on EKS. I assume many of you in the last couple days
+have been to the keynotes. I think Peter was Monday
+night, Matt was yesterday. I just heard there's a
+machine learning keynote going on as we speak. So thank you for coming to this talk. And many of those keynotes, they're talking about machine learning, generative AI features
+that are coming out. Graviton4, Trainium2 UltraServers, all of this cool stuff. And I think a lot of you in
+this room are saying, yeah, that's great, but I can't use it unless it works with EKS and a lot of customers, some of the largest
+foundational models out there, you see a lot of them were
+trained on Kubernetes. And that's exactly what
+we're gonna talk about today, is the work that EKS does to make running, Gen AI is in the title, but really any machine learning workloads easier to do on EKS. And I'm joined by Rama who's gonna talk a little bit about why EKS and Kubernetes has become a
+good fit for ML workloads. And then special guest, we have Cas from Eli Lilly and Company who's gonna talk about how they've built their
+machine learning platform on EKS and the success they've seen. Okay, super quick, why generative AI? What is generative AI? I know all of you probably know this, maybe some of you had a late night. It's the first talk,
+I'll go super quick here. AI that can produce content that looks like human content in a lot of cases you can't
+even tell the difference. And it's powered by
+foundational models that have up to several hundred billion parameters probably by next year
+approaching trillion parameters. And the real innovation with generative AI is that you can reduce the
+time to build ML applications because you start with these
+huge foundational models and then it takes only a little
+bit of training to fine tune and do what you need to do
+for your specific tasks. As far as use cases go,
+really four main buckets that we've seen for
+generative AI use cases, probably the one you're most familiar with is the enhancing customer experience. I think Andy came on stage yesterday and was talking about Rufus, the new agent that can help you shop on amazon.com. Boosting employee
+productivity is another one. Another few announcements yesterday we had were code migration tools. I think we talked about
+at Amazon how we've saved, I don't know, X number of developer hours moving from Java 11 to Java 17. I think we also announced a Windows modernization code migration. So that's a use case we see a lot. Content generation, image
+generators are cool, video generators are cool. And I think the more interesting one is business operations. I've actually talked, I've had a lot of customer meetings
+in the last couple days and a lot of you are already using Gen AI and some of the platforms you're building, whether it's doing log analysis to do faster troubleshooting, onboarding your developers
+faster to the platforms building. So we're starting to see some use cases that are actually working. Some of the trends we've seen, more complex generative AI workflows, agents talking to agents, you know, moving to production
+models require guardrails, other sets of capabilities. And I think the last one
+is the most interesting, AWS, you've gone to the keynotes. AWS has a lot of different tools. Bedrock was talked a lot about yesterday. Amazon Queue, we have a lot of different layers of the stack. EKS is towards the bottom of that layer where you really need
+the most flexibility, the most customization, the
+highest levels of scalability. But I imagine in a large enterprise, you might be using a mix of EKS, Bedrock, Queue, other tools. If 2023 was the year of
+gen AI, proof of concepts, POCs, we've seen 2024 be
+the year of production. And moving to that production mindset really requires a
+different way of thinking. You need to start thinking about how are we gonna make money or save costs? You know, we can't just run POCs forever. And you start to think about cost of inference at scale, latency at scale. You may just not want to pick the highest performing best model. You need to weigh that against
+how much is it gonna cost me to run that in production? What is the latency, how is it gonna impact
+the user experience? And then when you move to
+production, you also need to think about things like security, compliance, ethical constraints. So there's a lot more
+and a lot more effort that goes into building
+a production application. And that's really the trend
+we've started to see this year. So I'm gonna hand it off to Rama to talk about some of the
+generative AI challenges and how EKS helps solve them. - Thanks Mike, hey folks, good morning. I'm Rama Ponnuswami, I drive worldwide, go to
+market for AML on EKS. So talking a little bit about some of the common challenges that we see our customers face when they start to scale their gen AI workloads in production. It's sort of along three
+different buckets, right? Like as Mike was saying,
+there are different needs for your different teams
+within a single organization. And one model is not gonna
+fit all of them, right? So more than likely you'll
+have to run multiple models, different ways of customizing those models to fit specific needs of different teams. So that comes with the added
+burden of day two operations. How are you gonna manage the
+versioning of those models? How are you gonna upgrade these models when new models show up? How do you build guardrails
+against these models? And how do you manage access
+to data for these models? Because customizing these
+models is not gonna be easy. Customizing models requires
+specific curated data that is domain specific and fits your particular specific use case where you want these models to be able to drive tasks specific
+to that domain, right? And that also means that you are having to integrate multiple data
+sources, having to manage access to all of this data all while maintaining your
+data security requirements. And last but not least, all of this means that you are having to
+manage massive scale of infrastructure, which gets trickier. We have seen a lot of our customers, when they start to scale
+or hit critical scale in their production, they start to feel that delegating more of your infrastructure
+control makes you less capable of controlling any of
+these parameters, right? So we start to see customers
+as they hit some critical scale and production of Gen
+AI workloads, they want to have more control
+over the infrastructure and start looking at options
+like EKS where they can get that necessary control
+to be able to customize all of their models and the ML environment that they want to operate in, and to be able to optimize on their cost to meet their ROI targets. So those are challenges at
+the organizational level. Let's think a little bit
+about what are the challenges of a data scientist or an ML engineer on their day-to-day operations. Data scientists don't really want to be managing infrastructure. All they require is a rarely
+available infrastructure that they can just code deploy
+their model and scale on, and they don't really want
+to be doing boiler paid code or scripts that they need to run in order to manage the
+lifecycle of their ML models. Instead, they want a
+readily built platform that can help them with
+all of those capabilities that they need to effectively deploy and scale their workloads
+going further as well. And they want to be able
+to meet these requirements in a more optimized
+manner, in a repeatable way that they can just keep doing it over and over again instead of having to build something in a very
+individualistic ad hoc manner each time they need to
+build and scale a model. So to summarize in terms
+of the key challenges or considerations, if you will, in terms of deploying generative AI in production, it's along three lines, right? You want to be able to move fast, you want to enable your data scientists and ML engineers to
+build their models fast, deploy them fast, and be able to scale as they go forward as well. And the second thing is about how do you enable customization
+of your models right? At scale. You want to be able to
+customize multiple models to fit specific use cases within different teams
+in your organization. And you also want to be able to ensure that these models will be able to scale, not just to meet the demands of today, but seamlessly scale to meet the demands of the future as well. And how do you ensure that you're able to continuously optimize on your costs as you're hitting higher
+scales going forward? Scaling up your ML models as well. So this is really where
+we see a lot of customers mention that EKS makes
+a lot of sense for them, especially in environments where they need a lot more
+control over infrastructure to meet data security concerns,
+to meet cost optimization concerns because they need
+to hit the ROI targets, so on and so forth as well. So let's sort of dissect, where does EKS provide these benefits? Why do we see a lot of our
+customers start to leverage EKS for deploying the generative AI workloads? It's again, along those buckets of how does EKS enable you to move faster? It's twofold, right? The first is, in most cases where customers already have
+standardized on Kubernetes as the way to do their
+application development, they get to just extend
+that existing platform and deploy ML models on top of it because they already built
+foundational capabilities that they also need
+for their ML workloads. The second reason is availability of open source tooling, right? ML space in general is fast moving and a lot of those
+innovations are happening in the open source arena, right? And these open source tools,
+most of them usually come with out of the box
+Kubernetes integration. So with EKS customers can just integrate that ML specific OSS
+solutions on top of it and enable their data
+scientists to just move faster by providing them all end to end ML ops lifecycle capabilities, as we saw earlier, that's one of the key challenges. And in terms of scalability, Kubernetes and EKS as such provides
+native integrations to all of AWS ML infrastructure services, enabling you to continue to scale seamlessly as
+your demand increases for your ML models as well. In terms of customization, because you are getting control of your entire infrastructure
+right up to the instance level with EKS, you are able to flexibly configure your environment to suit your specific unique needs, and you are not going to be restricted because of a certain
+feature that we provide. And you know, we don't have restrictions in terms of how you can configure your ML environment within EKS. So that enables you to
+customize it to your liking, to suit your specific unique requirements. And because you're able
+to have multiple choices in terms of instances,
+you are constantly able to choose the right infrastructure sizing, the right instances, and be able to optimize
+on your cost continuously as you start to scale further with your ML workloads as well. So let's go a little deeper on how does flexibility
+and cost optimization work on EKS for ML, it's really across three layers. The first is at the instant level because EKS supports all
+of the EC2 instances, GPU, Nvidia based, GPU instances,
+Trainium, Andreia, Intel based instances, so on and so forth. Any EC2 instance that is available on AWS, you can leverage it with EKS. So that lets you choose flexibly
+which instances you want to use based on the workload and based on the
+requirements of the workload. So this is not just
+gonna be enough, right? Like ideally you don't want
+to be making these choices manually each time a new workload comes into for scheduling. And that's really where the power ofKarpenter comes into the picture. With Karpenter, you can
+effectively automate all of these choices by providing it the parameters under which you want to provision a specific instance and make it evaluate the incoming workload to choose the right instances for it. All of this gets automated by Karpenter and it's repeatedly
+doing this on your behalf whenever a new workload gets scheduled. And on top of that, Karpenter makes provisioning much easier as well. So Karpenter, along with
+our EKS optimized army comes with all of the inbuilt
+dependencies that you need and you are able to
+quickly spin up instances whenever your demand goes up and Karpenter gives you fast scaling, but more importantly,
+it also scales back down whenever your demand is not going up. So you are able to cost optimize on that front and you are also able to leverage GPU sharing mechanisms. And with built-in multi-tenancy of EKS, you're able to effectively share your constrained GPU resources securely across multiple teams
+in your organization, shooting up your utilization
+of GPUs further as well. And on top of that, you get to integrate ML specific OSS solutions, the whole ocean of solutions available out there. You get to pick and choose the right tools for the right functionality that you need within your
+organization to then integrate it with EKS and get all
+the flexibility you need with the ML specific functionality your data scientists desire as well. In terms of, I wanted to quickly highlight very few customers. We have a lot of customers
+running Gen A on EKS, but I wanted to pick a select few that have been able to
+reap certain benefits by deploying generative
+AI workloads on EKS. Vannevar Labs is a defense tech startup. They supply unconventional intelligence to national intelligence
+agencies and defense departments. So they operate at the
+highest level of secrecy and data security concerns. They were able to utilize EKS and Ray and Karpenter together to achieve 45% reduction
+in their inference costs. And they were able to do
+this by using mixed CPU and GPU instance types and being able to schedule CPU heavy workloads on GPU instances to utilize the under used
+CPU, within the GPU instances. So overall, increasing
+their GPU utilization by a huge margin. And we have recently
+published a blog with them. If you're interested in learning about the specific configurations that they did to achieve this cost cut, please feel free to check it out in our AWS containers blog channel. The next is Informatica. They are another customer that have built an LLM
+ops platform to train and fine tune multiple
+LLM models on top of EKS. They were able to achieve
+around 30% of cost saving compared to managed services
+that they were using earlier. And they were able to achieve
+enhanced configurability because they were sort of constrained by the managed services
+customization ability that the managed services
+was providing them. And Zoom is another
+customer that has been able to create a similar LM ops platform where they do multimodal hosting and they're able to reliably and efficiently scale to meet their ongoing demand as well. Another key customer I wanted
+to highlight is Hugging Face. If we have used the Hugging Face hub, the freemium pricing
+one, the three tier one that basically runs on top of EPS today, the challenge that they initially, when they started out
+building that platform was they had to build a platform that would enable inference of millions of models with dedicated
+inference endpoints and a lot of different domain names had to be hosted there as well. And all of this needed to be provided with three tier pricing. So it was a challenge that they had to hyper optimize on their cost, on their infrastructure cost
+in order to be able to afford to provide this as a
+freemium price tier as well. So the solution they've
+taken is to deploy it on EKS, multiple EKS clusters, 2000 plus nodes, and they're able to effectively pin pack a lot of parts within
+very fewer instances. And they're also able to
+use time sharing with GPUs where they swap models in and
+out every few seconds as well. And with this, they're effectively able to provide this platform across the world for ML developers to collaborate on. So I mentioned something
+earlier, customers that already have Kubernetes
+as a standard platform for their application development. This sort of a snapshot of how those platforms look like, right? They build all of those
+foundational capabilities already into this platform, like how to do logging, monitoring, disaster recovery, security at scale. All of those challenges have been solved. And customers, when it comes
+to ML, they don't want to, again, solve these challenges
+or reinvent the wheel, right? They just want to use all of
+these foundational capabilities and extend it to run ML
+workloads on top of this as well. So that's one key advantage. The second advantage is customers
+are able to use Kubernetes as the standard layer across
+all of their environments, be it on-prem, be it in the
+edge, be it on cloud as well. So providing, using Kubernetes helps them unify these operations. And if you have been paying attention to the recent releases we did last Sunday, we released egress hybrid nodes as well, making this much easier
+for customers to do with EKS hybrid notes, you
+get to attach node on cloud, on premises, on edge into a single EKS managed
+control plane if you desire and you get to offload all of the Kubernetes
+control plane management and you get to have sort
+of a logical mapping of your infrastructure across
+all of these environments, providing you a better way to utilize your GPU resources wherever available and to cost optimize as
+you go along as well. You can pick and choose
+which workload gets deployed in which environment based
+on the cost ROI benefits that you expect out of
+those workloads as well. So in terms of what we
+have seen customers do and when they try to
+extend these platforms is, as I mentioned earlier on, integrate OSS solutions
+on top of it, right? That lets Kubernetes do what it's good at, which is infrastructure orchestration. And you integrate OSS solutions on top, which provide you ML
+specific functionality. For example, we've seen a lot of customers adopt VLLM together with EKS that provides you a lot of
+functionality like memory and model optimization,
+multimodal management, request batching, query queuing, so on and so forth for
+inference infrastructure. So this can provide
+you a readily available inference endpoint or an inference stack that you can make available to your data scientists
+that they can just deploy a model and get an endpoint where they can run their inference out of. So in a sense, to summarize all of this, when customers use EKS for generative AI, what they've been able
+to get is more control of their environment to
+be able to customize it, to fit it to their specific needs, to be able to scale seamlessly
+to meet future demands and be able to continuously cost optimize to meet their ROA targets. So with that, I will hand out to Mike to talk about the specific
+features that EKS provides. - All right, thanks Rama. Okay, I'm gonna do a bit
+of a rapid fire overview of a lot of the features we've launched in the last 12 to 18 months to make it easier to run AI ML generative AI workloads on EKS. First, this is more a concrete picture of what Rama was just talking about of all the tools out
+there that you can use to get started, there's really two parts. The open source stack, very rarely are you starting from scratch. And Kubernetes Rama mentioned
+Ray, VLLM, Jupyter Hub, all of these tools work with Kubernetes and it's really the flywheel effect that we like to talk about at Amazon because say you're gonna try to author a new machine learning tool,
+you have a really good idea. If you want to get adoption of that, you're very likely gonna
+make sure it works well on Kubernetes as one of your
+first deployment targets. And a lot of these frameworks
+tools out there do just that. They work well in Kubernetes. Certain ones of these we
+choose to contribute to. We've made some some contributions to Ray and make sure it works well
+with the neuron frameworks. And then at the other end
+at EKS is we make sure that the infrastructure innovations and services at AWS that power this large
+scale training inferencing work well with EKS. So CSI drivers, ECR, a lot of
+those foundational services that you need to use with ML workloads, we make sure they work
+really well with EKS. Okay, features, this one, we don't give enough love to I think the work we do for scalability of the control plane. We rarely ever do a what's
+new post EKS is, you know, a little bit more performant. But I know for a fact we have customers that created EKS clusters six years ago when the service launched and they've just
+continuously upgraded then from one dot 10 all the way up to one dot 30. And those clusters look nothing like they did when they
+launched six years ago. So every time you create an EKS cluster, we're creating dedicated
+infrastructure for you. EC2 instances, nat gateways, NLB, and we do a lot of work there. It's over time to
+continuously add performance, whether it's newer instance
+types, faster volumes, you know, better networking. And one of the projects we've done a lot of work on this year is
+changing the way we manage at CD to really get to much higher scale. We have certain customers
+that are asking us for 10,000, 20,000, 50,000 node clusters. And in order to make that happen, we've had to do some
+pretty major refactoring to the way we manage at CD, which is the backend
+database of Kubernetes. So likely next year, we'll
+publish some more on that, but that's something
+we've been working on. EFA is an example of a lower
+level infrastructure innovation that AWS it's a OS
+bypass hardware interface that allows high levels of
+multi-node communication. We make that easy to use with EKS and Kubernetes with a device plugin. I think a couple notable
+recent enhancements, EFA just added support for
+cross subnet communication. You used to be limited to
+a single subnet with EFA. Now you can do cross
+subnet within the same AZ, you don't necessarily wanna
+do training across AZs because that's expensive, but that helps with IP address exhaustion. And then the other thing
+that helps with IP address exhaustion is oftentimes
+your ML training workloads, they're sitting there just
+crunching, doing a lot of math, they don't actually need
+to talk to the internet. They only need to talk to each other, the other nodes in the cluster. So we recently added support
+for EFA only ENI support, so you don't have to
+add actual IP addresses to the EFA devices in your cluster. And that's now supported on EKS when you're running large
+scale training jobs, you need a large scale storage backend to handle all of the data
+that you're processing. And there's probably no
+larger scale storage backend in the world than S3, S3 open source to technology called Mount Point last year that allows you to mount an
+S3 bucket to an EC2 instance and use file system commands. And they get automatically
+translated to S3 object commands. And we've made that easy to use, again with EKS via a CSI driver,
+Kubernetes native interface. Recent notable enhancement
+is the CSI driver added some more fine-grained
+access controls. So you can lock down, you
+know, which training pods in your cluster have
+access to which buckets. Generative AI training
+inferencing is not cheap, these instances are in high demand. They cost more than
+standard CPU instances. AWS has done a lot of work
+over the last five years to bring down, improve price performance, lower the cost Trainium. I think just yesterday
+we announced Trainium2 and we'll continue to
+innovate at the lowest levels of silicon to make sure
+we give you the best price performance for Trainium workloads. And again, these are great, but for, for those of you in this room, it's not helpful unless it works with EKS. And in the last couple of months we've introduced accelerated armies for both Amazon Linux 2023, which is the newest general
+purpose Linux distribution from Amazon, as well as Bottle Rocket, which is our container
+optimized operating system. These work with all of the
+various EKS compute options, self-managed node groups,
+Karpenter management groups and probably again, one
+of the underappreciated or under talked about things
+we do here is the testing behind the scenes, the amount
+of drivers, frameworks, libraries, Cuda toolkits,
+like all of these things that go into an is complex. They change fast and we have
+a pretty sophisticated testing framework where we're
+running training jobs, inferencing jobs before
+we release these ams. So you can just take them, run them and be confident that they're
+gonna work for your workloads. Specifically for training workloads, I know we talk a lot about
+Karpenter these days, but Manage Node Groups is our original managed compute
+product that we launched, I think five years ago at re:Invent now. Now and Manage Node Groups
+is actually a good fit for training workloads because often training
+workloads are not dynamic. You just have a large
+static pool of capacity that you need to run your training job. It's not going up and down often. So manage no groups is
+a good fit for that. And EC2 launched a
+feature a few months back called capacity block reservations. Again, I mentioned these
+instance types are in high demand and capacity blocks is kind of like a hotel
+reservation system, but for EC2 instances, so
+up to eight weeks in advance you can book capacity for GPUs and you know you'll have
+it at that specific time. Recently they just gave the ability to extend the reservation and that now natively works
+with managed node groups. So particularly for training workloads, we think this is a nice enhancement. GPU instances do tend to fail more often than
+than CPU instances. They're running complex math calculations. I know the EC2 team is doing
+a ton of work, you know, at the data center level to try to increase the performance. Things like, I don't know, 1% changes in humidity in the data center can give a 10% increase in the
+lifetime of a GPU instance, but they do fail on occasion and we've put a lot of effort this year into detecting those failures. So you don't have an instance
+that goes bad and your cluster and is wasting money while it's not actually doing any work. So this actually rolled out for EKS auto mode just this last week, which I'll talk about it in a minute. It'll be rolling out for other
+compute over the next week or two, but it's really two parts. It's the node health monitoring
+agent, which is an agent it'll run as a Damon said in your cluster, look for all kinds of issues. We have six years of experience of running lots of Kubernetes clusters. We've seen every possible
+way a node can fail. And we've taken that knowledge and built it into this node
+health monitoring repair agent with a specific focus on GPU instances. And then on the auto repair side, managed node groups will get to the auto repair functionality where you can opt in to say, okay, EKS, you detected an issue. In some cases maybe you want
+to recycle the instance. In other cases, maybe you want to reboot the instance depending
+on the type of failure. And that'll be rolling out very soon. And then my last slide is on monitoring observability. I think it was at re:Invent last year. We launched version two of of
+CloudWatch Container Insights, which it's a lot better than V1. If any of you had tried V1 a couple years back, had its challenges. The new version of
+CloudWatch Container Insights is really, really nice. It's also more cost effective
+for container workloads and a recent enhancement to
+the Container Insights plugin. And you just run this as an
+agent in your EKS cluster, is it now automatically
+includes the monitoring plugins for both NVIDIA and neuron instance types. It'll scrape those metrics,
+send them to CloudWatch, allow you to monitor how efficient your GP or resources are consumed,
+do things like understand how workloads are running, you know, figure out how to tune hyper parameters. There's a lot of work
+that the team did there to make sure that you have a simple out of the box check checkbox, GPU, Nvidia monitoring experience. So I highly recommend
+you check this one out if you haven't seen it. Okay, I wanna talk
+specifically about inference. I mentioned at the beginning, 2024 is the year of production. And production generally
+means inferencing. If you have a live workload,
+you're serving requests to your customers and
+that brings challenges, especially with these, you
+know, large language models. Running inference at scale
+can be complex, you know, how do you, how do you serve
+models that are cost effective, that have the performance you want? Latency, throughput, availability. All of these become concerns when you're running inferencing at scale. And how we're thinking
+about inferencing at EKS is really there's those three
+measurements on the left, the throughput, you know, how many tokens per second
+your model is serving, the latency, which is the
+time to the first token, and then cost, which is really
+the GPU compute utilization, how much of the GPU you're actually using. And so a lot of these
+features we're building and framework enhancements
+we're doing are designed to help you achieve that trade off between throughput, latency and cost. There's never gonna be a perfect answer, but we want to give you
+the tools to make it easy to do that trade off for yourself. Scaling to zero, scaling up quickly. Optimizing ML container images. This is something we're doing quite a bit of work in the container D project. You know, oftentimes
+these ML images are tens, sometimes I've seen hundreds of gigabytes. And when you start your instance, so you don't wanna wait 15
+minutes while the instance is costing you money and the
+image is being downloaded. So we've done a lot of
+work there to speed up that I just talked about
+minimizing hardware failures. And then we're doing a lot of contributions in the open
+source space to make sure that a lot of these popular
+frameworks do work well on EKS and speaking of them, yeah, Ray VLLM, these are two of the, and
+even in the last two days in customer conversations I've been in, I've heard these two projects
+mentioned more than any others is the ones that customers are now using to serve inference workloads in production using things like the,
+the device plugins, EFA, Nvidia neuron accelerated drivers, all of that is a very
+common infrastructure stack that we're seeing customers
+use for inference with EKS. Oh no, what happened? Okay, I dunno what's happening there. Anyway, we'll skip, Rama
+already talked about Karpenter, but Karpenter really is the tool that, especially for inferencing, I mentioned Manage Node
+Groups is good for training. Inferencing is generally a
+much more dynamic workload. Karpenter is a good fit there because it can help you
+more easily take advantage of the breadth and depth
+of VC2 instance types. In some cases you may want
+to use Graviton instances for inferencing, maybe
+you don't necessarily need to use GPU instances. Karpenter in general, we're
+seeing a lot of success with customers do for inference workloads, and hot off the press, some of you maybe saw announcements
+over the last couple days, but we introduced what
+we're calling auto mode the other day, and part of auto mode is integrating Karpenter into EKS, making it easier to use. Auto mode is really the new easy button for the Kubernetes data plane, the compute storage networking that you generally need
+to run in your cluster now is included by default in EKS. And I'm specifically bringing
+it up in this presentation because of the Karpenter angle. Karpenter's good for inferencing, it's now built in by default. Some of the, you know, the
+three things on the right, compute optimization, cost efficiency, supporting diverse workloads, that's really built in Karpenter. That's what it's doing. The interesting innovation that we did with Auto Mode, if you haven't been to any of the presentations
+yet, is we have this new operational model with EC2. Where previously you had
+two ways of running compute in AWS you had the fully
+managed lambda fargate model where computes running
+in a AWS owned account or you had standard EC2
+that was, you owned, this new model EC2 managed
+instances they're calling is in the middle of that
+or it's an EC2 instance in your account. But an AWS service like EKS actually owns the
+lifecycle of that instance. So if you go to try to delete an E and I, delete the instance, you
+get an error that says in use by a service and you
+have to use that through EKS. And I bring it up because
+I think especially in the top right here, the capabilities, a lot of the hard parts of getting started with machine learning workloads on EKS, which is figuring out
+the right device drivers, the EFA plugin, configuring
+instance storage. If you have local disc
+instances, you know, customers used to have to
+do these really complicated user data scripts to set up a raid zero
+volume on the instance. A lot of that is now fully
+automated with EKS auto mode. So we automatically configure Raid zero, we automatically configure
+the device plugins, whether it's Nvidia or Neuron, we already include, you know, if you launch a GPU instance, we're gonna pick the right omni
+that matches that instance. So just, there's a lot less work you have to think about. For training workloads, I'm not gonna quite say
+automotive is a great fit yet, there's a 21 day max instance lifetime. A lot of times we talk to customers who are running training jobs that go for months in some cases. But I think for inference workloads, for production running models and production auto mode,
+it could be a good fit. Just an example of a pretty common stack that we're seeing. And again, this is validated
+in the last two days of conversations I've had with customers, but using Ray, VLLM and you know, you're using Karpenter, which is gonna spin up
+a standard CPU instance to run the head pod and
+the cube ray operator and then it's gonna spin up, for example, inferential instances to actually run your serving workloads. So this is a more and more
+common pattern we're seeing for customers actually
+running inference workloads in production with EKS. And then finally, just a
+few more customer stories, H2O, Omi, Unitary, all of these customers, I believe these are all
+either case studies, blogs you can go read about. They've all moved to Karpenter to do their inferencing workloads. I think H2O is an
+interesting one they've done, they're using bottle rocket
+to prefetch container images. We have a a nice blog out there that shows you how to do that. I mentioned the 15 minute time it takes, yes we can optimize that, but the fastest way is
+actually just gonna preload the container image on
+the instance itself, which you can do with Bottle
+Rocket quite easily now. And other ones, yeah, just using Karpenter, reducing costs. We've seen a lot of these
+customers have success moving to Karpenter to do
+their inference workloads. Okay, I'll hand it off to Cas to talk about one of
+those customers who is one of those customers who's
+been successful with EKS. - Cool, thanks Mike. Hey everyone, I'm Cas Starak, I'm a product manager leader
+at Eli Lilly and Company and I focus on research and AI products. And just gonna share a little
+bit from a customer experience of building gen AI capabilities on EKS. And I thought to start, I could just talk a little
+bit about the tech evolution at Lilly and maybe help
+explain why someone from Eli Lilly is on an EKS
+Gen AI track at re:Invent. I'll talk a little bit about
+our platform development including EKS and then the Gen
+AI scale up that's underway. So just a little bit
+of historical context, the pictures here tell a
+little bit of Lilly's history with technology on the
+left, it's actually 1987 and some classic eighties
+corporate executives, very excited about the
+most recent delivery of some personal computer technology. And then on the right, some
+of you might know what that is or you can see the text there, it's actually a Cray-2 supercomputer. And in 1989, Lilly was the first
+non-governmental organization to purchase one of those in the US. And I just share that because after joining Lilly a year ago, I was pleasantly surprised
+to learn about this history of early technology adoption and innovation that I
+just, I didn't expect to find in 150 year old company. And there was, you know,
+the software development and the data science and
+everything else that came along with adopting those technologies. Now, unfortunately, it was not just a, you know, upward trajectory from there, similar to the so-called AI winters that, you know, that
+industry has gone through. We had some of our own kind of technology innovation winters, and it really started around 2001 in what in terms we call Year X. And that was the year that the first Prozac
+patents started dropping and going off patent. And at the time that was actually 1/3 of Lilly's profits. We had some other medicines
+that went off patent. And you can imagine as sales
+come down dramatically, there was a lot of examination of costs, bring down costs and
+things that were, you know, quote, unquote non-core
+like software development and some of that technology
+innovation was very hard hit. And so there was this long period where I think some of
+that early innovation started to atrophy a little bit. But you flash forward today
+and it's completely flipped and there's a recognition
+across the company that we really do need
+to become a tech company to continue succeeding
+as a medicines company, you know, for years and decades to come. And thankfully we've
+been successful with some of our recent medicines, we
+have a very strong pipeline and that's enabling us to invest and there's been significant investment and growth in those tech capabilities, software engineering capabilities, robotics automation, data
+science, all types of AI. And there's, you know,
+much more of that coming. And you know, one of
+the things we're doing as we're going through this evolution and making these
+investments is really trying to adopt, you know, most of the modern software
+development practices. And part of that is, you know, a team was formed just a couple
+years ago that I'm part of. This is the software
+product engineering team. It's led by a former
+Apple engineering leader Go Cole Rad Krishnan. And this team really focuses
+on building scaled products and platforms that are
+gonna be high reliability, high usage. And we try to take an approach that's really a kind
+of software engineering center of excellence to help demonstrate and kind of spread those practices across the developers at Lilly. And a big part of is
+this platform approach where we're thinking
+about shared libraries, reusable components. We tend to leverage a lot
+of open source capabilities and tools and doing things like building broad observability tools that can get used across the organization. And one of the platforms that's
+been a really big investment for us is this CATS platform. And so this is a cloud applications and technology as a service. And what this is is a
+comprehensive cloud application development and hosting solution. And so we built this on AWS and we use a series of open source and AWS managed services to support it. And this is a highly simplified diagram, but some of the key points,
+you know, we use EKS for Kubernetes management, we use EC2 and Fargate for container execution and we have other AWS
+services integrated into it, like S3 RDS, secret manager,
+a whole slew of things. We also do GIT ops, CICD automation. So teams can go kind of seamlessly from commit to production. So kicks off with GitHub Actions, docker image push to ECR, Argo detects and then
+automatically puts that into the right Kubernetes environment. And so, you know what
+this means for developers, it's really been a newer way of developing we've shifted to the
+cloud, they get, you know, a lot of speed and efficiency so they don't need to make a bunch of infrastructure
+decisions, let alone build that infrastructure kind of laid out, you know, a menu for them to get started and then they obviously have the speed of that automated deployment. So that's been a big part of our kind of tech transformation
+evolution to the cloud and it's gotten significant usage. It also brings security. So we have a lot of standardization and we kind of, you know, lay some tracks that we get people to follow. And so that gets them into robust, you know, security practices. We have vulnerability scanning, we've also provided observability
+tools, so some of those with the Amazon services. We also use some open source
+tools like Loki and Grafana. So that teams building on this,
+they get a lot of logging, alerting, reporting,
+visualization that can help them, you know, manage their
+applications as they scale. And that last part's
+really the biggest benefit is the scale and reliability. So, you know, once an
+application is developed here, it can scale up to, you know,
+all of Lilly's workforce, it can scale up globally and there's really no
+additional work for the team and it maintains high
+reliability when it does that. So as I've mentioned, we've
+seen significant adoption over the last couple
+years on this platform. We've got hundreds of developers using it. We've got growing number of applications, growing number of commits
+increasing exponentially in, you know, global deployments across, you know, many, many countries. And one of the metrics I like, I sat in the intern end of summer readouts and it felt like almost
+every intern mentioned CATS, using it and how it helped accelerate the development of whatever
+their intern project was. So I think that's a good
+measure of its effectiveness. And so you can imagine
+some of the increase in usage of this, A lot of
+it is coming from gen AI and we've been making
+big investments there. And just to give you some context, really what Lilly's looking to do is lead our industry in terms of, you know, pharma peers in the adoption of an impact from gen AI. And we do think it's
+fundamentally transformational to a lot of the work that we do and we've already been investing in it. So Lilly actually has
+a history of using AI for drug discovery, small
+and large molecule tools for generating its screening and there's actually a pretty
+solid data science team that's been doing NLP work before all the LMS came out to do things like clinical summarization. So there's a history of
+that that we're building on, but we're really going all in on gen AI and we're working with the
+hyperscalers, we're getting, you know, out of box
+solutions, we're working with smaller companies, startups for more, you know, organization or use case specific solutions. But then we're also doing a
+lot of internal development and as part of this tech
+transformation we're going through, we are looking where
+does it make sense for us to have some of those
+capabilities internally? And some of that is use
+case and proof of concept, but really we try to focus
+on what are scaled products and platforms that can serve the company. And one of the platforms
+that we decided to build was a, you know, broadly usable developer facing gen AI platform to help accelerate that work at Lilly. And I can actually a little bit here. So we knew gen AI is
+gonna be big, we want it to be reliable, we wanted
+to be able to scale large number of users globally. So we decided to build it
+on top of that CATS platform that I just walked you through. And we put together these main components and we started this development in 2023. We had our first production
+release in December and we've been adding features and capabilities as we've
+gone through the year. At the foundational level
+it's a model library, so we want teams to be able to choose from the
+latest and greatest LLMs and we're constantly
+updating it, you know, we're big fans of the
+anthropic line of models, but we also have Open AI, Gemini, hugging face, lama. You deploy pretty much any
+model from hugging face if you get the legal approval. And we allow teams to
+choose, you can host those as retail, we have open source, there can be fine tune models, you can host them locally
+in our GPU cluster. And then on top of that we
+built orchestration tools. So it started fairly simple and we use lang chain as our
+main orchestration framework and we started fairly
+simple with some tools for prompt engineering and model chaining. And we've added in, you know, more and more
+complex orchestration tools and you can now support agentic workflows and multi-agent systems with it. And then we have tools for operations, scaling and maintenance. So we try to take care
+of a lot of the scaling that the teams are gonna need so they don't need to worry about it. So our central team, you know, has an ops team thinking
+about provisioning capacity. We recently worked with the
+AWS team to help optimize some of our like cross regent inferences and our rate limiting capacity to help get better performance
+at scale, lower latency. And so we're kind of doing
+those things centrally so that other teams don't
+have to worry about it as well as quality and monitoring. So we've created various
+eval tools so that teams as they're scaling up
+can monitor for drift or if they want to assess,
+you know, the latest model, they can easily check
+how performance changes. We also have data
+integrations that, you know, where they're specific
+to the Lilly environment. We're always trying to add new ones there and information retrieval tools. We started with a fairly kind of vanilla semantic search capability vector database and we've been adding in more complexity, we made elements of that tunable. So if teams wanna optimize things like, you know,
+chunk size and overlap, they can get in there and do that. And then we started adding other things like contextual chunking and hybrid search and continuing to prove
+the information retrieval. So again, teams don't need
+to go out and build that. And we have it kind of optimize
+to the Lilly environment and all of it's wrapped in this oversight in compliance and security layer. So we have full input output logging, cyber has visibility into that, into all of the configs, all of the users. We also have scanning and alerts, it's configurable by our cyber team. We use some AWS tools as well as some open
+source tools to do this. And it helps give a lot of
+reassurance to our cyber team and actually kind of points
+this as a preferred platform. And so what that has
+allowed us to do, again, we've been able to accelerate development so teams are able to
+get started very quickly and get to POCs and MVPs quickly. They have optionality. So you heard the guys earlier
+talk about the importance of, you know, different models
+for different use cases. I think Andy talked about
+it in his keynote yesterday. And so teams can easily
+switch back and forth and figure out which model
+is right for their use case. I mentioned, you know, quality
+security compliance built in. And then because we've
+built this, you know, on AWS on EKS, it's very scalable. So we've had use cases that
+have gone from, you know, small early testing to deploy
+globally without, you know, having major issues or downtime and not requiring a ton of work from the teams
+actually doing the development. And so, you know, we
+launched it originally into production in 2023 in December. So it's been, you know, less than a year and we've been impressed with the uptake and it's really impacting
+every part of our business and we see this transformation happening. Just some examples,
+probably my favorite one is this agentic discovery assistant. So there is a chem informatics agent. It has access to about 20 different tools. Some of those are chemin
+informatics tools, some of them are internal databases with Lilly molecule information. They're external databases and we have an LM that's,
+you know, answering questions or executing, you know,
+user prompt workflows and choosing which of those tools to use. And it allows these very
+powerful workflows to be executed that can aid our scientists
+in early stage discovery. We have things in the
+clinical trial space, so helping with how we
+respond to regulators. We get thousands of questions and have to answer those from
+regulators all over the world. It's a natural thing for LMs to help us do we have tools in our manufacturing space. So we have global manufacturing, there's a huge focus on our
+manufacturing line uptime. And so we have this assistant that's been developed using this platform that uses structured and
+unstructured data from like SOPs as well as equipment sensor data to help as our line operators
+monitor and manage uptime. There's claims drafting tools and we're even developing
+our first patient facing Q&A tool on the platform. So it's exciting to see that adoption. And then in terms of results, we've seen the acceleration, so we've heard it anecdotally from teams and then we've seen teams,
+you know, in a little as a few weeks they're
+able to get a POC out there or in a few months, actually have an MVP that's pushed into production because they have these
+tools ready and available. We're able to meet quality
+security compliance. It's really become a preferred
+platform from our cyber team and you know, they
+encourage folks to use this because we have all of that
+visibility, logging and alerts and then it's enabled rapid scale up and we've seen a lot of adoption. So we have over 500 developers
+at Lilly using the platform. There's thousands of end
+users in over 30 countries and in a given month we
+have billions of tokens that are processed by the platform. So the scale has been, you
+know, what we were hoping to see and it's supporting this
+tech at Lilly evolution. Obviously we're building
+products on top of it that are impactful, but because
+of the work we're doing, it's also this kind of
+virtuous cycle of attracting and retaining, you know, talent
+that wants to work on this. And it's kind of supporting that transformation I was talking about. And you know, lastly, just to
+close, some lessons learned, I would say the main lesson is, you know, our kind of belief and intuition that having this platform approach, so using a scalable platform, you know, like EKS building this, you know, somewhat opinionated approach
+to gen AI development. It's worked, we have developers using it, it's accelerating it,
+we're seeing things scale, we're seeing things move into production. So I think that's probably
+the biggest lesson learned. But some of the other
+things along the way, if you build it, you know, some will come. So when you build a platform like this, you're gonna have the few early adopters that just naturally just start using it. Especially in a place like
+Lilly, you'll have kind of that top of the curve
+really capable, you know, fast moving developer teams but then there's you know, a whole distribution curve after that. And if you wanna get more
+adoption, there's a lot of work around evangelizing, answering questions, getting support documentation out there, getting support teams, product mindset. So we've really treated it like a product. We have product manager or roadmap. We're really always trying
+to gather voice of customer to make sure, you know, we might be very excited about building, you know, the latest
+incremental improvement to the information retrieval pipeline. But our customers like, I just wish your QA environment
+was a little more stable. And so making sure we don't
+get too lost in the engineering and technology of it, but stay grounded with the customers has been important. And then expectations increased rapidly. So initially there was skepticism and it's like for some
+developers at Lilly, this is like a new approach kind of channeling them
+into a certain platform and putting some constraints around it. But the, you know, skepticism
+quickly turned to like, oh I see, it's speeding it
+up, it's making it easier. I get the approvals and
+we're seeing adoption and then it turned to like, oh
+now I want this, this, this, where's the documentation? What are your formal SLAs? So I'd say if you're taking this approach, make sure to think ahead of it. And if you're building the platform, keep up with the documentation, keep up with the support, you know, get ahead of okay communicating SLAs. 'cause especially in a place like Lilly, we have patient facing stuff,
+we have manufacturing stuff, there's 24/7 expectations. And then lastly I mentioned
+the cyber partnership and investing in that early
+was pretty key I think to this platform success,
+especially in a company like Lilly where there's a high bar around cyber or privacy legal and all of that. So with that I think I'll
+turn it back over to Rama. - Thanks Cas, I appreciate
+you taking the time to share those awesome insights with us. So something we have talked a lot about throughout this presentation
+has been that customers want to integrate to us
+as solutions on top of EKS to achieve the desire ML functionality. So a lot of our customers were asking us for guidance around how
+to get started quickly integrating these solutions. What are the best practices
+for integrating them? Can you provide us some templates and patterns that you're
+seeing success with? So that's why we launched
+the data on EKS project. It's an open source project where we publish different gen AI patterns that we have seen across our customers. We publish blueprints,
+patterns, terraform templates that you can use to easily get started integrating some of the
+popular OSS solutions that we see getting integrated with EKS for solving those ML specific challenges. So we have launched a
+number of these patterns over the last year. We continue to create more
+patterns as we see success with those patterns in in the real world. We have been placing special focus on releasing inference specific
+patterns on top of EKS. Some of the things that we
+have recently released are, Nvidia with VLLM, Racer with VLLM, Nvidia NIMS on EKS, so on and so forth. So check out our data on
+EKS website where you'll see a lot of different patterns for inference and for training and fine tuning as well. With that, we have almost
+come to the end of it. There are some interesting
+sessions that are coming up with EKS, Amazon EKS
+infrastructure as code gitops session on that as well. And there is an interesting
+session from S&P Global that have implemented gen AI on EKS and how they're scaling to meet millions of inference requests per week using that setup as well. And we also have the Future of Kubernetes on AWS session coming up tomorrow that you can check out. You can continue your Amazon EKS learning through some of your
+resources available out there through workshops, through
+getting digital badges and best practices guides as well. With that, we come to
+the end of the session. Thank you for listening to us patiently, and if you have any questions,
+we'll be hanging out outside the room for some time. You can approach us and we can answer any
+questions for you as well. Thank you. (people clapping)

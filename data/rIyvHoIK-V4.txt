@@ -1,0 +1,521 @@
+- Okay, let's get going here. Hey everyone, hope you're
+having a great re:Invent so far. Alright. My name is Ranjith Raman and I'm a Solutions Architect here at AWS. And with me is Dave Roberts, who is a Solutions Architect as well. So Dave and I, over
+the past several years, we have worked with a number of customers building SaaS on top of AWS, right? And during our conversations, like, so we talk about like, how do you implement multi-tenancy
+across your entire stack to how do you optimize your customer or tenant onboarding process to billing, to metering
+metrics, cost per tenant and cost attribution in a
+multi-tenant environment, that's something that
+comes up quite a bit. So one topic that has been showing up, and it has been coming up quite a bit is customers have been asking us how do you implement or how do you, like, what are some of the
+best practices and patterns and give us some guidance around like multi-tenant data and storage. So that was basically the motivation for this part particular session where we wanted to dive into some of those best practices and patterns and basically get into
+the scaling and securing and tuning your multi-tenant data. So this is a 300 level session, which means we'll be going
+over some architecture and architecture diagrams and we'll be diving into
+some AWS services as well, but we won't be like cracking open an ID or start going through
+code or anything like that. So hope that matches
+with your expectations. So with that let's dive in. So let's say you're building
+a SaaS application, right? So it might look somewhat like this at a very high level, right? So there is some kind of a web layer, which is sort of this entry point, and you could have services
+like Amazon CloudFront here that is serving static
+content from an S3 bucket. And then you might have some kind of an API management layer, right? And then the request travels
+and it goes through Kognito, like if you have to
+authenticate the request, and then you might have some kind of an authorization
+in place as well. And then finally request
+reaches application layer, the services layer, you
+would have something like some kind of a compute and some kind of a
+database or storage, right? And you might make an argument
+that every single layer that you see here brings its
+own sort of SaaS perspectives and requirements and considerations. And you would be absolutely right because like for example, there could be like hundreds
+and thousands of messages that comes into the system. Like how do you manage all that and how do you identify that request is coming from the right tenant and the right tenant user? And then how do you authenticate them and how do you, like, you might have to throttle the request, like if you have like
+multiple plans or tiers within the SaaS solution. So throttling is a big aspect that we see quite a bit from customers. And then finally, the, you
+know, even at the compute layer, there are considerations
+around like scaling and partitioning and
+noisy neighbor situations is something that comes up quite a bit. But that's not going to be the focus of this particular talk. Our focus is going to
+be on the data layer. So predominantly for the most part it's going to be on the Amazon Aurora or the relational database side of things. But we will be covering,
+we'll be talking about S3 and DynamoDB patterns, like
+wherever it makes sense. And as we go along here. Okay, so what are some of the factors that makes a great SaaS
+storage architecture? And the first one almost
+always is security. And obviously there are
+foundational security principles that you'll have to apply
+in your AWS environment. But when we talk about a SaaS solution or a SaaS environment, security is really through
+the lens of the tenants or the workloads that
+the tenants are running in that system, right? And the next one is scalability. So as a SaaS provider,
+you'll have to think about, okay, how do I scale when I get all that tenants coming into the system? Like, I mean, when I get
+all that spike in traffic, is my system able to handle
+all that traffic, right? So scalability is something
+that's super important as well. But even more important in scalability is this fact that can you scale without any kind of manual efforts or manual interventions from your team? And the final one is efficiency. And so again, you as a SaaS provider, you'll have to think about, like how do you get the
+most out of your database and storage engines, right? And how do I achieve things like low touch operations. And efficiency is not
+just from a performance or an operation standpoint. It's also from a cost efficiency, like a cost standpoint. So like how do you prevent wastage at a per tenant level. So that's important in SaaS, like everything is at a tenant
+level or a customer level. So how do you prevent wastage? How do you prevent, like are there, just systems lying around
+not doing anything? Are they idle? So that's something that you'll
+have to think about as well. So before we get through the
+rest of the sections here, let's start with some fundamentals. And I wanna start with
+the deployment models and this is something
+that you might be already familiar with if you have gone
+through some of the content that the AWS SaaS factor team
+has produced over the years. But we still wanna quickly go over this. And the first one here is this notion of a silo deployment model, which means you're assigning
+like dedicated databases or infrastructure for every
+single tenant in the system. And then you have the pool model where like multiple tenants are sharing a common set of resources. And then the bridge model
+is something in between where there is, you know,
+it's a mix of silo and pool. Now if you look at the silo model, like the architecture, it tends
+to be a little bit simpler because you have dedicated instances and resources for every single tenant. So there are some natural
+security boundaries around those instances, but from an efficiency
+standpoint, it's not that great because you have all those
+systems lying around. So what if like, you scale and there are like hundreds
+and thousands of tenants and you'll have hundreds
+and thousands of systems. So from a management perspective, maintenance and operating
+it like silo model tends to be a little bit harder. But then as you move towards
+the right, the pool model, things starts to get a little bit better from an efficiency standpoint because you're sharing a
+common set of resources, but the architecture itself
+can get a little bit complex. So from an isolation
+and security standpoint, like when multiple tenants are sharing the same set of resources, like it can get a little bit harder. But understanding of
+those deployment models, it's super critical because if you look at
+any SaaS environment, tenant onboarding is
+this critical function. So let's say you are a SaaS admin and the request goes to what
+we call a SaaS control plane. So a control plane is this
+layer within your SaaS app that does things like onboarding
+and setting up the tenant and their user's identity. And at some point in that workflow, it's gonna call a provisioning service, a tenant provisioning service. And this provisioning
+service is the one that says, "Okay, I have enterprise tier tenants "or customers in my system. "Maybe I should, spin up siloed databases "or siloed compute or
+infrastructure fault. "for my enterprise tier customers." You might have free tier tenants. And for them it might make
+sense to just share resources. I mean, it may not make sense
+to like spin up dedicated databases or storage for
+your free tier tenants because they're not paying yet, they're not paying customers yet, so you may just place
+them in a pool model. But you can see how the deployment models already influences your decisions and tenant onboarding,
+the whole process happens during the tenant onboarding process, during that workflow. Now, the other thing is when you have different deployment models like a database per tenant
+or a database instance, or a cluster per tenant, or if you're having a shared schema, the important thing to keep
+in mind is how do you route or how your application is
+going to route the request between those different deployment models. So you would typically have
+something called a resource map or like a mapping service where you pass the tenant context. So tenant context is what
+you get in the request. So every request should have
+some kind of a tenant context, like a tenant ID as an example. And using that tenant ID, you would go to this mapping service. And then the mapping service
+returns a connection details using which you would go
+to the right destination or to the right database in this case. Now, I mean there's this
+common sort of misunderstanding that if you deploy things in a certain way or if you partition, your
+databases in a certain way, you automatically get isolation. But that's not always the case because if you look at this example, each tenant they have their
+own database instances or cluster in this case. But the microservice on
+the application layer, it's shared among multiple tenants. So all it takes is some kind of an issue or a bug in the service layer, where let's say somebody
+during a debugging session they went and tackled a tenant ID, right? So what you get is like every
+other tenant in the system is going to see the hard
+quarter tenant's data. So what you ideally need
+is something like this. You need to have an extra sort
+of extra layer of protection, we call it the isolation context, where you apply policies using IAM or there are other policy
+engines that you could use where you provide that extra layer of control or protection. But even in that scenario where someone hard codes a tenant ID, the request shouldn't go to the database or it should just error out, right? So this is ideally what you need. So if you deploy a partition,
+something in a certain way that it doesn't
+automatically guarantee you isolation that you're looking for. I think I've sort of set the context, covered some fundamentals. So what we are gonna do for
+the rest of the session is across the three different areas or topics that I had introduced earlier, we are going to look at some
+specific considerations, like specific topics. And this is exactly where
+we are going to spend the rest of the session on. And I wanna start with security, and I wanna start with access patterns and how does access patterns
+help achieve, isolation, right? So there are a number of things that you could do on your database side to achieve security or do
+isolation and partitioning, but access patterns is important because like how do
+you know a certain user can access a particular database? Like do they have the
+right policies in place? Do they have the right
+permissions in place? So that is important, right? So you could do a number of
+things on the database side, but the way you get to the database, like you'll have to have
+a good handle of as well. So we look at the first model, where you have a silo
+storage with silo compute. So in this model, you are assigning or assigning dedicated Amazon
+Aurora instance or cluster for every single tenant, right? And on the compute layer
+you have lambda functions. So when the tenant request
+comes in the lambda function, it has an execution
+role and it has a policy and if you look at the policy, it's specific for that particular tenant. And this policy would return back a temporary security credential using which the function
+would access the database, the tenant wants database. And the same thing for tenant two, right? So tenant two, they would have their own, lambda execution role, their own policy using which they get a credential and they would access
+their database, right? So in this model, you get, you definitely get better isolation because there are some natural sort of security boundaries
+in this model, right? And then we are using
+AWS IAM authentication, which works great. It gives you that temporary credential that you're looking for. And it also works great
+from a networking level, from a network segmentation standpoint. You can place one Aurora instance in one particular network segment, the other one in a
+different network segment where at some point the
+challenge with this model is that you're going to run out of limits. So if you have like hundreds
+and thousands of tenants, like just again, back to my point earlier, you're going to have to manage
+all these different systems. So that can get a little bit challenging. Now what if you switch the database to a single database instance? So instead of this, you have this, right? So the isolation characteristics, it's very similar to the previous model, but now you lose that network segmentation that you could do, right? In the previous model you could just place the database instance, like I said, in its own network segment, but you cannot do in this model. But from a compute standpoint, you can still use AWS IAM authentication, receive or retrieve a
+temporary security credential and using that you would
+access the right database. So from a compute standpoint, it's fine, but you lose some of the network level segmentation in this model. So now I talked about the
+AWS IAM authentication, it works great in a siloed environment when you have like lower
+number of concurrent users. But when you start moving
+to a pooled environment, there are some defined upper limits for AWS IAM authentication, right? For example, like how many authentication requests per second that you
+can make to a single database? So that's why in this
+model we are gonna replace AWS IAM authentication
+with Secrets Manager. And if you look at, I
+mean very similar pattern, but instead of an AWS IAM authentication,
+we have Secrets Manager and Secrets Manager would
+have a secret per tenant in this particular case. And if you look at the policy, I mean obviously we are asking the action as Secrets manager dot get secrets value, but we are doing it for a specific tenant. And then what Secrets Manager
+will do is return back these are long-term credentials because Secrets Manager uses
+password authentication. And using, which in this
+case the Lambda function would access the right database and very similar approach for tenant two as well. So the idea is, or the takeaway is if you're moving from a siloed approach to a pooled approach,
+consider using Secrets Manager for your credential management purposes. All right, so up until now
+we had dedicated compute, like dedicated lambda functions
+for every single tenant. But what if there is, there's
+a single Lambda function. So this is where you have to determine like which tenant is making the call. Like who is the tenant at runtime, right? So this is where you can use what we call a token vending machine. So this is a module that
+you'll have to build and you can search for
+TVM, AWS satisfactory and you'll find some examples
+on how to implement this. So the idea behind token vending machine is that you would have a single role and the role would have a policy which has a placeholder for a tenant ID. Like if you see all the way down, you'll have a placeholder
+for the tenant ID, which gets replaced at runtime. So you get back, or what the
+Lambda function gets back is a scope credential, right? So this is a credential that is scoped for that particular tenant
+that's making the request. And once the Lambda function
+has the scoped credential, it can go to Secrets Manager,
+retrieve the right secrets and then access the database. Now in this model, what is different? We have a single database for every single tenant in the system. So how does this change things? So we can still go through that whole token vending machine process and retrieve scope credentials
+for every single tenant, using which, the Lambda function
+would access the database. But at some point, when there are a lot of tenants in the system or there is a limit on the number of users that you could have on the database side. Like when you face those challenges, like you can just do this, where you have the Lambda function. Go to Secrets Manager,
+there's a single secret or database credential
+that gets returned back. And using that the lambda function would access the database, right? So in this model you would
+have to apply like more control in your code review process and you'll have to go, you know, you'll have to
+have a good process there. You'll have to make sure there is some kind of a filter as
+part of your application code or if not your application code, if you're using like still
+using store procedures, like you'll have to have
+something on the database side. Some kind of a filter. So that was access patterns. Now I'll hand it over to Dave to take us through the
+journey section here. - Brilliant, thanks Ranjith. So you look at all these foundations and you create a storage
+architecture out of that. And that's just the start. Because just because you have
+your storage architecture doesn't mean that your game's over. You need to be able to
+keep up with the growth of your SaaS application. As more and more tenants come on, your storage architecture
+needs to grow and scale to meet the needs of
+serving those tenants. So if we go back to our
+example application, we've created our
+application, we've gone live, we're starting to get our
+first customers on board. And as we get more and more
+tenants onto our system, we need to start scaling our application. And luckily we're using
+some managed compute service which handles the scaling for us. Life's nice and easy. So as we get more and
+more tenants on board, our compute just continues to grow. And as it grows, so do the
+requirements on our storage. More tenants means more transactions and eventually storage says, "No." Right? It becomes the bottleneck. And now we need to think
+about scaling our storage. And when we talk about
+scaling our storage, there are three things that
+we need to think about. We have vertical scaling,
+so adding more resources to a storage instance. We have connection management. So that storage instance
+has a finite number of connections that it can handle. So we need to make sure
+that we can scale that to handle more and more connections. And finally we have horizontal scaling. So adding more storage instances
+into our logical data set. And each of these scaling mechanisms is going to bring complexity
+into our storage architecture. So we want to make sure that
+we can stretch the architecture that we have as far as possible before implementing a new mechanism. And when we start scaling, we
+start with vertical scaling because it's easy, right? We just throw some more tin at it. Anytime we come close to a bottleneck, we just grow our instant
+size, add some more resources and keep on growing our tenant base. And this works really well. We can keep growing and growing and serving more and more tenants. Now the downside to this approach is that there's a finite
+limit to how far you can scale a single storage instance. So we need to keep in the back of our mind what will we do, if we get to that point. And at the same time that
+we are scaling vertically, we want to think about efficiency because efficiency just means that we can serve more transactions from that same storage resource. And this is really important
+in SaaS because SaaS scales and SaaS is gonna scale this efficiency. Any efficiency gain that we get is gonna scale with the number
+of tenants that we have. An improvement for one becomes
+an improvement for all. So investing your innovation
+points into efficiency is going to help offset
+your scaling requirements and let you stretch that
+storage architecture further serving more tenants. And even more importantly, SaaS
+is gonna scale your wastage. So when you're first deploying
+your SaaS application, you are just trying to
+get a product out there, trying to get it into the
+hands of the customer. You're not thinking about making the most efficient storage architecture and you may have some
+wasteful access patterns. Well, as you start growing and growing, these access patterns
+are going to be scaling that wastage as well. And this is going to impact
+your ability to scale, but also it's gonna
+impact your bottom line. This could mean the difference between profitability or not. So focusing on efficiency
+is really important when you talk about getting up
+into the higher growth phases in your SaaS journey. And when we talk about efficiency, there are two areas that we focus on. One is optimizing the
+efficiency of our queries. So things like micro batching rights, if we have a lot of frequent
+small right requests, then we can batch those together that can be a bit more efficient. And the other one is
+improving the efficiency of the physical disk
+serving those queries. So things like collocating
+all our tenant data to the same set of disks so we don't have queries
+spanning across several disks or pre-aggregating data if we have to do some sort of aggregation queries. And one way of implementing
+physical improvements is with table partitioning. So look at the simple query. We just want to return all the items belonging to a certain tenant. Now, we have the challenge
+here that we have a table that's shared amongst multiple tenants. So we have to do a full scan of all the items in that table just to see if they match
+to that tenant or not. And that can be pretty inefficient, especially if we have a lot of tenants. If we have a large pool database, we're doing a full scan every time, multiply that by all the other tenants doing the same thing at the same time, that's a lot of wastage. Now luckily for us, most storage engines will support some form
+of table partitioning and that means that we
+can split this table into smaller physical partitions that all have their own sets of discs. And when we do partitioning,
+we do it with a partition key. And because we are doing SaaS,
+we are doing multi-tenancy, a great partition key is the tenant ID. Because then we can
+select a specific tenant to put on their own partition. They get their own sets of discs, we get a bit of performance
+isolation there as well. And we still keep our root
+table within our database, but now it's just responsible
+for routing requests from our application through
+to the right partition. Now this is great 'cause we've improved our per tenant query performance and we haven't had to change anything in our application code. And this can be really nice for stretching out your pool model. If you have a lot of tenants, you can use this to
+mitigate noisy neighbors. But it comes at a cost, right? There's operational overhead. Now we have more partitions
+that we need to manage. So we need to think about
+whether those benefits off weigh the operational overhead. And as we continue to scale vertically taking on more and more tenants, we make our queries more efficient, we get more tenants on board, we're going to reach the next bottleneck. And that's connection management. Because every time our application needs to talk to our storage, we need to make a physical connection through to that storage. And because we are running
+multi-tenant applications, it's going to be doing this per tenant. So as we get more and more users coming in from more and more tenants, they're consuming the
+finite number of connections that our storage can serve. And eventually we're
+going to get to a point where we exhaust that connection pool and we can't take on any more connections. This is the bad thing, we
+can't serve any more queries and we need to implement a mechanism to handle these connections. Now one way is to build some sort of connection management
+into your application and that's okay. But that's you spending
+your innovation points, building something that's
+handling your connections instead of making your product better, so we want to look for a managed offering and this is where RDS proxy can come in. So RDS proxy will sit between your storage and your application. And now your application
+will connect to RDS proxy. And RDS proxy will make connections
+through to your storage, but it will reuse those connections across multiple sessions. This is great. We can scale through more
+connections through to RDS proxy. We can horizontally scale
+RDS proxy with more instances we can take more and more tenants on board and push our storage architecture further. However, there's a problem with RDS proxy and session variables and there are some
+examples, some use cases where we might want to
+use session variables inside a SaaS architecture. So look at this simple wear clause. This is some basic
+tenant isolation, right? This is saying just return the items belonging to that tenant, but we're doing it
+inside application code. The application code is
+fallible, it could break, someone could change it. We'd like to be a bit more secure and try and do it inside
+our storage engine. And one approach to this
+is using row level security with Postgres. And in row level security we assign every item
+to a particular tenant. So in this case we have
+that tenant ID in there. And one way of implementing this is to create a user per tenant and use those per tenant user credentials to access that database. And then Postgres is going
+to know to lock that down just to those tenants items. But there's a finite number of users that we can create inside Postgres. So another option there is to say, well we can pass through that tenant ID set that current tenant
+with a session variable, nice approach. And we can do a similar
+approach with stored procedures. So here we've taken that ware clause, we've put it inside a stored procedure. And when we execute that stored procedure, we pass through that tenant
+ID as a session variable. Some nice approaches you've
+made your tenant isolation a bit more robust. But what's the problem
+with session variables in RDS proxy, right? Why can't we use this? Well, when RDS proxy creates a connection with a session variable, it
+sees us as a unique connection and it can't reuse those
+connections across other sessions. Now this is called connection pinning. So now we're back at the
+same place we were before where we're exhausting
+our connection pool. So we've got RDS proxy, but it's not really
+giving us so much there. So we need to think about
+another option to handle this. And this is where RDS data
+API can come in and help. So data API is a feature with Aurora and you can enable that and it'll provide an HTTP API interface to your Aurora cluster. So you can work with SDK integrations the same way that you'd
+work with DynamoDB. You can do your SQL queries, set your session variables across there. Now we're making these
+HTTP requests through, we're still getting
+connection pinning, right? We're setting these session variables, we're still getting connection pinning, but data API is now managing
+those connections for us. It's able to close those off when it sees that we're running
+into danger and reuse that. And this is great. We've got a mechanism
+to scale our connections to handle more and more tenants and use session variables
+at the same time. It's a really nice time to be
+building SaaS architectures, we've got lots of tools in our toolkit to build secure and
+scalable architectures. And we continue to grow and grow and eventually we get to the problem that our single storage instance is reaching the limits
+of how large it can be. So we need to go and do something else. And one option is to carve
+out a subset of our data and move that to its own
+purpose-built storage. Another option is to add
+more storage instances. And the challenge with
+this, is this is going to introduce complexity
+into our architecture. We need to have tenant routing now. Our application needs to know where to send tenant requests
+to the appropriate storage. And we have more operational overhead. We've got more instances
+that we need to manage. And when we look at scaling horizontally, the first place that we can start is scaling out with read replicas. So a read replica is
+just a copy of your data. Your application can send read
+requests to that read note. Now those read requests aren't
+going to your right instance. So there's less compute impact to that. We can scale that further,
+more tenants great stuff. And if you have a read heavy
+workload, this is great. If you're using Aurora, you can have up to 15 read replicas in there. And some of those could
+even be serverless. So they don't all, they
+can scale down to zero and be more efficient
+in matching your load. And this approach can take us a long way. I mean, if we look at what we've done and how far we've gone, well we've scaled up our central instance, we've made our queries more efficient, solved our connection management problem and scaled out with read replicas. And this is a lot of work. We can see this is a lot
+of complexity to add. Now if we compare this to
+using DynamoDB for example, well Dynamo is gonna be
+handling our scaling for us, it's gonna be doing our
+connection management for us, it's going to be doing our table
+partitioning automatically, we just have to make efficient queries. And I mean that's the easy part, isn't it? But then the question becomes, okay, what if we need to go
+further, what can we do more? And to continue that story, I'd like to pass back Ranjith. - Thanks Dave. Alright, so Dave walked us through the different
+scaling options and solutions that you could apply on top of your relational database environment. But there's one thing that
+we haven't covered yet, which is, how do you write
+your write transactions. So this is where sharding comes in. right? So sharding, it's a way you basically, partition your data across
+the different shards. So in this case, the different shards would be represented by
+an Amazon Aurora cluster. And the way you would implement sharding is by identifying a
+column within the tables that you want to shard. In this case, let's take the
+example of a tenant table that you see on the top
+left or top right, top left. And tenant ID would be the shard key. Because tenant ID is the column that gives you the maximum cardinality in this particular case. So what you would do
+is take that short key, in this case tenant ID, pass
+it through a hash function, and then what you would get is like, a map of hashes, right? So you would map the hashes
+to specific partitions or specific partition IDs. And then the partitions are basically placed into the different shards. And again, the shards are
+Amazon Aurora clusters. Now this is sort of a representation of how that might look like. So you have gone through
+that exercise of partitioning and then you have the partitions, spread across the different shards. Now you now have your shards, you have your partitions. But again, the challenge is, this is going back to the fundamentals. One of the slides that I
+was talking about earlier, like when you have different partitions or when you have different
+deployment models, it's after the application to route the request to the right place. So in this case, let's
+say the tenant request is coming in to the application, the application uses a tenant context. So let's say in this case the tenant ID, that's part of the
+request that's coming in. And then first it'll have
+to retrieve the partition ID and using the partition
+ID, it'll get the shard ID. And then it'll have to make
+the request to the right shard. But you can see how this is getting really challenging. So the whole process, it's
+getting a little bit complicated. The first challenges with querying where your application
+now has to figure out where a particular piece of data resides and then it has to send the request to that particular piece of data. And if there is a scenario
+where you have to go to multiple shards, now your application has to aggregate all those results and join it and send
+it back to the client. So I mean, this is something
+that you would rather have a relation database do that for you instead of you having
+to do that by yourself. And then from a consistency standpoint, like when you have like
+a sharded environment, that's a manually sharded databases, there's no consistency guarantee. There's no asset compliance
+or asset transactions in that particular model. And then even from an operations and a maintenance standpoint, like things like performing upgrades, backups, I mean backups, especially when you don't
+have consistency guarantees, that's gonna be hard. Debugging and applying optimizations, like all that gets really challenging. So to overcome all those challenges, so this is where we have
+the limitless database and specifically for the
+Postgres database engine where you don't have to manage, or create all these different shards, all you have to do is
+like hit a single endpoint or a single interface and
+limitless database for Postgres, it'll do the horizontal scaling for you. So it's a managed service
+that does it for you. And limitless database, it
+can scale to like millions of write transactions per second, it can store petabytes of data and you're able to, like,
+from an operation standpoint, you can, you know, it's pretty seamless. You can ensure transactional consistency with a limitless database. And then, the main takeaway is that, you don't have to manage or deal with the complexity
+of doing this by yourself or doing sharding by yourself. So limitless database
+handles that for you. So some of the key concepts
+within a limited database, Aurora limitless database is
+this notion for shard group, which is this collection
+of routers and shards. And a router is basically Aurora
+node or an Aurora instance that receives or intercepts
+the incoming requests coming from the different clients in this case it would
+be the different tenants and their users in a
+multi-tenant SaaS environment, so it receives a request. And router has the metadata
+for all the data access shard so it knows where to route the request to. So that's what the router does, right? And a shard is where your data resides or a slice of your data resides. So if we look at an example, so this is sort of a
+simplistic representation of an e-commerce
+storefront SaaS application where you have a notion of a tenant and then there is an order table and then there is a table that
+stores all the tax details for the city, state, country, almost like a lookup table. And if you look at the
+tenant and the audit tables, we have, I mean we have
+violated tenant ID there. Because between the sharding
+solution that we did manually and the managed sharding
+solution with limitless database, there's one thing that's still common. It's the notion of a shard key, you still have to identify a column, and make that as a shard
+key for limitless database. And using that shard key
+is how limitless database does its partitioning. So if we expand on that
+particular example, so the order table in
+this particular case, you want the data for the order table to be partitioned across
+the different shards. So when you create that shard key or identify that tenant
+idea as a shard key like limitless database
+would place the data or a slice of a data across the
+three different shards here. And the same thing with the tenant table, because tenant table has,
+obviously has a tenant ID. And again, you want
+this to be partitioned. So limitless database
+would place the partitions in the different shards. And you can see that we are calling that a collocated table. So collocated table is two sharded tables that share the same shard. And the beauty of this is, all the data for the same shard key value would be sent to the same shard, which means in a multi-tenant environment, you can see how this is useful. So you get that isolation
+and the segregation of data that you're looking for. And from a performance
+standpoint, this works great. Because data that are related
+for a particular tenant, it's on the same shard. And overall like you don't have
+to do this all by yourself, limitless database does it for you. And finally, the tax rate. So we call this a reference
+table within limitless database. Since this is a lookup table, limitless database, it
+just creates a full copy of the reference table across
+all the different shards. And this is to help with performance and yeah, mainly performance. Now that was the
+conceptual side of things, like how do you actually do it is by setting a session variable with a create table mode as sharded. And then like I said, you
+would identify a column called the shard key, in this
+case it would be tenant ID. So when you create the tenant table, you would specify the shard key. And then for the collocated order table, so you will do the same
+thing, but you'll say that, "Hey, we wanna collocate
+this with the tenant table "so that data for both the tables "will be collocated together
+within the same shard." And then finally we
+have the tax_rate table, which is a lookup table
+or a reference table. So you would set a
+session variable called, create table modecular reference and create the tax_rate table. So if you're looking to do sharding, and if you have a Postgres environment, so definitely consider
+Aurora limitless database for that instead of
+going through the hassle of manually doing sharding by yourself. Alright, so you wanna go now? - Brilliant, brilliant. So we can see a lot of these things have just come out in the
+last year or year and a half. So things like limitless
+database or data API really useful things for creating scalable multi-tenant storage architectures. And whilst we're creating
+our architecture, we also have to think
+about things like backups. Backup is a pretty standard requirement of any storage architecture and luckily for us it's a solved problem. Most storage engines are
+going to have native tools that will let us do backup and
+restore at an efficient way. But the challenge for
+us in a SaaS environment is that they're doing back
+up backups at the disc layer. Now that's nice and efficient, generally it doesn't have any
+sort of performance impact when you do a backup, but it means if we have a
+shared deployment model, like a bridge or a pool deployment, well we are going to back
+up all of our tenants at the same time. And this means when we
+restore that backup, we're restoring all of our
+tenants at the same time as well. Now, if that's what we're
+trying to do, that's okay, but what happens if we want
+to restore a single tenant? Well now we need to introduce a mechanism to separate that tenant data
+out of that shared backup. And the challenge there
+is that our native tools may not work along the same lines as our tenant partitioning. So if we are doing a schema per tenant or database per tenant
+within a bridge model, okay, that may work with
+things like PG dump. But what happens if we
+have a shared table? Well, we can't tell them just, "Hey, extract that based on
+tenant ID, it's not gonna work." So we may have to create
+a solution ourselves. And this is going to bring complexity into our backup and restore processes. And when we introduce that complexity, we have the choice of introducing it during backup or introducing
+it during restore. And generally what we see is people introducing that during restore. And the reason is simple, we can keep that simple backup process, we can use those native backup tools, we can use things like AWS
+backup to manage it at scale. It makes our backup process nice and easy and we only introduce that complexity during the restore process. And we generally do a lot more
+backups than we do restores. And if we see how we would do this, well in silo, there's no change. We can just use those tools
+to back up and restore. But in the bridge model where
+we have a schema per tenant or a database per tenant,
+when we take our backup, all of those tenants are
+being backed up at once. So when we want to
+restore from that backup, we restore to a temporary database or temporary storage engine, and that's going to be the
+same size as all those tenants. So that could be quite a
+large temporary database that we need to restore. That could be costly to do. And then we need to
+separate that tenant data out from that restore database. So because this is a database per tenant or schema per tenant, we
+can use some native tools, increase some efficiency there and use those same tools to import that back
+into our live data set. But when we look at the pool model, it gets a bit more complex because now when we do our restore, we have to effectively
+scan all the tables, do a full scan of all those items and see what belongs to that tenant. And if you have a large pool database that can take a long time. I've even seen it take days to scan that and now you've extracted that data, you need to import it back
+into your live data set and that could have a performance impact. You're using up your rights
+on that storage engine. You may even have to
+delete some existing data before you put that in. And you need to think about the impact that that's going to have
+on the other tenants. So you may need to throttle
+your restore process, there are compromises that
+you need to make there. But in general, it's
+the preferred approach for most of the customers that I've seen because they can continue
+doing the backup processes that they already had and they just introduced their
+complexity during restore. But there are some reasons why you may want to do
+separation at backup as well. So if we look at silo, nothing's changing. Simplicity at the cost of efficiency, but inside the bridge model, now we can use those same mechanisms for separation that we had before, but we're doing it
+during the backup phase. Now, the challenge here is that before when we were
+using the native tools, we were doing it in the physical layer. So we weren't having a performance impact. You look at things like Dynamo or Aurora, there's no performance impact to your production database there. But now we have to consume
+rights, oh, sorry, reads. We have to consume reads
+from our storage engine, this is going to have
+a performance impact. But now we get a backup per tenant. And this is great because
+when we do a restore, the restore databases is right sized, it's just the size of what
+we are trying to restore. And of course we can
+go and import that back into that live data set. And the main benefit of
+doing separation at backup is that every tenant is going
+to get their own backup. And this can be really useful
+if you've got compliance or regulations to deal with. Or maybe you've got writes
+to be forgotten laws because now you can have your tenant data as one logical unit. Even within your backups to work with in an operational way. And think about things like off-boarding. If a tenant leaves your platform, you want to delete all of their
+data, including in backups. I mean, imagine if you've
+got retention policies of seven years for compliance and a tenant leaves and
+you've got shared backups, are you really gonna go
+through all those backups and purge them out of that shared backup? Probably not. You're just gonna end
+up paying for their data even though they're
+not paying you anymore. So the ability to purge
+a single tenant's data can be really useful. But we can see separation
+of backup and restore both have their pros and cons and deciding which one that you want to do really depends on what your
+business requirements are. So you need to look at that
+before making a decision. And another thing we need
+to think about is fairness. And fairness just means
+that as a paying customer, I get what I paid for. So if that's the free tier,
+well maybe you have best effort, but if I'm actually giving you money, I expect to get the performance
+that I'm paying for. And that's pretty fair to me, right? But on the other side, it's also fair that as a SaaS provider, I'm able to protect my
+storage infrastructure. It's fair that a single tenant can't make life bad for other tenants, we don't want noisy neighbors. So we need to think about mechanisms to implement this fairness. And this can be quite a
+complex rabbit hole to go down. There are lots of ways of doing fairness and we're not going to dive
+into a lot of them today because it's never ending. But a good place to start is rate limiting upstream in the application because you can set a limit
+on the number of requests that come into your application and consequently, that's
+a limit on the number of requests coming into your storage. And a nice simple way of
+doing this is with API gateway up in front with usage plans. So you say this is the total
+number of requests per second or concurrent requests, and you get some nice
+way of rate limiting, which lets you stretch off
+storage architecture further. And another mechanism in fairness
+is going to be migration. So moving a tenant from one
+storage instance to another, and you may be doing this
+because they're a noisy neighbor or they've become a VIP customer, they've grown so large that you put them on their own database. Or you've been able to upsell them from a basic tier to a premium tier so they get their own storage. So rate limiting upstream
+and migration are two tools that will commonly come
+into your fairness patterns fairly early on. And I know we've covered a lot of things and you're really keen just
+to get back out of this room, back into your hotels and start designing your next storage architecture. But before you go and start
+implementing anything, I want you to think about
+creating the data model for your architecture. Now, this isn't anything
+that's unique to SaaS. Data model design is well documented, have a look at the DynamoDB pages, they have some great guidance there. But think about mapping up those entities that exist within your data model, the relationships that they have and the access patterns that they have. Because when you create a good data model, it's going to be performing and efficient and also extendable later on
+for future access patterns as they arise. And there are some things
+that we want to think about from a SaaS perspective
+when designing a data model. And the first one is
+that we are storing items that belong to tenants. So we need to associate tenant ID with every one of those items because we need a way to
+tell us who owns that item. Because we're going to use that data for things like tenant isolation
+or backups or migration. So that needs to be owned by the tenant and in a way that those
+mechanisms can use. We want to aim for efficiency. SaaS is going to scale your efficiency. So make sure efficiency
+is key to your mind when you're creating this data model. So things like collocating data together on the same set of storage instances or the same set of discs is going to help you be more efficient. And another thing is that
+when we talk about storage and bottlenecks, it's
+generally the compute, which is the bottleneck. I don't often see someone saying, "Hey, I can't scale my storage instance "because I don't have any
+more disc space to give." It's generally the compute. And storage space is cheaper than compute. So we can think about our
+common access patterns and duplicating some of our data and things like secondary indexes or views so that we can serve those
+access patterns more efficiently. This is going to take
+the compute requirements, off of your compute. It's gonna make those
+queries more efficient. So we can stretch our
+storage architecture further and tenants are getting better query per tenant query performance. I mean, that's a double
+win. It's really nice. And at the same time that we're
+looking at our data model, this is the time when you
+want to be thinking about how you'd set upstream
+limits in your application. I mean, this isn't part of
+your data model design per se, but when we talk to the service teams, this is the message that
+we constantly hear saying, "When you talk to your customers, "tell them to think about "how you would set those upstream limits." Because once your storage is down because you haven't got
+those limits, it's too late and your customers are impacted. And we've covered a lot of content today. We've really skimmed over a lot of things and a lot of things that we
+haven't been able to cover. There's a lot more content out there, so satisfactory team is creating stuff. We've got internal teams creating stuff. There's a data for SaaS
+patterns repository on the AWS samples, GitHub. So if you're interested in
+diving into more of those, there's examples there,
+best practices there. We've created a data for
+SaaS YouTube video series. So you can go follow the link there and see that and explore some
+of these concepts further. Even better because it's a GitHub repo, you can create an issue. Tell us what you'd like to see. This is us creating content for you. So give us that feedback. Tell us the patterns that you wanna see, the challenges that you have. And that's bringing us towards
+the end of the session. And if we think about the takeaways that I'd like you to
+have from this session, well, remember that
+SaaS is going to scale, it's gonna scale your wastage, it's gonna scale your efficiency. And that efficiency
+could be the difference between you turning a profit or not. So efficiency has to be
+a first class citizen when we talk about storage architectures, especially once you're
+in that growth phase. Remember the three
+horsemen of scaling, right? We've got vertical scaling,
+connection management, horizontal scaling. Use them as far as you can before you implement that
+next scaling approach because things like sharding can be a one way door decision. Once you've implemented sharding, it's a big change on your architecture, very hard to get back. So try and stretch your
+storage as far as you can. Collocate that tenant
+data with a tenant ID, make sure that item is
+owned by that tenant. You shouldn't have permission to get that, it's their data associated with tenant ID. Collocate it together for
+operational reasons as well. Make your life easier
+by having tenant data as a logical unit that you can work with even in your backups. And think about fairness,
+rate limit upstream, implement some migration processes. These are things that
+you are going to need as you build up and scale
+your storage architecture. Now, if you're here at
+this time on a Monday, I'm sure you're tired, but you must be really loving your SaaS. And we've got a lot of SaaS sessions here at re:Invent this week. So recommend going out and seeing, looking into some of those. If you're into tenant isolation, if you have challenges there, we've got a good session
+tomorrow with SaaS 312. So come along to that chalk talk, look at some patterns there. We've got lots of workshops going on. So if you wanna get into
+some implementation, get your hands dirty, do some code, go out and talk to the supporters there. They're people that are working
+with SaaS day in, day out with lots of customers. Bring your problems, talk to
+them, really great opportunity. We have some builder sessions. First time in re:Invent
+for builder sessions. So go out and see what they're all about. Enjoy yourself there. We have a survey. I'm sure you know all
+about the surveys by now, but this is really important. One, it's important for us to
+know if we did well or not, but more importantly, this is the chance for you to give us feedback about what you'd like to
+see in terms of content. What do you wanna see
+us producing next year? What do you wanna see
+in re:Invent next year? So use that mechanism.
+Give us that feedback. What are your problems? How can we help you
+scale your SaaS further? I hope this has been a
+good learning experience, a good session for you today. On behalf of Ranjith and I,
+we would like to thank you for sharing your time with us today and we hope you have a great
+re:Invent going forward. Thanks a lot.
+- Thanks very much. (audience applauding)

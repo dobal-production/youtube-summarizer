@@ -1,0 +1,561 @@
+- All right, hello everyone. Can you give me a thumbs
+up if you can hear me in the headphones? All right, thumbs up. Awesome. Well, happy day one of re:Invent and welcome to this
+session, Kubernetes 205, where we will introduce a new
+feature for EKS. (laughing) Yeah, you need to put the
+headphones on to hear me. So we will introduce a new EKS feature called EKS Hybrid Nodes that makes it possible for
+you to use your on-premises and edge infrastructure as
+capacity in EKS clusters that really, essentially, you
+can bring the power of EKS to your on-premises deployments. My name is Chris Splinter, and I am a product manager on
+the Kubernetes Team at AWS. I focus on building the EKS products that extend EKS beyond AWS environments and to your on-premises data
+center and edge facilities. We also have Jonathan Ogden
+from Northwestern Mutual with us today who will come up in a bit and talk about his team's
+experience with Hybrid Nodes in the months leading up to our launch. So, quick run-through of the agenda here. First, we'll review the challenges that we hear from customers who are running Kubernetes on-premises and how these customer
+conversations have really influenced our product strategy and
+roadmap on the EKS team. Then we will dive into
+the EKS product portfolio for on-premises and edge use cases and really the different
+things that led us to build Hybrid Nodes. And then most of this
+time that I'll be up here, I'll be talking about Hybrid Nodes, diving deep into the
+architecture, how it works, and how you can apply it to your own use cases
+in your own environment. And then I'll pass it off to Jon who will cover his team's
+experience with Hybrid Nodes and some of the things that
+they did testing in the months leading up to our launch. And we do have Q&A on this agenda. It is a silent session, so
+we will not do live Q&A, but we'll be available afterwards if you have questions or comments for us. So, before we really
+jump in, I do wanna say that like the thing
+that I really love most about being a product
+manager on the EKS team is that I get to talk to all of
+you almost on a daily basis about the things that you're building, what's hard, what's
+working, what's not working, what could be made a little bit easier if we built a fix or a feature into EKS. And every one of these
+conversations plants a seed that can grow into new ideas,
+new products, new features, and new fixes in the
+products that we build. And one thing that has
+become abundantly clear to the AWS Kubernetes team and to me in particular,
+is that a whole lot of you that are running EKS in the
+cloud also have applications that are running on-premises. And we also learned that a lot
+of you are using Kubernetes many times in the first place because you do have to run applications across different environments. In Kubernetes, the core APIs
+and the declarative operations remain consistent
+wherever you need to run. So with this said, we've
+definitely heard challenges from you and from customers about running Kubernetes on-premises and the things that make that challenging. And many of these challenges
+become increasingly painful as application portfolios grow and there is more and more
+to maintain and manage, which, really, is the result
+of what we're all trying to do, which is deliver more value
+faster to our end customers. And so in our conversations
+with all of you, for example, we've heard when running
+Kubernetes on-premises, there's a lot of operational overhead in managing those Kubernetes clusters and managing patching, keeping those control planes up to date. If you've run Kubernetes
+on-premises before, you've probably dealt with
+cluster certificate expiration or DHCP lease expiration that can just send your
+cluster into a frenzy. All of that stuff does not
+directly impact the value that we can give to our customers and it really equals
+just operational overhead and inefficiencies for our teams. Another challenge that we
+hear quite often is, like, limited experience with
+managing Kubernetes. And I'm sure we would all love to just magically have more expertise and knowledge in the systems that we use to build our products, but the reality is that
+technology moves really fast. Like as soon as you adopt something, there's something new out
+there that you want to use. And unfortunately, a lot
+of the on-premises systems that have been around for many years tend to lag behind some of the new stuff that we build in the cloud. And if you've run Kubernetes on-premises, you know, like, it is not
+for the faint of heart. And the last challenge
+I wanna touch on here is technology sprawl. If you have applications running
+in different environments, you know that the tools and
+the systems that you use to run things in the
+cloud are not the same as the tools and systems that you use to run things on-premises. And so this equates to
+different processes, different skills,
+different knowledge bases depending on where those
+applications are running, and all of that adds up to silos. And silos are not efficient
+and they do not scale. And so these are just some of the things that I think about all the time as I define and shift our product
+strategy on the EKS front. So you might be thinking like, "What is this guy from AWS doing, talking about my deployments
+that don't run in AWS?" And to put it simply, we
+listen to our customers and as I said, like,
+we've certainly learned that a lot of customers that
+are using EKS in the cloud also have applications
+that they're running in their own on-premises environments. And across the board
+on the Kubernetes team, our goal is to make managing Kubernetes and operating Kubernetes an
+afterthought for customers, no matter where your
+applications need to run, and that wherever your applications need to run is important. We know that customers have
+applications all over the place, in AWS on-premises in other
+clouds, and they run there because you need to deliver
+low latency response times to your end customers. Or maybe you have strict or sticky data dependencies on-premises that are preventing you from
+moving things to other places. And sometimes you might be just dealing with regulatory mandates that say you have to run your
+applications in a location that you have full control over. And so to meet the
+needs of these customers that have these types of applications, our EKS solutions need to
+run in all of the places that your applications run. And so that brings us to the
+EKS portfolio for on-premises and edge use cases. Our journey in this space
+started with EKS on Outpost back in 2019. And if you don't know, Outpost
+is AWS-managed infrastructure that you can run in your data
+center or colo facilities. One of the really great
+things about Outpost is the consistency that you get with how you run applications
+in an AWS region. For example, you can use EC2 for compute, VPC for networking,
+EBS and S3 for storage, and yes, EKS for your
+containerized workloads. We've learned that customers
+really like the experience that they get with EKS on Outpost because it is consistent with
+how they use EKS in the cloud. And so we've seen customers
+adopt EKS on Outpost for a number of use cases. A few of them are
+highlighted on this slide. Use cases like just general
+enterprise modernization or local data processing,
+so banking applications or real money gaming
+applications to name a few. However, through EKS on Outpost, we learned that there
+is a customer segment and a type of customer with
+a certain type of workload that we really weren't
+addressing with EKS on Outpost. And this type of customer had applications that were running in disconnected or intermittent connectivity environments where they had very strict
+networking requirements, such that they can't
+connect to external entities outside their data center or outside of their edge locations. And this led us to build EKS Anywhere, which we launched in
+2021, or EKSA for short. EKSA is AWS-managed or AWS-supported Kubernetes
+management software that runs on infrastructure
+that you manage. And EKSA simplifies the
+infrastructure provisioning and lifecycle management
+of Kubernetes clusters on your own hardware. And customers told us
+that they really like that they now can use this
+AWS-supported Kubernetes offering on their own infrastructure, so on their own vSphere
+or Bare Metal or Nutanix, but they also told us, you know, "It's great, it's a
+software solution though and I still have to manage it." And so we have seen adoption
+of EKS Anywhere for use cases that have to run in air-gapped
+or disconnected environments. So, some examples of those
+are like Telco use cases that are running on Bare
+Metal at the far edge or financial services use cases that have very strict
+networking requirements for their on-premises networking. And through this though, we realized that there's
+still a customer segment and a type of customer
+that we're not addressing with these two offerings of EKS on Outpost and EKS Anywhere. And the customer segment that we were still not addressing
+are customers that want to and can connect their
+on-premises environments to AWS to take advantage of
+cloud managed services and to bring their on-premises
+estate more in line with how they do things in the cloud. And all of that is what
+led us to the feature that we launched yesterday
+called EKS Hybrid Nodes. With EKS Hybrid Nodes, you can
+use your existing on-premises and edge infrastructure
+as nodes in EKS clusters, and this enables you to unify
+how you manage Kubernetes across both your cloud and
+your on-premises environment. And Hybrid Nodes can be
+used with any physical or virtual machines that you manage and you can use the same
+AWS-managed EKS clusters, features, and tools that you use to run
+your workloads in the cloud. To put it simply, no more
+managing Kubernetes control planes for your on-premises environments, you can leave that to us
+with EKS Hybrid Nodes. Hybrid Nodes can also be used with other EKS features like EKS add-ons, EKS Pod Identity cluster access entries, as well as extended
+Kubernetes version support. It's also integrated with
+other AWS services like SSM and IAM Roles Anywhere for
+temporary IAM credentials, and also Amazon Managed
+Prometheus and CloudWatch for centralized monitoring and logging. So to bring it back to the EKS on-premises and edge portfolio, Hybrid Nodes is a fit for customers who can and want to connect
+their on-premises environments to the cloud, and also for customers that can't refresh their
+on-premises hardware and move to Outpost, they need to continue
+using the infrastructure that they're using today. So we've seen interest in Hybrid Nodes across industry verticals and
+for a number of use cases. And a lot of this came in
+in the months leading up to our launch during our preview period. To touch on a few of these use cases here. The first one is enterprise modernization. So customers that are either running on virtual machines on-premises today or are self-managing
+another Kubernetes solution, these customers have told us, "Listen, we don't wanna manage
+Kubernetes control planes, we just wanna connect this stuff to an EKS cluster and be done with it." And so we've seen a lot of
+interest in those customers that are looking to expand and standardize how they
+run Kubernetes on-premises. We've also seen a lot of
+interest from customers that have machine learning use cases. These customers tell us that
+they wanna leverage the GPUs that they've already bought and that they're hosting in
+their on-premises environments, and they wanna run those
+GPUs in the same cluster that they use for their workloads that are running in the cloud. Some of these customers just don't wanna run their proprietary AI outside of their data center and some of them just
+can't get enough GPUs no matter where they are. And so we've seen interest in Hybrid Nodes from these customers
+because it enables them to literally run their jobs on-premises and their jobs in the cloud
+with the same EKS cluster. And the last one I'll touch on here is what I consider to be
+distributed edge use cases. And so, on this slide we have media streaming and manufacturing. The benefit of Hybrid Nodes for these customers is really the scale. So, these customers have
+deployments that are running usually all over the place, geographically separated locations, and traditionally, they would have to run a separate Kubernetes cluster across each one of these sites. With Hybrid Nodes, you can
+either run a single cluster with nodes on each site or you can rely on the scale of Amazon EKS to handle all of the different deployments that you have on-premises. So, leading up to launch,
+Darktrace was one of the customers that participated in our preview. And if you don't know, Darktrace is a global
+leader in cybersecurity AI, helping to keep organizations ahead of the changing threat
+landscape every day. Darktrace uses Kubernetes on-premises to provide a common deployment platform and assisting with things
+like common observability, application scaling, and disaster recovery across their application portfolio. Instead of creating a cross-site self-managed
+Kubernetes cluster with homegrown tooling, Darktrace decided to use Hybrid Nodes, and Hybrid Nodes enabled them to unify how they were managing Kubernetes across their different
+sites and across the cloud and on-premises environments, which, for them, drove higher
+availability, scalability, and efficiency for their teams. We also had several software
+and hardware partners validate their technologies
+with Hybrid Nodes leading up to launch. One thing to note is
+that EKS and Hybrid Nodes are 100% upstream Kubernetes conformant. And so you still have access
+to all of the innovation that's going on in and around
+the Kubernetes community when you use Hybrid Nodes. And if there are any
+partners in this audience, which I do see some,
+sending a personal thank you for participating in this launch and I really cannot wait to
+see all the awesome stuff that customers build
+with our joint solutions. All right, so now
+digging a little bit more into the technical side
+of this new feature. Starting off with the architecture, I've covered the EKS control plane runs in the AWS region, and this is quite literally
+the same control plane that you're used to to run
+your workloads in the cloud. With Hybrid Nodes, only the worker nodes
+are running on-premises, and, with this feature, we're using a bring-your-own
+infrastructure approach. So we are not reaching out and calling any infrastructure
+APIs in your environment. You can continue using the
+existing tools and systems that you're using today
+to provision those VMs or Bare Metal servers
+that you use as capacity with Hybrid Nodes. The network connection
+from that EKS cluster to your Hybrid Nodes goes
+through the VPC that you pass during EKS cluster creation. So it's reusing the existing
+networking mechanism that is in EKS today. And, really, the core
+requirement here is that that connection between your VPC that you pass to the EKS cluster and your on-premises environment
+is a private connection, and most of the customers that participated in our preview period were using AWS Direct
+Connect, AWS Site-to-Site VPN, or their own VPN solution
+for that connection. For authentication of those worker nodes with the EKS cluster, we are using temporary IAM
+credentials that are provisioned by SSM hybrid activations
+or IAM Roles Anywhere. And so the tool that we built, that I'll go into more detail about, integrates with those systems to be able to centralize
+your identity management and your authentication in
+your EKS clusters, all on IAM. All right, now moving to the
+shared responsibility model, to put this simply, we manage
+the stuff in the cloud, you manage the stuff on-premises. We do support the components
+that are installed with the Hybrid Node CLI,
+which is called nodeadm. Those components include Containerd, the kubelet, SSM, IAM Roles Anywhere, as well as the Kubernetes add-ons that are compatible with
+Hybrid Nodes at launch. That includes kube-proxy, coreDNS, the CNI, either Calico or Cilium, the AWS Distro for OpenTelemetry add-on, the CloudWatch Observability add-on, and also the EKS Pod Identity add-on. And so the important thing here is that you are still responsible
+for that on-premises infra. So the hardware, the
+virtualization networking storage, as well as that operating
+system provisioning, that is your responsibility. You can continue using your tool of choice for that management, And we manage or we support
+the things above that stack that run in your environment, and then we manage the things that run in the region
+like the EKS control plane, the observability and identity services, as well as some of the
+other auxiliary services like Amazon ECR for
+your container registry. Okay, to summarize the, kind
+of, the core prerequisites that you need to have in place
+in order to use Hybrid Nodes, on the network connectivity side, it's that private
+connectivity from your VPC to your on-premises environment. At the infrastructure layer, you bring your own infrastructure, you can use your Bare Metal servers, your VMware virtual machines, your Nutanix infrastructure,
+we don't care. You can also use x86 or ARM architectures with Hybrid Nodes at launch here. At the operating system, these three operating systems that are listed here are
+compatible with Hybrid Nodes and validated by AWS for
+that compatibility at launch. Ubuntu, Red Hat Enterprise Linux, as well as Amazon Linux 2023. Amazon Linux 2023 can only be used in virtualized environments on-premises. And for credentials for
+authenticating that kubelet that runs on Hybrid Nodes
+with your EKS cluster, we're using temporary IAM credentials and we require either using Systems
+Manager Hybrid Activations or IAM Roles Anywhere
+for those credentials. All right, so now diving deeper
+into what this looks like in the EKS create cluster experience and also into how the networking
+works at a deeper level. So when you go into create a cluster, this is what you would usually see, except for that purple box at the bottom, there is a new section in the console, and this corresponds to new API fields, for configuring your remote
+networks for Hybrid Nodes. And when you enable this
+toggle in the console, you're presented with
+these two new fields, this Remote Node Networks
+and this Remote Pod Networks. These are used to route traffic
+from the EKS control plane that runs in an AWS service
+account to the VPC that you pass during cluster creation. The node network is used
+for Kubernetes operations like kubectl logs,
+kubectl exec port-forward, and the pod network here is
+optional but recommended. It's optional because
+it's really only needed if you're running webhooks
+on your Hybrid Nodes and the Kubernetes control plane
+needs to reach out directly to those webhooks that are
+running on your Hybrid Nodes. So, if you aren't running webhooks, you don't have to enable this, but generally we recommend that because a whole lot of
+Kubernetes add-ons use webhooks. All right, so now I'm gonna go into, like, the end-to-end flow here of
+how that networking works from that Kubernetes control plane down to Hybrid Nodes and back up. Just covered that. The first thing here, this number one, the remote network config and
+the remote pod network config, those are configured when
+you create your EKS cluster. Those facilitate the communication
+from the control plane into your VPC that you pass
+during cluster creation. The next thing that needs
+to be in place here is this VPC routing table. You need to configure
+that remote node network and that remote pod network
+with a path to the gateway that you're using to exit that VPC. Usually this will be a transit gateway or a virtual private gateway but there are some other
+ways to do it as well. The important thing is
+that these two routes need to be in that routing table. So once we get to the point where that traffic is exiting your VPC, now we're in your on-premises environment and the next step there is
+your on-premises routing table needs to be configured with
+that same remote node network and optionally that remote pod network so that when that traffic gets to your on-premises environment, it knows where to go in terms of sending that
+traffic to your Hybrid Nodes. And then the last piece that
+matters here is the CNI. And this is a bit nuanced so I'm just going to
+touch on it briefly here. The pod CIDR that you
+can configure in your CNI if you're using an overlay network should correspond to
+the remote pod network that you configured on your cluster, it should be the same thing. There are additional configurations that you can use at that CNI layer, like natting the outgoing pod traffic when it leaves your on-premises host, in that case the pod
+CIDR isn't as important because your router is
+gonna route to the nodes and then your CNI is
+gonna take care of sending that traffic onto the pods. But for that I'll leave
+it to the documentation instead of going into a
+deep dive on that here. One additional thing that I wanna add is just the network access on both sides need to be in place, so
+your firewall needs to allow that bi-directional communication
+with the EKS control plane as well as the security
+group here that you add that gets attached to
+the ENIs that EKS uses for that communication with your VPC. That security group needs
+to enable that ingress and outgoing traffic for
+the remote pod network as well as the remote node network. All right, so now talking
+a little bit about like, okay, well, what are the
+minimum networking requirements? And I gotta say right off the bat that it depends, All right? You should test with your own environments and your own applications. We did a substantial amount of
+testing leading up to launch, and aside from that private connectivity that we've already touched on here, we recommend reliable connectivity, at least 100 megabits
+per second of bandwidth, and then generally, like,
+the lower latency you have between that control plane
+and your Hybrid Nodes, the better experience
+that you're gonna have, and we recommend no greater
+than 200 milliseconds of roundtrip latency
+between your control plane and your Hybrid Nodes. It depends. It depends on a lot of things. It depends on the number
+of nodes that you have. It depends on how big your
+application images are. It depends on your
+application dependencies. Are you accessing AWS services? If so, how much data are you sending? It depends on the elasticity
+of your workloads. Are you spinning pods
+up, spinning them down? Are you spinning nodes
+up, spinning 'em down? And it also depends on what
+you're using for monitoring. How much data are you sending
+from your Hybrid Nodes to potentially Amazon Managed Prometheus or CloudWatch in the region. All of these things come
+into play when it comes to what are the minimum
+networking requirements, so we recommend testing. The figures on this slide should be used as a starting point. All right, so, with networking covered, now the next big piece here
+of the user experience is the Hybrid Nodes command-line interface. And I talked about how
+Hybrid Nodes embodies like a bring-your-own
+infrastructure approach, where it's your
+responsibility to configure and manage that infrastructure
+and operating system that you're using with Hybrid Nodes. Nodeadm is the piece that runs on top of your operating system, and it really simplifies
+the lifecycle management of Hybrid Nodes. And the inspiration for nodeadm actually comes from the EKS AMIs that you might be using
+for your worker nodes that are running in the cloud. In the AL2023 EKS AMIs,
+there's also a nodeadm. And so what we did is we took that tool and we adapted it to work
+with other infrastructure and other operating systems, and we also integrated it with SSM as well as IAM Roles Anywhere so that you can now use this same tool in your on-premises
+environments for Hybrid Nodes. What we recommend is that you
+take this tool and run init's, the nodeadm install process during your operating
+system build pipelines to pull down all the
+dependencies that are required to transform a host into a Hybrid Node. And then you can either
+configure nodeadm init to run as a systemd service or you can use your choice of tooling to kick off nodeadm init when your operating system boots up. And this enables you to really
+automate that end-to-end flow of bootstrapping Hybrid
+Nodes to EKS clusters. Most people when they're
+first trying this out, yes, you can use this as
+just a regular old CLI, but again, we recommend that
+you automate this process of bootstrapping Hybrid Nodes by baking this stuff into your golden operating system images. What I'm showing here, this is an example of what that nodeadm
+init command looks like. Before you run this command, you should run the install command which pulls down all of the dependencies. Nodeadm init is what is going
+to start up those dependencies and is what's going to grab
+those temporary IAM credentials and connect to the EKS
+cluster that you configured. On the left-hand portion
+of the slide here, this is the SSM hybrid activation example. You pass in your cluster
+name, you pass in your region, and then you pass your activation
+code and activation ID. These two values here are what you get when you create a SSM hybrid activation. Basically, SSM uses these
+things to exchange as a token and get back temporary IAM credentials, and then SSM will manage the rotation of those credentials on disc. On the right-hand side of this slide here, this is the IAM Roles Anywhere example, again, cluster name, cluster region, and then there's a few
+more values here, all based on how the temporary credential
+provisioning process works in IAM Roles Anywhere. IAM Roles Anywhere is using a
+certificate-based mechanism, exchanging your certificate
+for temporary IAM credentials. And so generally speaking, like, if you don't use
+certificates for machine identity or authentication in your
+on-premises environments, SSM can be a little bit
+easier to get started with, but if you are using certificates, you can continue using those as well for your Hybrid Nodes authentication. All right, so after you
+connect your Hybrid Nodes to your EKS cluster, this is what they're gonna
+look like in the console or if you ran like kubectl get nodes, this is what you'll see. One thing I wanna call out
+here is, like, this node name. This is automatically provisioned by SSM when you bootstrap a node with the hybrid activation
+that you've configured for SSM. This node name is not configurable today. If you're using SSM, let
+me know if you need that to be configurable in the
+future and we can talk. But in this one at the bottom here is an IAM Roles Anywhere provision node. When you use IAM Roles Anywhere you can configure that node name. That node name does have to correspond with an attribute that's
+in the certificate that you're using to exchange for those temporary IAM credentials. One new thing that we added
+was this compute type column to the console. I also wanna call out
+that when you use nodeadm, it's automatically applying
+a label to your Hybrid Nodes and you can use that compute
+type equals hybrid label for workload placement. So if there's things that you only wanna run on Hybrid Nodes, you can use that label outta the box to make sure that stuff
+only runs on Hybrid Nodes instead of cloud nodes that you might have in
+the same EKS cluster. This slide is basically to show, like, you can also see the resources that are on your Hybrid
+Nodes in the EKS console. If I were to scroll down on
+this page in the console, you could see pods, labels, all kinds of details about that node. You can also, if you're using SSM, view your nodes in Fleet Manager, and you can do some of the
+SSM built-in operations with the Hybrid Nodes if you're
+using SSM hybrid activations for your credential provider. All right, so now to
+run through the features that are available at launch, this is scope to what
+we launched yesterday. Currently Hybrid Nodes is
+available in all AWS regions except for GovCloud in China regions, and it's currently available
+for new EKS clusters only. We are working on enabling Hybrid Nodes for existing EKS clusters,
+but that is not ready today. Hopefully that'll be ready
+shortly in Q1 of next year. You can also use the same
+EKS Kubernetes versions for both standard and extended support. Standard support for Kubernetes
+versions in EKS is 14 months and then extended support
+ads on another 12 months to that 14 months for a given
+Kubernetes minor version. The same interfaces that you're used to for managing EKS clusters
+are also available for managing Hybrid
+Nodes-enabled EKS clusters. You can use the console, CLI, eksctl, the APIs, Cloudformation, Terraform, it's all available today. You can use EKS cluster access
+entries with Hybrid Nodes. One thing I didn't touch on here is that there's a new access
+entry type called Hybrid Linux that you can use for the
+Hybrid Nodes IAM role that you use to authenticate
+your Hybrid Nodes with EKS clusters. For the EKS clusters that you
+create, you have to use API or API in config map as
+the authentication mode for your EKS cluster. The last one on the slide here, you can run mixed-mode EKS clusters. So you can have a single EKS
+cluster with some nodes in EC2 and some Hybrid Nodes running in your own on-premises environment. We also announced a feature
+called EKS Auto Mode yesterday and you can also have a single EKS cluster that's using EKS Auto Mode as well as Hybrid Nodes
+in the same cluster. We are supporting IPv4
+only at launch here. And as I mentioned, we're supporting Cilium and
+Calico for pod networking. The VPC CNI isn't available but you can get support from AWS for those two community-based
+CNIs when using Hybrid Nodes. The core networking Hybrid Nodes or core networking add-ons are
+available for Hybrid Nodes, so coreDNS as well as kube-proxy. You can also use Pod Identities and IAM roles for service accounts. And then all of the stuff
+that you might be using as EKS add-ons for
+observability is also supported with EKS Hybrid Nodes, so Amazon Managed Prometheus,
+agentless metrics, the ADOT agent, as well
+as the CloudWatch agent for your Hybrid Node monitoring and also the control plane logging for the EKS cluster control plane. And lastly, you can also use
+GuardDuty EKS Protection, which looks at the audit
+logs of the EKS cluster and analyzes them for vulnerabilities. I'm gonna quickly touch on
+a few best practices here. I'm touching on these so that
+hopefully something goes off in your head at one point like, "Aren't I supposed to do this?" There's a ton of detail about this stuff in our documentation, so I
+recommend checking that out to see how to actually
+put these into practice. And the first one as I touched on was automate your node bootstrap. Don't run the nodeadm as a CLI if you're gonna go to
+production with this. Build your golden images with
+the dependencies included and configure nodeadm to connect to your EKS
+cluster at host startup. Second one, lower latency,
+better experience. Use the AWS region that's closest to your
+on-premises environment when you're using Hybrid Nodes. And by "use the AWS region," I mean create your
+cluster in the AWS region that's closest to your
+on-prem environment. Work with your networking
+and security teams. 90% Of issues that we saw
+during our preview period were something to do with
+a firewall or networking or something along that traffic path. So, if you're gonna deploy this, like, go ping the the man or woman
+who owns your networking stuff and form a good relationship with them because it really is a
+key piece to success. The other piece here on the VPC side, one thing that's personally tripped me up when I've been using this is my security group for my EKS cluster. Make sure that your VPC has the roots for your remote node network
+and your remote pod network and make sure that that security group for your EKS cluster allows that ingoing and outgoing traffic
+from your Hybrid Nodes. Last one here, I touched on that label that we're applying by
+default to Hybrid Nodes, compute type hybrid, use that for workload placement. Be intentional where you
+want your workloads to run. This will involve headaches down the line when a pod moves from one node to another and you realize that not only did it move from one node to another, but it moved from your
+data center to the cloud, like that'd just be... Could be a mess. All right, so the other one here is leverage AWS integrations. A lot of the reason why we're going through
+a lot of validation of all of these different add-ons is because we wanna take
+that off of your plate. We want you to use the things that we have a very big test
+matrix going internally for, and we want to support
+you with the integrations with AWS services. And
+this is really the best way to bring your on-prem estate more in line with how you're doing things in the cloud. This one here refers to the EKS clusters
+Kubernetes API endpoint. We recommend using public
+or private endpoint access. We do not recommend using public and private endpoint access. The reason for that is since
+your Hybrid Nodes are running outside of your VPC, when
+that endpoint gets resolved, the Kubernetes API endpoint, it's going to resolve to the public IPs, and that can result in
+surprising behavior. So if you want private connectivity, just use private, don't use both. This one refers to, specifically, if you're running mixed mode clusters. So if you have some nodes running
+in EC2, some Hybrid Nodes, make sure you have at
+least one coreDNS replica in each one of those places. This is for resolving those requests, but then also in the case of
+an outage, you wanna continue to be able to contact those
+services within your cluster. This one here is poorly
+written on the slide, but use zonal labels. So let's say you have two data centers. If you have nodes in one data center and nodes in another, label those nodes with the Kubernetes topology zone label because Kubernetes uses
+that zonal information when it's evaluating node reachability during network disconnects, where if it sees that, let's say all nodes in
+a zone are unreachable, the Kubernetes control plane is gonna say, "All right, don't evict any of these pods. Just let things be. Something's clearly
+messed up at that zone." So use those zone labels when you configure your Hybrid Nodes. And the last one here is generally we recommend
+doing rolling upgrades, so provisioning new Hybrid Nodes on the new Kubernetes version and then taking down the Hybrid Node on the existing Kubernetes version. This generally is a safer technique, but we also do support
+in-place upgrades with nodeadm. And then the last one here that I kind of coupled into this is make sure to delete your unused nodes. We are metering these. There is a cost to use Hybrid Nodes and so make sure that you delete them if you're not using them so that you don't get surprised
+by charges on your bill. And with that, I will pass it off to Jon to talk about Northwestern Mutual. - Awesome. Thank you Chris. Everybody hear me? Awesome. So I'm Jon Ogden, senior director of engineering
+at Northwestern Mutual. I have accountability over
+all of our cloud platforms, and those include all container
+and Kubernetes systems. Let's see. But before I get started, I need to talk a little bit
+about Northwestern Mutual. For those of you who don't know, Northwestern Mutual is a
+financial services company. Our sole focus is to free
+Americans from financial anxiety. A fun fact, in the mid-1850s
+when our company was founded, Wisconsin was the northwest
+of the United States. That's how we got our name. We're not a publicly traded company. We're nearly 5 million of our policy owners
+are our shared holders. And so every single dollar
+of profit we generate goes back to our customers, ultimately to make them
+more financially secure. So if you're interested in any of our risk and
+wealth management products, please check out northwesternmutual.com or reach out to one of our
+local financial advisors and they can help you get started. But we're not here to talk
+about financial services, we're here to talk about
+our Kubernetes journey. So we started about nine years ago doing Kubernetes the hard way. We started with Kubernetes
+0.9 deployed on EC2 Instances. And this all started as a microservice hub to integrate our data in
+our on-premise data centers with a startup company called LearnVest that we had purchased at the time. It worked for a while, but like all successful
+greenfield projects, they eventually turn into
+an enterprise platform. So in 2018, we launched our
+official cloud platform. Every area of the business was able to start to
+modernize their applications, move them out to the cloud. At that point, by 2021, we had
+thousands of microservices, micro applications
+running almost every area of the business. We also had lots of other
+teams around the company running their own Kubernetes clusters, and a lot of those other teams also found how difficult it
+was to maintain stability, deal with security and
+compliance regulations. And so eventually we
+consolidated them all down to a single container platform team. And we also migrated everything to EKS 'cause we also didn't want to maintain and operate all those control planes. A year later, we found the need to have an
+on-premise Kubernetes solution. We had so much success
+with our cloud-based one, we wanted to start wrapping
+some of our legacy data center, data assets like the mainframe
+in a microservices shell. But that was done a little bit different, done with a different team, different tooling, different ways. So for the last two years, we've really started to
+try to optimize, scale, and consolidate our on-premise experience with our cloud experience. And that's where EKS
+Hybrid Nodes comes in. Our cloud platform has
+these six strategic themes, we call 'em the six S's. So stability, security, standardization, simplification, spend, and what I think is the most
+important is our staffing. And we'll see as we talk about how EKS hybrid
+fits into every single one of these strategic themes that we have. So what's our current state
+of our on-premise data center? So we have the luxury of
+having two data centers in the same Milwaukee metro area, which offers us ultra-low
+latency networking between the two data centers,
+and that's allowed us to run in a spanned network
+configuration for quite some time. We also use a lot of metro clustering for our storage and compute platforms. So really our two data centers
+appear to be one data center and that's really what was configured to be more for high availability, not necessarily DR and recovery. We also use Kubernetes
+to manage Kubernetes. So we have a Kubernetes management plane and each one of our clusters is spanned between those two data centers. And as everybody knows with etcd and trying to maintain quorum, you can't divide odd numbers by two. One of those data
+centers is gonna lose out in the event of an issue. So we have problems like I just mentioned. What happens if we lose any
+one of our two data centers? Your control plane goes
+into read-only mode, your workloads still keep running but you can't make any changes. Maybe an app team needs to fix something, they weren't really ready to go. So we have to restore etcd
+quorum and the control plane in the event of a full data center outage. What if we lose our primary data center? We also lose our management plane, then we have to restore
+the management plane, get that back in sync before we can recover the control planes and the worker nodes. Towards the end of last year,
+the company decided to sell and exit our primary data center facility, and we decided to move to a colo facility 6 to 800 miles away
+from where we are today. Also a lot of operational overhead. We also have to patch and
+maintain every cluster as well as our management plane as well. And some of you might be thinking, "Well, it's easy to solve,
+just segment your clusters and run, you know, each
+data center independently." Well, that just doubles everything else you have to patch and maintain. So we needed some better solutions. We started thinking about, well, I talked about why
+segmenting the current platform is not necessarily the best
+option, but it's out there. We also retire our on-premise platform, just push everything into the cloud. AWS would love that. But we have a lot of data
+gravity and latency issues that require us to keep
+some of our workloads really tightly coupled
+to those data centers. We could replace it with EKS Anywhere, we're not currently using that. It's a perfectly fine product, but it also would require us to continue to patch and
+maintain that control plane. And like all great engineering teams, I wanna start building something custom. And this is actually where I met Chris about a year and a half ago. I reached out to my AWS account team and I said, "What would happen if I started pixie booting
+Linux boxes on Bare Metal with a kubelet and IAM Anywhere, could I make this work?" And so Chris got on a call with me and he goes, "You could
+technically do that but I wouldn't recommend it and it's definitely not supported, and it's probably not gonna work very well for you in production." And so I don't really wanna
+run platforms that are not... Production platforms that are
+not supported by the vendor. So last year at KubeCon in Chicago, I sat down with Chris
+and one of his engineers. We kind of started walking through a list of potential requirements.
+You know, what kind of CNI? How is your network set up? What OS's do you use? And they said they're
+working on something. They can't make any promises but they're working on something. So that got me thinking, if they could solve it with
+something like Hybrid Nodes, what would that look like? And so we have our EKS control plane, which runs out in the region. We've been running EKS control planes for four or five years now. We've been running Kubernetes
+for nine years out in AWS. This is easy. We've got
+that provisioning down. But now we could start to attach
+our on-premise nodes to it. And as we think about
+that new colo facility we have to move to, we can also segment our
+hardware into an A and B lane, so we get high availability
+within inside the colo and we use our current
+secondary data center as just a DR failover. So we think this is the best option. Control plane resiliency
+is offloaded to AWS. A lot of the option maintenance
+burden is offloaded to AWS for the control plane. We can use our primary data center as HA. As Chris was talking about earlier, depending on your node labels and your Taints and Tolerations, you can really use... That secondary data center
+can be live, ready to go. You just change a couple
+parameters in your control plane and everything would get rescheduled. We have a goal of recovery
+time objective of under an hour to make sure everything
+shifts between data centers. This also allows for a
+transitional architecture pattern. So as our on-prem applications
+are continuing to monetize and try to move to the
+cloud, this would allow them to exist in a Kubernetes cloud native way, accessing on-premise resources and AWS resources at the same time until they're fully cut
+off from on-prem resources and can be moved to the cloud. So I think I sent Chris an
+email probably once a month, once every two months. Is it ready yet? Is it ready yet? When can I get this thing? When can I get my hands on it? And about four months ago
+or so, he finally said, "Well, we have something,
+let's give it a try." So based on the requirements, this is what we used
+for our implementation. So we already had AWS Direct Connect that's been running for years, that's been working out great, kinda makes all of our VPCs
+and our on-premise data centers seem like they're on the same network. For our current use case, we used virtual machines, we use VMware. It was just easiest to get started. We already have all that
+automation figured out, but we are really interested in checking out Bare Metal
+servers in the future. We use Red Hat Enterprise Linux as our standard OS in our data center. And because we weren't really
+using IAM Roles Anywhere, based on their recommendation,
+we started off with SSM, was the best option there. So I wanna cover a couple learnings as we kind of went through this process within those first couple
+of days or couple of weeks. Like Chris said, bring
+your networking team and your security team
+along for this journey. We had all the requirements from his team, Chris's team, EKS team. We tried to set up all the routes, all the firewall rules, get
+all the right CIDRs set up, but we still ran into problems. You still need to make those tweaks, still need to try to
+figure those things out. And having them right there by your side makes this whole process
+go a lot smoother. The other thing I would
+recommend is really understand how the components of your cluster and your applications communicate. Understand that flow of data. We ran into several issues that are probably now in the documentation but weren't at the time we started, things like making sure your
+CNI gets configured for both, we use Cilium, but make sure it's
+configured for both networks. We threw in a third data center as our DR site failover as well. Ensure critical components like coreDNS are spanned between those. Chris touched on that. We also ran into some
+problems with webhooks and that pod CIDR range being routable, so we just moved the webhooks
+to AWS just to make it easier. We had a few other things. So we do have a security requirement that all node-to-node communication
+be encrypted in transit within our networks. Now, this is taken care of in AWS on EC2 because of the Nitro platform,
+but we need to solve that, so we used a feature
+of Cilium called IPsec, but you could use something
+like WireGuard as well to set up that encryption
+between your nodes. We also ran into a lot of
+issues trying to get IAM roles for service accounts, IRSA,
+to work in our workloads that were deployed to the Hybrid Nodes. And it turns out you should
+not have both endpoints, the public and the private turned on for your EKS API server. So working with Chris's team, we quickly realized that mistake,
+turned it to only private. So let's take our new design for a test. So primary reason, one of the biggest problems we had is we couldn't lose a data center, wanted to make sure our
+RTOs were gonna be good. So let's block network, shut down nodes, let's pretend that primary
+data center disappeared. We then went into the control plane, changed a few tolerations, uncordoned or made the DR site node schedulable. Everything moved just like you
+would expect in Kubernetes. Hit the load balancer, validate,
+everything still works. We got this down to about 20 minutes, but we think we can go a lot
+faster with pre-cached images and some more automation. We'll continue to work on
+that now that it's a GA. Let's see if we can really break this now. So let's see if we can cut
+off the EKS control plane. Maybe there's an internet
+issue, a networking issue. AWS regions never have
+issues, right, Chris? And this worked flawlessly. No disruption to our workloads at all as long as they were completely
+contained on-premise. We had zero downtime. Now remember that because
+you can't control... The kubelets can't talk
+to the control plane, you're now in a static state. You're not gonna have change, you're not gonna scale, you're
+not gonna do those things. But hopefully this doesn't
+last for very long. Just for fun, we left it
+this way for five days. Started this on a Monday,
+we reverted it on a Friday. Everything synced, backed
+up, everything kept working. We also wanted to test the use case of what if we just change where a pod runs? You know, we have that
+idea that we wanna use this as a platform to modernize
+our applications. This worked seamlessly. You know, go in, change your node selector
+on your deployment. It'll move according to
+whatever your pod disruption and rollout strategies are. But there's a lot of caveats there. It really depends on, you
+know, how DNS and ingress and some of the things for
+your apps are figured out. What are some of those
+backend dependencies you need? But for very simple workloads,
+it worked flawlessly. So, Russ, my lead architect on
+my platform, found it awesome that a lot less customization
+was needed to configure this. We've been provisioning ECAs
+clusters for many years, like I said, and this was really just
+adding a few more parameters to that provisioning process
+for the different CIDR ranges, and then a little bit of configuration on the startup of the nodes. So it was really easy to fit into our current provisioning process. Anthony, my lead platform
+engineer, found it super easy to integrate and leverage
+on-premise workloads, on-premise compute for hybrid workloads using things like SSM and IAM to do that. And that's again, one of the
+things we really wanna bank on for our app modernization journey. So I wanna go back to those six S's that I talked about earlier. What do we see as the benefits here? So it increases our stability and resiliency of our
+on-premise platforms. It helps us maintain consistent
+security configuration and platform guardrails that we have had for the last nine years in
+our cloud-based platform. It also allows for a common set of tooling and a common developer
+experience, helps simplify that. No longer do you have to remember, oh, am I deploying it here? I need to use this tool or have
+this pipeline look this way. Maybe a different set of monitoring tools. It's all gonna be the same now. Helps with simplification by enabling applications to modernize, eliminates duplicate platforms,
+eliminates complexity. Also helps us control spend, because it is a
+consumption-based platform now, you're only paying for the nodes that you use at the time you use them. You're not necessarily paying
+licenses for other products or things like that that
+you might have to do, whatever your peak usage is for the year. It's also allows you to fully utilize your
+on-premise compute investments for running workloads, not for running tools or control planes. And what I think is the most important is it allows more staff, more engineers to gain experience working
+in a more cloud native way. So Amazon EKS Hybrid Nodes will support our data
+center migration efforts in this upcoming year. And we hope to be fully rolled
+out to production by Q3. Thanks everybody for
+listening to my story. Chris? (audience applauding) - All right, well, we'll wrap it up here. I hope everybody enjoyed the session. There are a ton of EKS sessions this week. A few related ones are on this slide here. Check 'em out if you're interested. And you can also continue
+learning about EKS and EKS Hybrid Nodes with some of our assets that are online. We published a whole bunch of stuff about Hybrid Nodes yesterday, and so I recommend checking
+out the documentation and some of the other
+things that we published. Thank you so much.

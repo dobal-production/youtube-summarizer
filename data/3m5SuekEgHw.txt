@@ -1,0 +1,444 @@
+- Good evening, everybody. I hope you're all enjoying re:Invent and you can hear me alright. Awesome. Thank you for joining
+us for this session today. My name is Urvashi Chowdhary. I'm a senior manager for
+product management at AWS, and I have the pleasure of being joined by Dr. Sirawit Sopchoke
+from Gosoft Thailand, and Dr. Charles Laughlin,
+a senior specialist account solutions architect at AWS. Before we get started, I
+would love to understand who we have in the audience today. Please raise your hand
+if you've been building machine learning models
+for a year or more. Couple of folks. Please raise your hand if you consider yourself to be early in your machine learning
+journey and have ideas that you wanna apply with ML. Lots of folks. And, please raise your
+hand if you're a data, technology or business leader looking to roll out machine learning initiatives across your company. Awesome. Well, thank you so
+much for joining us today. I'm pretty sure you'll
+all find the session extremely exciting. Let's dive in. So today we'll talk about three things. First, we'll talk about how you can
+accelerate machine learning without writing a single line of code using Amazon SageMaker Canvas. Then Charles will give us a demo of how SageMaker Canvas works, focusing on a specific
+machine learning problem type for forecasting. And finally, we'll hear from Dr. Sirawit on how Gosoft improved item accuracy, item forecast accuracy using our services and realized tangible business benefits. At AWS, machine learning and
+innovation is part of our DNA and our mission is to
+democratize machine learning for everyone. To realize this mission, we build Amazon SageMaker
+that provides the broadest set of tools to build, train, deploy, and manage machine
+learning models at scale. With Amazon SageMaker
+expert data scientists and ML engineers have
+access to the broadest set of machine learning IDE
+tools with SageMaker Studio. You can easily train models
+across distributed compute, leveraging the latest hardware from AWS as well as distributed training libraries to build machine learning models as well as foundation models. You can streamline your
+end-to-end ML ops processes and apply ML governance and responsible AI, as
+well as harness the power of human feedback and democratize
+machine learning for all. That's where we'll spend most of the time. As our customers standardized
+their data scientists and machine learning experts on SageMaker, we heard a common set of
+challenges across the board. First, they had a lot of ideas and opportunities to innovate
+with machine learning. However, they were limited
+by availability of experts and they found bottlenecks
+in getting access to these experts. As a result, a lot of projects remained
+on the backlog, waiting to be prioritized or
+waiting for data science and experts availability
+for weeks, months, and sometimes years. Our customers wanted to enable broader audiences
+across the organization to be able to accelerate
+innovation with machine learning. They wanted domain and data experts to be able
+to apply machine learning and take their ideas into production. However, these larger,
+broader audiences struggled with the technical, coding
+and ML knowledge needed. The need to know Python,
+machine learning algorithms and frameworks created technical barriers that were hard to overcome. And lastly, organizations
+wanted to make sure that regardless of how
+these models were built and who these models were built by, they followed the same ML
+ops processes, workflows, and governance, and none of the existing tools really enabled this sort of collaboration. To solve these challenges, we built Amazon SageMaker
+Canvas from the ground up. It's a visual no-code interface where you can do end-to-end
+machine learning without writing a single line of code. With SageMaker Canvas, you
+have access to ready-to-use machine learning models,
+including foundation models, so you don't need any ML knowledge to build high quality ML models. SageMaker Canvas offers
+end-to-end machine learning model building from data
+preparation to model training to model deployment without
+the need to write any code. And the best part is all
+of the work that you do with SageMaker Canvas can easily
+be exported as Python code and Jupyter Notebooks. So you can share these with
+experts such as data scientists and ML engineers so they can
+easily review the work, iterate with you on it, and also
+implement this in the same way as they do with other models
+in their ML ops pipelines, without the need for any rework. Our customers are using models built with Amazon SageMaker
+Canvas across a variety of domains and use cases. They're using their fine tuned
+models with generative AI to do technical documentation Q&A, build diagnostic guides. Using their tabular and time series data,
+structured data, typically, they're building churn prediction models, predictive maintenance, sales forecasting, and then with their unstructured data, they're building computer vision and LLP models to detect defects, to do sentiment analysis
+and entity extraction. In our own teams, we're using
+SageMaker Canvas to predict customer revenue in the
+coming quarters as well as get deeper insights into
+customers such as churn and customer segmentation. Now let's see how SageMaker
+Canvas enables faster iteration across the end-to-end ML lifecycle. All machine learning
+typically starts with data and SageMaker Canvas allows you to connect to 50 plus data sources
+across AWS data sources, such as Amazon S3,
+Redshift, Athena, as well as third-party data
+sources such as Snowflake, Salesforce, and Databricks. You can visualize your end-to-end
+machine learning pipeline using the visual interface and automate this so it can
+scale to petabytes of data. Under the hood, we leverage distributed EMR serverless clusters so your data prep can scale
+from small data sets all the way up to petabytes without
+writing any additional code. Typically before machine
+learning can be done, you need to understand your data,
+analyze it, and prepare it before you have a training-ready data set. This means exploring your
+data generating insights and SageMaker Canvas provides,
+with a click of a button, a detailed data insights
+and quality report. This report helps you understand what the data actually looks like, what the anomalies are, outliers are, and also detailed specific attributes that might impact model
+quality downstream, things like target leakage
+and class imbalance. It also gives you recommendations on how you could transform your data to remove some of those issues. All of this without writing any code. Typically this process can
+take data scientists hours to days, and even our
+expert data scientists love the data quality
+insights that get generated. SageMaker Canvas also offers
+built-in visualizations so you can understand deeper
+relationships in your data. Insights such as correlation
+matrices, feature importance, as well as 300 plus
+built-in transformations so you can easily prepare your data. These data transformations
+can be as simple as manipulating your rows and columns such as dropping columns, imputing missing values, or more ML focused transforms,
+such as one hot encoding or balancing dataset and so on. We made it further simple
+to prepare your data by enabling support for
+natural language instructions. Now simply by typing and giving instructions on
+what data prep you would like to do, for example, dropping columns, Canvas will generate the
+code behind the scenes that you can edit or add it as a step in
+your data prep pipeline. Similarly, you can describe
+the type of visualization and insight you want to gain. In this case, a scatter plot, and canvas will generate the code and also enable you to
+download these visualizations. Now, some of this code might look simple, but for a lot of our audience members and a lot of our customers who don't have the technical expertise, writing simple Python
+can also be challenging. So this is a great way for them to be able to do custom data transformations and visualizations without
+the need to learn code or technical concepts. Now once we have a
+training-ready data set, the next step is to build an ML model, and SageMaker Canvas enables you to build high quality ML models
+for forecasting, regression binary and multi-class
+classification, image and text analysis, as well as
+fine tuning foundation models. I earlier mentioned that
+you don't need ML expertise and the reason is we use state
+of the art AutoML techniques that do the heavy lifting for you. When you train a model
+with SageMaker Canvas, behind the scenes, we
+run multiple experiments with different configurations
+that run in parallel to give you the best performing model. You can select techniques, such as hyper parameter optimization where we search the parameter space using different ML techniques
+or ensemble these models where we run many jobs in parallel and combine the results to give you the best performing model. Or if you choose, you can also select
+the specific algorithms that you would like to train with. Similarly, we suggest default
+configurations for your jobs, but you also have the option
+to customize your job runs. So if you wanted to change the data split or the job run times and other parameters,
+you have those controls. Once your training is complete, SageMaker Canvas provides
+detailed model insights into key metrics such as F1 scores, accuracy, feature importance
+that help you dive deep into how the model is actually performing. And we offer a detailed model
+leaderboard that helps you see how the different models
+runs that we have done and the models that have
+been trained on your behalf have performed. Here, you can easily compare how each of these models performs
+across different metrics. And while we recommend
+the best model for you, you can choose to go
+with a different model. For example, in some
+cases you may want models that have lower inference
+latency versus accuracy. So using the leaderboard,
+you can select the best model for your use case. Now we applied the same
+simplicity to enabling you to fine tune foundation models as well. You can pick models from
+Amazon Bedrock as well as SageMaker Jumpstart and fine tune them
+without writing any code and get the detailed model metrics as well as compare the model runs
+across the leaderboard. Let's see this in action. Imagine we're an investment fund and we're building a chat bot that recommends the best fund
+given a customer profile. If we were to choose a
+public model which is trained on public data, the results of the model can be quite generic and not specific to the
+funds that we offer. So to solve this problem, let's fine tune this foundation
+model using our data set. Here, we use a prompt completion
+data set that comprises of historical customer queries as well as the different funds
+that were recommended. This helps the foundation model learn about the relationships between our customer profiles as well as the funds that we offer. Now we simply upload the data set and select the models
+that we want to fine tune. Here, I've selected three models. I provide my input output, optionally I can configure
+the training parameters and that's it. I can start my fine tuning job. Now, behind the scenes, we are
+running multiple fine tuning jobs to give you the
+best performing models. Here you can look at the
+detailed model metrics as well as look at the model detailed leaderboard. And now let's compare how the fine tune model is performing compared to the generic model. Here when we compare, we'll
+see that the fine tuned model on the left is much more specific and gives much more detailed results compared to the generic model that we had. So here we fine tuned a model
+without writing any code and all of the model metrics along with detailed model evaluation reports and the artifacts can
+be downloaded as well. Now once we have a high
+quality machine learning model, the next step is typically
+to evaluate the model and generate predictions. Canvas makes it easy by
+offering in-app predictions as well as what if analysis capabilities. So by just changing some
+input parameters, I can see how the model responses
+would be different. This helps with quick
+iteration and evaluation. You can also run batch
+predictions on batches of data and automate those predictions
+to run on certain frequency as well as when data changes. With a click of a button,
+you can deploy these models for real time inference
+on SageMaker Endpoints and also share these predictions
+with Amazon QuickSight and also share the models
+with Amazon QuickSight so you can build predictive
+analytics dashboards. Now, earlier I had talked
+about how collaboration between experts and
+non-experts is critical. All of the work done in Canvas, whether it's data preparation or the models built,
+can easily be exported and deployed into production on SageMaker, which provides the same ML ops and ML governance that experts are using. All of the models can be deployed to the SageMaker model
+registry, which serves as the backbone for ML ops processes. You can think of the
+model registry as a place where models are centrally
+cataloged, approved and used to promote into production. You can also export the
+code in Jupyter Notebooks and share these Jupyter Notebooks
+with your data scientists. They can review these in SageMaker
+Studio, iterate with you, help you improve performance, or take these models into production without rewriting any of the code. So the interoperability and collaboration between data scientists and non-ML experts is really amplified with SageMaker Canvas. I would like to invite
+Charles to give us a demo and talk about forecasting. Go ahead. - Good With us today. You can hear me? Great, yeah, thanks. Thank you for sharing time with us today. We've put a lot of effort
+over a few months into this, so we hope that you learn a lot from it. I know we've worked hard on
+it. I'm Charles Laughlin. I'm an AI specialist here at AWS and I'm pleased to say that
+this is my sixth re:Invent. One of the things, the
+reason I'm here today, I worked on a team this summer. We huddled together with Gosoft and AWS, we experimented, we architected, and then ultimately we
+delivered a production pipeline, which has created value for Gosoft. And during Dr. Sopchoke's section, he will actually quantify that value that's been returned for you. During my session here,
+what I'll be covering is the end-to-end process to build time series forecasting models and I'll share with you the architecture created with Gosoft. For anyone not familiar with the concept of time series forecasting,
+this slide is kind of meant to illustrate the concept. It starts by providing a known truth in a historical known
+period, and the idea is that the model learns patterns
+in the data, it's able to extract that and then save that model. From that saved model, customers
+can produce predictions to help them navigate and
+make planning decisions into an unknown future. Often with retail forecasting, the idea is that retailers want to
+have enough product placed at the right locations in
+order to meet consumer demand. So there is a balance here, a dilemma of having too many or too few. And now I'll walk you through
+a demo here in the Canvas UI. I'm gonna cover this end to end. And while I'm doing this
+inside the Canvas UI Gosoft, like many customers,
+choose to automate this, fully automate it
+without coming to the UI. Both methods are viable and both methods produce the same level of accuracy underneath. I'll start by narrating
+an example data set. It's a tabular data set. It is a synthetic data set
+that will be used for the demo. This is the example of
+looking at the tabular data. There are some features that are optional and there are also some features
+that it will be mandatory, and I'll cover those for you here. Data preparation is one of
+the most important facets. You will need to have a target feature. Here, it's called case quantity. This could be units, it could be dollars, it could be resources,
+pallets, each has cases, but you also need a date period. And here it's weekly data, but this could be from
+minutely to yearly data or any points in between. Next, customers wanna make
+predictions at the item level or something similar. That could often be an item or a sku, a product and a location. Here I'm using warehouse
+and a product category. Just to demonstrate, our
+system supports up to 10 of these dimensions to be able to produce predictions at
+high grain or at a fine grain. Next, you have the ability
+to bring external world data to help your forecast be more accurate. The examples here include
+the temperature, the price of fuel, inflationary data. My suggestion would be
+that you bring any data that you think is
+important to your business that help drive your business up and down. SageMaker will give you feedback. I'll show you that here
+today to let you know if that feature was or is not important to drive your business. There's also the concept
+that you can bring calendar and event data to your business and that can help to anticipate ahead, special events holidays. With Thailand, there's a new year that's celebrated in April. They celebrate that with
+water, so it's no surprise that during that week, bottled water and other water-related products
+sell more during that week. And when it comes to retail
+forecasting, retailers do a lot of different treatments, maybe
+sometimes at the same time that help them drive business
+and drive a consumer purchase. These could be advertising
+spend, they can be the fact that your product is in stock, not in stock, in season, not in season. Or you can put things
+on product promotion, where you discount the price, and all of these things
+can influence the business. So once again, I would suggest to bring anything you think is important. So what if it's not important? I create a feature here called random and I'll show you what
+that would look like. So if there is a feature that's more noise and really not helpful, I'll
+show you what that looks like upcoming in an explainability report. So now that I've covered the data, let's look at creating a model. You simply do that by hovering here. You will click create a model, and then next what you do
+is give it a friendly name. And then as a user, the next thing that you'll do is you're
+gonna pick the target feature. What is the thing that you are predicting? And in this case it's
+gonna be case quantity. The next thing you do is you notice that the UI is prompting
+you to configure the model. So you will need to pick some feature that you're gonna have an
+item to dimension against. In this case, I'm choosing warehouse. We can also get predictions
+at the warehouse and product category grain. Canvas is automatically aware that the data is sampled
+at the weekly grain, so we can request that
+we produce 12 predictions for 12 weeks into the future. Urvashi touched on this, but one of the key features
+of Canvas is its ability to use a mix of both neural
+network models as well as statistical models that have served supply chain for decades. The idea is that each of
+these will produce value, but they will be ensembled
+together in a way that produces a higher level of accuracy than any single model alone. So within a few minutes
+without writing any code, we click a button here to
+start building a model. And again, you can do
+this if you choose to through the UI or through the API. The main idea on this slide is what's happening during training. So the idea is that the ML models are learning patterns in the data. They're learning the
+relationship of demand to itself. They're learning the relationship
+to all those features that you provided, such as
+inventory, retail treatments, the things that I talked about earlier. And the idea is that the
+model learns the relationship between those variables. In this case, if the shelf is
+empty, if the product is out of inventory, then that
+will act as a constraint and limit the number that can be sold. Most retailers prefer
+that not to stock out and instead they prefer to have enough supply to meet the need. That was a conceptual view. This is more of a compute physical view of what's happening during the training. So from the UI or from the
+API, at this point, you ask to train a model. SageMaker will then be aware
+of the size of your data and it will select a cluster that's appropriately
+sized, an EC2 cluster. It will bring your data and start training against that cluster, but it's well known that
+there's not one model that's the best fit for
+universal model and time series. So SageMaker will launch up
+to 20 or more containers. They're all running at the same time. There are different algorithms that are tried, different
+periods of time are sampled and hyper parameter
+optimization also occurs. The goal is here in each of
+these independent containers that are running concurrently, the goal is to have the highest
+level of accuracy available. SageMaker monitors those and when they're all completed, it will run an optimization
+process called ensembling. So the idea here is it's
+gonna create a unique recipe, and this is one of the
+strengths of this product. It creates a unique recipe for every single item in your
+dataset, whether it's one or tens or tens of
+thousands or more items. And it will produce a unique
+weighted ratio for every item. For product one, maybe
+it's 100% a REMA model, a statistical model. For product two, it
+could be a 50-50 split, statistical and neural and so forth. But the idea is that ensemble, this will produce the most
+amount of accuracy per each item. That ensemble model is saved, all the other base candidate
+models are also saved. And then as a customer,
+you have the freedom to make predictions
+from the ensemble model or any of the others. And I'll show you the leaderboard that appears in the canvas UI just ahead. Okay, so imagine an hour or so have lapsed and here we are in the product and this is what it'll look like. First, the top of the page here, you're gonna have global accuracy metrics. There's some common accuracy
+metrics here that express how well that data set trained. It'll give you accuracy on
+percentage as well as unit basis. There are also some other
+artifacts that are produced. And all those artifacts, by
+the way, land on Amazon S3. I'm gonna cover one of those. I'm gonna cover something called
+the explainability report. And the idea with the
+explainability report is this is giving you feedback. If the data that you provided, those optional data features, if they were or were not helpful, and to what degree. In this case, I'll highlight an item
+called the inflation. And so here, imagine that
+you're predicting revenue. This is an effective... It's a positive number. And this tells you that
+as inflation rises, so does the amount of revenue
+that you're predicting. That doesn't mean that
+people are buying more units, but it means for every unit they buy the revenue is increased. When we get to retail treatments, two and five, these could be
+examples of advertising spend that cause revenue to be increased. These are positive numbers, you keep them. Then also concurrently, a lot of concurrent things
+are happening in retail. So you may also have treatments
+named here, one and four. And these treatments could be
+discounts that are applied, buy one, get one specials and they will produce
+a little less revenue. But the good news is they may be producing higher unit demand. And then finally, I warmed you up earlier to the idea of random. So here's a random feature. So the idea here is if you've
+got weights that are zeros or close to zero, I would suggest that you remove this from
+your data, keep your data set as simple as possible,
+as lean as possible, all other things being considered. Okay, so now we've just covered what happens when the
+training is completed. This is an explainability report. What I'll do next is walk you
+through the model leaderboard. Zoom in a little bit here. And in this case what we
+actually see is the results for each of those models. The top line here is our model ensemble and there are accuracy metrics provided. Against any column,
+this one is the leader. It provides a better level of accuracy than other candidates. For example, the average
+weighted quantal loss here, this number of 0.121, that number's lower than any other items. And, that's just an example of the strength of the ensemble. It's stronger than any of the parts that it was made from. I would mention here as a
+customer, you can choose to predict from any of
+these models by the way, the ensemble or any of the other. And then finally here
+in the UI, let's look at how you make predictions. SageMaker Canvas UI gives you the ability to make predictions on a batch basis or on a single item basis. You can also do these in the API form. So here, clicking on the
+single item prediction, the system's aware of your data. So let's pick some
+dimensions to forecast on. For the Atlanta warehouse, let's look at cookware sales in general. And what this will provide, you recall we did a 12-week forecast. So what we'll see here
+is a 12-week of history. This is the actual ground
+truth from the past as well as 12 weeks that lie ahead. I'm gonna zoom in on on one of these and talk about a little bit closer. So this is cookware. If we look at the Thanksgiving
+2024 week, we can see that cookware has a
+little bit higher sales than other weeks adjacent. And there's not just one truth. There are probably forecasts here, and I'll cover these on the next slide. There's a 50% chance that
+81 units would be enough to serve that market. But sometimes 50% means
+there's a coin toss and you may not have enough. So what if you have a 70%
+chance to have enough product? And here that's 110 units. And so here, this is
+really an important thing that most retailers want
+to have generous supply to meet all the demand, especially on products that are not perishable. Okay, just to recap,
+what I've just walked you through is the process to look
+at data, to train a model, to analyze that model and then to produce
+predictions from that model. I would highlight here by
+the way, that the forecast, if if you're using the system, the forecasted points land
+on Amazon S3 in Parquet form or in CSV files. It's very easy to consume that almost wherever you wanna consume and use your predictions. The purpose of this slide is to highlight the actual
+solution that was delivered for Gosoft this summer. This is their training architecture. The process occurs once per month and it starts here on the left. Gosoft will extract their
+historic sales data, some of the features we looked at earlier, and they'll land that
+out of their warehouse. They'll land it onto S3. And they have a lot of data. So one of the things they did is design a clustering technique
+to split all of the items that they have into different clusters based on characteristics of that demand. So the volatility would
+be one feature, the amount of sales would be another
+feature and so forth. But that data also lands on S3. And then once that data's landed, Gosoft already uses AWS Glue. So Glue is actually invoked
+here inside of a step function. The AWS step function is the process that orchestrates all of this. It's a serverless way to manage workflows. So the step functions open
+up that original data, the monolithic data on S3, and then they start to cut
+it into the right shards. The output of that AWS glue job is fed into multiple concurrent SageMaker training jobs here. So all of that information, if you notice this diagram
+here from the earlier slide, that happens in parallel. And what that allows Gosoft
+to do is to divide and conquer and to shrink the amount of
+wall clock time needed to trai.n Each of those training jobs produce artifacts on S3,
+including the models, statistics, there's some back testing results and I'll cover what that means. And, the explainability
+report that we looked at. Here, what I would highlight is their inference architecture. This is not very dissimilar from what we looked at on
+the training architecture. This process runs each week for Gosoft. Once again, you starting here on the left, that ground truth data up
+to the last weekly data, the last day's sales are unloaded to S3. That data, once again is
+orchestrated by the step function. A glue job cuts that monolithic
+data very large into shards. And then what we'd use is
+the SageMaker Inference Jobs. Thhe number of concurrent
+jobs are controlled by the step function
+and that allows Gosoft to make predictions for nearly a quarter billion
+item in store pairs every week within the the required SLA. We use the power here of
+the serverless SageMaker inference jobs to divide and conquer. And what that does is land the results. The predictions are landed on S3 and those become the
+input to the next part where they go into a replenishment cycle. This is my last topic, it's
+a little bit of advanced, so stick with me here. I'll talk about the
+balancing supply dilemma. So first I would highlight
+that there is no forecast that's perfect. So faced with that dilemma of having too many or too few items, retailers err the side of
+having, more than is needed but minimally more. Suppose, for a given item in store pair, you look back over a five-day period. By the way, this is back testing data. I should introduce what that means. So back testing data is
+data that's held out, it's not seen by the training cycle, but it also exists in the past. And so therefore you know that
+actual value from the past and you can align that
+next to the predictions for the future for that uncertain future. I will highlight that this
+is trained in the blind and this is your canary. If this performs well,
+then all other things in the world being the same, this is your example of
+what your future predictions may look like. And the way this works, this
+is automatically handled by SageMaker product. The way this works is if
+your horizon is five days, it will hold back five days. If you have five weeks or five months or whatever your horizon
+is, the same amount of time is used during this canary period. So we have the luxury of looking back at the last five periods and the true value that was needed that customers would
+purchase is 218 units. The p50 value here, and
+that's a 50% probability. In other words, and the total is 189. So what that means, there's a 50% chance that 189 units will be enough. And on the other side of
+that equation, that means that won't be enough and
+there would be an under stock. In fact, if we compare it
+to the ground truth here, we can see this is about 30 units short. So if you were the
+retailer, you would be able to satisfy the first 189 buyers. That's all you had. You would be able to
+make profit 189 times. Alright, so beyond that p50, let's look at some higher quantiles. And the idea here is that this allows you to make an informed bias to
+add extra to the stockouts but also to minimize the over surplus. Here at the p60, that
+means there's a 60% chance that 208 units will be enough, also a 40% chance it'll be short. And that is the truth here. So we are a 10 units short,
+so we're getting closer. You'll satisfy the first 208 buyers. You'll make profit for the 208 times, but you won't have any at surplus. So, and this story
+continues here at the p70 for the very first time you
+can see that our true supply of 228, for the first
+time exceeds the demand. That means you satisfy all your buyers. Nobody had an empty shelf or out of stock, they didn't
+have to find an alternate. That means you earned profit 228 times and often for your companies,
+that can be very important. You're making profit and
+also you have this intangible benefit of satisfying your buyers. And if we would continue
+to go higher, the p80, the p90 at least on this one item, all we're doing is oversupplying. So in short, what I would
+say here for this item, SKU 1 at Location A,
+the right number is p70. And you use this bias in the past, this becomes your algorithmics collection. You can help balance that dilemma of having too many or too few. The ask is here to be
+algorithmically driven, to be data driven. And what you can avoid by doing
+that is avoiding hand edits or judgment forecast and all of those things
+that take a lot of time. And we recognize that customers
+have to do that on thousands of items, millions of items. So this is a way that I would
+tell you that Dr. Sopchoke, when he speaks, he's gonna
+tell you the outcomes that they received today with Gosoft. And this technique here was used by Gosoft and I can tell you that
+was partially responsible for some of the outcomes that
+he'll be sharing with you. So that's all I had. I would like to welcome
+to the stage Dr. Sopchoke. Thank you so much. (audience applauds) - Thank you, Charles. Good afternoon, everyone. Has anyone visit Thailand before? Alright, so if you have a
+chance to visit Thailand before, maybe you are one of our customer. So my name is Sirawit.
+I'm from Gosoft Thailand. I'm honored and excited
+to share with you today on our experience performing
+AI demand forecasting with SageMaker with AutoML. But before we get into that,
+let me share you briefly who we are and what we do. So actually we are from CPALL. CPALL is the little business
+under (indistinct) Group, CP Group. You may recognize 7-Eleven
+logo in the top left, right? Yes we are. We are CPALL and we own
+7-Eleven in Thailand. 7-Eleven license in Thailand. So Gosoft is the IT
+company set up by CPALL. At the IT arm of CPALL, we need to develop and operate our IT company for the group. So at CPALL is not only for
+convenience store, we have from cafe, pharmacy, cash and kelly to wholesale and hypermart. So now let me share
+with you with some stat. In Thailand we operate
+7-Eleven for 15,000 store for across the country. We currently operate the 7-Eleven in the neighbor country
+like Cambodia and Lao. And there are more than
+200,000 SKU for our customer. In Thailand we have 33 million household across the country. So if you look at the stat, we have about 30 million daily customer with 40 million transaction. You can assume that
+every family in Thailand buy something from us every day. And technically this amount
+of workload run on AWS. Throughout the past four year, we go on the AWS from the
+common service like EC2 S3 and RDS to the advanced
+service like Personalize and of course SageMaker. During the COVID pandemic
+we fought to close our store for many day. To survive that pandemic, we initiate 7-Eleven delivery. With the application you
+can order some product from the nearest 7-Eleven to
+your door step in 30 minutes. And from that day 7-Eleven delivery become
+our super application. With that application you
+can have a personalization, digital coupon and promotion and we learn a lot from our customer with analytic throughout
+the loyalty program. Two favorite our store
+operation there is the store operation called demand
+forecasting and replenishment, and 7-Eleven is no exception. For what happened in a nutshell, the certain amount of demand
+is automate generated based on historical stock and then
+store staff need to review and adjust some order
+to order it manually. With this new replacement process, it took about two hour daily, which mean that we have to use about
+8% of over netting hour. So look at this from the country level, it take about 30,000
+man-hour daily, which a lot. So what if we can automate this for them and let our store staff to
+take care of our customer and improve customer satisfaction. In the terms of measurement,
+there are two key KPI for our project, the
+stock day and stock out. Stock day indicate the duration of the particular product
+in the current inventory. High stock day means you are
+wasting eventually spread and your product are likely to be expired before it can be sold out, right? And the second KBI, stock out indicate insufficient
+of particular product in your inventory. So high stock out potential lead to loss of sale opportunity, right? And could also impact our
+customer satisfaction. So in the nutshell, the demand forecasting and replenishment activity and to maximize efficient in
+the store inventory management by reducing this two Key KPI. So our foundation cover. Now let's take a look at
+our problem statement. Even we learned 7-Eleven
+for many year in Thailand, but it's become more complex year by year, especially in the past four year. As the (indistinct) amendment said it, one performed manually and it
+took about two hours, right? And we also suffer from these two KPI. So to add the challenge, we want to simplify the replenishment
+activity, simplify enough that we can do it whenever we want, and of course with the accuracy. So, we create the initiative focusing on automated
+demand forecasting solution and we want it to be able
+to handle our massive data and it had to be cost effective. So that initiative we call AITK. AITK stands for Artificial
+Intelligence: Tanpin Kanri. Tanpin Kanri is Japanese
+food, which is the approach to merchandising founded
+by 7-Eleven in Japan. This Tanpin Kanri consider
+the demand on store by store and item by item instead of item cluster. So the purpose in life
+of AITK is to level AI and machine learning to assist those staff with recommendation to replenishment by maximize the forecasting accuracy and to certify the two KPI, reduce the staff workload,
+reduce stock days and reduce stock out. And we are talking about six terabyte daily. So we need to present the
+data like six terabyte daily. So at the first step data collection we took our historical data and the data related to
+our inventory like on hand or the inventory in particular store. And we also have a lot of promotion at each chain every week, right? And of course product information
+with 2000 hundred SKU. and store logistic, like this store there near the school and this
+store near in gas station, something like that. And after this step we learned AI/ML pipeline on SageMaker came AutoML until we got the output. And we use that output for
+the auto replenishment model for something like we do the replenishment by our visual logic and do the other automatically As Charles mentioned, we level
+it for key advanced service behind this AITK. For the step function, we use that to orchestrate all the flow and we use good job to confirm
+the data where segmentation, charting and constellation are done. We put everything together in S3 and the more important
+one, the key to our success in use case, SageMaker convert AutoML which help us automate
+data people, I think the feature engineering and ultimately the machine
+learning, we help accept a lot of development effort. Okay. So throughout the adaptation
+of SageMaker convert AutoML, We managed to our achieve
+our desired results. The first one, time to replenishment is reduced from 120 minutes
+to one and a half minute, with it 95% with a lot improvement, right? And for the stock day is decreased by 5% Stock out decreased by 40%,
+which is a huge improvement. And so, when we can automate this process, like the daily process,
+we can let our staff to take care of our customer. And that's all from my session This will conclude how
+goes up level at SageMaker in our demand forecasting solution. So I will take back to Urvashi. (audience applauds) - Yes. Thank you Dr. Sirawit For
+joining us all the way from Thailand and sharing
+this amazing success story. I just wanna reemphasize
+Gosoft saw 95% savings in replenishment activity time spent. So from 120 minutes per day that the store associates were spending in forecasting are now down
+to one and a half minutes. That means that all of this time saved can
+go back into improving the customer experience,
+serving customer experience, customers in the stores. That's amazing and we're
+really happy that we were able to partner so closely with
+Gosoft in enabling these results. Before we wrap up, I just wanna close with the three key takeaways
+from our discussion today. We talked about how you can
+accelerate machine learning and take your ideas into
+production without writing a single line of code using SageMaker Canvas. We saw how SageMaker Canvas can help you build high quality ML models without writing any code and without having deep ML experience. Not only can you build
+high quality models, but you can also put them
+into production confidently and automate your training
+and inference pipelines. And lastly, how you can leverage
+tangible business results with the example that we saw from Gosoft. I'm really excited to
+see how you will innovate with SageMaker Canvas and I'd
+love to hear your feedback. Thank you so much for joining us today. We're gonna be available here
+for questions one-on-one. Please don't hesitate to
+reach out to us. Thank you. Have a good rest of the day. (audience applauds)

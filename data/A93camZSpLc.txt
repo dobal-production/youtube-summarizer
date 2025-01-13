@@ -1,0 +1,760 @@
+- And thank you for
+coming out this evening. I know this is a later session. I know probably happy hours are starting, and there's some fun activities
+that you're, you know, coming to spend our time with
+me instead of going to those. Really appreciate your time. This is gonna be SAS305. This is gonna be architectural
+pitfalls that our team, the SaaS Factory, has learned
+over the last 10 plus years of working with SaaS customers. We're gonna focus in on what we've learned
+from these experiences. We're gonna go through some
+different progressions, not just in the pitfalls, 'cause I don't wanna focus on things that people have done wrong. Rather, I wanna focus
+on what we've learned from those pitfalls, and how you as SaaS customers
+can develop your applications with these best practices in mind and try to avoid those same
+pitfalls that we've learned. So my name is Bill Tarr. I'm a principal partner
+solutions architect with a team called the AWS SaaS Factory. Thank you all for coming out. Now, let's start off
+with the promise of SaaS. So if you happen to see this on YouTube, this was a repeat session, we
+did this session last year, but I want to contextualize that this is gonna be
+a little bit different. We've rejiggered this, it's gonna be some slightly
+different pitfalls, but what isn't different
+is the promise of SaaS. Over the last years, we've been trying to really achieve the same types of things with
+SaaS, and those include being, maintaining agility and
+flexibility for our teams. We wanna be able to continue to focus on delivering
+innovation for our customers. We want to continue to put features that delight our customers
+in front of them. We wanna maintain operational
+efficiency while doing so. We don't wanna get bogged down in the details of managing our application to the point where we
+stopped being able to scale. And we're focused on
+operating the solution rather than the innovation. And importantly, this is
+one we've been talking about more and more over the last
+few years, sustainable growth. Initially, when we were
+thinking about SaaS, we were talking about
+it in terms of growth, and that was fine. It's great to grow your solution, but the focus has
+increasingly shifted away from just growing your application, just getting more customers
+to being able to be profitable and being able to have sustainable growth. Understanding the
+underlying cost structure of what we've built, and
+being able to express that to everyone who's investing into our cust, into our company. How do we know that the
+customers that we're attracting are actually profitable? How do we prove that over time, as we continue to grow our software, we'll be able to operate
+it at a profitable margin? Now, what has changed
+this year for this talk are the pitfalls that I want to focus on. So I'm gonna start off thinking about how we build for growth. Now, there are a lot of
+strategies for growth, of course. This is very much along the technical side of how we operate SaaS at scale. But sleeping on identity, this is one since I've
+joined the SaaS Factory team, and I've been with the
+team over five years, we've been talking about identity, but I still run into
+people making the same, having falling into the same pitfalls, not addressing the same issues, and not even getting ahead
+of the identity story by the time their
+customers are asking them for specific features. Insufficient telemetry, this
+is also a very common one. We're often coming into
+this, our SaaS customers, and they're telling us, "Yeah, we have some telemetry,
+we have some observability," but they're not thinking deeply about how that observability
+should be used, the roles who are gonna be consuming it, and what data they need
+to properly do their jobs. Revenue leakage is a term that I was introduced to this year. I don't think it's a new term,
+but specifically for SaaS, the concept that instead
+of simply understanding how we're bringing in money, understanding from a
+very fine-grained detail what potential we have to gain revenue from all the streams that
+we're putting out there. Whether that's usage based, and making sure we're
+collecting that usage based, or whether that's entitlements and make sure that we're measuring
+how much consumption our, you know, our tenants use, and, you know, understanding who we need to renegotiate contracts with them. Then under investing and
+testing, this is a big one. This is one that was spread
+throughout the talk last year. I consolidated this into a single pitfall because I continue to see testing being a challenge for customers in SaaS. So let's jump right
+into the first pitfall, and this one's out of control. And of course, this is a
+reference to the control plane. If you've ever built any SaaS, the control plane is one of the core ways that we operate SaaS at scale. When we come into, when
+I'm talking to customers, I'm still hearing the
+same story from them. We ask them, "You know, do you
+have these different pieces?" when I'm doing discovery. They're doing onboarding, they're somehow getting
+tenants into their system. They might have a FinOps and
+they might have a DevOps story, but when we really start to dig in and ask if they have a control
+plane, they really don't. And they're usually, they're
+pretty upfront about this. Yeah, we don't really think
+we have a control plane because they're not
+operating their solution through a single viewpoint. Rather, these tools are spread across their whole application, and they don't have a way
+to operate their system as a single unit. Now, SaaS requires a
+different set of tools. That includes the control plane, right? Your application plan can
+be any number of things. This is just a simple example of a, very simple SaaS application
+might be running on ECS, might have load balancers in front of it. Regardless of what this looks
+like on the application plane, the control plane is made
+up of a variety of tools that allow you to operate many
+of these application planes. We might have to have an admin experience for this control plane,
+we might have onboarding and how our admins can
+easily onboard customers in a frictionless way. An identity story, of course,
+which we will talk about how that spreads across both the control plane
+and the application plane. Metrics, billing, hopefully
+we're doing billing, hopefully we're getting paid
+for our solution, right? And then how we manage
+the tiers and tenants and the admin users and the tenant users that all make a part of our control plane. This is sort of a single concept, and we've been talking
+about it for a long time. What's different for me this year and probably the thing
+I'm most excited about in terms of progress our team has made is a tool that we're calling
+the SaaS Builder Toolkit. So this is an open-source, free solution that our team has built that builds out a lot of the concepts that I was just talking about
+in terms of the control plane. Of course, everything is still
+about an application, right? At the end of the day, a SaaS
+solution is an application we're putting in front of our customers. But what we've built
+out is working services that demonstrate all of these concepts. So it's written in AWS CDK, so it is opinionated in
+terms of its implementation, but we have services that
+demonstrate onboarding, metrics and analytics,
+billing, tiering management, tenant user management, and all of these different concepts that we consider part
+of the control plane. And it also provides that
+admin user experience. An admin console, a UI, a CLI,
+all of these different tools that enable an admin to use
+and manage the control plane. We've also taken an opinionated approach to how we do deployments. So instead of saying
+a single control plane is responsible for deploying
+into the application plane, a piece of this deployment solution moves into the application plane. And now that allows us to simply
+use a tool like EventBridge to fire events from our control plane into our application plane, where it kicks off the provisioning, and the application
+plane can be independent. This allows a single
+control plane, like SBT, to manage different types of stacks. So you can use our serverless
+reference architecture, our EKS reference architecture, or ECS reference architecture. Regardless of your technology preference, you can use the same SaaS Builder Toolkit to manage all of your application plans. When we've also provided
+some point solutions that demonstrate the
+best practices of SaaS that we see people building over and over. TVM is a token vending machine. Best practices for SQS and S3. Some dashboards that allow
+you to monitor your software. And we continue to add onto this. Importantly, SBT is a pluggable solution, and I'll demonstrate some of the plugins that we've built a little bit later. But we've got plugins for identity, we've got plugins for billing, and we're gonna continue to build that out to allow you to use different
+third-party software to manage aspects of your control plane, and, of course, also
+your application plane. Okay, I'm also gonna throw
+some QR codes up here. Don't. I don't know if you'll have any luck taking pictures of these,
+but this will be online. We do post the video very quickly, and also we post a PDF out there that will have all of
+these links in there. So if you can't get pictures of these, if they're too small,
+don't worry about this. All be online in a couple of days as well. Now, standardization
+that I was talking about, the pluggability of this
+SBT really comes into play, and it's SBT's not the only thing that's doing this innovation by the way. There's a tool called Omnistrate, which is control plane as a service, which I'm also really fond of, which is also following the
+same path of providing plugins that fill in the holes of
+all of the functionality so that you can understand
+what you need to build and what you can simply
+use third-party tools for, and that includes billing. And these single topics often break out into multiple topics. You might have multiple payment providers, you might have to have an integration with AWS Marketplace as well, especially if you're selling
+to enterprise customers. Metrics and analytics, might
+be an observability story, an analytics story, and perhaps
+alerting for our SRE roles. Security will have many
+different implementations, of course, but identity comes into play. Compliance, our security story,
+our authorization stories, all of those come into play,
+as well as our DevOps stories, with our CICD tools and our FinOps tools. All of these might represent individually third-party products
+that can do a better job of doing these very specific tasks than our team might wanna take on. But having SBT and having
+these different examples of how these third-party solutions work allow us to remove some of the undifferentiated heavy lifting of testing out these applications and seeing how they would
+work in a SaaS environment. Now tenant management is one of the topics that we saw on the control plane, and in terms of why I think
+not having a control plane can be a pitfall. I wanted to sort of demonstrate some of the concepts that
+we were thinking about when we were building this
+tenant management inside of SBT and how those play out when they actually come into
+a real SaaS application. Because SaaS applications tend to have a fairly large footprint that covers a lot of different areas, like your CICD tools,
+understanding the versioning, what's been output from CI/CD, our infrastructure is code, where are the outputs of that, you're running Terraform, what are your stacks actually outputting, and where are we managing those states. What's our identity provider? What's our tenant identity provider? What are the analytics
+dashboards that we're providing? What are the URLs we've
+given to our customers? What payment processes do we have? What FinOps tools do we have? And what's a feature
+management tool we use? Are we using LaunchDarkly? What is the status of their, all of their feature
+flags for a given tenant? How do I understand that? And how do I see this if I'm a operator of a SaaS solution through a single viewpoint? And of course, all of those are involved in our onboarding and our
+offboarding story, right? If we onboard a customer and
+we create all of this stuff, I also have to be able to go and offboard all of these tools as well. If I picked a payment processor, I wanna make sure I go and clean up anything that's left out there
+to avoid any extra exposure, and it all connects to everything. And the control plane
+makes this all work, right? So, yes, the tenant is the ultimate entity in the middle of this, and the control plane is what connects all these
+things to our tenant. We do have two more SBT sessions. I don't usually call out
+sessions in the middle of a talk, but we have these tomorrow
+because it's already Wednesday. We're lucky that both of
+these happen to be tomorrow. One of them is Todd
+Golding, it's 12:30 SAS406 and the other is a workshop, SAS304. Because it's Thursday, even
+if you go and wait in line, there's a pretty good
+chance you get into those. So please check those out if you can. And if you're interested in SBT, they're gonna go much deeper than I could in just a few slides. And the second pitfall is
+having an identity crisis. Again, we've been working
+with SaaS providers since I started. We've been working with Cognito,
+OKTA, Auth0, Ping Identity, and we continue to see
+the same sort of problems creep into this. You start off with a very
+simple identity story, and other things start to pop up. What about machine to machine instead of just user authentication? How do we deal with
+different identity policies for our customers? And this identity story
+is a very intricate one. It's actually a series of pitfalls, where if we don't build in the
+right way in the beginning, we'll often find those
+pitfalls hitting us downstream. So where does it start? Let's start off with a
+simple identity story. We might just have a SaaS application, our SaaS admins, our tenant users all logging
+into the same application. You might start off with a database that has your username
+and passwords in it. Hopefully we get away from
+that as quickly as possible and start to use an identity provider. Once we have the identity
+provider in place, our users are logging into it, and it's returning some
+form of identity token, perhaps we create some sort
+of identity mapping tool and say, okay, this tenant is these users, this tenant is the users,
+and we keep that management. And I'm not saying that
+that's the right solution, but maybe this is where we start, and we'll see if some
+of these pieces fall off a little bit later in a few slides. And maybe we provide an
+admin console as well. And we allow our tenant admins
+to log into the same console. So there's already some things in here that might be fine in the early stages, but we might have already
+introduced some technical debt that we're gonna have to clean up. And I'm gonna introduce
+a couple more slides that introduce some new concepts that we might wanna think
+about in the beginning, or if we've already built it this way, we might wanna start thinking about when we need to address these. And one of the first of those is thinking of your identity
+is actually a multi-part story. It isn't really a single application that we're building when we build SaaS. That control plane we were talking about and the application plane are
+really two separate domains from an identity perspective. So we still have our admin console, we still have our SaaS application, but now I want you to think about differentiating these a little bit from an identity perspective. Our tenant user might still be logging into our identity provider. We might still be doing tenant mapping. Maybe that'll go away a little bit later. And now I have a separate
+identity story for my SaaS admins. I wanna keep those as separate as possible because, in fact, we are really building two types of applications. Our application plan is a
+multi-tenant application. Each one of our customers or tenants are using the versions
+of that application. On the other hand, our control
+plane, the tenant is us. We are the only ones
+using that application. And the implications
+for your identity story should be very different for how you manage these two things. Even if you use the same tool, even if you're using
+Cognito for both sides, I want you to keep these very
+distinct, separate user pools, even perhaps separate
+accounts where Cognito exists. Keep those stories distinct, 'cause the last thing on earth
+I want is one of my tenants to accidentally log into my control plane. Keep these stories distinct, and it will also help
+you keep some flexibility in terms of how you build
+these different tools. And of course, your consoles
+should also be distinct. This is an area that's been something of
+a pitfall I've run into, where people think their control plane is something that their tenants access. And while you may have
+different terminology and perhaps maybe you're
+using control plane for multiple things, the tenant experience for how they manage
+their user's experience is really part of that tenant domain, and I want that to be
+part of the identity story that belongs to the application. Now, I kept mentioning
+this tenant mapping tool, let's talk about what it means to not use a tenant mapping tool. So we're gonna get a
+little bit more concrete on our application now. So now we're gonna
+introduce an API gateway and a Lambda Authorizer, and the Lambda Authorizer, if
+you're not familiar with it, it just can take your JOT
+token and map that out. It can say, "Okay, I
+can read this JOT token, I can use it and interpret it." I'm gonna give you a concrete example of what that looks like
+in a couple slides too. So let's introduce Cognito now and we're gonna give you
+some examples with Cognito, even though Cognito is far
+from the only identity provider that we see SaaS providers using. We're gonna create user pools, which are a very convenient way to create isolation inside of Cognito. Each one of the tenants in this example will get a separate user pool. It's not the only way to do multi-tenancy in terms of Cognito, but
+it's a very convenient way and it allows us to keep some flexibility between our tenants identity patterns. Okay, now using these individual pools and having the JOT token
+now have the tenant identity baked into it means that we don't need to
+do tenant mapping anymore. Cognito is actually doing
+our tenant mapping for us. So you can kind of see how
+this looks here, right? These are pools, we'll have
+identity inside of them, and those will be passed to
+us through the JOT token. So now we're really
+using this tenant token as the way to map to the
+identity of each tenant, right? So we understand as their
+JOT token flows through who an individual user belongs to, and that unlocks us to be able to use IAM, to start to use policies to define what those users have access to. So we can use a tool that we call STS to assume roles inside of IAM. And a role might look
+like something like this. Hopefully that's readable. If it's not, that's okay. But I just want you to mostly
+focus on that bottom line. There's a variable in there, just like every other
+variable we use in software. That little squiggly thing there just says we're gonna call us type of tag called a principle tag, and
+it's gonna be called tenant ID. We're gonna replace that
+tag with a concrete value that I'm gonna get into in the next slide. Once we do that, it's gonna return a temporary
+security credential to us, just like the ones that we use when we're logging into the CLI for AWS. You know, it's a secret to,
+a secret key, an access key. We're gonna get that
+exact type of values back, and we can use those to
+restrict tenant access to AWS services like DynamoDB or S3, especially ones with native stories. We can also use this same value
+to create other experiences, but really the native
+experiences using AWS services, particularly in serverless,
+is really valuable. Like this one right here, where you can see there's
+a tenant discriminator in the first column. And if you look back over
+here at this IAM policy, you can see it says DynamoDB leading key. That means the first column
+that we're looking at should tell us which tenant
+has access to that row. This is a very powerful technique that we sometimes call row-level security. And of course, we have a blog that talks about
+implementing the strategies using a type of security
+terminology called ABAC, or attribute-based access control. This is a great blog that
+describes this in great detail and shows how IAM can actually manage these dynamic roles for you without you having to use
+any sort of templates. So now let me get into
+a little bit more detail and a little bit of depth in terms of what the code
+side of this looks like. I'm not gonna get too deep. It's okay if you know, if
+you're not a day-to-day coder, I think this will still
+be pretty understandable as a concept. So let's go a little
+bit deeper into Cognito. We said that each tenant would
+have their own user pool. Inside of each user pool is a tenant user, and that tenant user will have
+custom attributes on there, like a tenant, like their status, like what tier they belong to, maybe even what region they belong to, and we can stuff some of
+these variables into there. Now that's gonna be in
+included in our JOT token the Cognito vents for us. And you can see here a
+very abbreviated version of a JOT token. This isn't a full JOT token, but these custom claims have
+been added to our JOT token. Now in our code, and I'm gonna show you some example code that comes from our serverless
+reference architecture, with a minor exception
+that I'll tell you about when I get there. This is from the tenant_authorizer class, and here, we're gonna
+actually take that JOT token and extract the tenant identity out of it, which is exactly what we showed
+on the last slide, right? Relatively straightforward to do. And now I'm gonna use
+STS to assume the role, just like we talked about. Now this is where I
+said I lied a little bit and that this is actually not entirely from the serverless reference architecture 'cause that doesn't use ABAC, that actually uses custom templates. So I changed the code just a little bit to use the ABAC strategy, and you can see, I'm
+actually passing in a tag. So I'm passing in my tenant variable as a tag into IAM and saying, "Hey, go find that variable and
+replace it with this value." And that goes back to Tenant 1, right? So I'm passing in Tenant
+1, and now I'm gonna, it's gonna pass this back to me. Remember we're in a Lambda
+Authorizer right now, right? So this is passing through my API gateway. I've taken my JOT token, I've
+extracted the tenant identity, and now I've baked some credentials that say, "Here's the security
+key, here's the access key." And that will restrict
+access to any version of the AWS SDK we're using to be able to retrieve things
+from other AWS services. So in a virtual sense, our IAM role has been replaced like this. So Tenant 1 has replaced
+that squiggly variable we saw before. And now, in our terms of
+our data access object, when I go to initialize
+my AWS SDK for DynamoDB, I can just pass that context in. And now any calls to DynamoDB are gonna be scoped by
+those tenant variables, and I'm only gonna be able
+to access the tenant data that I should have access to. Even if of my code, I forget
+the, you know, WHERE clause, DynamoDB doesn't exactly
+have WHERE clauses, but I think you understand
+from a conceptual basis, if I forget to limit these queries, I still only have access
+to my tenants data. So this kind of wraps this up. This is a link to the serverless
+reference architecture. These are the actual file names. So other than the fact that if they weren't using ABAC in there, you can look how they
+used file-based policies to do the same thing. So you can actually see
+two separate methods of doing the same token
+vending machine concept in the same exact files here. Okay, another piece of this concept that I think is important, and I do see a subset of tenants running into this frequently. In terms of how we think about
+policies and permissions, in SaaS, we tend to think of things almost entirely through in
+the terms of tenant identity. So we have our tenant, they
+log into our SaaS application, just like we did on the last slide. We still have Cognito, they
+still have their user pools. But what happens if our
+actual business use case isn't just tenant isolation? What happens if multiple tenants need to share the same data? So imagine, if you will,
+for a business use case, a supply chain. So a couple of us are working
+for different companies, but we're actually working on
+the same supply chain of data that lives in an S3 bucket. And I need to be able to
+access that data at one point. You need to be able to access
+it at a different point, but I need rules in place that say when you can access
+it and when I can access it. So we can actually create, and I'm gonna introduce DynamoDB here for a slightly different purpose. I'm gonna use this to map out
+what are called policy stores. And those policy stores live in a tool that we call
+AWS Verified Permissions, AVP for short. AVP allows us to have policy stores, and the method that I'm using right here is a policy store per tenant. So each tenant has their own
+independent policy store. And within that is gonna be this custom
+language called Cedar, and Cedar is just gonna spell
+out some very simple rules that say, "Hey, for this
+context, this specific tenant, 'cause we're in a tenant context already, is allowed to retrieve a specific document if the principle type matches
+the one that I'm expecting." So this is a very simple example of Cedar, of course, it can be
+much more complicated, but this allows us to create
+different isolation patterns other than pure tenant isolation. I still want my tenant
+isolation to be in place and I still wanna protect
+tenant-specific data, but if we have other types of data that don't meet these neat rules, we can use AVP to spell out rules that actually allow us to map to the data that a tenant might need, even in context where it's not just done by tenant isolation. And of course, we do have
+another blog on there as well. So hopefully you're able
+to capture these QR codes. I guess we're gonna find out, right? Federated identity is another one. I won't be able to get into too much depth in terms of how federated identity works, but it is a concept you're
+gonna have to get into at some point if you're gonna
+sell to enterprise customers. At a very high level, all this is, again, we've got our
+simple SaaS application, multiple tenants, we're
+still using user pools, but now we introduce a new variable. Our tenants come to us and Tenant 1 says, "You know what, I like Descope,
+that's my identity provider. I've got thousands of
+users in there already. I don't want to create all those users in your identity pool. I want you to disconnect to mine." And fortunately, let's say, you know, Tenant 2 might also wanna use Okta. We might have any number of
+different identity providers that we wanna connect to. But fortunately, there's a
+couple of different standards that allow us to do so. And tools like Cognito
+or Auth0 or Descope, any of these ones that we use as our primary identity provider allow us to federate with
+these other data stores. So we could use OIDC
+to connect to Descope, and our users simply log
+into a Descope login. And Descope will have a
+conversation with Cognito. And Cognito will simply vent the same type of JOT
+token it would've been if this was a native Cognito user. And the same goes with Okta
+and that other Auth flow. But perhaps this time we
+use SAML, another open, another open standard for allowing these two
+different identity stores to talk to one another. So in terms of where I
+think this might be going and some innovation that
+I think is interesting, I wanna introduce a concept of frictionless onboarding again. When we think about onboarding, we want to see tenants get
+to the value of your software as quickly as possible. And one of the barriers that I've run into in terms of doing this is when you sign up and
+you want to do federation. So what'll happen, you
+sign up for the software, and then you'll say,
+"Okay, well, we use SAML. They're gonna go to my SAML IDP. I'm gonna pull in the files,
+I'm gonna pass them off to you. Someone's gonna set those up manually." In the meantime, let's
+say a week has passed, I haven't been getting any value of the software that I wanted to evaluate. Maybe I've moved on and I'm looking at another
+piece of software now. So I wanna think about
+how we could possibly get to the point of doing this
+in a frictionless manner and allowing the tenant admin
+to do this for themselves. So let me reintroduce Descope again 'cause I like how they've built this out and I like the functionality
+that they've built, which allows you to select
+your own identity provider as your onboarding into your service. So again, our tenant admin is simply signing up for the software and when they reach the point that they wanna add their users, they can go in and select
+their own identity provider. And from there, they
+can configure federation in the UI of your application. So I can simply go in,
+upload my SAML file, and my users are using your application. You didn't have any SaaS admin interaction and you were able to get them
+onboarding with your service. This is a great innovation. And I'm not gonna say Descope
+was the only one doing this. Of course, there might be
+other solutions for this. This is the one I'm familiar
+with and it's pretty cool. I also like the way that
+Descope is doing identity flows and allowing you to
+have different identity, different identity flows
+for individual tenants. It's a pretty cool functionality there. So you might wanna check it out. Okay. And then you're often
+using the application Go. Now leaving out the
+microscope, as you might guess, this is a reference to observability and being able to have all
+the different telemetry emitted from your application that will allow different roles of users to observe your
+application and operate it. Now often when we talk to SaaS providers, they say they have an
+an observability story, but you scratch the surface a little bit, and what they really have
+is an SRE story, right? Our different SREs can actually observe how many CPUs we're using in EKS. They can see whether the
+state of our EC2s are healthy. If you ask them how are
+the business metrics about our application be emitted? Or how are the different
+roles within your organization able to see the operational
+health of your application? The answer is usually, "Well,
+we're getting to that." So let's think a little
+bit about what it means and think about some of
+the practices we could use to make this flexible and resilient as we build our observability story. So first, why do we care
+about observability? What are the different roles
+that we wanna think about, and why we're emitting this
+data in the first place? So it might include cost management. The FinOps story of how we emit cost data is critical to the success of SaaS. If your finance teams aren't able to see and visualize the data that describes how we're
+spending our hard-earned cash on the is supporting these tenants and they can't understand
+the underlying unit economics of what it costs to operate a
+tenant or a specific feature, how are they gonna understand how to continue to invest
+into this application and what types of customers to attract? How about troubleshooting? Again, there's still
+SRE story here, right? We still have to be able to
+troubleshoot our application and understand the application
+health at any given moment. These are still stories
+that are important, but product development is another one. How do we emit these metrics
+to the business users who aren't managing the
+application day to day that rather are trying to
+understand the strategy of how to evolve this application? How does a given product owner understand that tenants in a certain tier prefer this type of feature, and that's why they're
+buying the application. How do they understand where
+they should be investing their software services, the developer's time
+into these new features without understanding
+how they're being used? Security and compliance stories. How are we emitting the data that eventually will be used by auditors? How are we emitting the data about the state of each
+one of our instances and whether they've been patched to the right threat level
+for our security teams? How do we think about
+performance monitoring, right? Again, going back to our
+SRE story a little bit. How are we anticipating
+what's gonna happen and understanding what
+that user experience is? How can I drill all the way down and understand a specific
+tenant's experience? And then, of course, how do we get to predictive maintenance? 'Cause this is the next
+gen story of this, right? Eventually, I want to be able to have my application get ahead of itself and be able to take preventive
+maintenance measures, or at least tell my SREs that
+something needs to be done before they discover they need to do it. Now, surfacing activity
+with tenant context is the core of everything we
+do in observability in SaaS. There's no way you're gonna
+ever be able to drill down to a tenant-specific problem if everything we're emitting
+from our application. Whether that's logs, whether it's traces, whether it's events that
+describe our application usage or, you know, the business
+underlying context of what we're doing without tenancy. So making sure everything we're omitting from our application
+has tenant context in it allows us to unlock
+these types of dashboards and the operational experience that these different roles can look into. If we have this tenant context and we wanna build out that FinOps story, we can easily express to our FinOps users, "This is the exact state
+of these given tenants, this tier of tenants,
+this region of tenants." Whatever those different
+units they wanna measure are, as long as we have tenant context and long as we have
+good operational context and observability story, they can break these things
+down by different units. Now, in terms of actually
+building this out in a better way, I wanted to kind of think a little bit about what I'm not seeing today. One of the things I
+see is people start off with a relatively simple
+operational story. Maybe they're using CloudWatch, maybe they're using some basic
+AWS stack like Prometheus, and that could be fine for a while. But what I find is often
+I'm meeting SaaS customers at a time, when they're discovering their
+observability story stack doesn't do everything they need it to do. So what might be one answer to that? Well, how about OpenTelemetry? What I like about OpenTelemetry is it allows us to use
+the same type of emitting, of observability emissions
+across any type of stack. Whether that's EC2 or
+EKS, ECS or even Lambdas, all of them have a great
+OpenTelemetry story. We can use either the open
+source OpenTelemetry embedder, or we can use OTel, the
+version that AWS has produced. I'm gonna use the open source version here 'cause I wanna emit all
+of my data out to S3 and emitting traces to S3 requires the open source
+version at this point. I think that's a change we're gonna see pretty in the near future. So I might be able to
+create a very flexible stack right outta the gate. Maybe it's just, you
+know, some Glue, Athena, with a QuickSight on top of it, and maybe that works for me for right now. But I've used OpenTelemetry and I have everything flowing into S3. So if I discovered that this
+stack isn't working for me, and again we have do have a
+blog on doing multi-tenant, multi-tenant, multi-account OpenTelemetry. That specific version
+does use OTel by the way. That isn't using the open source version. We have another blog coming
+out that we'll talk about that. But OpenTelemetry brings flexibility. So if you're using this AWS stack that we've been talking about, whether it's S3, whether it's Prometheus
+or CloudWatch, X-Ray, any of these different tools, including our distro for OpenTelemetry, you can use those as long as you need to, and you can even use multiple ones 'cause you can send OpenTelemetry
+off to multiple sources. But if you reach a point where any of these tools
+aren't working for you, you can also take a look at some of the third-party
+solutions who are our partners, like Datadog. What's the Datadog story? Is there something about the
+way that they manage logs that would be better than
+what we're doing today? How about Dynatrace? Is there something about and doing tracing or anything else that they
+do that we would prefer? Honeycomb has a great way of
+debugging your application. Is that something that I could
+use for specific use cases? How about New Relic? How about Sumo Logic? The upside of all of
+these partner solutions is they all have rock-solid
+OpenTelemetry integrations with AWS already. You can start using this and
+not have to worry as much about whether the telemetry
+stack that you've built today is the one you're gonna need next year or five years from now. Instead, you can send your
+different telemetry off to different sources if you need to, and use these different tools for even for specific use cases. So this is one of the things I really like about OpenTelemetry. I think if you're gonna be
+building from scratch today and you can use
+OpenTelemetry in your stack, it's really gonna benefit
+you in the future. So this is a pitfall I think
+you can avoid even today without even investing
+too much into this stack. Another pitfall we've gotten into is thinking about not thinking about how to manage agile pricing. So when we think about pricing, we usually think about it
+through a business lens, "Eh, I'll let the business guys decide how they're gonna price our product." The problem is we have
+to be able to support it from an architectural perspective. It doesn't make any sense
+if our business comes to us and say, "Hey, we're gonna charge every time the customer calls our API," if we're not counting how
+many API calls there are. And one of the common
+use cases I've run into, and this has been repeated this year, is customers who are
+have sold their products and actually don't measure the
+usage of their application. They may say, "Hey, you're entitled to
+call this service 100 times," and they're not counting it. Or they're saying, "We're
+doing usage-based pricing," and half of the usage that
+they should be billing for is falling on the floor. This is what we call revenue leakage. And this is something,
+especially in this market, where we're becoming conscious
+of sustainable growth and not just pure growth, where we really have to
+tighten up the reins. So let's look at what this looks like in terms of practices and perhaps
+in terms of tools as well. Let's start with the simple example. Billing, you know, is pretty
+simple and we start with SaaS. Maybe you have your SaaS solution, emitting billing events or you're manually creating billing events and you're sending 'em off to a billing provider like
+Stripe, great billing provider, and, you know, the events might look
+simply like this, right? A simple one that describes
+a tenant and some usage. Again, maybe we're
+typing these in by hand, maybe we're actually able to
+emit them from our application. But that's not about
+starting point, right? I can bill my customers,
+I can create invoices. This isn't bad. But what are the problems
+that we see with this? The real problems that
+we're gonna run into are the resiliency and flexibility that we're not building
+into a solution like this. How do we get ahead of that? Well, let's think about what it might mean in just in terms of flexibility. To have a SaaS solution, again, that's still
+emitting billing events, but instead is dropping
+them into EventBridge or some other flexible queue-based system. Now we have resiliency, we can handle any sort of
+failures along the way, and queue those up in guaranteed delivery into a billing service that we bill out. And this could just be a simple Lambda that writes into DynamoDB, where we can start to do calculations on the data we're emitting. So we capture the current
+state, what exactly we emitted. Now we wanna start totaling those up, and we'll get into what that
+looks like in just a second. But of course, the flexibility
+that I'm talking about here is also along the lines
+of the billing provider. So we still like Stripe, we still wanna send our data off to Stripe for certain customers, but maybe there's some
+different use cases here. What about a tool like Amberflo that lets us experiment with our pricing? So now, I wanna send some of
+my customers off to Stripe, but I also wanna start to
+experiment with my pricing for this new tier of customers I built. I can use a tool like Amberflo to go in and massage my pricing and try out different pricing plans and still have them integrate with Stripe. So all of my data ultimately
+lands with Stripe, but this provides me some slippage. So now I might have two
+different billing providers I'm actually sending data off to. And what about Marketplace? If you have enterprise customers, eventually, some of them are gonna ask you to build them through Marketplace. Not only might they prefer
+the single interface of being able to pay their
+bill through Marketplace, but AWS actually has some
+incentives for them to do so in terms of spending Now
+their own EDP commit with AWS. So it's a little bit of inside baseball, but if you're selling SaaS products, it's an inside baseball you're
+probably gonna learn about and you're probably gonna wind out integrating with
+Marketplace at some point. So we need a flexible system
+that can capture this telemetry and send it off to multiple sources. And we do have a blog that talks about sending
+off building telemetry to a third-party system
+that looks a lot like this and talks about how to
+integrate with Stripe. Now tracking and avoiding
+the revenue leakage goes back into the data
+that I was talking about. Like I said, we're gonna
+capture this data in DynamoDB, but we're not just gonna
+capture the raw data. We're also gonna perform calculations and understand the exact
+state of the revenue that we should be drawing out of all of the different usage that our tenants have applied. And this might mean
+monitoring entitlements. So we're probably gonna have
+some customers, in some cases, where they're entitled to use a certain amount of our application. In this case, you can see Tenant 1 is supposed to be able to call
+the order service 10 times, the product service 100 times. And you can already see the red text here. So they've already called the
+product service 105 times, that means they've exceeded
+their entitlements. We need to know that this is happening. But let's look at this through the context of a
+specific billing provider. Let's say you're using AWS Marketplace, where you have contracts. So our contracts allow
+you to set up entitlements for each one of your tenants. So this is more of a
+traditional context, right? You are allowed to use this many times, but I don't wanna have my tenants stop using my application
+as soon as they hit 100. I wanna monitor that, I wanna
+have an understanding of that, and then I make a business decision about the processes that kick off then. Do I notify my customer and tell them they're
+over their entitlements? Do I encourage them to talk to the CSR and maybe increase the
+tier of their product? There's different ways
+that I wanna handle this. The way I don't wanna handle this is to have my billing provider
+stop collecting telemetry 'cause I've exceeded my limit. So I wanna have the slippage
+in between my billing provider and my application that
+allows me to massage this data and make decisions on it based
+on my own business rules. Now, of course, we're gonna have usage-based
+pricing as well, right? Everyone's understands
+that usage-based pricing is starting to become more prevalent, especially with the
+introduction of GenAI features. So maybe we also have usage-based pricing to go alongside with my entitlements. Maybe some of my tenants have both. You could actually see Tenant 2 goes across these two different tables. And we, in Marketplace, have a different type of
+SaaS product you can offer called Contracts + Consumption, which will allow you to
+both do these entitlements plus usage, even in combination. I can say you've had an
+entitlement to 100 product calls and I'm gonna charge you
+$1 for everyone after that. So you can combine these
+two concepts in Marketplace. And you can see Tenant 2 is actually continue to
+use their product usage, and there's no limit there,
+it's just usage-based pricing. Now Tenant 3 is only
+doing usage-based pricing, which you might call
+subscription-type listing in AWS Marketplace, where we can simply do
+usage-based pricing. And you'll often see this, if you look at products
+like Datadog or Snowflake in AWS Marketplace,
+it's purely usage-based. You're gonna use a Snowflake unit every time you do something. And whatever that is that
+Snowflake's monitoring, that's a Snowflake unit, right? So that's usage-based pricing, and, of course, Marketplace
+supports that as well. And there is a blog that we
+have about integrating SBT, the control plane that we built, with AWS Marketplace as well, if you're interested in
+learning more about Marketplace. One of the things I didn't
+talk about last year that I had some regrets about was not talking more about
+including free experiences into your pricing. Now, what might that look like? Well, maybe you have a standard tier, and it has some features
+that are turned on and some that are turned off, and you have a standard architecture. Maybe, let's say this
+is a silo architecture. Everyone gets their own EKS
+cluster, their own database, and their own OpenSearch instance. Now let's think about
+what this might look like from a free trial perspective. If we wanna allow our
+users to try our product, entice them to buy our product, what might be some things we think about? Well, did the specific features
+we're turning on and off entice them to make a choice between, let's say, a standard tier and a more advanced and
+expensive tier product? And can I limit some of these features so that they can try them? So as you can see, the standard tier doesn't actually have
+access to feature too, but I might wanna, while limited usage of like an a very nice
+GenAI feature allowed, be it once or twice a month, maybe just so they can try it
+out and inform their decision about whether they wanna
+buy the standard tier or the advanced tier. And the architecture is probably the more
+interesting part to me. I want you to support a less expensive, cost-effective version
+of your infrastructure. If you're running complete stacks, just like you do for
+production for your free tier, it's gonna be prohibitively expensive. What are some choices we could make? Well, we could make a choice on isolation. What about namespace isolation rather than a completely
+siloed EKS instance? What about runtime isolation, where they're all using the same services? It could be significantly cheaper to run. What about retargeting our SLAs? Instead of saying, "These are
+your guaranteed runtimes," you could do something like Neon DB does. When you try out Neon
+DB, they will tell you, "Hey, it's gonna be a little slower 'cause you're in the free tier. It might be a minute before
+your database starts up," and that's entirely different from their production experience, where it's lightning-fast
+right out of the gate, and they tell you that upfront. Is that something that that's acceptable to your fair share customers? Maybe. And that would be an
+interesting choice to make 'cause it mean you could
+scale all the way down to zero when they're not using the application. Lower data resiliency. Do I have to back up this free tier data? Is this data that we're ever gonna
+convert to production data, or is it just garbage? Is it data that I can
+just drop on the floor? I don't wanna put into multiple AZs. Make decisions that lower
+costs, like row-level security. Instead of having an instance per tenant, perhaps we can share all of
+that data and cram it in, just like we did with
+DynamoDB into the same tables. And perhaps we can do an index per tenant in OpenSearch as well. All of these are options. And depending on your architecture, there can be all sorts
+of levers you could pull to reduce the cost of
+your free tier experience while still keeping the
+quality of that experience up to what pendants would expect to make that purchasing decision. There's another concept here I like to call the last mile of pricing. I've been working with
+a team called Schematic. And unlike a lot of other teams that either do feature
+flags or do pricing, they've combined these two concepts. So they allow you to manage features within their application. But what's different, unlike
+LaunchDarkly or App Configure, or other tools that are
+purely feature-flag-driven, they allow tenants to use these features and they drive the usage
+of this into pricing. So your pricing models are entirely driven by the how many times your customers hit these feature flags. It's a convenient way to connect the usage of your application into your pricing models. And of course, you can
+create these pricing models inside of Schematic. So you don't have any
+sort of pricing knowledge within your application,
+everything is downstream. This allows the business users to manage the pricing in this other tool, and your developers don't
+even have to think about how that works, entirely
+divorces these two concepts. And of course, they
+will do the integration with your billing provider, whether that's Stripe or whatever else, and they'll provide the
+invoices for those customers. Failing to fail is,
+throughout my talk last year, I had testing at the end of ever section, and I included most of those same slides, I'll go over them, but I don't
+know if we got deep enough. I think I'm still hearing a lot
+of SaaS customers come to me with unit tests, with some
+very basic overall testing, integration testings that they run right before they go live. But testing as a culture is still something I'm
+not seeing enough of in software in general, and especially for SaaS providers with a blast radius of problems
+can be pretty dramatic. So what were the things
+we talked about last year? Well, we talked about how policies work. How do we think about
+creating artificial tenants that can push the boundaries
+of our application? Can test that we can't
+have a noisy neighbor issue introduced by this artificial tenant putting load on the
+edge of our application. Can we test it if that API
+gateway URL actually is exposed that someone can't get behind
+the edge of our application and start pounding on that API gateway and cause our transaction per
+second limit to be exceeded and cause noise and neighbor issues for all our other tenants. Can I get behind that even and actually find a Lambda itself that's exposed and attack that? And could I take fake
+payloads that I've created or payloads that I've
+intercepted from other tenants and use those to pass
+into the application? And is there any way at all
+my data could be exposed? Have I made sure that
+my data is locked down and that there's no
+external access in any way? And I wanna test all
+these things continually across all of my different releases. And the SLAs that we're
+promised to with customers, so this is a bit of an eye chart, but let's say we have
+different types of tiers with different infrastructure. The SLAs of those infrastructure
+could be very different. That silo infrastructure we're promising to our
+enterprise customer, maybe it takes one second to respond, but that completely shared
+experience is three seconds. How are we testing that
+every release we make isn't interfering with these SLAs? Are we creating different load profiles that actually provide
+extreme load versions of what happen can happen during the day? What happens if we have one spiky tenant? What happens if that multiplies
+to five or 10 spiky tenants all hitting our application
+at the same time? Do our SLAs still
+continue to be successful? What are the penalties if it doesn't? Are we willing to pay those? Are they properly configured
+for our application? And can we test our
+individual workload parts? Can we actually take our
+asynchronous wake workloads and exercise them and prove that our synchronous
+workloads aren't affected by any load that's put onto
+our asynchronous workloads? Now, this is one of the areas I've been thinking about the most. When we talked last year, I talked about turning features on and off to prove that an application
+can continue to function even if all the features were turned off. I still think this is good, but what it doesn't really prove, I'll get into on the next slide. This is valid. Continue to use your existing
+product features for testing, continue to do blue-green
+of deployments for testing. It's a great pattern. If you aren't doing some sort of rollout or wave-based deployments,
+it's a great pattern for improving the
+resiliency of your system. And maybe we can
+experiment on our packaging and our pricing by using these same flags. I can darkly launch a
+new tier of my product and can continue to innovate and experiment behind the scenes without causing too much chaos
+to my existing application. What I have been thinking
+about a lot this year though is chaos. How do we be reliable reliably? And there's an interesting
+tool I started to talk to that I find to be very, a great fit on a couple
+of different fronts. First, let's set up a
+scenario for testing. We've got a simple application,
+maybe not so simple. We've got an API gateway. It's got that Lambda Authorizer
+we were talking about so we can authenticate our tenants. Then it just have some
+other business logic in this other Lambda that calls DynamoDB. It calls some third party services. What happens if any one
+of these pieces fail? And this is where the
+feature flag argument I was making before kind of falls apart because that feature flag probably covers many different
+parts of my application. So I started looking at
+a tool called Gremlin, which is a chaos engineering tool that offers a SaaS solution. With Gremlin, you can
+actually set up experiments, and inside of those experiments, they have a concept
+they call failure flags. I think this is a nice renovation in terms of thinking
+about how you do testing and how you introduce failure, 'cause you can use these failure flags to attack specific parts
+of your application. There's a Lambda extension that they built that connects through their SDK so that your application
+is monitoring the state of each of these failure flags. Of course, you'll need some flow code. I'm not showing in here,
+simplest statement that says, "Hey, if this flag is
+off, don't call DynamoDB," might be enough to set
+up this failure state. But we can test all these
+different scenarios, Cognito not being available, a specific tenant not
+being able to authorize. That's one of the things I like here is you could pass in contexts and say attack different tenant scenarios. What happens if I take
+my largest tenant down? What is their experience like? What happens if I apply a lot more load right after I've launched? What happens if a Lambda is unreachable? This is actually almost
+impossible to test for real 'cause you really can't go
+and take your Lambdas down. So having these failure
+functions that go in and say, "Hey, let's pretend this
+business function is down. How does my application respond? Is it completely down altogether? Can it great gracefully respond
+to these failure states? What happens if our
+database is unavailable? What happens if our third-party
+services are available?" Again, hey, that billing scenario we were just talking about, is it a really asynchronous? Did all of our billing
+events actually back up and then successfully go
+off to our billing provider? Introduce chaos at every
+part of your application. And what I really liked about Gremlin, in addition to this tool, 'cause, hey, you could probably
+build some tools like this yourself too. Gremlin's a cool example, and it removes a lot of the heavy lifting. What I really like about them
+is they do this every week. Gremlin actually attacks their
+own SaaS system with Gremlin. Perfect dogfooding story. And they've actually brought down their largest customers by doing this. And every week they meet
+all the way up to the CTO. They talk about what they've learned from the attacking their own application and what they can do better in the future. So it's a pretty cool tool
+and also a pretty cool case of using your own product
+to test your products. All right, not anticipating
+more complex deployments. This one's very specific to this year. I've been talking about how you deploy into customer accounts since I joined the team. One of the first customers
+I worked with, Dremio, has publicly talked about how part of their
+infrastructure is deployed to their customer accounts. We worked with them, it's an
+important strategy to them, but it was sort of an outlier. A lot of SaaS customers
+really still followed the Salesforce model, where all of the infrastructure lives within your own accounts. What's changed? AI has changed 'cause AI requires
+access to customer data. This is pushing more
+and more SaaS providers to push their infrastructure
+toward the edge. What does that mean and
+how do we deal with it? Well, it's an important question. Because if your largest
+customer comes to you and says, "You know what, I love your application. I'm willing to use it, but we're not gonna use
+it if you don't put it in our accounts." Do you just not sell to them? You say, "Well, thanks anyway. We don't want that $10
+million you're gonna pay us. We're good. Thanks. We don't like that model." No, you're probably gonna have
+to support it in some way. So what I wanna think about is what are the different
+models we could use to support this 'cause security is pushing us to the edge, but there's a sliding scale to that edge. Let's start, it's sort
+of the traditional model for how we might protect ourselves. This one's really straightforward. A customer managed key, let's
+say we have an S3 bucket. Our customer could pass the data off to us and it still goes to us. We could decrypt the data with this key. As soon as they're done and they don't wanna use
+our application anymore, they could break that key and their data is no longer usable to us. This is a model that works to an extent. It can provide some
+confidence to your customers. Okay, now, so, you know, when I don't wanna use your application, of course, I could break the key, but what happens if you've
+already decrypted the data and it's living inside your CloudWatch or it's living inside a
+database somewhere else? So it doesn't solve all of the problems. There's other ranges of solutions. One of them is Nitro Enclaves. It's a pretty intricate solution. I have a different slide on that. But Nitro Enclaves allows you to protect and secure the data
+within a certain context, and the data could only be
+decrypted inside of that context. We could use a data privacy vault. So I'm gonna give an
+example of how Skyflow, a data privacy vault, allows
+you to de-identify your data and have your customers
+share their data with you without you having any of the PII in it. Of course, we can use remote agents. This has been common for a long time, and this is somewhat
+like how Dremio Works. They deploy part of their application. The application collects data, and it emits only the relevant data that Dremio actually needs to be a business intelligence tool. We could deploy our whole remote machine
+learning environments into the customer accounts, and then only emit the
+business intelligence or the, you know, the derived data, the stuff that doesn't have
+PII, it isn't sensitive, and export that into our applications. Or we can simply throw
+our whole AI application over the wall, deploy it
+into customer accounts, and say, "Well, there we are. We still have a control plane, we still don't wanna get observability, but we're gonna have, you guys are gonna have to manage this. We've shifted the burden of operating the software onto you," which may not be ideal, but honestly it's something
+that does happen now as we're talking to SaaS providers. Some of they're being
+forced into this model. This is an interesting
+conversation around open source. I have seen an increasing
+number of enterprises more comfortable with software
+if it is open sourced. So this conversation too
+about the sliding scale could be influenced by how you actually, what code you're deploying and whether it's open source or not. That may or may not be a decision-maker and it's not an option
+for every SaaS provider. It's just something I
+wanna put on your radar. If you're going down this scale, what happens if it's open source? Would the enterprise
+customers be more or less willing to trust that code if
+it's running in your account and it's open source? Now, I did say I was gonna
+talk about data privacy vaults, relatively straightforward concept. We still have our SaaS application, and then we wan our SAS tenants using that application directly. But of course, their data
+lives in their own accounts. I'm using DPCs for a shorthand here, but these are their
+accounts that they own. They have, you know, some
+S3 buckets, some databases. Well, what data privacy
+vaults allow us to do is deploy these vaults into
+the tenant-owned resources. There, the data is de-anonymized. As the data passes through
+the data privacy vault, it extracts the PII, Bill
+Tarr is replaced by XYZ 123, and it's consistently replaced. So I can use the same data patterns and understand that XYZ 123 is a person. It's that not the person called Bill Tarr. Now, at some point, we can also introduce re-identification with these type of tools, and re-identification
+allows a role-based control. So somebody with a, for
+example, a medical admin to come in and say,
+"Okay, I need patient data so I could actually go
+re-identify the data through this tool, and maybe other roles," perhaps like a call center rep only be able to see what
+the state that they live in and maybe, you know,
+parts of their address. And Skyflow is really a
+great example of this. The hard part about this is both the cryptography and
+the role-based access control. And another thing that
+Skyflow is doing right now that I'm actually pretty excited about is they're using GenAI to
+actually train these models to understand what the private data is. So that what they do, they
+run through all of the data, and they present you with what they think might be private data or
+IP that you wanna protect, and allow you to choose whether that's what you
+wanna protect or not. It removes some of the
+undifferentiated heavy lifting. That is the downside of this model, which is you actually have
+to know what your PII is and strip all of that out. And it is, you know, it's
+still a human process. Someone could make a mistake. And we do have a blog, a
+couple blogs of Skyflow. One of the examples is here as well. Now, another way you could go with this is you could actually push
+your machine learning workload down into the customer account. This is more familiar with
+the SaaS anywhere model we've talked about in the past, including the breakout we did last year. Now our SaaS application might look more or less like it does today, but we take our SageMaker, our
+Glue, our machine learning, and push it down into
+the customer accounts. There, it accesses the data, it does any processing on it it needs to, and gets the business
+intelligence out of it. And we can take that BI, pass it back up to our SaaS account, where the tenant users are
+actually accessing that. Somewhat similar to what Dremio does, except the machine learning side of this is quite interesting, right? If you have tenant data that really can't leave their accounts but you need machine
+learning to process it, it's one model that might work, but it still involves a lot
+of operational overhead. You have to manage all
+of this at arm's length, or the tenant themselves actually has to be managed
+to be able to manage this whole stack. And of course, you repeat
+this across many tenants. It really limits us down to the silo model for everything we're doing here. So, finally, Nitro Enclaves
+are probably the newest part of this conversation
+and an interesting one, if maybe still not the perfect
+solution for every scenario. What I like about Nitro Enclaves
+is it provides assurance that the data that's
+flowing into your accounts can only be seen in a very limited window. So Nitro Enclaves work
+is you create an EC2. Within that EC2, you actually give part
+of the EC2 back to us. So AWS will manage part of this, picture it like a docker container that you don't have access to. This docker container
+has a single vSOC pipe that allows traffic in
+and out of this enclave that you've created. So you create the enclave
+as part of the flow and you generate a signature. You know, just think of
+this a lot like TLS, right? You generate a machine signature that's specific to this machine and you share that with your customer. You say, "Hey, this is
+the key that you'll use to encrypt things with KMS. This has to be part of your key, and that becomes part of the
+signature that KMS uses." So now everything that I've
+signed in my S3 bucket with KMS can only be decrypted by this
+Nitro Enclave I've created. So I pass the envelope-based
+encryption back. And it's okay if you don't understand all of the deep parts of encryption. You know, just understand we created a key when we encrypted the data
+and I have encrypted data, I pass those both back
+to the Nitro Enclave as encrypted data, and Nitro Enclave exchanges
+the attestation document. So this is the thing
+that says, "What it is? I am this entity." And it exchanges that with KMS, which does this fancy
+little dance that says, "Okay, I know who you are and I'm gonna let you decrypt this data." And the only thing that
+could decrypt this data is the Nitro Enclave itself. It's an interesting pattern. It does have some potential fallbacks, one of which is you could
+actually emit the data outta the Nitro Enclave. You could actually, this vSOC
+is open, it can emit data. So you have to have some
+agreement with your customers with the code that's gonna run in here, and this is often how it works. I'll say, "Hey, we're gonna run this code inside of Nitro Enclave. Do you agree that it's
+not gonna emit anything that's sensitive to you?" So you might have this
+two-way conversation with them about what you're gonna
+do with their data, and then prove that it's not gonna emit, be emitted in any way, or you have to really think
+about what that data is. Now, the other side of
+this is it's just an EC2. So this limits how far we can go in terms of our overall application. You might not want a giant footprint to live inside of a single EC2, right? So this might limit how
+we set up our application and how it runs. Still, it's a very interesting model. And if you have customers
+who really their only concern is how and where their data is read, this might be a way to help us, you know, assure some of their concerns and remove some of their objections, get them to run the
+application in your accounts. And now one of the things I insist on across all of these models is please try to get observability. Don't let these, don't throw these over the wall, like we used to do with
+packaged software and say, "Well, I hope it all runs great." Good luck with your software. No, make sure you're
+getting the operational data about this software and what it does back. Whether this is CloudWatch and we're simply taking
+all of our CloudWatch and aggregating it together and putting it through
+central dashboards, or not. Now, we're almost at time here. I wanted to make sure I took a second and brought up that there
+are a couple sessions that I've talked about before tomorrow. Not too many 'cause
+it's already Wednesday. But that SBT session, it's breakout, it's Todd Golding, it's a great talk. Please attend it, if you can. Most of the other talks there
+in white, unfortunately, have already passed, but the breakouts are
+already appearing on YouTube. I saw two of them already from earlier this week
+on YouTube this morning. And we have a workshop
+and a builder session. There are still repeats that
+are going to happen tomorrow. So if you have a chance,
+please go and check those out. And with that, I'd like to say thank you. Please, please, fill out your surveys. This is incredibly important. If you wanna see more SaaS topics, this is how they determine what
+the topics are at re:Invent. So if you could possibly go on, say some nice things about
+me, I'd really appreciate it. Or at least say nice things about SaaS and say you'd like more SaaS topics, then we'll see more SaaS
+here again next year. All right, thank you, everybody. (audience clapping)

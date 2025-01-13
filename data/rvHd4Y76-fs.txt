@@ -1,0 +1,509 @@
+- Yeah, well, hi, I'm Marc Brooker. I'm a distinguished engineer at Amazon. I spend my time mostly, as you can see on our database services, but also a bunch of time
+with our AI and gen AI teams. But this talk isn't about
+any of those pieces directly. Instead, it's about some of the hard, you know, hard lessons that
+we've learned over the years running large-scale services and small-scale services at AWS. And you know, one of the
+things that you'll know as somebody who has operated
+services, has built things, is that often you learn the
+most from your worst days. And so what's baked into this talk is some lessons from some
+very stressful hours, some times that we disappointed
+ourselves and our customers and have learned ways
+to not do that again. Over my career at AWS I have, I was trying to estimate the other day how many postmortems I've
+read from across the industry. The best estimate I could come to was between three and 4,000. And so there's quite of
+hard things baked into, you know, baked into this. So over this hour, I'm gonna talk about
+the trouble with retries and the problems they cause in systems. And especially the problems that what I think a lot of
+people would consider best practices around
+retries cause in systems. I'm gonna talk about circuit breakers. And, you know, their pros and cons, the stuff that the circuit
+breakers are great at and some of the problems they cause. Some of the unexpected downtimes of implementing circuit
+breakers in systems. I'm gonna talk about erasure coding and some other techniques
+to bring down tail latency. And some statistical techniques for thinking about tail latency, modeling and simulating tail latency. And then I'm gonna talk a little bit about the theory of stable systems and a kind of framing of stability and metastability that I really like and I think really sort
+of helps our mental model in thinking about these kinds of things. And then finally, I'm gonna have a little bit
+of a rant about statistics because I think it is something that I would love to see more folks use, but we make it unnecessarily difficult. So let's get started with retries. Now, you know, I think everybody, when they saw kind of
+distributed systems building 101, it's like, ah, well I'm
+gonna do retries, right? Because that's good. Retries are gonna save
+me when things are down. They're gonna save me
+when there are errors or when there's packet loss. And that is not fundamentally
+a bad way of thinking. But it is a way of thinking that has some real hidden
+risks and downsides to it. So to understand that, let's talk about an example system. And so on the, what is that, the left-hand
+side of the slide, we have a set of clients. And these are the sort of usual kind of think of them as
+website clients, right? They're people who are coming in sort of randomly or
+completely independently. And their behavior is what a
+lot of folks would consider a kind of best practice, right? Like they implement a timeout
+when they call our server. If they get an error back from the server or an error back from the network, they do three retries. But because they've read a
+bunch of articles on this, they also do exponential
+backoff and jitter because those are good things to do. On the other side of the slide, we have our server. And there's nothing
+interesting about the server. It's always successful,
+always high performance, but it does have one kind
+of interesting property. And that is the latency it returns is linearly dependent
+on the amount of load. Now, that's not a perfect
+model of the real world, but it's not an unreasonable
+model of the real world. We know that from building
+large-scale systems because of contention,
+because of coordination, because of threads
+needing to work together, because of locking, because of latching, and because of all sorts
+of other similar things, latency does tend to rise with
+concurrency in real systems, rather than being constant. And so then what we're
+gonna do with this system is we're going to offer
+it an amount of load. And the kind of baseline load is going to be well within
+its ability to handle. And then we are going to add a short, single-second spike of overload, too much load for the system to handle, enough to push our latency high enough that clients start timing out. And then we're gonna try and understand what happens to the system in that case. So let's start by looking at the number of successes per second, where we are doing no retries, right? This is where we have disabled the retry behavior in the client. And so what we see here is
+that we're going along normally because we're doing a
+normal amount of traffic and we're not triggering
+those timeouts yet. And then as that spike happens, all of the client's time out. So the system latency has gone way up because the traffic has gone way up. And from the client's perspective, what they see is that their
+success has dropped to zero. Then those excess requests kind of work their way through the system and the system recovers. It gets good again. Our clients start seeing success again. And hopefully, continuing out over to the
+right-hand side of this graph, they continue seeing success. So this is bad because clients
+saw a period of downtime, a period of downtime
+that's about twice as long as the traffic spike that we saw. But it's also good because very quickly, in only twice the time
+of the traffic spike, we got to full recovery,
+the system fully recovered. So let's add those three retries that I talked about back into the system. Oh, no. Now we don't recover at all. This is a big problem. And it's a big problem because
+we haven't made our retry, we haven't made the availability
+during the overload period any better with those retries. But we have introduced a mode where the system doesn't recover at all. Clients never see recovery. And why do those clients
+never see recovery? Because what happens is a client comes in, it does its first request, that spike of requests went up. Now all of the clients are timing out. And all of the clients are timing out, and so retries have kicked in. And so what we've done is we've
+put the system into a mode where every client comes
+in, every client times out, every client retries,
+every client times out, around and around and
+around a circle four times. And so we have, if you think about the amount of traffic that server is now handling, because of those retries, the amount of traffic
+the server is handling has gone up by a factor of four. And now the system
+cannot get this work done within the timeout. And so we were built a resiliency
+mechanism into our client, something that was supposed
+to make things better that has caused interminable downtime. And so the only way we're gonna
+make the system work better is by adding more server capacity, which would hopefully make it recover, or by temporarily blocking clients and making the overload period filter out and then slowly letting
+clients back into the system. This is and this might too, to some of you sound like
+science fiction, right? Like, hey, what a silly
+model of the world. This is fundamentally the effect behind some of the biggest outages
+of large-scale systems over the history of the industry. Sometimes it's retries specifically, but it can be all kinds of effects that cause our systems to do more work when they're in the worst position, more work when they're under duress. And that's exactly what's happening here. Our clients have said, you're overloaded and slow, here's four times more work to do. How well would that work with you? Right, if you went to your boss and say, I'm feeling a bit overworked, right, I'd like to take some time off. Maybe, you know, maybe a couple of days. And he said, no, you can do four times more work now. Yeah, you're probably gonna quit. The server didn't get to quit. It just got to slowly churn
+through meaningless work. And so what this tells us is in fact that there are two different kinds
+of failures in these systems. There are transient failures, which are common in redundant systems. They're common in networks. They are individual failed requests. They're individual periods
+of packet loss, right? They're individual things that
+fail in an uncorrelated way. And during these transient failures, retries help a huge amount. In fact, they can make most
+cases of transient failures almost entirely invisible to clients except potentially a
+small increase in latency. And then there's the
+second kind of failures, the systemic failures. And these are failures where there are large number
+of failures or timeouts driven by the same cause. They can be caused by load. They can be caused by contention on locks. They can be caused by software
+bugs, by operational issues, and all kinds of other things. And during the periods of
+these systemic failures, retries actively harm the behavior and
+availability of the system. Despite them being considered
+this kind of best practice. And this counts retries
+at all levels, right? It could be network retries, you know, send another SYN packet. It could be application level retries. Or it could be just a
+customer kind of wailing on F5 when the website doesn't load. So what can we do about this? Is there a solution? Well, it turns out, yes,
+there is a solution. There actually a whole bunch
+of different solutions, a whole bunch of different algorithms. But there's one here
+that I particularly like that we at AWS called token
+bucket or adaptive retries that we've built into
+nearly all of our systems over the last 10 or so years. This adaptive retry algorithm, which I will explain in a second, if you compare it to the
+no retries algorithm, makes the outage just a little bit longer, makes this overload period
+just a little bit longer, but still allows the system to recover without having to add more capacity, without having to kick
+clients out or whatever. So how does this algorithm work? Well, we sort of at the top
+by trying the call, right? This is just a retry algorithm. I'm not yet thinking about, you know, should we try it all? And so what the client does is it looks in its bucket
+and says, is there a token? You know, do I have a retry
+token in my bucket, right? This is like a basket
+full of coins or whatever. And you know, have I
+done my limit of retries? So if it can pull some
+coins out of the bucket and pay for a retry, it does the retry. And if it can't, it gives up. And then if it does succeed, what it does is it puts
+a few pieces of a token in the bucket, right? So you need to pull out a dollar from the bucket to do a retry. You throw in a penny
+every time you succeed. And so there's a very,
+very simple algorithm, a very simple change to the
+way that a retry loop works. But what it effectively does is it caps the total traffic coming
+from a stable set of clients to 101% of the usual load. Compared to the three retries case, which could drive load up to
+400% of the usual load, right? And so without any kind
+of circuit breaker, what we've done here is very effectively limit the maximum amount of work the system can do during retries. So we can compare the
+three solutions this way. No retries, they're great
+for systemic failures. They don't make things
+any worse, which is great. They provide no help for
+those transient failures. That's bad. The sort of standard three
+retries with backoff and jitter, they're terrible for systemic failures. In fact they can make many
+classes of systemic failures significantly worse. They're great for transient failures. And because those transient failures are so much more common
+in real systems, right? They happen every day. When there's single server
+failures or packets lost or you know, machine reboots or whatever, those things all happen
+inside your infrastructure, it makes it look like
+three retries is good. And so there's a sort
+of organizational thing that's gonna happen here, where you're going to say, actually, no, I don't
+want all of these retries. And someone's gonna say, well, if we turn on retries, it's gonna make those little spikes on our error dashboard go
+away, which it sure will. But then when you reach
+these kind of overload cases, these rarer cases that
+don't come up often, you've built a system that is going to be down for much longer. And so adaptive retries don't
+entirely solve this problem, but they do provide us a solution that is both pretty great
+for systemic failures, it doesn't make them go away, but it does allow the system
+almost always to recover if it would recover under normal load. Which isn't a given,
+but is a good property. And an easier thing to test by the way. And it's great for transient failure. In fact, if the error rate is below 100%, sorry, below 1% in my algorithm example, then they will have
+exactly the same behavior and the same goodness
+for transient failure that the sort of three retries
+naive algorithm would've had. So this tiny change in retry
+algorithm avoids whole classes of what we've come to
+call metastable behavior, thanks to some great
+work in system stability from the research community. I'm gonna talk a lot
+more about metastability later in this talk. It's a small algorithm change that makes a really,
+really big difference. We've built it into the AWS SDKs. We've built it into our internal service frameworks at Amazon. We've built it into parts
+of our network stack. And I found a lot of
+improvement in stability thanks to that. And every time I hear of somebody writing a retry loop just with a kind of, you know, for i equals zero to three, I send them to read this document. Right, you have to understand this stuff if you're gonna build large-scale systems. So you're saying, well, doesn't exponential
+backoff solve this? And the truth is, no, it doesn't
+or it only does sometimes. And to understand when it
+does and when it doesn't, we need to talk, hey, we've got an extra dog here, we need to talk about two
+different classes of systems. And so this distinction between two different classes of systems comes from a great research paper called "Open Versus
+Closed: A Cautionary Tale." I recommend that you check
+it out after this talk. And we have these two
+different class of systems. One called an open system where there's a stream of requests essentially arriving at random. And this is very common of websites, of mobile backends, of
+web services, right? These are your, you have
+thousands of customers, tens of thousands of customers, millions of customers,
+billions of customers, and you have no control over when they decide to load your website, they do it essentially at random whenever the mood takes them. The other class of
+systems is closed systems. Systems that have a kind
+of fixed set of workers, a fixed set of, you know, people doing work in the system or systems doing work within the system. You can imagine, for example, you have a streaming data system with a set of five machines
+that pull data off a stream or pull work items off a stream, do the work and then do
+the next item of work. And the really important difference here is in the open system, if you slow a client down
+by making them backoff, it doesn't change when the
+next one's gonna come along. And so slowing those clients down doesn't reduce the load in the system. But in the closed system,
+the opposite thing happens. If you slow a client down, it reduces the overall
+load in the system, right? And so it's very effective
+to say to clients, whoa, whoa, whoa, whoa, backoff, backoff, reduce your load. Because that will reduce the
+overall load in the system by making them backoff. And so understanding this distinction and understanding what kind
+of system you have built is key to choosing a good
+retry and resiliency strategy. Now in most systems there are somewhere a mix of these two different behaviors. There are some systems
+that are purely open. Web servers for example can be. There are some systems
+that are purely closed. But there are also systems, for example, all of
+AWS's control plane APIs that contain a mix of open
+behavior, new work coming in, and closed behavior, like a customer running a
+cloud formation template or running through an API flow. And so there are these hybrid systems. And every system is somewhere
+along this kind of spectrum. Backoff is a very effective
+strategy in closed systems and mostly ineffective in open systems. Jitter is always a good idea by the way. I don't think there's any good reason not to jitter if you're gonna do retries. And by jitter what I mean is instead of sleeping for n seconds, you sleep for a random number between zero and 2n seconds. And that helps break
+up correlated behavior. It helps take spikes of load
+and flatten them out in time. We've done some really
+cool work over the years with simulating and
+understanding that dynamic, which you can check out in the Amazon Builders
+Library if you're interested. Let's work on, move on to a second topic. What about circuit breakers? And so circuit breakers are
+one of those weird ideas where everybody seems to have a slightly different
+definition of what they are. And you know, even different
+textbooks, websites, references will define a circuit breaker and there are a lot of
+different definitions. But for me, this is really
+the topic of deciding when and where should I
+try the first time, right? Should I try it all? Or should I observe that
+this downstream system is overloaded or unhealthy and just say, whoa, I'm not even gonna
+send it one attempt, right? And to understand the role of
+circuit breakers in systems, I think we should separate
+systems into another two, or separate our circuit breaking task into another pair of distinctions. One of them is reducing harvest, right? This is also a topic,
+a word that comes from some classic distributed systems papers. And here what we mean is removing non-essential
+functionality such as UI elements to preserve availability. And so if you go to amazon.com for example or the AWS Console or most
+big websites these days, they will have UI elements
+that are kind of optional, that they won't block the
+loading of the website on being able to load this little sort of additional info box or some other functionality. And this idea of reducing functionality when the system is under overload or when that optional
+functionality is unavailable is a great idea. If you can get it, right? And you know, humans tend
+to be fairly resilient. They don't necessarily love it when their favorite website
+widget doesn't load, but it doesn't break them entirely. Unfortunately, API clients are
+kind of the opposite, right? If you send an API client
+back 2/3 of the API fields, 90% of the time, they're really gonna freak out about that. And sometimes they're
+gonna freak out about that in an entirely unexpected and bad way. The other case for circuit breakers is rejecting load, right? And sacrificing upstream availability to help a downstream system, to help drive a downstream
+system back to success. And this is actually super common. This is probably the most ubiquitous
+distributed systems pattern. For example, this is one of the
+things that TCP does, right? What TCP does fundamentally
+under the covers is it watches for overload, for signs of overload on the
+link that it's talking over, which it detects as
+latency and packet loss and reduces its load if it
+sees those signs of overload. These same kinds of patterns are common at the application level. They're common in all
+kinds of network protocols, from the physical level on up. This is also a good idea. But the algorithms that do well for rejecting
+load are often different from the algorithms that do
+well for reducing harvest. And fundamentally, they reduce the quality of
+service to their clients, right? They are generous in saying, well, I think this system
+is under too much load, I am gonna slow down and have a worse time to help us all recover and to help us all share
+this resource equally. And so circuit breakers of that kind can allow systems to avoid congestion, avoid the excessive latency
+or excessive failure that comes with high congestion, and to recover fast from
+congestive collapse, and are therefore a pretty good idea. But they do have a
+couple of big downsides. One of them is that they can reduce the
+availability of sharded systems. And so here, imagine I have a client
+with a circuit breaker that is talking to the service. And it's implemented the logic of saying, if the failure rate goes over 10%, I'm gonna trip the circuit breaker and stop sending requests. And now I have built this sharded system, a system that breaks up the
+data into multiple pieces of which three of the pieces
+are working perfectly well and one has failed. What's gonna happen in this case? Well, my client's gonna
+look at this and say, I'm seeing 25% failure rate. I shouldn't send any traffic
+at all to this service. And so what we've essentially
+done with that algorithm is that we have turned a 25% failure rate into 100% failure rate. And that's pretty bad. And these kinds of sharded
+systems are very common in large-scale distributed systems. For example, you can
+go and read this paper from the DynamoDB folks. This was at ATC, USENIX ATC in 2022. There's a great paper
+that dives super deep into the architecture and
+design choices of DynamoDB. And DynamoDB is exactly one
+of these sharded systems. And with all of these
+kinds of sharded databases like DynamoDB, like Aurora DSQL. You can check out the shirt. Aurora DSQL that we launched yesterday, having a naive circuit breaker reduces client availability
+in these systems. Here's another bad case. Circuit breakers can expand blast radius in SOA and microservice architectures. And here I have a service that offers through a tree of microservices, APIs A, B, C, and D. And each of those APIs has
+some set of dependencies. And here we've seen
+that there is a problem only with the dependency of API C. A works, B works, D works,
+those are still happy. But a naive circuit breaker
+on top of this system would look at that, see, well, I'm seeing failures. I'm seeing 25% failures if the load each of these APIs is equal, I'm gonna backoff. So again, what we've done here is we've stopped sending
+traffic to API A completely, and completely unnecessarily, right? And so this is a risk and downside of using circuit breakers. So what are the lessons that
+we can pull out of this? I tend to avoid binary
+on/off circuit breakers. These kinds of when you go over X, stop
+sending traffic at all, when you go back to Y,
+start sending traffic. They've got poor dynamic behavior and make these downsides
+of circuit breakers worse. I prefer algorithms like the additive increase
+multiplicative decrease algorithm that's inside TCP, which automatically adapt
+to downstream capability. These algorithms are a little bit hard to understand and reason about, but they are very easy to implement. And simulation and testing
+are great ways to understand whether you've implemented them in a way that actually helps the
+availability of your system. Avoid high blast-radius circuit breakers. Avoid building circuit breakers that turn off large swaths of a system based on simple error rates or latency because they're likely to turn off things that don't need to be off. And then finally, successful circuit
+breakers might need to know some internal details of
+the downstream service to make good decisions. And if you're sitting here thinking, oh, that sounds like a real
+sort of layering violation, I feel a little bit sick about doing that. Yeah, you should and it's bad. But it's actually something that can really help your systems. And so that's something to
+think about really deeply as you implement a circuit breaker, is whether breaking some of your layering, kind of doing this bad thing of leaking a little bit of the
+implementation of a service into the client might not allow the client to make much, much better decisions. And if you've ever sat
+at home during a storm, especially a wind storm, and your lights have dipped, flicked on, dipped again, flicked back on, that's because of these
+things called reclosers. They automated circuit breakers within electrical distribution networks. And the only way that those
+things work really well is because they deeply know about the topology of the downstream and what they're protecting. And that's a great lesson from
+some physical infrastructure. Okay, let's move on to
+talk about tail latency and what some of the things
+that we might want to do about the tail latency of our services. But before we do that, let's try and agree on what
+we're actually talking about. Here is a cumulative
+density plot of the latency from a real AWS microservice. And if you're not familiar
+with a cumulative density plot, let me describe a little
+bit of how to read this. So on the x-axis, we have latency. That is just amount of time
+that it takes the service to respond from the client's perspective. And then on the y-axis, we have what percentage of requests take that amount of time or less. And what's cool about this kind of plot is that you can directly
+read percentiles of it by just taking a horizontal line from the percentile you're interested in and finding where it
+intersects the red line. So if you take a horizontal
+line from from .5 and you draw that over
+until it hits the red line, that's your median, that's
+your 50th percentile. This is my favorite way of visualizing and thinking
+about latency of services, much more than histograms, which I actually find rather hard to read. This is a super information dense but also quite intuitive way of plotting the latency of services. So here what we can see is this service is pretty fast, right? Most of the time, mean, median is responding
+in just over one millisecond. And at the 99.99 percentile, so that means the slowest
+request out of every 10,000, it's responding at 8 1/2 milliseconds. So it's pretty fast, but it's got a bit of a tail on it, right? The 10,000th request is
+nearly eight times slower than the median request. So let's start building an intuition about the behavior of
+the tail in services. And we'll start with saying, what if we call this
+service 100 times in serial, call it once, wait for the response, call it twice, wait for the response, how long will that 100th run take? Well, those of you who paid attention to statistics at school or university will say we can apply the
+linearity of expectation and say the mean is gonna be
+100 times what it was before. The percentiles are harder. They're harder to reason about. There aren't such nice rules because there's a bit
+of a weird distribution. It's not normal, it's not log
+normal, it's not well-behaved. And so we're gonna have to
+apply a different technique. I'll tell you what the
+technique is in a minute, but first I'm gonna give you the answer. So what we see with calling
+this 100 times in serial is the mean and median have gone up by, well, the mean's gone up by exactly 100x, the median's gone up
+by almost exactly 100x, but their p99.99 has only gone up 24x. And so the tail on calling 100 times is actually a little bit flatter than the tail of calling once with this particular distribution. That's a real distribution
+of website latency, sorry, web service latency. And that you might find a little bit counterintuitive, right? Like you might think, if I'm gonna do something
+100 times in serial, surely I'm gonna see a
+lot of these slow requests that are gonna make the overall
+thing have a heavier tail rather than a lighter one. And this highlights the
+importance of doing the math to understand the behavior of a tail. Now let's ask another question. What if we do this 100 times in parallel? Rather than 100 work units, they're completely independent, I'm gonna send them all off to the service and I'm gonna get them all back and I'm gonna wait until they're all back. What do we think that's gonna do to the shape of this distribution? What do we think the
+distribution of waiting for that 100th one is going to look like? Well, it turns out the mean goes up to about 4x, 5x of what it was before. The p99 only goes up to
+12x of what it was before. And the p99.99 is also about
+12x of what it was before. So again, what we have
+here is a distribution that has a lighter tail rather
+than a heavier one, right? Like fewer outliers. And this I think is more intuitive. I think this matches my
+intuition better of thinking, well if I send a bunch
+of stuff out in parallel and wait for that slowest one, well, maybe that slowest
+one's gonna be slow, but I'm doing this work in parallel and so that's gonna be fast. I don't know, that seems intuitive to me. Okay. So let's talk about our first
+tool for flattening the tail. We're gonna send two requests and we're gonna use the first
+response out of the two. What do we think that's going to do to our latency distribution? This is sometimes called hedging. There are actually sort of two things that are called hedging out in the world. But this is a simple pattern of I'm just gonna fire everything off twice. And when the first one comes back, I'm gonna forget about the second one, and use whichever one comes back first. What does this do to our
+latency distribution? Well, not much to the
+mean and median, right? They remain just over a millisecond. They're kind of 20, 30% better. But I have improved the
+four nines behavior by 60%, which is pretty significant, right? Like if this is a service where I'm worried about outlier latency, where my clients and customers really worry about outlier latency, that 66% reduction can
+be a really good thing. Now remember I'm doing
+double the work here in exchange for that 66%, but it might be that this
+is still much cheaper than other ways to get that 66% reduction. And so this is the cost
+is double the throughput and double the request volume. Maybe that's a big deal. Maybe it's not a big deal. Only you can sort of think about the economics of your system and think whether that's worth it in exchange to really flattening the tail. And I will say that I've
+only gone up to p99.99 one in 10,000 on these graphs. But if you have far outliers like one in a million type latencies that are much, much higher, this technique can be even more effective. It can make those almost entirely
+invisible to your clients, which is a really nice property of it. Here's the second tool. We're gonna change. We're gonna say we don't want
+to pay double every time. We're only gonna pay
+double some of the time. So we're gonna send one request. And if it doesn't come back soon, for some definition of soon, we're gonna send another request, and use whichever one of
+them comes back first. Now we might think, hey this is gonna work really well, right? It's gonna save us from having, from doubling the traffic. Those slow ones are gonna happen relatively infrequently, right? If we set our threshold to 90%, they're only gonna happen 10% of the time. And we're still going to
+be able to flatten the tail and reject those far outliers. Cool technique, it's good stuff. And here's what the output
+looks like for that. Again, we've had no effect
+on the mean and median because we're still only
+sending one request for them. And then we've gotten up
+to our 90th percentile and we've already sort of
+flattened things out there. And so in the exchange
+for 10% extra traffic, we have reduced our
+99.99 percentile by 54%. That's really nice. Great, good technique. Let's go off and implement it. Well, maybe not. The problem here is
+again we're talking about those stability and metastable
+failure modes, right? What's gonna happen if you
+use this technique eventually, if you use non-adaptive version of this technique especially, is the service is gonna slow
+down for whatever reason. Like it's a little bit
+overloaded as we began the talk. It's gonna slow down for whatever reason. And suddenly instead of
+sending 10% extra requests, you're gonna double the traffic. And now you're saying to
+that overworked service, no, do to us the work,
+be even more overloaded. Go down, don't come back up, right? And we don't kick our
+services when they're down because that's just
+counterproductive for all of us. And so I don't really like this technique. And I don't really like this technique because of that modality. Even though it seems super
+attractive at first glance. Now you can't fix this
+with a token bucket, like the token bucket approach
+we used to fix retries, which adds some complexity
+to the whole system but does avoid some of the worst cases of these metastable failure modes. Here's another tail tool, erasure coding. You can't do this with arbitrary APIs but you can in storage
+systems and in caches. And erasure coding, which I'm not gonna go into the details but it's a super
+interesting field of math, allows us to send N
+requests out into the system and assemble the response
+from the first k. For example, we could
+design our system in a way that we could send out six
+requests into the system of which the any four will allow us to assemble the right result. This is a ubiquitous
+pattern in storage systems. It's a ubiquitous pattern in
+some kinds of cache systems. It's been around forever. But I think it's underused
+in distributed systems and especially distributed
+caches of immutable data. So the costs here are it's N
+times the request rate, right? Because we're sending N requests. And so whether that's expensive or not depends on whether you
+are request rate bound or throughput bound. It's N over k times the bandwidth and N over k times the extra storage because you've got to sort of store the different encodings of
+each of your pieces of data. But it is constant work. And because you can kind of
+arbitrarily control N and k, the only rule here really is that k can't, you know, has to be
+equal or smaller than N. And because you can turn that knob, you can kind of arbitrarily tune this to the economics and performance
+goals of your system. And it is super, super effective, right? In exchange for doing a
+little bit of extra work, so I can potentially even an arbitrarily small amount of work, we can bring the tail way, way down. And we can bring the tail way down because we've sent out
+those say six requests. And the two slowest ones, we just don't have to
+wait for them, right? So this is a technique that we use in a bunch of places in AWS. As I said, it's ubiquitous
+in storage systems. But one particular place that I really enjoyed building it into was the container loading
+system in AWS Lambda. This is a paper we wrote
+for USENIX ATC last year. This goes into details on how we added container
+support to Lambda and built the data plane that allowed us to support artifacts that were 40 times bigger without increasing cold start latency. So a really fun system to work on. And one of the core ways that we did that was building the system
+based on erasure coding in a tiered cache, which really helps flatten the tail. And so by building erasure coding into AWS Lambda's container data plane, we saw those significant
+tail latency benefits I showed you on that graph. But we also saw some really
+cool resilience benefits, which is an extra benefit of
+a lot of these techniques. Both the kind of send
+to requests technique and the erasure coding technique and even that send a request
+after a long wait technique. What it does is it makes the system much more resilient to one server or one component being out of service. And the benefit of that, in exchange for a relatively simple kind of client-side algorithm change, you've made your deployment
+story a whole lot easier. You've made your operational story of how quickly you have to find
+and respond to a bad server a whole lot easier, right? You've got a lot more time before it's going to become
+visible to your clients. And so one of the really hard things of running large-scale
+high-availability services is these operational
+tasks like deployments. If I have a storage fleet
+that's just sharded, deploying is super hard. Deploying is super hard because I have to take
+a storage server down for some amount of time, that could be milliseconds to minutes, while I put new software on it. But if I have erasure coding, well then I don't really
+need to optimize that because while that one is down, it can be down for a while, but my client will be able to get the results it needs from
+elsewhere in the system. I like erasure coding too
+because it's constant work. It does the same amount of work in the success case and the failure case. And if you've been paying attention, well that's kind of a
+theme of this talk, right? You don't want to do more
+work in failure cases. You wanna do the same
+amount of work at all times during success or during failures. And if you can, you wanna do
+less work during failures. Lambda uses a very simple 4-of-5 code. That means we send out five
+requests, we use the first four. It turns out that that is a simple code that is just like parity. But there are erasure codes for all needs of all
+systems and all sizes. They're relatively computationally cheap. And so it's a cool tool. So I've talked a lot about
+metastability in this talk, and you might be thinking
+like what is this word? You know, what do you mean anyway? So let's just talk a little bit about the behavior of systems under load. And this is the slide that you are seeing, you're showing your boss that you're seeing in a
+systems research paper, you're seeing from your
+system vendor that shows, that performance just
+goes up into the right. You add more load, you get more success. You add more load, you get more success. We all wish our systems
+actually behave this way. You add more load, you get
+more success, and so on. But the reality is that
+it's not like that. The reality of almost
+all distributed systems and I think literally all
+single machine systems is there becomes a point
+where adding more load leads to less success. You drive more contention. You drive packet loss on interfaces. You drive thrashing in of caches. You drive thrashing of schedulers. You drive too many threads. There is some point where adding more load makes the system do less successful work. And at this point, we start to run into trouble. Because what we would like to happen here, now we don't like this situation at all, but what we would like to happen here is that when we get into that point, if we reduce the load, we would follow the path nicely backwards, sort of back uphill, getting more successes as
+the load goes back down. But as we saw on that sort of first slide of three retries keeping the system down, unfortunately this is not what happens in a lot of kinds of systems. Unfortunately what happens
+is instead the load goes up and then you have to
+bring the load way down before the system recovers. In that simple retry
+slide that I showed you, you have to bring the client
+off at load down to 30% of what it was originally succeeding at before the system recovers. And again, we might not know it and we might not see
+it in our usual graphs, but the vast majority of systems have some flavor of this behavior, right? Where you have to reduce
+the load below what it was, below the optimal load, to have the system recover back into its normal working behavior. And so here is what it looks like, right? We have our normal operations
+up and down, up and down. These are our day-to-day operations. We wanna run in this mode all the time. Then you get to some point where the system is saturating, right? All of your calls are busy, your cache is optimally full, and so on. And here you're starting to
+see your failure rate rise, your latency go up, the success rates start to drop. And then we enter a
+mode of true saturation where more work, more offered load, more requests from clients
+leads to less progress. And this again, thrashing of caches, thrashing of schedulers, too many threads, packet loss at network interfaces, saturated storage devices, right? There are so many different patterns, so many different systems, you know, phenomena that
+lead to the same behavior. And now we're in this
+bad kind of downstate. Often then we will see, as we saw in our first slide, that retries now are holding
+the system in saturation, or thrashing or contention or lock contention or latch contention is holding the system
+in the saturation mode. And then we have to reduce load
+way, way, way, way, way down before retries drop, successes come back, and the system can recover
+to its usual behavior. This is, again, I think for some people, it's gonna sound like science fiction, but this is probably the most
+ubiquitous pattern I've seen behind long outages of
+large-scale systems. I don't what happened with this. Okay. I don't know. I don't why we're getting these, sorry. Having some slide trouble here. I don't what's going on here. Anyway. And so the open area in
+inside this graph indicates what I've been calling metastability. If the overload traits of your system, if you drive your system into
+overload and then recovery has an open area inside the graph, then you have metastable
+behavior in your system and you have the risk of long, painful, non-self-recovering
+load-related outages. And almost all systems that follow kind of best practices
+of implementing retries, especially if those
+retries aren't adaptive, does have this kind of behavior. It is one of the most
+important things to understand if you think about the
+resilience of systems. So let's move on to a little
+bit of a different topic like where these numbers came from and how we can understand the behavior of our systems better. My favorite technique for understanding the behavior
+of systems is simulation. I like to write very simple,
+small event-based simulators often in languages like R or Python that explore various
+areas of systems behavior. I find that my intuition about the dynamic behavior of
+systems is actually pretty bad and I've learned not
+to trust it super well. Your intuition might be better. I hope it is. And so I find that simulation is a tool that allows me to explore
+the behavior of systems. And let's pick up some examples. So where did this graph come from? Like where did I, how did
+I calculate that 66% lower? Well, one way I could
+have done that is with kind of sort of, I don't
+know, parametric statistics. I could have fitted a distribution
+to this latency curve. I could have done a bunch of math. We used all super powerful techniques. For arbitrary distributions like this, its kind of beyond my powers and beyond my knowledge. But there is a much easier way. And that is to use a
+simulation method, right? Where you take that real
+data, you take that real CDF, you take your real samples of latency from your monitoring infrastructure, from your observability infrastructure. You don't make any attempt to fit a distribution or anything to them. You just use them straight out of the box. And so what I did here was I picked five samples of the data. I just took my whole huge
+array of samples of data from the service. I picked five at random. And I chose the fourth best. And I did that over and
+over and over and over just a bunch of times, and wrote down the result. Wrote down the output CDF of that. And so without any kind of like fitting a distribution
+or anything like that, what I've been able to do is calculate the real-world behavior of the system using its real-world latency measurements. I don't have to make assumptions like latency is log normal or latency is, you know, whatever, right? I can use my real measurements. It's a super powerful,
+very simple technique. This is literally like
+three lines of Python. And so there's no need
+to choose a distribution, fit a distribution, implement
+goodness-of-fit tests. And I'm not against those methods, right? There's nothing wrong with them. But they do require you to
+make a set of assumptions and they do require a set of skills that unfortunately most
+software engineers, designs, don't remember. You know, you might have
+learned this stuff in college but you can't use it. And so I think unfortunately
+as an industry, what we've done is we've been like gotten into this sort of a
+little bit of a stuck mode where we've said, well, I don't remember how to
+use those statistical tools. I'm just kind of scared of statistics and so I'm just not
+going to try and measure and think about these things. And I think these sort
+of simulation methods are a really great way, using simple adds and
+multiplications and so on, to understand the behavior
+of our systems better without requiring the same level of kind of symbolic sophistication. And again, you know, where
+did this graph come from? How did I understand the
+behavior of this system? Well, once again, I wrote
+a simple system simulation. This is like a piece of Python. This one's about 100 lines, you know, 50ish lines of commands and about 100 lines of code that directly models the system. It's like, you know, object orientated, there's a server object
+and some client objects and they send requests to each other. And what's really cool about this is that it's super easy to review, right? It's a really simple piece of code that does really simple things. I can send it to any engineer on my team and they're well within their capabilities to review and understand it. And then I can say, well, I can tweak these things, I can add some retries,
+I can add adaptive, I can try two retries instead of three by changing just a couple
+of lines of this code. And that saves me a huge amount
+of time as a system designer because I can explore the parameter and behavior space of my
+system super dynamically. This kind of simulation
+technique is met in disguise. And it's so disguised that
+people look at it and say, well, that doesn't seem real. Here's another example
+where I love simulation. It's a great paper called Nudge, which looks at a way of
+improving the tail latency in first-come first-served queue systems. I'm not gonna go into the algorithm. It's a very fun paper, you should read it if you have any kind of
+queue or work queue system in the systems that you're building. But the question in my
+mind is going to be, well this technique that I read about in a
+systems paper, in a journal, is it actually gonna help my
+system and then my customers, or would I go off and
+write a bunch of code and when I deploy it, see no improvement? Well I don't want to do that. Writing production code takes me time. Deploying code is risky and takes me time. What if it makes things worse
+then I'm gonna, you know, have a bad day and I'm gonna
+disappoint my customers. And nobody wants that. And so once again, by building a just very simple kind of object-orientated
+system simulation on my system, what I can do, and I've got the code
+for this up on GitHub if you're interested, what I can do is I can say with the parameters of my
+system, with my real latency, with my real distribution of client behavior and request sizes, will this help my system? And what I learned when
+I did that simulation was actually, yeah. Yeah, it really does. It really does help my
+system in a bunch of ways and flattens the tail. And so it's gonna be worth
+implementing for my system. And this took me, you know, under an hour
+to write this code. And you know, directed a couple of weeks of work of building a new queue
+discipline in our systems. And if it turned out the answer was no, this isn't gonna help, it would've saved us a
+couple of weeks of work. And that's really cool. It gives us answers, quantitative exact
+answers much more quickly. And luckily, there's an even faster
+way to do that these days. It's gen AI. That's what everyone's talking about. One of the things that I've
+learned works super well is to write these kind of
+descriptions of simulations and pass them to a model like
+Sonnet 3.5 on Amazon Bedrock and get it to write the simulation for me. This is the full program
+that I've written. It took me all of 30 seconds to write it. And it generated a graph
+that I have in a slide for a different talk this week. Now it would've taken me
+probably half an hour, maybe an hour to write and
+debug the code that does this and make my graphs all pretty and remember which libraries are using R for drawing the right kinds of graphs. But this took me all of 30 seconds, maybe a full minute if I
+was typing super slowly. And so it saved me a bunch of time and allowed me to explore a behavior of my system using simulation that I maybe just wouldn't have
+bothered to explore before. This is the kind of thing that's so exciting to
+me about generative AI is it allows us to do
+these kinds of things, to learn these kinds of things much more quickly and much more cheaply than we would have in the past. Let's talk through some takeaways. We'll go back over the talk and see what I think I'm
+hoping you've all learned. So by retries, that's where we started. Jitter is good. We should always jitter. Again, jitter, I mean add some randomness. Randomness is good for systems. It helps break up spikes. Retries can introduce these metastable or tipping point failures, where they knock systems over in a way that they don't come back up, even the sort of best practice retries with exponential backoff. Using a token bucket algorithm like the one we use in the AWS SDK can completely avoid this failure mode for most types of systems in just a few lines of client-side code. That's built into the AWS SDK and you can see how we implement it there. The other lesson is that backoff isn't particularly
+effective in open systems. So systems where there are a large number of clients
+kind of arriving in random. It's effective in those closed systems. But if you're building an
+open system like a website, backoffing your clients is unlikely to help overload much at all. Circuit breakers, super powerful tool, both for that reducing harvest thing where you reduce UI features or you know, other optional
+functionality in your system. And for making sure for clients being generous
+to the downstream system and not sending extra traffic when they know that it's overloaded. But be careful with them, especially be careful with
+them in sharded systems and in deep circuit service architectures. Pushing circuit breakers
+down into those architectures or bubbling up a little bit more detail of the architecture than
+you're really familiar with into the client implementation can be effective ways
+to avoid those problems, but come with their own downsides. The tail. There are a bunch more of
+techniques like hedging, like just calling twice,
+like erasure coding, that allow a system to do more work, to get a flatter tail, to
+get less outlier latency. I tend to prefer techniques
+that do constant work. They do the same amount of work in the happy case and the sad case. And that's why the erasure coding and always just do it twice techniques I find particularly effective. You can use a token bucket just like I talked about with retries to limit additional work. But that does mean that there is some amount
+of additional work. And erasure coding is great. This is a systems technique that I just wish more
+people knew about and used. As I said, it's been a staple of
+storage systems for 50 years. But isn't widely used
+in distributed caches for some good reasons, and I think just mostly
+a lack of awareness. I think that simulations are a really powerful mathematical tool that just sort of fits the mental model of most
+programmers very well. There are a whole lot of people
+who would feel uncomfortable reviewing a page of kind
+of symbolic statistics, and probably should feel
+uncomfortable reviewing that, who would be really
+happy and very competent at reviewing a small simulation that got the same kinds of answers. I'm not against more sophisticated
+simulations by the way and simulation frameworks. I just think that people
+tend to reach for those a little bit too early and feel like, hey, if I'm gonna do a simulation at all, I'm gonna have to use a cutting-edge distributed
+simulation framework. Those things are super
+powerful, they're great, but you don't need them for a lot of the systems
+work you're gonna do. Simulations look like code, they feel like code, they smell like code, you review them like code, you test them like code, but they're actually powerful
+mathematics under the covers. It's mathematics in disguise. You should write more simulations. I should write more simulations. If you take one thing out of this talk, it's that you should go back and write some simulations of
+the behavior of your systems, behavior of your clients and
+behavior of your servers, and you might discover something that saves you a long and painful outage at some point in the future. Well, thank you very much
+for joining me today. I hope there's something
+you got out of this talk that you found interesting and can apply to your own
+systems and architectures to make them more resilient and to avoid especially
+those tipping point failures that cause the worst kinds of outages. Thank you very much. (audience applauding)

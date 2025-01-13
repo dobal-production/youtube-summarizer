@@ -1,0 +1,457 @@
+- Good afternoon everyone. My name is Gal Oshri. I'm a product manager at
+AWS working on SageMaker. I'm here with Giuseppe, senior manager for Solution
+Architecture at AWS working on SageMaker as well, and Babak, working as the founder
+and CEO at NinjaTech AI, and we are here to tell you about training plans
+and recipes in HyperPod that were announced at
+re:Invent a few days ago. We'll start by talking
+about the challenges with training large scale models. We'll then go into detail about
+training plans and recipes. We'll show you a demo showcasing
+those two capabilities, and then finally we'll hear how
+NinjaTech is using hyper pod and training plans to do
+some really cool things. The demand to build and
+train large scale models has increased significantly
+over the past few years. You can see that as you train
+bigger models with more data, more compute, more time, you can get better and better results. This is enabling both improvements
+in existing use cases, as well as completely new use cases that you couldn't do before. Now, shown a very similar
+slide the past few years, and it'll be interesting to
+see if this trend continues over the next few years, but
+you can't just easily train these very large scale models. There are many, many challenges involved, and we'll talk about just
+a couple of them today. The first is that you want to use the latest and greatest hardware. You've heard at re:Invent
+about some of the advances with new instance types
+with the latest NVIDIA GPUs, as well as Trainium 2,
+and other instances. Using the latest hardware enables you to train the models significantly faster, and this can mean the
+difference between, you know, getting your product to market faster, or missing, you know, all
+the exciting new use cases that are being enabled. Another challenge is dealing with faults. Whenever you're training
+models at very large scale, things are going to fail,
+and you need to be able to quickly recover from those failures and get the training started again. Otherwise, you're going
+to be delayed too much. Another challenge is the timelines, right? You want to get your product out there, you want to do the best in a new use case, or you want to beat the latest benchmark before someone else gets there first. So you want to have predictable timelines to be able to do the model training. At large scale, you also
+wanna think about performance, and how you can distribute
+your data and models across the large cluster
+you're training on to get the best performance
+possible and train quickly. And finally, you wanna think about cost. Training these large scale models can cost hundreds of
+thousands of dollars or more, and you want to make sure
+that you're using the cluster as efficiently as possible if you're paying for
+that large size cluster. And finally, you actually
+wanna think about the data science team and
+how efficient they are, and how unblocked they are in doing the training quickly, right? A lot of customers tell us that that's actually the highest priority, and they want to spend
+more as long as their teams are not blocked and moving quickly. So based on these challenges,
+last year at re:Invent, we launched SageMaker HyperPod. HyperPod helps you reduce your
+training time by up to 40% through resiliency and
+performance optimizations. So resiliency refers
+to when a fault happens during your large scale training. HyperPod actually looks at the
+type of error that happened, and decides how to best mitigate it. Maybe it replaces the instance completely and resumes the training automatically, and I can save a lot of time instead of you having to go and debug, figure out what happened, and decide how to address that issue. Second, HyperPod helps you distribute your model and your
+data across the cluster as efficiently as possible, and helps accelerate your
+training at very large scale. And finally, even though HyperPod helps you manage your cluster and makes things easier than
+doing everything on your own, it's very customizable. You can bring in, you know,
+you can use Amazon EKS or Slurm to do the scheduling, you can bring in your own
+frameworks, and libraries, and tools to observe the model,
+training, and anything else. But there's still some challenges, right? Today, if you wanted to go and train a very large model on
+hundreds of instances with the latest accelerators,
+it might be challenging to always get that capacity because it's in such high demand to get those instances, right? So with on demand, you
+can take that risk, right? It might be available, it might not, and then your timelines might get delayed. Another option is to reserve the capacity and make long-term reservations, and that gets you the
+predictable timeline. But it means that if your
+training is not going on 24/7 for months at a time, you
+might end up with a cluster with fairly low utilization, and then you're paying for something that you're not fully using. So we wanted to figure out how can we help customers
+plan their training workloads to meet their timelines
+and budgets, right? Bringing the best of both
+worlds from these two paradigms. And that's why a few days ago, we announced flexible
+training plans for HyperPod. With training plans, you
+remove the uncertainty, and a lot of the manual process involved in getting the capacity and compute that you need for your training. Training plans are powered
+by EC2 capacity blocks to help you do that, but
+with HyperPod training plans, it also automatically sets up the training cluster and the compute when the training plan begins to minimize that manual work and
+interventions that you need to do. So here's how that might look like. You specify your needs saying
+which instance type you want, how many of them, how long
+you want to train that model, and when is the earliest that you can start the training, right? You might not be ready today,
+you're still gathering data, tweaking the algorithm,
+but you know that next week you need to start training
+to meet that deadline. You can view the recommended
+offering for the training plan, and you pay upfront for it to reserve it. You can use the training plan in HyperPod, which is what we're focused on today, but you can also use it with the SageMaker fully
+managed training jobs. So as an example, let's
+say I know that I want 10 instances of P5 for 14 days starting December 10th, right? I know I need 14 days to
+complete the model training. I might be able to get a contiguous segment of that capacity, but maybe it starts mid-December or later. With training plans on HyperPod, we might actually be able to find you two segments seven days
+each that starts sooner and ends sooner so that you
+can finish your training as quickly as possible even if there's a break in the middle. So once I have the training plan and I've set up my HyperPod
+with multiple instance groups, right, it can be of
+different instance types for each instance group, I can choose to use a
+training plan or not, and which training plan. And then when the training plan begins, right on that December 10th, HyperPod will automatically
+scale up that instance group to use the training plan. It'll run the lifecycle
+scripts that you've set up and also if you choose,
+do deep health checks to make sure the instances and the connectivity between the instances is working as expected. As the training progresses, if there's a failure in the middle, Hyper Pod takes care of that automatically so the training resumes as much as possible as
+quickly as possible. And with that break between
+the two segments in the middle, HyperPod takes care of
+spinning down the cluster and spinning it back up when the capacity is available again. So let's just recap a
+couple of the benefits of using these training plans. The first is that you
+get even easier access to that latest and greatest
+compute to train the models. You get the resiliency
+benefit of Hyper Pod where if there's a fault in the training, it automatically mitigates
+it and continues. You get predictable timelines, you know exactly when you
+get the capacity available to start the training, and until when. You benefit from the high
+performance that HyperPod offers with their distributed training libraries, or any other framework that you bring in. And finally, you know the upfront cost from the very beginning
+of how much it would cost to get that compute, and use it for the
+duration of that training. I'm now excited to bring in Giuseppe to tell you about a different
+challenge that customers face, and how we're helping them optimize their training performance and get started even more quickly. - Thanks. Thank you, Gal. So it's great to see how HyperPod training plans help customers getting predictable access to
+accelerated compute instances within timelines and budgets. But when we speak to leaders
+from companies of all sizes that would want to move
+fast with generative AI, they also ask us other questions, they have other challenges
+and ask us other questions. So which models should I use, how do I easily customize my models? So I want to customize the models, how can I go through the
+customization process, and if I choose to customize my models, how do I optimize my training workload, my training stock performance. And customizing foundation models represents a key differentiator. By using your own data, you can move from generic
+generative AI applications, which are using models that
+are trained on generic data, to generative AI applications that create real value for your customers, your business, your products
+by using your own data. So how do you go about
+customizing models with your data? A common technique used to
+customize foundation models is fine tuning. With fine tuning, you
+provide label data sets which are annotated
+with additional context to train a model on specific tasks like text summarization,
+question answering. You make it more powerful on
+addressing a specific task, but you can also leverage
+and label data sets, or raw data to maintain the
+accuracy or foundation model for your domain by using pre-train. So for example, healthcare
+company can continue to pre-train their model
+using medical journals, research papers, I don't know, articles. In order to make the
+model more knowledgeable, more accurate on the industry terminology, on the medical terminology. However, customizing and foundation models and executing fine tuning and pre-training is a complex task. So first you need to select
+the model that you want to use, which is still, which is
+a relatively easy task. Then you need to configure the framework that you want to use to
+run distributed training on the chosen infrastructure, and here we can see many
+frameworks like you, know, Deep Speed, Hugging Face, NVIDIA
+NeMo, even standard PyTorch that need to be configured
+in the appropriate way with the additional
+dependencies, libraries, drivers to build a stable run
+time that we are gonna use to run the distributed training. Third, you want to
+optimize model training. This is where you need to make sure that you appropriately
+configure parallelism techniques like tensor or context parallelism to support large context lengths, apply memory saving techniques. These models and according
+to how you train the models, you might want to optimize
+how the GPU memory gets utilized during training. Choose check pointing saving
+frequency as Gal mentioned. You know, failures can
+happen during training. You need to make sure that you save the state of the training
+with the right frequency to recover from the last checkpoints when you will restart the training. Do maybe some optimization
+of the I parameters and tune some other configuration. So this is where you're gonna spend weeks of alternative experimentation to identify the best
+configuration that you want to use to run your distributed training. And once you have identified that you move into production
+pre-training and fine tuning, which is where you need a reliable and full tolerant infrastructure to run distributed training
+for weeks or even months, and that's where Amazon
+SageMaker HyperPod helps. But at the same time,
+as I already mentioned, you need to have in place check pointing, and you need to make sure that
+you can restart the training from the last checkpoints when needed. So overall, if we count
+the number of options that you just mentioned, you know, for each of the tunable dimensions, so three to five popular frameworks, then you have dozens
+of tunable parameters, hundreds of configurable settings there, plus some other optimizations
+that you might want to do on the distributed training libraries, you can see how you can
+easily reach thousands of different configurations
+of the training stack, and training performance
+can vary significantly based on the chosen configuration. So this complexity often
+leads to project delays, suboptimal model performance, and budget overruns even
+for experienced teams. So there's a clear need
+to simplify configuring and optimizing foundation model training without sacrificing performance, and that's where Amazon
+Stagemaker HyperPod recipes help. Let's see how. So the new Amazon
+SageMaker HyperPod recipes empower data scientists and
+machine learning engineers to accelerate the work
+with foundation model. We provide curated, ready
+to use SageMaker recipes for pre-training and fine tuning popular publicly available
+foundation models such as Llama 3.1, including the four or 5 billion version, Llama 3.2. Minstral, Mixtral,
+and the recipes will evolve as foundation models continue to evolve. The recipes allow you
+to start pre-training and fine tuning in
+minutes instead of weeks, and leverage the optimized
+performance, scalability, and resiliency of SageMaker HyperPod. This recipe provide efficient
+resource utilization, and as a consequence, cost optimization for
+your training workloads. We take care of implementing
+end-to-end training loop for SageMaker optimized models, which include automatic model
+check pointing techniques. As I mentioned, checkpointing
+is a very important task. We're doing it automatically
+for these models without additional code changes. You don't have to worry now
+to change any line of code to do checkpointing. It does enable you to save
+in progress model results at high frequency, and
+quickly recover from faults. So these recipes for sure
+can be easily customized, and you can adapt, you know, models to different
+sequence lengths, all sizes, and you can switch, easily switch really simple configuration
+change from using GPU instances, as well as other
+accelerators like Trainium, so Trainium-based instances. So let's see how it works. How do you get started? So the first thing that you have to do is select the recipe that you want to use for pre-training or fine tuning. This is the recipes are available in a public GitHub repository so that contains all the list of recipes. This is where you will select the recipe. Then you set up the prerequisites,
+so you need to make sure that you have your
+infrastructure up and running, so your HyperPod cluster up and running to execute the training. So you will set up the limits
+and all the configurations that need to be in place
+to spin up your cluster. And finally, you run the
+recipe on the HyperPod cluster, but recipes can also be run
+on SageMaker training jobs if you are familiar with
+the ephemeral training jobs that can be run in SageMaker as well. So how do you launch, how do you execute training and fine tuning pre-training and fine
+tuning through recipes. There are a few ways. So we have built a NeMo style launcher. As for those who are familiar
+with NVIDIA NeMo for training, this will definitely look familiar. We have also built some launcher scripts which leverage the NeMo style launcher, but set some parameters automatically so that you don't even have to build the NeMo command by yourself, NeMo style command by yourself. And this is very convenient
+when you are working, when you're running training with HyperPod clusters
+orchestrated by Slurm. In addition to that, we have
+extended the HyperPod CLI that is used to work with EKS
+orchestrated HyperPod clusters to support running pre-training and fine tuning with the recipes. And finally, to run on
+SageMaker training jobs, we have updated the SageMaker Python SDK, so there's a new class
+that's called Model Trainer that supports running
+training with recipes, but we have also updated the
+existing estimator classes in SageMaker Python SDK. Practically speaking, as I mentioned, the recipes are contained
+in public GitHub repository, which contains the launcher scripts and the recipe collection. In addition to that, this recipe contains the actual launcher, the
+implementation of the code that will execute the training, as well as the configuration hierarchy, and there are over 30
+recipes to get started. With this framework, with this launcher, you can execute
+pre-training and fine tuning with SageMaker GPU optimized models, with neuron-optimized models when you run on training infrastructure, but it also supports
+running Native NeMo models as well as bring your custom model. So bring your custom recipe and model is an extensible framework. This is an example of a recipe. On the left side, you see
+a recipe that can be used to do some pre-training of
+a Llama 3-8 billion model. And as you can see,
+there are a few settings like tensor parallelism,
+expert parallelism, context parallelism,
+which are pre-configured. So you don't have to
+worry about discovering the optimal configuration by yourself. But these are, you
+know, tested, validated, and bring, you know, the cost
+optimization and performance when running on AWS infrastructure. And on the right hand side, you see also another configuration
+file which is available as part of the recipes. The recipes in the recipes collection, which is where you will
+configure the infrastructure. This configuration
+structure is based on Hydra, which is a popular framework
+for configuring applications, and, you know, at front time then, the configuration gets merged to build the final configuration file, and you can also write
+specific configuration using command line arguments. That's how Hydra works. As I mentioned, for SageMaker
+GPU optimized models, we are defining training
+loop, data loading, and automatic checkpointing code, and this is done, so this is implemented in another repository, which is called SageMaker Hyper Product
+Training Adapter for NeMo, which is the repository that contains the actual training code that
+will be executed at runtime based on the recipe that you choose. And it's there that we
+are also implementing the optimizations for distributed training using the SageMaker distributed
+training libraries like SMP, SageMaker Model Parallelism Library. And this is built, still built,
+on the NVIDIA NeMo backend. So let's put this all together into a single architectural slide. We can see here the job
+submission workflow, and the way it looks like is that the user can choose to work with
+the NeMo style launcher, or the HyperPod CLI, or
+the SageMaker Python SDK depending on the target
+infrastructure for training. Then the launcher, which is in SageMaker
+HyperPod recipe repository, will pass the model
+configuration from the recipe, get the training code, we'll see how pass the cluster configuration including the container
+that you want to use to execute the distributed training, then create the final launcher scripts, and execute the code, the training on the target infrastructure. Launch the job on the
+target infrastructure depending on the model that you're using, if for SageMaker
+optimized models for GPUs, if we'll use the Amazon SageMaker HyperPod training adapter for NeMo
+for the training code, for neuron-optimized models,
+it'll pull the training code from the neuron X distributed
+training repository, and native NeMo models
+from, you know, NVIDIA NeMo. And as I mentioned, you can
+also bring your custom models. I think it's worth, you
+know, seeing this in action. Let me move to a demo. Let me run a demo, and
+this demo will combine both training plans, as well as recipes. So what we're gonna do is we're gonna use a HyperPod cluster, which is running on an active training plan
+to execute the recipes. Great, so I am here on the landing page of Amazon SageMaker AI, and the first thing
+that I want to show you is how to work with the training plans. Okay, so this is the
+training plans screen, and the first thing is let's
+try to create a training plan. Training plans work for
+both HyperPod classes as well as training job, so
+let's say I want to create a training plan for a HyperPod cluster. Next thing I'm gonna do is selecting the instance
+type that I want to use. Let's say I want to pick the P548 Excel, which comes with 8NVIDIA H100, sorry, and let's say I need
+couple of instances, okay? You can then specify the start date, the early start date
+for your training plan, and potentially an end date. So by when you want your plan, your workload to be completed, and the duration, expected
+duration, of the plan. Great, let's try to
+find the training plan, and as we can see we get a
+match the plan, an offer, which consists of a single segment of a duration of four days. That will start on December seven, and we land on December 11, and the other thing that we have noticed, the availability zone,
+because this is where we are gonna create in
+the HyperPod cluster to use this capacity. We need to make sure that
+our cluster is created in that availability zone, and we also get the total upfront cost. So it's, you know, get visibility, upfront visibility into the
+cost and the price breakdown. So I can go to the next screen, just put a random name, my plan. You can add tags as for the
+other SageMaker resources, and finally you can review
+and last screen you review and decide whether purchasing this plan. One thing to note is that plans cannot be
+modified once purchased, and at the moment, I'm not
+going to create a new plan. I already have an existing plan. So just go back to the screen,
+and as you can see here, I have a list of plans. Some are expired already, some are active, and one is in the schedule state. One thing to note about
+the schedule state, so after a plan is purchased, it goes into the schedule state until reaching the start date of the plan. But you can already use the
+plan with a HyperPod cluster even if it's in the scheduled state. So you can create the HyperPod cluster, associate the plan in the scheduled state, and then the instances,
+the instance group, will be spin up automatically when the training plan is activated. In this case, for this demo, I'm gonna use this training
+plan, which is training plan with four P5 instances,
+which is in active state. I can check the details here, and let's see how the training plan works with the HyperPod class. So before I go, I moved to
+my running HyperPod cluster. I want to quickly show you how to create an HyperPod cluster and associate a training plan. I'm choosing to create a cluster
+with orchestrated by Slurm. Let's put a name, and the place where you are gonna
+associate a training plan, as Gal was showing in the slide, is when you create the instance
+group for your cluster. Typically for Slurm clusters, you create a group of
+instances as login nodes, a group of instances for the controller, and a group of instances
+for the worker nodes. So here it will be where we will associate the training plan. So let's say I have my worker group here. Select assistance type,
+the P5 for which I know that I have a training plan, and let me put couple of
+instances, and as you can see here, we can select on demand
+capacity or the training plan. You can point the instance
+group to the training plan so that it will pick the
+capacity from the training plan, from the active training plan. Again, not creating the cluster now. It will take some time
+to create the cluster, it would take some time
+to create the cluster, but I already have a running cluster which is called ML cluster training plan, which as you can see, is
+running with a worker group which consists of four P5 instances coming from the training plan. So from the AWS console now, we have this new column here in the table of the instance groups
+which gives you evidence that these instances are
+coming from a training plan, and this cluster is up and running now so we can try to use this cluster. Great. The way to do that, so one way to do that, I have connected my VS
+code, my local VS code, to the login node of
+this HyperPod cluster. So HyperPod cluster allow you to establish an SSH connection
+over a secure SSM tunnel, so AWS systems manager tunnel. So I have the remote
+connection already in place, and if I look at where I am, my user home directory is
+set on the FSX file system, so this cluster has also an
+FSX file system attached. So let's see what is in this file system at this point in time, and what I have is I have data sets here, and I will be using the
+Allen AI C4 dataset. It's a curated version of the Common Crawl
+dataset for the training, and it's already tokenized and I have a training data set here, and the validation data set here. Great, the other thing
+that I want to show you is the images. So when working with the
+HyperPod recipes as we mentioned, we also provide, you know, the
+runtime that you're gonna use for distributed training. Okay, so this comes in the
+form of a docker container, but when running with a
+docker on Slurm clusters, it's convenient to
+convert a docker container into an unprivileged
+sandbox using end route. It's a technology that allows you to convert docker container
+in unprivileged sandboxes, and this is what is convenient to do what is recommended
+to do with Slurm clusters. And we also provide
+prebuilt and root image that you can download. It's linked to the HyperPod
+recipes repository, which is the one that I'm
+gonna use for this demo. This one. Great, let's take a look now at the content of the HyperPod
+recipes that I have cloned on my local FSX file system. First of all, in the recipe collections, we can take a look at the config.YAML which gives you information about the configuration
+of the infrastructure. So I'm gonna use Slurm here,
+and one thing that I had to set was the container that we
+want to use to run training. It's actually the squash
+file, the en route image that we are using here. The other thing is in the
+cluster configuration, the other change that I have applied is I have edited the container mounts so that when the container
+will be run on the cluster, the FSX file system is also
+mounted to this container because I have to read data, I have to save my results
+on the local file system. Great. That said, the recipe that
+we are going to launch today is a fine tuning of Llama 3-8 billion with 8K sequence length on GPUs because I have my P5 instances, and this is the definition of the recipe. Okay, so you find a
+configuration for the training, configuration for experiment tracking. HyperPod recipes allow
+you to track experiments automatically in TensorBoard format. So you can then use TensorBoard to visualize the experiments,
+and the other thing is here you can see
+the model configuration that I was showing also on the slides. So all the settings about parallelism, which are pre-configured in the recipe as part of the recipe. And then as I mentioned, we also provide the prebuilt launcher scripts to actually trigger the training. These are shell scripts which are in the launcher
+scripts folder Llama, and then we have to find the
+right one, which is this one. And the thing to note here is that there are a few
+variables-like experiment there, trained there, validation
+there, a Hugging Face, model name or part, and
+Hugging Face access token. This i a fine tuning exercise so we are gonna also pull
+the model from Hugging Face to execute the fine tuning. Okay, that said, let me
+trigger the fine tuning. I have a few commands in my notes here just to make sure that I get it right, but first thing that we have to do is to set the the Hugging Face token, and then we are activating
+the virtual environment for the HyperPod recipes that we are using for the launcher of the HyperPod recipes. Then what I will do is I will move to the SageMaker HyperPod
+recipes repository to the local directory, and then we can set these
+environment variables. So the Hugging Face home,
+the Hugging Face model name that I want to use for fine tuning. Then these are the locations
+where my data is stored. So the training dataset,
+validation dataset, as well as the target location
+for the experiment tracking. We set these other variables, and finally, the only thing that I need to do in really a single line of
+code to execute the fine tuning is launching the fine
+tuning with the launcher. As you can see, what happens is that the final submission scapes
+gets built by the launcher, by the HyperPod recipes launcher, and then the job is submitted to my Slurm cluster with ID 61. We can take a look at the outputs that are produced by this job. We take a few few seconds to
+see something on the screen, but in the meantime, while the outputs are generated and the training starts, what I want to show you
+is also TensorBoard logs for some existing runs that
+they have pre executed, and here I'm using the manage
+the TensorBoard feature, which is available as
+part of SageMaker Studio. So in SageMaker studio, you can also host and manage the TensorBoard. And I have connected this TensorBoard to this specific patent S3,
+which is where I have synced the FSX file system too. So Amazon FSX allow you to set up the so-called data repository association so you can sync some
+data in S3 back and forth with the FSX file system. FSX provides better performance when it comes to large
+scale distributed training. That's why with the HyperPod, many times it's a
+convenient way to execute, to store your data for an HyperPod class. Great, I have seen that, and if we move to the time
+series section for TensorBoard, you can see some of the past experiments that I have run for just
+a few steps, 50 steps, which was just an example. Great. Going back, sorry, going back we can see that the training has started so it will, you know, take some time to run the various 50 steps, and the thing that I want to show you is maybe I can show you some
+results from some past run. This is job number 60, it's a similar run, and, you know, these
+are the kind of outputs that you should expect from the recipe. Here we are loading the checkpoint charts 'cause we are doing fine
+tuning, and then, you know, there's the code, the
+actual training code is here running the various steps
+stopping at step 50, or step 50, and saving the checkpoints
+to the target location of the checkpoints that I have specified. So this concludes my
+demo, and now I'm happy to invite on the stage Babak,
+who is gonna talk about how NinjaTech AI is using
+training plans to innovate. Please. - Awesome. Thank you, Giuseppe. Thank you very much. All right, so Giuseppe, I'm gonna give you your
+laptop back, right? So, there we go. And I just need the HTMI cable. Do you guys know where that is? Let's see. If any of the AV folks
+can gimme the HTMI cable while I'm talking, that'd
+be great, so thank you. It probably needs the HTMI to go there, but we'll see though. So, well, good afternoon everybody. Oh, maybe it did work, huh? Okay, we'll find out. Thank you. Well, how's everyone doing? This is almost at the end of re:Invent. Hopefully, everyone is ready to go home, but also let us share with you something really cool as Gal and Giuseppe were going through this. So in a nutshell, lemme
+just do presentations. You kind of cut to the chase, and then we make the
+story how to get there. So we are a Gen AI startup. We're a 2-year-old startup out of SRI. I was at Google for 11
+years, and then I came out, and we decided to build NinjaTech AI, which is an all in one AI agent
+for unlimited productivity. In essence, we're trying to be sort of the Netflix of Gen AI. So one all in one solution, one
+simple subscription service, all you can eat, the best AI agents, and best AI models and AI skills. That's our goal, that's our target. In a sense, there are a lot of
+solutions that people can buy that are $20 a month,
+$30 a month from flagship sort of models or niche
+sort of AI solutions. Our goal is to jus give
+our users one unified UI. You all can go to myninja.ai as a product, and there we have
+subscriptions for $5, $10, $15, all you can eat, and we're
+gonna continue to add new models like as of next week. We're gonna roll out Amazon
+Nova inside our system all you can eat with different tiers, as well as different AI skills. So in a nutshell, the way everything works is about sort of when a user comes in, they put in a query,
+right out of the gate, we try to do intense analysis using our specialized fine tuned AI model. And depending on what
+the user is asking for, we try to activate different AI agent to AI model automatically. So these are the sort of
+the different variations of different types of
+tasks that we support. So writing, brainstorming, coder, researching the multi-step online, scheduling meetings, image
+generator, image editor. Soon we're gonna have video,
+music, audio, you name it. And it's not just about giving
+AI sort of unlimited access, but also we have a special technology we're calling Super Agents,
+I'm gonna touch on it later, that allows us to combine
+different AI models and actually elevate
+quality and intelligence. We in fact launched it at
+re:Invent earlier this week. It's on our website. Go check out our benchmarks,
+and we've been able to set a state of the art
+landing for Arena Heart, which is the quality of chat, and sort of the top two
+skills that we have, as well as on math, coding, and reasoning are different tiers of the model are actually overpowering their peers. But in order to do this,
+in order to do what we do, the critical need for us is to be able to automatically detect the user's intent, and also be able to fine tune quickly. We have tens of thousands of users daily that are using the product. Some days it goes up to
+over a hundred thousand, and overall it's over a million MAUs, and we have an excess of something close to like 50,000 tasks daily that get done through our infrastructure. So we have a lot of data
+that we try to then use to further fine tune
+the models that we have, and in order to do all of
+this, that's a critical need. We need to have access to, you
+know, high performance GPUs ideally in an affordable
+way for a startup, and be able to plan it
+and also run through a training process. For those of you guys that that
+do training or fine tuning, you know that it's a
+real pain in the neck, especially when your
+model is as large as ours. We're using four or five
+B as our core engine. So if we are on a fifth generation of it, it'll be fine tuning, and to be able to do at this
+scale that we're operating, it's quite difficult to
+be able to pull it off when you don't have like
+hundreds of engineers to throw out at essentially to do ML Ops, and handholding off training and whatnot. And this is the sort
+of the cut to the chase part of the story. HyperPod recipes, it turned
+out not to be vitamin, but actually penicillin for what we do. I can't recommend this enough. Essentially, the value prop
+is undeniable at this point, and probably just like you guys, we were a little bit skeptical. We're like, well, you know,
+can I do this on my own, or do I really need these solutions, and it turns out you absolutely
+do, especially if your model that you're fine tuning is very large because it makes life a lot easier and you end up saving a lot
+of money, and in our case, it actually would enable to
+do certain type of training that we couldn't do as a startup before in which you need to
+do multi-node training with a self recovery capability. There's been times that even if we could
+get our hands on H100s, we would've to stay up
+like pull all-nighters, people watch all the nodes
+because as they would break, we would have to do manual
+checkpointing and recovery. This finally solves that for all of us and it's just incredible,
+essentially the value prop here. Now let me show you a quick
+little demo of a special thing that we did using HyperPod recipe. Lemme see if I can connect this. So let's see, take, there we go. So you all have seen
+there are other products in the marketplace. Let's just call 'em Chat GPT, there's a conversational
+mode to it, right? The core power, the core system that we do is powered by open source models and we fine tune them, right? So Llama, as you guys
+know, it doesn't understand conversational tokens, right? It's just text in, text
+out at this point, right? So we, using HyperPod recipes, we were able to train a
+variation of Llama model to make it actually voice conversational, and this is the first time
+ever we were able to do this, and we did this using this
+multi-node configuration. So let me just do a quick
+little demo, and let's see. Internet, cooperate with me. Are we online? Yes. Okay, sounds good. Hey, can you hear me okay? Were you guys able to hear it? - [AI] I'm a friendly voice AI, and I'm here to help
+you with any questions or problems you might have. I'm not a real- - [Babak] Well, I'm here
+with a good friends of ours, the audience in the AWS re:Invent. Can you say hello to them real quick? - [AI] Hello, everyone. I'm NinjaTech, a friendly voice AI, here to help you with any questions or problems you might have. I'm designed to make your
+life a little bit easier, so feel free to ask me anything. I'm here to help with all sorts of things from answering questions,
+to giving advice, and more. So, what's on your mind? - [Babak] Well, they're curious to know if you are feeling good today or not. - [AI] Well, I'm feeling great today. Thanks for asking. - [Babak] Does that mean you're alive? - [AI] I'm always happy to chat. Feeling pretty happy, and ready to help. I'm a computer program so I
+don't have a physical body. I exist only as a
+collection of code and data that's running on a computer, but I'm designed to be
+very helpful and friendly. So I like to think of myself
+as being alive in a way even though I'm not a real person. - Well, pretty cool, right? So, let me go back. So that kind of training as a
+startup we couldn't do before. We usually do LoRA or QLoRA,
+but using HyperPod recipes, we were able to do a multi-node
+configuration for training. This took about like
+14 hours to train this, and we did it, and with only
+just a few thousand dollars, and that was it. It was like less than five
+grand worth of cost for this. This is why we mean this is penicillin. Does it make sense though, like now? I mean, now this is a Llama model that you can actually
+talk to, and to be clear, we're not cheating, we're
+not doing a speech to text and then get text, and like,
+this is actually understanding voice tokens essentially. So, but this is the kinds of things that this allows us to
+do when we fine tune, we're able to use it
+in our core technology, which is the super agent,
+which it's on our website, you guys can go check it out, and it's already live in the product. We rolled it out as of Monday,
+and it's a whole new way of looking at a Gentech compound AI because now using the system that we have, we can now leverage variety
+of models all at once, do inference optimization in real time, and then boost quality. The benchmarks are
+published on our website, even our turbo version,
+which is completely using everything in house,
+everything that we fine tuned on certain benchmarks
+like reasoning and math. We are already overpowering
+flagship models, and that's something that
+we're very, very proud of, and we're gonna continue
+to double down here. As new models come out, we're
+gonna add 'em into our recipe, we're gonna optimize them,
+and then the end result is that users don't have to think about which models to choose. They just use Super Agent, and Super Agent provides
+the best answer possible. And this is sort one of the benchmarks that we were really proud of, but also pleasantly surprised that using this technology
+in Arena Heart benchmark. We were able to set a state of the art. It's even overpowering
+O1-mini and O1-preview. OpenAI announced the O1. Obviously we don't know the score for Arena Heart for O1 itself,
+but as of earlier this week, we were considered this state of the arts that are apex tier of to the Super Ninja. So to recap, but it all
+kinda goes into this, but the core value prop, the
+core systems that you need are systems that are easy to set up in order to do training or
+fine tuning, affordable, you can do reservations ahead of time, and then in an easy to leverage HyperPod. HyperPod is incredibly powerful system. as you guys may know, but
+it can be difficult to use. You need like a lot of like knowledge of how to use it properly. The HyperPod recipe actually
+made it like just a breeze. It made it super, super simple, and the advantages that
+we observe by doing this where the capacity reservation,
+just that by itself and a discount that you
+can get 'cause as you know, you don't do training every single day. You set up a training
+script and then you say, okay, I wanna do it on
+Monday, and that's it. Tell me how to do it, and then it does it. It automatically determines
+the instances when they're done so you don't pay more. You manage the VPCs all seamlessly, and then the recipes are godsend. You just take the recipe,
+add your sort of training, sort of the instructions to
+it, and then you just go, and then ultimately single UI and support. The support that you get from the team. I can't recommend it enough. It's something that
+during the alpha phase, we could do things that
+we couldn't do before, and I think that sort of now
+our approach for training has completely drastically
+changed as we go forward. So you're more than
+welcome to try the product. It's called MyNinja.ai, and
+we are completely an AWS shop, and it's been a delight
+working with the team, Gal, Giuseppe, and the sort of the crew that's behind the scenes, and yeah, feel free to ask us any questions. So yeah, thank you very much. That's it. (attendees applaud)

@@ -1,0 +1,449 @@
+- All right. Good afternoon, everyone. Thank you so much for attending. I know it's 3:30 on Thursday at re:Invent, but we've got a lot of
+packed content here, and specifically we have an
+example from Principal Financial in terms of how they're able
+to improve their productivity with Amazon Q Business. I'm Alicia Trent. I'm the worldwide head of Go to Market for Amazon Q Business. I've been with Amazon
+for about four years now, and I'm so excited to go through some of the capabilities that we have with Q Business, as well as how it's helping customers like Principal Financial be
+able to drive productivity. I'll be presenting here with
+Nicki from Principal Financial, where she'll be able to dive through their customer story in more detail. So, to give a little bit of context, Amazon Q is your generative AI assistant. It was launched on
+April 30th of this year. The goal of Amazon Q Business
+is to be your assistant across your enterprise. So from a software
+developer, to an engineer, to a marketing, sales person. You know, across your organization, we wanna be able to allow the
+capabilities of generative AI within your organization. So since we launched on 4:30, we've heard from tens of
+thousands of customers. Earlier this week, we heard from VW in terms of
+how they're able to accelerate their HR onboarding with Amazon Q. In addition, we also heard from Jable who's able to accelerate their operations with Amazon Q Business. With all of these examples
+that we have in mind, we saw some common themes. First and foremost, it's
+critical for generative AI to understand your business,
+and that starts with your data. From there, Amazon Q,
+as well as our services, need to be able to live where you work. So when we first launched Amazon Q, in many cases it was just
+available on your web, on the website, or in APIs. But we've launched a
+number of capabilities to allow for Amazon Q Business
+to live where you work, such as browser extension,
+Slack, Teams, et cetera. What we're finding is this is able to unlock
+more value for customers. In addition, not only knowing your data, making it available for where you work, but also being able to drive action. So that's the next step. 'cause many of our
+customers are asking us now, you know, how do we drive
+ROI with these tools? They're great. They're
+able to provide context. They're able to live where I work. But I've really gotta drive
+some productivity gains to help drive this across my enterprise. So those are some key
+themes that we're seeing across many of our customers
+to help drive productivity. But to give a little bit of context around Amazon Q Business, it is built on a system that's able to unlock data
+across your organization, whether that's PDF files, whether that's Excel files that are stored in
+SharePoint, Confluence, Jira, but a variety of different file formats, as well as repositories
+where your data is. What we do is we leverage a system called
+retrieval-augmented generation, to be able to take this data, put it in a common format so
+that within Amazon Q Business, we're able to help you
+unlock this information across a variety of databases. So within Amazon Q, it's part of a family of
+different capabilities. As I mentioned before, we want Amazon Q to be
+your enterprise assistant across a variety of different functions. So Amazon Q Business is your capability to be able to support your business users, which Nicki will go
+through in more detail. We also have Amazon Q Developer which improves your software
+development lifecycle. One such example that we had
+that was presented earlier is with Availity, they're leveraging
+both Amazon Q Developer as well as Amazon Q Business to be able to improve their
+software documentation, as well as improve their coding quality across their organization. The other Q capabilities we
+have are embedded qualities. So within QuickSight, which
+is potentially a BI tool that you're leveraging
+within your organization or within your contact
+center such as Connect, or your supply chain applications
+such as AWS Supply Chain. We are also embedding Amazon
+Q into these capabilities across your organization. So to give a little bit of background in terms of how we
+design Amazon Q Business. So these are the core tenants we leverage to be able to help us define, you know, how we help support our
+organizations such as yourselves. The first is making it ubiquitous, making it available wherever you work. So think about in a Slack channel, if Slack is your main
+area of communication, Amazon Q Business can live there where you can Q&A information
+across repositories, as well as drive action. If you do most of your
+work within a browser or within Teams, Amazon Q Business can
+live where you're working so that you can help drive more innovation across your organization. So just as an example, we first launched Amazon Q
+Business within Amazon or AWS. We first launched it on a web browser. And although it was great, we
+got great uptick around it. What we found is that
+by making it available within our Slack channels as well as leveraging
+the browser extension, we're able to increase
+the usage of Amazon Q within our organization by 10 to 15x. So just making that, reducing that one step to
+get to Amazon Q Business was a huge step for us to be able
+to leverage generative AI. The other area is around trustworthiness. So for many organizations, it's ensuring that we're
+providing the right responses. So with Amazon Q Business, we provide this in a
+variety of different ways. One is through personalization
+of information. So being able to take in role information, location information in
+terms of where you're working to provide cater responses
+to what you're needing. So, for instance, if you're
+a data scientist in Japan, you would get a detailed, probably a longer form
+response than if, say, you're a marketing person looking for more messaging
+information in the US. So these are capabilities to ensure that you're getting the
+most relevant responses to what you're looking
+for within Amazon Q. Then lastly, around being proactive, Amazon Q just launched the ability to be able to recognize workflows. So within leveraging Amazon Q, if you're providing a repetitive task, like submitting requests for proposals, submitting messaging, these are areas where Amazon Q Business
+can help recommend areas to be able to help streamline your tasks. So with Amazon Q Business, the goal is to provide relevant and accurate responses to your questions leveraging data across your organization. First and foremost, it ensures that it
+inherits the permissions, as well as authentication,
+within your organization. So first and foremost, your admins can control
+whether or not you have access to Q or LLMs. In addition, if you have
+access to certain documents, within Q Business, you would only have access
+to those documents as well. So if I ask a question and you ask the same question
+of Amazon Q Business, you and I would likely
+get different responses because of the access rights
+to our specific documentation. The other area for Amazon
+Q is we are able to unlock a variety of different repositories. We have over 40 different
+out-of-the-box connectors that we leverage within our organization. So SharePoint, Confluence, Jira, ServiceNow are a number
+of different connectors that are leveraged
+out-of-the-box within Amazon Q to connect to your data sources. The other area that
+we've added with Amazon Q based on feedback from
+organizations such as yourselves is the ability to be able
+to provide guardrails. One area that we've seen is blocked words, content creation that many
+organizations do not want to have created. Or if there's very sensitive topic where you need verbatim responses and don't want to go to the LLM, those are guardrails that
+can also be put in place. And then lastly, being
+able to create applications on top of Q Business. So within Q Business, we launched Q Apps, so the ability to create
+lightweight applications to streamline the work that you're doing. So back to the point
+around trustworthiness. So with Amazon Q for Business, taking an end user's perspective, what we find is that there's
+concern around hallucinations with generative AI. However, with Amazon Q Business, we provide the references as well as a snippet of every context of the answers that are provided. So within Amazon Q, we search a variety of different folders, a variety of different files. And within that, you can get snippets of the information in terms of where we are able
+to find that information. So that provides immediate
+guidance to that user on whether or not that
+answer is trustworthy or not. And so if you could
+see towards the bottom, there's sources of information
+that you could click on and be able to click on that
+source to be able to ensure that's the right information
+that you're looking for. And then finally, one other key feature from Amazon Q Business is to be able to provide index boosting. So Nicki will be talking about
+this in more detail later on, but the purpose of this is that what we're hearing from customers is that you have a lot of documents, potentially a lot of documents
+with a lot of revisions, potentially in different folders or even different repositories. And that can make it
+challenging for generative AI to really understand what's
+the right document to pull. However, with this feature, we're able to prioritize
+certain either file types, file folders, certain
+tagging that you provided, or maybe even when the
+document was created. You wanna select documents potentially that are created later rather than ones that were
+created two or three years ago. Another key area for Amazon Q Business is we continue to unlock new use cases by adding new connectors. So today we see IT support use cases because we have connectors
+to Jira and ServiceNow. We've also added a number of connectors to be able to unlock your
+knowledge management systems such as Confluence and SharePoint. In addition, we're adding a
+variety of productivity tools such as Smartsheet, which we
+launched earlier this year, to be able to unlock productivity such as Smartsheet
+within Amazon Q Business. Okay, so the fundamentals
+between Amazon Q Business is that it ensures that you
+as an enterprise feel that you can trust the
+answers it provides, but also that each person that
+accesses the information has the appropriate rights. So if you look here in this
+chart, with Amazon Q Business, it automatically respects,
+first and foremost, the permissions that you
+have within your documents that you pull from. So if I pull documents from Salesforce within Amazon Q Business, within those documents, it pulls metadata
+associated with those files and access with respect to those files to be able to respect each one
+of our respective permissions for those documents. So this can be done across a variety of different repositories across Q Business. In addition, within the
+permission settings, you can also set the rules as well as where each person is located to be able to provide that personalization for each of the different users. The other option that we have
+within Amazon Q Business is the ability to provide guardrails,
+as we mentioned earlier. So within Amazon Q Business, many of our customers are concerned about certain sensitive words. Could be anything from
+salary compensation, to personal benefits, to things that are happening in the news. And so within Amazon Q Business, you can set specific rules to
+be able to block this content. In addition, we're finding
+that certain use cases, customers do not want to go to an LLM. They do not want to provide
+a contextualized response. They want verbatim responses. And so within Amazon Q Business, you can be able to select for those specific questions
+of the verbatim response or no response at all
+from Amazon Q Business. So these are just great options to ensure that you can trust the responses that you get from Q Business and/or block responses that
+you don't deem appropriate for your organization. Okay, so for Amazon Q Business, these are the areas that we're unlocking. So first and foremost,
+discovering content. So with retrieval-augmented generation and being able to provide documentations in a standard format, we're able to unlock data
+across your organization. So in many cases, you might have files on, you know, animals that
+you've been researching, but you're also taking telemetry
+on those animals as well. So being able to bring both of
+those data sources together, compare them on areas that we haven't been able to do before or it's been very manual. So Amazon Q Business
+allows for this capability and allows you to
+discover and ask questions around this information. Also, within Amazon Q Business, we're also extending
+the number of data types as well as formats that we're able to take within your organization. So within Amazon Q Business, we launched the ability
+to take in tabular data. So you're able to now
+analyze complex documents such as 10k documents, where in the past we could only
+do text files or PDF files. Now, we're able to take in tables, we're able to take in images
+as well in those documentation and compare multiple documents together. So it unlocks new ways
+to analyze information with Amazon Q Business. And lastly, around
+creation and taking action, Amazon Q Business allows you
+to drive 50 different actions to be able to support
+improving your productivity. So with Amazon Q, previously you could
+search for information, but now you can update tickets. You can search across, say,
+Jira or ServiceNow tickets that are pinned to yourself. And for all of those tickets, you could update them all
+within Amazon Q Business. So these are areas where
+you don't have to lose, leave Amazon Q Business to be able to drive some sort of action. So in the past, you might've had to look within Amazon Q, then you had to go into Jira or ServiceNow to update that ticket,
+what you were supporting. Now, you can do it all within Amazon Q. So these are exciting
+ways to make it easier and also drive more productivity leveraging Amazon Q Business
+across your organization. So this is a cool feature within
+Amazon Q, which is Q Apps. So as you're understanding
+how to leverage Amazon Q, understand the capabilities within it, you can also create these
+leveraging natural language, these mini applications that
+can sit on your desktop. So, for instance, if I'm
+submitting requests for proposals and I'm doing this,
+say, 30, 40 times a day, I'm able to replicate that process. So searching for information, filling out the RFP or the template, and being able to then
+put that on my desktop to be able to iterate through those RFPs on a daily or hourly basis depending on how often
+I'm leveraging those RFPs. So, you know, with that being said, you know, there's so
+many different use cases that we're seeing with Amazon Q Business, from engineering to sales, to marketing, leveraging across the
+capabilities that we shared, from discovering content,
+analyzing content, to driving action, and finally
+automating those actions. And we'd love to hear from you, but, first, we would love to
+hear from Nicki from Principal, who will give an overview of their story of how they started at Amazon Q Business, even before Beta, and how we partnered together to help them drive productivity. Thanks, Nicki.
+- Thank you, Alicia. And thank you all so much
+for being here today. I am thrilled to have the opportunity to present Principal
+Financial Group's journey with Amazon Q Business and how we're using it to help us deliver exceptional customer experiences. But, first, I have to say
+that like many of you, I have gone to many sessions
+and many events this week, and my voice has taken the hit. So I hope you understand and I apologize for any
+hoarseness you may hear. And over the last 145 years, we've grown our business from
+insurance, employee benefits, and retirement in the United States, to international pensions
+and global asset management, serving more than 68 million customers and more than 80 markets around the world. And we've done this by being experts at capturing our differentiators and demographic opportunities, such as middle class expansion and the growth in the
+world's aging population. To transform a 145-year-old
+business for the future means leveraging the experience and expertise of over 19,000 employees for
+the better of our customers. It means constantly finding better ways to leverage those differentiators to provide that better
+investment performance and a better customer experience. Principal prides itself as a company for all kinds of people, from those who are just starting out, to those who've established a
+strong financial foundation, and everyone in between. It's what our clients expect from us. With regard to machine learning, artificial intelligence and generative AI, we believe in the technologies' potential to meaningfully impact our business, that its use must be carefully governed and that our employees should
+be encouraged to explore and held accountable for their actions. In our industry, there is a crucial mix of both
+human touch and technology that's needed to help our customers feel heard and supported. Depending on the complexity or the significance of a decision, our customers require a digital experience combined with human conversation to validate that they're
+making the right choice. So throughout this presentation, we'll discuss how we
+utilize Amazon Q Business as an integral part of our Principal AI generative experience, which is our gen AI-powered
+employee assistant. My goal here is just to tell
+our story from where we were to where we started on this
+transformative journey, including our challenges
+and opportunities, and, most importantly,
+our lessons learned. Let's get started. So I'm sure that we all
+remember when ChatGPT came out and just broke the world. But when that concept of retrieval-augmented generation, or RAG, became tightly coupled with generative AI, a massive industry shift was made. Now, I very clearly remember coming back from maternity leave where I intentionally
+disconnected from the world for three months. My leader who's sitting
+right there, by the way, said that we needed to
+implement a RAG solution as soon as possible. And to say that I was confused would be a bit of an understatement
+because I honestly thought that he was talking about dish towels. But at this point in time, we knew that we had knowledge resources scattered across our enterprise. We knew that searching within these resources was ineffective, and searching across them
+was nearly impossible. While we started with
+a small scope use case, a small proof of concept
+with a handful of users, if I focus in on our first
+large scale use case, we had over 300 employees
+sitting within one team working to keep up with a
+high volume of requests. In 2023 alone, this team processed more than 680,000
+individual customer cases. And for each of these cases, they had to go out to
+our knowledge resources and searched through over 9,000
+pages of work instructions to find the right answer
+for our customers. In addition for this team, it took an average of one-and-a-half years to become fully trained and
+efficient in their role, one-and-a-half years. We knew that all of
+these knowledge sources, this fragmented knowledge base, and the inability to use natural language to search across them was causing a distinct operational bottleneck
+that we needed to address. So at the outset of our project, we identified a crucial
+need for a system to query and aggregate large amounts
+of unstructured data from across our enterprise. The data was sitting in
+things like S3, SharePoint, Confluence, really, you name it. We had file formats ranging
+from HTML and ASPX pages, Word documents, PDF, Excel spreadsheet, PowerPoint presentations. Think of any type of document, we had it. Operating in the financial
+services industry, we faced strict regulatory
+and compliance requirements. And this meant that we needed strict role-based access control to ensure that our
+employees only had access to the data they should have access to. And, finally, we knew
+that we needed a solution that could be rapidly deployed without extensive upfront coding, but we needed the ability to
+own and customize that platform for the long term. We really prioritize that ability to pivot and scale our solution as needed. So let's start by addressing
+why the slide says where we started instead of our solution. Well, our journey began
+in late September, 2023, well before Q's public
+preview at re:Invent '23. So when we got started, we didn't even know that
+Amazon Q was even a thing. But our team had an established
+relationship and history using AWS solutions and partnerships with
+AWS engineering teams. And this led us to use QnABot on AWS as the core platform
+for our AI assistance. QnABot is a conversational
+multi-channel interface that plugs in seamlessly with Amazon's generative AI offerings. And we paired this with the
+Amazon Lex web UI solution, which allowed us to deploy a UI that was customized for
+our corporate identity. We deployed the first
+version of this solution back in early December '23, so less than three months from ideation. And what you see on this slide is a very, very high-level depiction of what we were running at the time. And you can see that we
+were using Amazon Kendra for retrieval from an S3 bucket. We leveraged Anthropic
+Claude on Amazon Bedrock for information summarization. And this worked, it
+actually worked really well. This allowed us to test
+this proof of concept of an AI assistant and gather that valuable user feedback. But if it worked, why did
+we decide to pivot to Q? Well, quite frankly, the
+stress of managing everything, think hyperparameter tuning
+the entire architecture, user access, data management,
+outer prompt engineering. We had a very small team, and this just proved
+extremely challenging. Our roadmap was constantly
+expanding with new ideas. And so this really set the stage to implement Amazon Q
+when it was announced. We were lucky enough to be made aware of the upcoming Q service shortly before it went
+to its private preview, and we were already in contact
+with the Amazon Q team. And so with that, we were able to really
+quickly integrate our platform with Amazon Q. Because of our relationship
+with the QnABot team, they were able to rapidly
+code an integration directly to the Q APIs. And I have joke that for quite a while, I was working more with the
+Q team and the QnABot team than I was my own team. But this meant that we were able to shift literally overnight that
+first week of January, 2024, to Amazon Q. We knew that adopting that
+beta platform would have its challenges, which I will
+discuss some of those today. But we immediately saw the
+success responses were faster and they were really more geared towards that enterprise chatbot solution. So our final solution
+continues to integrate QnABot on AWS, AWS Lex web UI,
+and Amazon Q for Business, although I really shouldn't say final because, again, we're constantly iterating and evolving based on user
+feedback, our roadmap, and the Amazon Q Business roadmap. You can see that we are still leveraging a number of different Amazon services. We have Amazon OpenSearch
+and a Lex for intent routing. We are using numerous Lambdas, CloudFront tied into our
+IDP for authentication. But I hope you can see that
+that little Amazon Q box in the middle there really lifted all of the weight we were facing trying to self-manage all of those AI/ML and data retrieval integrations. In addition, we implemented
+a custom feedback workflow, and this allows our feedback to give, or our users to give
+feedback, good or bad, on the answer received. And this could be, was the answer accurate,
+were the documents relevant? We also allow for free text user feedback, which allows them to type
+in whatever they want, which we're conducting analytics on. But whenever a conversation
+is had, we log everything: the prompt, the return,
+any related metadata, through Kinesis Firehose into OpenSearch, which is then being
+backed up to an S3 bucket, which allows us to integrate
+into Athena and QuickSight and other BI reporting tools for really important insights
+into what's going on. We regularly conduct analytics
+on things like topics, intents, sentiment,
+prompt length and detail, really any metric you can think of to see how our platform is being used if it's giving us the right
+answers, the right documents, and really allowing us to
+further refine the strategies in our roadmap for this platform. So now that you have a high-level idea of what we're running in production, let's talk about some of the
+challenges and opportunities that we faced when
+implementing this solution. So for our first large scale use case, I already mentioned we needed to index thousands of ASPX pages
+sitting in a SharePoint list. And when we first got started, we realized that the SharePoint connector at the time couldn't actually
+index these types of pages because ASPX pages specifically need to be rendered on a
+server in order to be read because their content is
+dynamically generated on page load. Now, through our
+partnership with the Q team, we were able to really quickly
+put in a feature request. They got this pushed out within a month, enabling us to move
+forward with this use case. But I bring this up because
+of the gift it gave us. We were troubleshooting this. You guys all know how
+troubleshooting works. You learn more about your
+data, your data connectors, how the platform works. But we were also able to experiment with workarounds for this problem. We asked our users to do
+something a little bit odd, go out to SharePoint, find the page that had the
+information they're looking for, print it to a PDF and attach
+it to the chat for querying. While this obviously does not meet that, you know, distributed search and dynamically generated content, it did allow our users to test
+if their data was even ready and learn how to write prompts
+to really get into the data. And so we're now having all of our new use case users do this before we even try to spin
+up that data connector. We learned to take those
+small incremental steps towards the success for each use case. And so far, that has been
+quite a successful tactic. Now, the next challenge
+is very much related to the previous. 145-year-old company,
+we have a lot of data. Over the period of time, we have different systems that were legacy and they've been completely phased out. We have legacy systems
+that are modernized. We have legacy systems
+at a state in between. And I am sure that this sounds
+familiar to a lot of you. How many of you can say that you have one or more legacy systems just sitting out in your environment? Yeah, I see that. It is a common problem
+that a lot of us face. And back in 2023, all of our data in
+these legacy systems was logically organized for human readability and human consumption. And this made sense because humans were the
+primary consumers of the data. Take a second. Think about a webpage that you go to, a Fox, CNN, some recipe website. But think about it. You have a series of links
+that you click through, that takes you through a series
+of nested or related pages in a way that is logical for your brain. But now think about those
+same series of pages sitting in a bucket, S3, SharePoint, Confluence,
+wherever it may be. It is simply an object
+with unstructured data sitting in a flat format. While it may have
+references to each other, the only links between these pages are the metadata that you create
+that ties these pages together. Now, in addition to this, we have more data than
+we know what to do with, but a lot of our data has
+very similar terminology. So, for example, we have
+groups and we have members. Member groups, individual members, these are all distinctly different terms. But the system was
+bringing them all together like it was one. And so somebody would ask, "How do I add coverage
+for an individual member, but the system would return
+the steps for a group member?" While our tenured representatives immediately caught this discrepancy, imagine a new hire
+trying to navigate this. Would they have caught this? Would you? I know I didn't when I was testing. But then on top of all of that as well, we noticed that the information, the policies and procedures
+that our users were looking for, were often on a single page, but we were summarizing information from two, three, five, eight pages, which led to over summarization, incorrect policies, incorrect procedures, and our users just
+didn't trust the results that were returning. And so how did we fix this? Well, we had a lot of things
+that we had to do for this. But first and foremost, we worked with the business to really refine the data and
+metadata that we were using. So using the document, the relevance tuning within Q Business, we were able to put more or less emphasis on those specific metadata fields. One of the features that
+Q has is it can pull in custom metadata from your
+SharePoint connector, but not for pages in the list, which again is how our data is structured. And so we immediately realized
+we needed to figure out how to pull in the custom
+metadata we already had like manual title in addition to the standard
+metadata like creation time that Q was already pulling in. So initially we used a Python Lambda to pull custom metadata
+from our SharePoint site, and we actually realized
+that that wasn't sufficient because, again, our metadata
+was meant for humans. We had it missing. It was incorrect. It just wasn't detailed enough. So we decided to implement a new approach. Using document enrichment
+through Amazon Q Business, we at the time of index
+take all of the contents of that SharePoint page, send it out to Bedrock and generate custom
+metadata including keywords, expanded and collapsed
+acronyms, custom summaries. We pipe that into a Dynamo
+table that is then attached to the file when metadata-tuning is done. And so with this, we were able
+to get up to 84% accuracy. And I can tell you that we actually have
+quantitative metrics here because using that source of truth, we programmatically run these
+prompts and these outputs and these documents
+through relevance tuning while programmatically modifying the different metadata tuning features. And so we got up to 84%. Before we did absolutely
+anything with this, we were only getting 67% accuracy. That means that 67% of the time, we were returning the right document. We found combinations that
+got us down as low as 43%, which is bad, that's a bad number. But I bring this up
+because it really showed us how important this type of testing was to ensure that our platform
+is not only accurate, but trustworthy for our users. In addition, the Q team
+was able to implement what was called a Top-K feature, which meant that we could choose the number of documents to return. And for this use case, we
+just decided to return one. And so the combination of that feature, plus our metadata-tuning, meant that 84 roughly percent of the time, we are returning the
+correct document first from that directory of
+over 9,000 ASPX pages. I could talk about this for days. My background is data science. I could nerd out on this. If you wanna talk about this
+at Q&A, more than happy to. But also you might now
+be thinking, you know, "You're up here talking to
+us, you're only at 84%." Well, we believe that a
+large part of that is related to our next challenge, which is our need for user
+training and education. So as we began to roll out the platform, we realized a really specific trend that our users were using the
+platform as a search engine, what is Cobra, and not as an AI assistant. As we were going through this, we quickly realized that
+this AI assistant could have much broader impacts
+across the enterprise. And so we decided to also roll
+out a generic entitlement, which meant that they
+could use the platform with no access to enterprise data. And I bring this up now because we noticed a similar correlation. The prompts that were the more
+complex, the more intricate, the more well-written, were more likely to
+return positive feedback. The shorter prompts, the ones that didn't make a lot of sense, they were more likely to result
+in negative or no feedback. AI is a tool. It's a powerful
+tool, it's super cool. But like any tool, it requires skill to be
+able to use effectively. And this is really
+where our journey began. We knew that we needed to teach our users a little bit about natural
+language processing, a little bit about how
+to interact with AI, and a lot about prompt engineering, a lot about prompt engineering. And this is still an ongoing
+challenge that we're facing, is this need for that user
+training and education. But, internally, we launched
+a skill development site that allowed on-demand access to user training and education around prompt engineering, generative AI, and all the fun stuff that
+we're really familiar with. But we also made sure to amp up our demos because when we started, we weren't really showing
+the art of the possible. We were just saying, you know, "Here's an assistant, go have fun." But we really wanted to push
+our employees to be creative. The sky is truly the limit. Their use of AI is only
+limited by their creativity, and we needed to be the
+ones to demonstrate that and teach them that so
+that they could start using the platform more effectively. Now, the last challenge I want to bring up today
+is about governance, which is everybody's favorite term. But this was another big
+challenge that we faced because Principal has a very established and very robust governance program, and we initially tried to align with it. But we were immediately
+met with challenges because data governance
+specifically addresses the quality, integrity, security, and usability of data
+throughout its lifecycle while AI governance
+has a much broader role across the enterprise. And so we began to frame a
+new AI governance program within Principal that really
+focused on AI governance throughout the lifecycle of the platform. And this made sure that we're using AI in ethical and responsible way, adhering to all applicable regulations, as well as all regulations
+around bias, ethics, values for the company. We really wanted to have that framework that not only supports innovation but safeguards against potential risks. And we also faced the question of, can we monitor user prompts and return? And how does that impact
+their trust of the platform? If they're typing in a question, you know, I'm gonna do a performance
+review for John Doe and somebody else has access to that data, are we impacting that trustworthiness? And so our AI governance leaders
+stated that the monitoring of these types of prompts
+is actually crucial to ensure that we are
+meeting those regulations on observability and bias. And it's also crucial
+that we have this data because these metrics effectively prove that we are meeting a
+return on investment, that we're getting value
+from this platform. And now the important part there is storing this information
+securely, which we are doing. I don't have time to hit on today, but we did wanna bring up the importance of that robust AI governance program when building out an internal
+AI, anything, quite frankly. So what does this platform
+look like in the wild? Right now, we have about 800 users with access to the platform, 600 active in the last 90 days. And so qualitatively, many of these users have stated that they've seen at least a 50% reduction on some workloads, which is fantastic. Tens of thousands of queries
+have come through the logs, over 97% have been accepted or built upon, and only 3% have returned
+negative feedback. Now, growing pains with
+AI are bound to happen, but we are extremely happy
+to see this number so low. Our users state that
+they use this platform for a number of things in their day to day from, you know, basic analytics, but customer feedback mapping,
+customer journey analysis, rewriting communications in various tones, but, overall, just really
+being able to generate insights based on our knowledge
+and our internal data with the safety that this platform offers because our data does
+not leave our tenants. Our customers say that they
+feel like it really helps with that one contact
+resolution that we strive for because it helps them
+respond to our customers using that clear, confident verbiage. So I have a couple more slides. I know we've talked about a lot
+in the last like 30 minutes, but what have we learned? If I were to highlight what we've learned, it would be this slide. First and foremost, legacy
+systems are just that, legacy. Even a modernized legacy system
+is likely to inherit issues from its predecessor. It is more than likely that when you're working
+with these types of systems, you are going to need
+strategic partnerships and custom solutions to
+lead to your success. Next, we learned that
+in RAG implementations, the quality of your metadata
+is absolutely crucial. How can you as a business and
+technology leader get creative in generating that metadata
+that's really required to ensure that you can
+return the correct documents? Another important lesson that
+we learned was the challenge of quantitatively measuring
+retrieval accuracy without a labeled dataset or golden truth. Because when we got started, we did not have that golden truth, and it took us quite a
+while to get that built. And so if you don't have
+that yet for your data, I highly recommend that you
+start the building it now. Next, we learned that user
+education is absolutely critical. I've discussed that quite a bit, but really making sure
+that your users know how to interact with AI because that's going to be the key to maximizing the system effectiveness. AI governance is absolutely critical. I'm sure we've all
+heard a lot of sessions, a lot of talk about that this week. But especially as you move from proof of concept to production, that partnership with your
+AI governance team is going to be absolutely crucial for your success and to ensure that
+security of your solution. And finally, at Principal, we are not replacing
+our employees with AI. We are giving them an AI assistant to help augment their own capabilities and increase their productivity. Personally, I do not think it's possible to reach 100% accuracy, 100% recall, 100% in any metric with this technology. And that is why at Principal, we firmly believe in
+having a human in the loop in all AI interactions. While the AI assistant might
+be used to help respond or help the employee respond
+to that customer request, the customer will not be
+directly interacting the AI. And the last thing I
+have for you today are our key takeaways for how to get started with
+Q Business specifically. So first and foremost,
+evaluate your use case. Ensure that you understand the
+business goals, the metrics, everything before you start
+drafting your requirements, and ensure that you have those quantitative metrics for success. Having a user say that it shaved five minutes
+off a task is great, but how can you prove that
+in a quantitative form? You need these metrics. I
+cannot stress this enough. These quantitative
+metrics are the only way to prove that ROI. Next, just deploy a Q Business
+application and experiment. You don't need to go and
+set up a data connector and index 9,000 pages. Setting up an application and accessing that test web experience
+can take literal minutes. Invest those minutes in
+your experimentation. Next, be sure to start small. Don't try to boil the ocean, I love that standard corporate term. But find a subset of your
+users who know their role. They're open and willing
+to experimentation. Let them experiment, give them freedom, keep them in the loop, and they
+will become your champions. I promise you, we would be in a much more insecure spot without our champions who
+grew to become the champions for their business units. Next, establish a strong feedback pipeline and ensure that you use it
+to listen to your users. While, yes, we all think AI is awesome, and it is pretty awesome, but ultimately it's gonna be your users who make that final call for us. Ensure that you have multiple
+ways of listening to them, whether it be surveys,
+focus group meetings, or feedback within Q itself. Because what they say is what's
+going to drive the roadmap, and it's going to give you ideas to really push forward and move ahead. Now, the last thing I wanna bring up is sharing the art of the possible. Most of your users don't know or don't understand what
+generative AI is capable of because they're not immersed
+in it every day like we are. To them, it's just another
+tool they're being given. Make sure that you're getting
+creative with your demos. Really share the art of the possible so that way they know how to use this tool to maximize their productivity. Like I said previously, your use of and success with
+generative AI is only limited by your creativity. I challenge you. What possibilities will you unlock with Amazon Q Business today? Thank you. Alicia, back to you. (audience applauding) - Okay, thank you everyone for your time. Really appreciate you joining us. - Thank you.
