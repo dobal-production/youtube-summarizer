@@ -42,19 +42,22 @@ class YouTubeHelper:
 
     @staticmethod
     def extract_video_id(url):
-        video_id = re.search(r'(?<=v=)[^&#]+', url)
-        if video_id:
-            return video_id.group(0)
+        # 정규 표현식 패턴
+        patterns = [
+            r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)',
+            r'(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)',
+            r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)',
+            r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([^?]+)',
+            r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([^?]+)'
+        ]
 
-        video_id = re.search(r'(?<=be/)[^&#]+', url)
-        if video_id:
-            return video_id.group(0)
+        # URL에서 video ID 찾기
+        for pattern in patterns:
+            match = re.search(pattern, url)
+            if match:
+                return match.group(1)
 
-        video_id = re.search(r'(?<=youtu.be/)[^&#]+', url)
-        if video_id:
-            return video_id.group(0)
-
-        return None
+        return None  # video ID를 찾지 못한 경우
 
     # Getting video title from video ID using Youtube API
     @staticmethod
