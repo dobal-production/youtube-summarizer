@@ -5,11 +5,6 @@
 * Translate transcripts to other language using Amazon Translate
 * Summarize transcripts using Amazon Bedrock
 
-## Streamlit install
-```shell
-pip install streamlit
-```
-
 ## 파이썬 가상환경
 ```shell
 # 자막, 요약 결과 파일이 생성되는 폴더 생성
@@ -20,6 +15,11 @@ python -m venv venv
 
 # 터미널에 (venv) 문구가 없을 때, 실행
 source ./venv/bon/activate
+```
+
+## Streamlit install
+```shell
+pip install streamlit
 ```
 
 ## 필요 패키지 설치 (주의: 가상환경이 반드시 설정되어 있어야 함)
