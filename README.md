@@ -5,6 +5,11 @@
 * Translate transcripts to other language using Amazon Translate
 * Summarize transcripts using Amazon Bedrock
 
+## Streamlit install
+```shell
+pip install streamlit
+```
+
 ## 파이썬 가상환경
 ```shell
 # 자막, 요약 결과 파일이 생성되는 폴더 생성
