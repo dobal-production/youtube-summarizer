@@ -67,17 +67,29 @@ def translate_transcripts(video_id, source_lang, target_lang, region):
 
     translate_to_file(video_id, source_lang, target_lang, region)
 
-def get_translated_transcripts(video_id, target_lang='en'):
-    if target_lang == 'en':
-        translated_file_path = get_file_path(video_id, "txt")
-    else:
-        translated_file_path = get_file_path(video_id, "txt", "ko")
+def get_transcripts(video_id, target_lang="ko"):
+    translated_file_path = get_file_path(video_id, "txt", target_lang)
 
     if (translated_file_path).exists():
-        with open(translated_file_path, 'r', encoding=config.FILE_ENCODING) as f:
+        return get_translated_transcripts(video_id, target_lang)
+
+    return get_original_transcripts(video_id)
+
+def get_original_transcripts(video_id):
+    transcripts_file = get_file_path(video_id, "txt")
+
+    if transcripts_file.exists():
+        with open(transcripts_file, 'r', encoding=config.FILE_ENCODING) as f:
             transcripts = f.read()
 
     return transcripts
+
+def get_translated_transcripts(video_id, target_lang="ko"):
+    translated_file_path = get_file_path(video_id, "txt", target_lang)
+
+    if (translated_file_path).exists():
+        with open(translated_file_path, 'r', encoding=config.FILE_ENCODING) as f:
+            return f.read()
 
 #initialize markdown file
 def initialize_markdown(video_id):
@@ -150,6 +162,7 @@ def add_to_videos(video_id, video_title):
 
         # add new video to the list
         videos.append(new_video)
+        videos.reverse()
 
         # add list to the list file
         add_to_list_file(videos)
@@ -211,25 +224,6 @@ def get_selected_video(videos, key):
                             )
     return None
 
-def streamlit_app():
-    st.title("YouTube Transcript Summarizer")
-
-    tab1, tab2, tab3 = st.tabs(["New Summary", "Explore Summaries", "Get Insight"])
-
-    with tab1:
-        summarize_new_video()
-
-    # Load video list
-    videos = load_video_list()
-
-    if videos:
-        with tab2:
-            explore_summaries(videos)
-
-        with tab3:
-            get_insight_from_video(videos)
-
-
 def load_video_list():
     list_file = get_file_path("video_list", "yaml")
     if list_file.exists():
@@ -237,8 +231,7 @@ def load_video_list():
             videos = yaml.safe_load(f) or []
     return videos
 
-
-def get_insight_from_video(videos):
+def display_insight_from_video(videos):
     selected_item = get_selected_video(videos, "tab3")
     question = st.text_area(
         "Ask a question about the video",
@@ -248,8 +241,7 @@ def get_insight_from_video(videos):
     if st.button("Get Answer"):
         if question:
             try:
-                # Get the selected video's transcript
-                transcripts = get_translated_transcripts(selected_item[0])
+                transcripts = get_transcripts(selected_item[0], "en")
 
                 # Get the answer from the transcript
                 bedrock = BedrockHelper()
@@ -276,11 +268,35 @@ def get_insight_from_video(videos):
             st.warning("Please enter a question")
 
 
-def explore_summaries(videos):
+# Display selected video's link for transcripts and translated files with file icon
+def display_related_files(video_id):
+    with st.container():
+        row1_col1, row1_col2 = st.columns([0.3, 0.7])
+
+        with row1_col1:
+            if get_file_path(video_id, "txt").exists():
+                st.download_button(
+                    label=f"Download Transcripts",
+                    data=get_original_transcripts(video_id),
+                    file_name=f"{video_id}.txt",
+                    mime="text/plain"
+                )
+        with row1_col2:
+            #if translated file exists, display it
+            if get_file_path(video_id, "txt", "ko").exists():
+                st.download_button(
+                    label=f"Download Translated Transcripts",
+                    data=get_translated_transcripts(video_id, "ko"),
+                    file_name=f"{video_id}_ko.txt",
+                    mime="text/plain"
+                )
+
+def display_explore_summaries(videos):
     selected_item = get_selected_video(videos, "tab2")
     # Display summaries
     if selected_item:
         embed_youtube_player(selected_item[0])
+        display_related_files(selected_item[0])
         display_summary(selected_item[0], selected_item[1])
 
 
@@ -299,34 +315,39 @@ def summarize_new_video():
             model_options = BedrockHelper.MODEL_ALIASES.keys()
             selected_models = st.multiselect("Select Bedrock Models",
                                              options=model_options,
-                                             default=["np"])
+                                             default=["s35v2"])
     with st.container():
-        row2_col1, row2_col2 = st.columns(2)
+        row2_col1, row2_col2, row2_col3 = st.columns(3)
 
         with row2_col1:
             # Language selection
-            lang_options = ["en", "ko"]
-            selected_lang = st.selectbox("Select Source Language", options=lang_options, index=0)
+            source_lang_options = ["en", "ko"]
+            origin_lang = st.selectbox("Select Source Language", options=source_lang_options, index=0)
 
         with row2_col2:
+            target_lang_options = ["ko", "en"]
+            target_lang = st.selectbox("Select Target Language", options=target_lang_options, index=0)
+            isTranslate = st.checkbox("Translate", value=True)
+
+        with row2_col3:
             # AWS Region selection
-            region_options = ["us-east-1"]
+            region_options = ["us-east-1", "us-west-2"]
             region = st.selectbox("AWS Region", options=region_options, index=0)
     # Process button
-    if st.button("Process Video"):
+    if st.button("Summarize"):
         if video_id:
             try:
                 with st.spinner("Getting video title..."):
                     video_title = YouTubeHelper.get_video_title(video_id)
 
                 with st.spinner("Downloading transcripts..."):
-                    download_transcripts(video_id, selected_lang)
+                    download_transcripts(video_id, origin_lang)
 
                 with st.spinner("Translating transcripts..."):
-                    translate_transcripts(video_id, selected_lang, 'ko', region=region)
-                    transcripts = get_translated_transcripts(video_id)
+                    translate_transcripts(video_id, origin_lang, 'ko', region=region)
 
                 with st.spinner("Generating summaries..."):
+                    transcripts = get_transcripts(video_id, "en")
                     process_model_summaries(
                         model_aliases=",".join(selected_models).split(","),
                         transcripts=transcripts,
@@ -352,6 +373,23 @@ def convert_to_list(videos):
     video_options = list(items.items())
     return video_options
 
+def streamlit_app():
+    st.title("YouTube Summarizer")
+
+    tab1, tab2, tab3 = st.tabs(["New Summary", "Explore Summaries", "Get Insight"])
+
+    with tab1:
+        summarize_new_video()
+
+    # Load video list
+    videos = load_video_list()
+
+    if videos:
+        with tab2:
+            display_explore_summaries(videos)
+
+        with tab3:
+            display_insight_from_video(videos)
 
 # for command line
 def main():

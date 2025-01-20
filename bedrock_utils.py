@@ -125,7 +125,8 @@ class BedrockHelper:
             "system": system_prompt,
             "inferenceConfig": inference_config
         })
-        response = self.bedrock_client.invoke_model(modelId=model_id, body=body)
+        # logger.info(f"Sending request to Bedrock with prompt: {messages}")
+        response = self.bedrock_client.invoke_model(modelId=model_id, body=body, trace="ENABLED")
         response_body = json.loads(response['body'].read())
         return response_body['output']['message']['content'][0]['text']
 
@@ -165,7 +166,10 @@ class BedrockHelper:
     def __generate_translate_prompt(self, text):
         #Your response must be in Korean.
         return f"""
-        응답은 반드시 한국어로 해야 합니다.
+        <transcript>
+        {text}
+        </transcript>
+    
         당신은 YouTube영상에 대한 내용을 번역하는 번역가입니다.
         <transcript>에 있는 내용을 읽고 번역해 주세요.
         <conditions>에 있는 조건을 준수해주세요.
@@ -182,29 +186,29 @@ class BedrockHelper:
         모놀리식 애플리케이션을 마이크로서비스로 원활하게 분해하여 더 빠른 혁신, 확장성 및 유지 관리를 가능하게 하는 방법을 알아보세요.
         </example>
 
-        <transcript>
-        {text}
-        </transcript>
         """
 
     def __generate_insights_prompt(self, text, question):
         return f"""
-        응답은 반드시 한국어로 해야 합니다.
+        <transcript>
+        {text}
+        </transcript>
+        
         <transcript>에 있는 내용을 읽고 <question>에 있는 질문에 답해주세요.
+        응답은 반드시 한국어로 해야 합니다.
         
         <question>
         {question}
         </question>
-        
-        <transcript>
-        {text}
-        </transcript>
         """
 
     def __generate_summary_prompt(self, text):
         #Your response must be in Korean.
         return f"""
-        응답은 반드시 한국어로 해야 합니다.
+        <transcript>
+        {text}
+        </transcript>
+        
         당신은 YouTube영상에 대한 내용을 정리하는 기자입니다.
         <transcript>에 있는 내용을 읽고 핵심 내용들을 주제별로 정리해 주세요.
         <conditions>에 있는 조건을 준수해주세요.
@@ -242,7 +246,4 @@ class BedrockHelper:
         * 금융 서비스의 미래는 더 많은 업무 자동화와 멀티모달 모델 활용으로 특징지어지며, 텍스트뿐 아니라 다양한 매체를 포함하는 모델이 중요하다.
         </example>
 
-        <transcript>
-        {text}
-        </transcript>
         """
