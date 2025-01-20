@@ -343,8 +343,9 @@ def summarize_new_video():
                 with st.spinner("Downloading transcripts..."):
                     download_transcripts(video_id, origin_lang)
 
-                with st.spinner("Translating transcripts..."):
-                    translate_transcripts(video_id, origin_lang, 'ko', region=region)
+                if isTranslate:
+                    with st.spinner("Translating transcripts..."):
+                        translate_transcripts(video_id, origin_lang, target_lang, region=region)
 
                 with st.spinner("Generating summaries..."):
                     transcripts = get_transcripts(video_id, "en")

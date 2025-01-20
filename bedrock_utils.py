@@ -14,13 +14,13 @@ class BedrockHelper:
     REGION_NAME = "us-east-1"
     MODEL_ALIASES = {
         "s35v2": {"name": "Cloaude 3.5 Sonnet v2", "model_id": "us.anthropic.claude-3-5-sonnet-20241022-v2:0"},
+        "np": {"name": "Nova Pro", "model_id": "amazon.nova-pro-v1:0"},
+        "nl": {"name": "Nova Lite", "model_id": "amazon.nova-lite-v1:0"},
         "s35": {"name": "Cloaude 3.5 Sonnet", "model_id": "us.anthropic.claude-3-5-sonnet-20240620-v1:0"},
         "h35": {"name": "Cloaude 3.5 Haiku", "model_id": "us.anthropic.claude-3-5-haiku-20241022-v1:0"},
         "h3": {"name": "Cloaude 3 Haiku", "model_id": "anthropic.claude-3-haiku-20240307-v1:0"},
         "c21": {"name": "Claude 2.1", "model_id": "anthropic.claude-v2:1"},
-        "tg1e": {"name": "Titan Text G1 - Express", "model_id": "amazon.titan-text-express-v1"},
-        "np": {"name": "Nova Pro", "model_id": "amazon.nova-pro-v1:0"},
-        "nl": {"name": "Nova Lite", "model_id": "amazon.nova-lite-v1:0"}
+        "tg1e": {"name": "Titan Text G1 - Express", "model_id": "amazon.titan-text-express-v1"}
     }
 
     SYSTEM_PROMPT =  "You are a helpful AI assistant. Be concise and precise in your answers."
