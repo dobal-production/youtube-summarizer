@@ -1,0 +1,669 @@
+- Thanks so much for showing
+up for this session today. I hope your re:Invent's going well. Really hope you're ready here to dig into a little bit of SaaS
+and multi-tenancy today. As the slide says, my name's Tod Golding. I'm a solutions architect at AWS and I've been working, I guess,
+for the eight-ish past years with different SaaS providers in different companies
+in different domains, helping 'em cross a whole
+range of different problems. And also been part of a SaaS factory team where we've just developed
+a ton of reference content and guidance around what it means to build and deliver SaaS on AWS. And obviously, a big part of the effort that we've put in over
+the years has been focused on just show me how to build something. Give me concrete examples. That was always the feedback
+we got from lots of people. It was like, good, you've told us about these
+principles, but show us how. And so, we went away for a few years ago and really started our
+talks were very much about, show me how to build an EKS SaaS solution. Show me how to build a
+serverless SaaS solution. Give me the code, give me
+a token vending machine. These things were awesome and they're still awesome
+at really giving you a great head start in terms of a specific end-to-end
+example of how to build SaaS. But then, when we sat down
+for re:Invent this year and we said, well, what are the topics that
+were gonna be valuable? We said, well, what happens beyond just getting over the basics
+of getting a solution to work? What does it mean to build a really good, scalable, multi-tenant SaaS solution, independent of which technology
+you're building it on? What is a good way to build
+a resilient SaaS environment? And so, that was the motivation and the spirit behind this
+talk, which is to say, instead of going specifically and to just show me one solution, give me a mental model,
+give me a framework for the basic moving
+parts of what it means to build a great, scalable, efficient SaaS solution on top of AWS. Now, I think it's a super broad topic. I don't think we're gonna get into every nuance of what
+it means to achieve this. But what I've tried to do for the talk today is tease
+out the moving parts of this to give you a sense of like, here's some of the big things
+that if I were sitting down with a customer right now and talking to them about
+scale and resilience, these are the things I
+would tell them to go after. And I would also say, yes, the front of this will be
+about scale and resilience. To me, the back third of
+this talk, which is about how do we actually prove
+these things are working, it's the area we've
+talked the least about, which is how do I actually
+build chaos mechanisms? How do I build validation mechanisms that tell me that scale's working, that tell me that resilience is working. Now, this is a 300 level session. So, it says deep dive, but I hope let's set your expectations about what deep dive is. We're gonna get into the
+architecture. Absolutely. It'll be all over the architecture here, but I'm not gonna show
+you a bunch of code. I'm not gonna show you all the underlying moving parts of this. This is more about architectural patterns, architectural strategies. I hope that's why you're here. I hope that matches what
+you read in the abstract. And if so, let's move forward. Well, I wanna start here
+at the outer level here, which is just, if I'm trying to write and build an architect
+to SaaS application, it turns out that even though
+when we talk about scale and we talk about availability and we talk about resilience, there's tons of really
+good bits out there. In fact, I would tell you as
+a complement to this talk, you should be absolutely
+looking at the guidance if you've not checked
+out AWS well-architected, just really good pillars of resilience and scale and availability that are great guidance
+on how to do those things. And those things are all still
+valid for a SaaS environment. But what I find is SaaS
+architects have another layer of considerations that
+they have to think about. And multi-tenancy adds all
+these extra sort of nuances to what it means to achieve
+scale and resilience. And the things that are
+at play here is that, yes, we have availability,
+everybody wants availability, we never want the system to go down. But imagine in a multi-tenant environment what it means to say we
+are targeting availability. And it's your job as the architect to build a highly available system. Well, in traditional systems,
+if you weren't available, it might mean one or
+two customers go down, because some particular aspect
+of the system went down. In a multi-tenant SaaS environment, we have the potential to
+bring the entire business down and all the customers down
+if our system goes down. So, for me, the bar for availability is way higher in a
+multi-tenant SaaS environment. In fact, when big multi-tenant SaaS companies have
+outages, it makes the news. Because some other business
+can't consume their solution or some other dimension of that is gonna be so wide-sweeping
+that others are interested in. The other thing here is
+we, as SaaS architects, we are being asked to
+achieve cost-efficiency. I give a whole talk on cost
+optimization on Monday. In fact, there'll be a little
+bit of overlap in here, 'cause scale and resilience
+and all those things, I'll show intersect with these concepts. But we're being asked to be achieve economies of scale in SaaS. A whole reason that people go to SaaS is to actually get the great
+margins that come out of this. So, as the business grows,
+we generate more profit. So, how do we somehow achieve
+all these awesome ways of minimizing the amount of money we're spending on infrastructure, but still wanna over-provision and do all the other things we do that give us safety in terms
+of availability, and so on. The other challenge
+here is predictability. And software's inherently unpredictable, but imagine in a multi-tenant environment where you have new tenants
+showing up all the time, you have tenants potentially leaving, and then you have the workloads of those tenants varying
+wildly across the day, wildly across the month. And so, here, you're
+saying, I want availability, I want efficiency, I want
+all these other things. But by the way, you
+have to achieve all that and you have to design an environment that will still allow for the fact that the profile of tenants and how they consume your
+system is changing all the time. The other piece of this is we don't tend to end up with one sort of
+architectural footprint. If we just have to achieve
+scale and resilience and all these things in one
+well-understood architecture, it's a little easier to do, but the reality is, and
+we'll get into this, SaaS environments actually have to support a range of
+deployment models sometimes. Some tenants are deployed in. We'll talk about siloed deployments, we'll talk about pool deployments, the footprint of their solutions, and their architecture change. And now, what does it
+mean to achieve scale, resilience, et cetera,
+across that experience? And then, finally, the
+business is coming to us and saying, by the way, we want to be able to
+sell into many segments. We wanna sell into small companies, we wanna sell into large companies. And we, by the way, wanna offer them different
+tiered experiences. So, we might wanna put
+throttling experiences or we might wanna exchange the experience of those customers. And your architecture, by the way, needs to achieve all of that for me. So, for me, it feels like
+this big tug of war sometimes. On one side of the equation, the business is telling me like, we want all this on the
+left side, you'll see here. We want all this efficiency, just enough infrastructure
+for what we're doing, maximum cost efficiency, share all the infrastructure
+you possibly can, so we get all the great
+economies of scale. 'Cause we wanna have as big a margins as we can possibly have. But on the other side,
+they're saying, by the way, we got all these other
+variations we want to support, because we wanna be able to
+go into multiple markets. We wanna able to offer tiering. We wanna support multiple
+deployment models. And these things don't
+necessarily outright conflict with one another, but they definitely are hard to support side by side with one another. So, I feel like this is
+part of the challenge that you all have in trying
+to build these systems. And part of the fun of building
+these systems honestly too, because it has to be pretty creative to come up with the approaches
+that are gonna work here. So, awesome. Let's talk about scale here. And what does it mean to actually build a scalable,
+multi-tenant environment? What are the unique multi-tenant things you need to be thinking about? And I think if we're
+gonna talk about this, we really have to broaden our view of what it means to scale. And this is probably me get
+on the soapbox a little bit, because I feel like this is an area where people put scale
+into small of a box. Generally, I think people think, especially infrastructure
+people and architects, the view of scale is usually, well, how will I scale vertically or how will I scale horizontally? And so, as I throw a
+bunch of workload at this, I'm just gonna scale and I'll use the elasticity of the cloud and I'll use all the great constructs that are out there to just make the load
+grow as much as I need. Maybe a lower provision a little bit, but I'll still get good scale at it. Absolutely 100% true. And a good way to build
+a scalable SaaS solution. I just think it's not enough. I think you have to
+add to that definition. Yes, I want the scale of infrastructure to be part of my experience, but if you are in a SaaS universe, whether you like it or not, you're also in, as a SaaS architect, you're wearing a business
+hat now a little bit more. You have to think about how the SaaS
+business is going to scale. So, that means your definition of scale has to be bigger than
+just the infrastructure. Think about onboarding. What does it mean to onboard new tenants
+into an environment? A lot of organizations will actually put
+onboarding off 'til later. They'll focus all their
+scale on the application, and then eventually say, yeah, we gotta go write that
+onboarding automation. Onboarding has to scale it. If I tell you tomorrow I'm gonna give you a hundred new tenants or a thousand new tenants and I ask you whether or
+not your onboarding process can scale to meet that need, a lot of companies haven't even thought about
+whether that solution scales. Like B2C companies do, 'cause they only can survive
+by being able to scale wildly. But a B2B organization who only gets like maybe 10 or so tenants a month or something, they might think they don't
+have to focus on this. I would suggest that you
+have to include onboarding as part of this experience. Oops, went forward. Didn't mean to. Let's go back. I think operations is part
+of this story as well. If you have to scale operations, you as an architect have
+to provide your teams with the tools and the mechanisms and the constructs they need to be able to operate a multi-tenant
+environment to achieve scale. You may not even know if
+you're scaling effectively if you don't have the data and the metrics and the insights operationally to see how your architecture's
+actually behaving. And finally, even though I wanna get, I wanna move forward, for some reason, even though I shouldn't,
+let's try this one more time. Deployment is part of this as well. Like how rapidly can we roll out features? How can we support feature flags? How can we support all these
+unique deployment footprints of all these SaaS environments and still do that efficiently? And so, I could probably
+put more items in that box, but my big point is think beyond just the core infrastructure of your application when
+you think about scale. Think about everything in your business that has to scale as
+you add new customers. Okay, so when I said well, what are the main things
+I'd put on one slide if I could just create one slide that tried to say what are
+the things that are on my mind when I'm thinking about
+developing a scaling strategy? It's a mix of the things you see here. So, in the left, you'll
+see I have workloads. We have to support all kinds of workloads with different sort of
+profiles, different tenants potentially saturating the
+system in different ways, consuming different parts of
+the system in different ways, and in different patterns all the time. So, no matter what, no matter
+what I'm doing for scale, I've gotta figure that out. I've gotta be thinking about that and that's gotta be part of my plan. And then, on the right-hand
+side, you'll see, well, I've got also options here in terms of how I can
+address those workloads. That's a pretty long list of options here. Certainly the compute stack I choose has a lot to do with how my system scale. I'm gonna do EC2. Am
+I gonna do serverless? We'll get into these details.
+I gonna do containers. And how do those particular
+compute technologies align well with all
+these varying workloads and all these other requirements. The storage that we choose,
+the storage stack we choose. Are we gonna do RDS? Are we gonna Dynamo, manage, not manage? Like there's all kinds
+of variation in here that depending on the
+nature of those workloads, depending on the goals of the business, mean you have to pick
+a different strategy. And even here like domain, industry, other kind of requirements that are just common in the environment, compliance, things of that nature are going to influence your approach. And then, overlaying all of that is the stuff in the
+middle that you see here. So, you'll see like
+tiering, like strategies. You'll see isolation. You wouldn't think of isolation when we're thinking about scale, but isolation actually has
+a lot to do with scale, because depending on how
+I deploy the resources, depending on the architecture I choose, some things will scale
+differently than others. And some are good compromises
+on isolation, some are not. Same with noisy neighbor that's here. Which strategy is noisy? Which one of these are
+good for noisy neighbor? If I have really spiky loads, which compute stack is the right stack? So, for me, this is like if
+I'm at the very beginning of the process and you said,
+Tod, what are you gonna do? Where are you gonna start? I'm gonna try to get
+the business and myself to think enough about these things that I have a sense of what the landscape of options I have and what choices I have. Will you get it all
+right on the first day? You absolutely will not get it right. But if you don't do this at all and you just go grab a stack, 'cause it's the one you like, and you just go grab a database 'cause it's the one you like, you still may not end up
+having made very good choices. At least here, there's a little
+bit of data in the process. Now, if we just said scale, what's the simplest view of scale? And I could just do this one
+slide. You could all go home. This is the easiest and simplest view of what
+scale can look like in SaaS, which is we put a bunch of tenants into a shared environment. Shared pool means
+infrastructure is shared. That term is what we use to describe shared infrastructure here. And everything is pooled for all tenants. Storage is shared, compute is shared, and all these tenants are just
+poured into this environment and it just scales horizontally
+to meet their needs. We just look at this as one
+big collective workload. We probably over-provisioned it a bit. Assumes that whatever the experience here is good enough for everybody. But you can imagine
+that in this environment like scaling policies and mechanisms are gonna be challenging, because it depends on the nature of these microservices and how they scale. There'd been a little work here to chase the scaling policies, which most people will just
+overcome with over-provisioning. But if this is all you need and this is what you think your
+SaaS environment look like, just use all the basic tools of scale that are available to you. Take advantage of the goodness of pooled resources and you're done. The reality is though most environments that I work with don't look like that. There's some part of the
+environment looks like that, but it generally doesn't
+all fall out like that. In fact, the landscape of the environments that SaaS companies are running are way different than
+a lot of people think. They are a mix of patterns. So, here, you'll see I've got a pooled environment
+just like we showed. It has order and product in
+it as these two microservices. One's running in lambda, but
+one's running in containers for some particular reason, because of the nature of the workload. And then, I have these
+siloed microservices. Siloed, meaning dedicated
+to an individual tenant. And here, we've said, hey, the analytics service based on SLAs or based on compliance or some
+other need for our solution, needed to be broken out as a separate standalone microservice. And then, also, we have a set of customers who are what we call full stack silo. They get an entire silo of their own. By the way now, all these tenants and all these services
+are running the exact same version of the software. They're all managed through
+the same experience. So, it's not like we're
+having one-off versions or anything here, but they are running
+different infrastructure deployed in different patterns here. And if somebody's willing to
+write you a big enough check and I've seen lots of companies here and says we won't buy your system, we want it to be full stack silo, or some people just want that to be their premium experience, they offer that as an option. So, now for me, what does it mean to scale when this is the footprint? 'Cause all of this is
+your whole environment. So, you have to come
+up with a way to scale when you have to support
+all these strategies. And now, the notion of
+scale gets much harder. What is it scaling in a full stack silo? It looks way different than
+scaling in a pooled environment. So, if we said, let's go ahead and try to put a little
+formula to this together, I'd say start with the personas. And what I would go out and do is I'd actually go create some profiles. I'd actually go say, well, ask myself what are the
+consumption profiles? What are the isolation profiles? What are the tiering profiles,
+and so on, of my environment and take the mix of the personas and the different ways they're going to consume these resources, the different ways that
+they wanna be isolated. And then, lay those alongside the different options
+I have available to me. For example, how am I
+gonna meet these needs with different microservice
+decomposition strategies? What's the right breakdown
+of my microservices? What's the right mix of microservices? Which one should be siloed? Which one should be pooled to meet the needs of
+these specific workloads? So, I'm not just arbitrarily
+taking domain objects or doing event storming or using one of these other things, coming up with nouns and
+there's my microservices. No, I'm picking these microservices based on the actual
+profiles that you see here. And sometimes, by the way,
+you end up with microservices that aren't mapped to
+anything in the domain. It's just this is the big
+bottleneck in the system. We carved out this one little
+piece of functionality, 'cause it made sense to run it
+as a standalone microservice. Other things may be way more coarse-grained than you expected. Then, again, back to compute technologies. What are we gonna do? Serverless lambda
+containers, which ones fit? And then, what deployment models are we gonna need to support? And when I have some union
+of all of these things, I think I have a good sense
+of where I'm gonna go. And don't think of compute
+as mutually exclusive here. I absolutely see, like we do, we're not getting into control
+plane and app plane here, but if you look at our patterns,
+we'll say control plane and app plane are part
+of a SaaS environment. I'll see some people using
+serverless for the control plane, and then containers for the app plane. Or even for some
+microservices a batch workload versus not for containers versus lambda. You could pick them for any
+number of different reasons. And this bottom right one, don't overlook that deployment models, ask your product teams now
+like, who are we selling to? Are people gonna come along
+and need full stack silo? I wanna know that now, so I
+can build for scale around that and come up with a
+scaling strategy for that. Just to drive home this
+point on decomposition, say I have this order of service and it's just a bunch
+of lambda operations. Each function corresponds
+to some operation. And as a noun in my environment,
+it totally made sense to just make this a
+microservice and I was all done. But after I got more data on the profile of how these profiles showed consumption and isolation needs, I came up with all four
+separate microservices that represented this decomposition. And this is an oversimplified example, but just imagine for
+example like fulfillment was some huge scaling
+point of your system, or fulfillment had some specific
+isolation need, or so on, I might decompose differently to achieve scale based on
+the nature of the workloads. The other thing we have
+to look here is just, I've talked about compute. I want to drill into that a little more in terms of picking compute. The easy one here, I've
+got this order microservice and the order service has
+a couple of operations, GetOrder, UpdateOrder on it. And the unit of deployment
+is the microservice. And in EC2, it's just what
+AWS has been doing forever. It's just a scale here in elasticity and we scale horizontally and I can absolutely
+run in this environment. I will say if you're building for scale and you're dealing with all these multi-tenant
+workloads challenges that EC2 to spin up and react
+and respond to spiky loads can be tough in a
+multi-tenant environment. And this is why people will often over-provision
+in this scenario. So, you do have to think about what it means to spin up these instances and how quickly they'll spin up. And obviously, this works probably better in a pooled scenario. So, if I send a whole
+bunch of tenants into it, then I get more tenant scaling, probably less idle resources,
+probably a better fit. Where things get better and where I have done
+lots of talks on is lambda and the fit with lambda and multi-tenancy. Because in lambda now, we move
+to a managed compute service and when a managed compute service, the unit of scale is
+not the whole service, the unit of scale are
+individual functions. So, if today, somebody's just really consuming
+the update order function and doing nothing with GetOrder, and tomorrow that inverts,
+I don't really care. I'm just gonna pay for
+whatever tenants are doing. And in fact, I might even not care as much about how I break the service
+down and decompose it, because the service is still gonna scale
+at the function level, not at the whole microservice level. And this is just awesome in
+terms of getting you away from what's the right scaling policy, how will I get this thing to scale? I'll just rely on this. And by the way, this works great for both
+silo and pool models. In fact, our serverless
+reference architecture has examples of both of those. I would absolutely recommend
+you take a look at that and see how that works. And then, of course, containers. Lots of SaaS companies just loving EKS as a deployment model and
+gives them lots of tools here. What I like here is in the EKS space, I also get new ways to think
+about deployment models. For example, namespace per tenant comes in here as an option. So, I can put namespaces in here. I get ways to do things like node affinity and attach workloads to
+certain kinds of nodes. We'll look at that in a minute. So, here, I get fast scaling
+sort of environments, so I don't have to over-provision a bunch. So, I get really good
+efficiency out of this. But I also have the option here. You'll see AWS Fargate in the window. Fargate lets me bring
+the serverless option into the EKS space for me, so I don't even have to think about what the nodes are that are
+running underneath the cluster and just operate in the
+same mindset I do in lambda. There's nuances there, but generally, you get to
+bring that far with you. So, for me, when you're sitting down and picking your scaling
+strategy, where are you going? Well, again, I'd still say you can't say absolutely one
+of these is the right one, but I'm gonna look at my workloads and figure out what's best. And again, all back to the personas and the nature of those
+workloads, it's there. But if we were gonna pull this apart and we were, say, well, how do the deployment
+models affect scaling? Well, if we look at siloed
+scaling, silo is a pretty, like you have one tenant in there and if it's fully siloed, that resource, it's scaling profile is probably a little more predictable. It's like a traditional
+system, it has a life cycle. It may have an end of day for the business that's consuming it and
+have a tail off at the end. You're not gonna work too hard to figure out how to
+scale those environments. But when you start putting resources into
+these pooled environments, any resource in a pooled environment, now the consumption patterns
+are all over this place. So, now, figuring out how to scale here much more focused on how do we deal with the peaks and
+valleys of these things? We don't have to worry about
+idle consumption here as much. But now, we have to think about
+things like noisy neighbor and things of that nature. Finally, one of the other units of scale and one I've talked more
+about at re:Invent this year, I did in the cost efficiency talk and I think it's valid here as well, is I think generally, we think about scale along the service boundaries
+like, how does compute scale? How does this storage scale? But you can also take
+a broader view of scale and say I'm gonna create
+these notions called pods and I'm gonna put these tenants into pods. And I'm gonna put a certain
+number of them in there. I'm gonna know that
+set of tenants in this. I've got eight tenants here. I'm gonna know probably
+generally for just eight tenants, I can probably figure out how to define scaling
+policies for this pod that generally would
+mean this pod is safe. Also, it isolates this pod, so its blast radius is just
+limited to those eight tenants. And then, once I get comfortable wherever the boundaries of that pod are and how many tenants
+I want to put into it, I can then spin up another pod. I'm just sharding here and scaling horizontally
+on a pod by pod basis and I put the next set of tenants in here. And for some teams, they like this, because they're not scaling and dealing with policies all the way down to the individual service levels. They're just trying to get the pod to scale successfully enough. And then, also, by the way, if
+they get a tenant in one pod that's not fitting anymore or there are struggle with them, they will migrate tenants potentially between pods to deal with
+management and scaling issues. And then, this just continues on and we essentially can scale out on pods. Now, I would also say this
+has value in terms of scaling, because it means that you can support
+multi-region models as well here. So, if I have pod already
+as a unit deployment for my environment,
+(mic thuds) sorry about that, unit of deployment for my environment, now I can take these same pods and deploy them into regions as well and have a multi-region footprint. Lots of nuance to that. This doesn't come at zero cost, 'cause it has more deployment complexity, it has more operational complexity. We now have to aggregate everything across the pods for
+operational views into it. But still, if you're talking about scale, it is another dimension, I think. It's still somewhat debatable, but I think it is a way to approach scale a
+little bit differently. The other thing is, and this is something some of my team has started talking about and I'm still wrapping my head around it, but the idea was also, well, as part of looking at all these workloads and scaling strategies,
+I have certain kinds of services that have
+very different footprints. Some are compute-intensive,
+some are batch-focused. Do I just write all my microservices, put 'em all on the same instance
+type, especially let's say this is in a container-based environment, and just assume if that
+instance type needs more memory or it favors a GPU model, I'm just gonna let that
+instance type scale out and it'll just have to
+scale out to meet that load. And that raises the question of, could we really connect specific workloads to specific instance type to optimize scale a
+little bit better here? And again, I think we're
+still thinking about this, but imagine for example, these
+are three made-up services. So, who knows if they fit the
+profile that I've got here. But the idea is could I run
+these three different services on three different instance types? Could I use node affinity inside of EKS and bind certain types of workloads to certain types of instances. And would that yield a better scaling experience
+for my environment? If I have something
+really memory-intensive or something that would
+really benefit from a GPU, am I better giving that workload a GPU? Well, it depends. There's a
+whole lot of depends in there. It's a cost. How much does it scale? There's a lot of math to do in there to prove to yourself that it's valid. But I think it's an interesting
+area to think about. And just to go one step further with this, if you look at EKS and you
+look at how clusters are, so I've got a couple of
+nodes here that are running and they're running on M5 instances. One of the cool things that we have here is this
+tool called Carpenter. And Carpenter actually gives me a way to go after this problem
+within the EKS environment, which is with Carpenter,
+I can essentially go out and tell Carpenter, here's a list of available instance types and I would like you as you schedule a set of pods into a node here, potentially assign
+different instance types to those nodes as they come to life. I think this is super speculative, but I think it's interesting enough to start thinking about, especially the node
+affinity version of it. The carpenter bit, I
+still have to figure out how does it schedule effectively enough to really get the right workload
+to the right instance type. But it seems like it's intriguing. Now, the other part of this, which you may not think about at all, but I encourage you to
+really lean into this, is I talked about onboarding and why onboarding is part of this story. You do have to think about
+the scale of onboarding. So, if we have this onboarding process, you'll see the control plane
+in here and it creates tenants and it provisions tenant environments. And obviously, it goes
+out to the app plane and sets up all the services we need, all these different deployment models, it talks to a billing provider
+to set up that relationship. There's a ton of moving parts to this. Ask yourself, what's
+a lot of scale for us? So, today, we're doing about 10, so what if I threw 100 at it or what if I threw 1,000 at it? Find some upper limit that's practical, but high for your organization and do you scale effectively
+in that environment? 'Cause imagine onboarding
+starting to fail, say tomorrow we just, for whatever reason as a business needed to
+onboard a bunch more people. And our answer back to the business is, we can't onboard 'em fast enough. We're not gonna be able to
+scale to meet that need. That's gonna be a big hit to the business. So, please give emphasis to that. Now, if we look at the
+multi-tenant complexities that come with provisioning
+these environments when we talk about this onboarding process and we have our control plane. One of the things that has to deal with is these different deployment models. So, when you go build these environments and you're looking at scale, one of the things you have to figure out is how to automate the deployment and to each one of the, and configuration of these
+different tenant environments. So, if I have full stack
+silo for my premium tier, I'm gonna have unique terraform,
+I'm gonna have CDK bits, I'm gonna have all kinds of whatever my DevOps
+automation bits are here that are gonna have to deal
+with the fact that full stack looks a little bit different
+than everything else. It might share some things,
+but it has its own nuances. I might have an advanced tier and the advanced tier
+happens to have one service that runs in silo, and then the rest of its services running shared with
+the pooled environment. Now, I also have the model where I onboard a basic tier tenant and they just go to the
+fully pooled environment. Well, there's a lot to think about here and if you look at our
+examples that are out there, we have examples that show
+all the moving parts of this. In fact, there's a great
+builder session here that shows how Helm and a bunch
+of other Kubernetes tooling is used to automate and control all of this
+experience in a way that you aren't just chasing
+all kinds of crazy one-off code to make it all work, but it's
+still one process end-to-end. And then, as part of scale, we wanna say great, this
+works for one customer. What if I throw a whole bunch at it now? Well, all that automation work. We have good sort of fallbacks if some of these things
+fail along the way. How does the system know if
+something failed or succeeded? Lots of important questions to ask there. Now, the other bit of this is deployment. Deployment is a little bit different than tenant provisioning. We onboard a tenant, we get a
+tenant into the environment, we set them all up in provision,
+all their environments, but we also have the
+experience where a builder on your team somewhere is just
+writing some new microservice and they don't care
+about deployment models, they shouldn't care
+about deployment models. But somewhere in your deployment pipeline, you still have to have this
+tenant awareness baked in. So, for example, Sam
+using feature flags here and I've got standard
+tier and advanced tier, and they all have all kinds
+of different settings. And then, this environment then has to deploy to all
+these different configurations. You have to figure out how
+to make this scale as well. What does it mean to
+push out a new feature and how do you push it
+out with feature flags or what if you're doing AB or
+you're doing canary releases. Canary releases are really
+popular in SaaS environments. Well, now, you have to do that against all these different
+deployment models. What's it look like? How's it work? How do you make it effective? And then, just to make this
+a little more concrete, here's one example lifted out of the serverless SaaS
+reference architecture that supports multiple deployment models. It has two stacks. You'll see here a basic stack, and then one that's a fully siloed stack that's identified as tenant1. So, all the, basically
+all the pooled tenants go into the basic stack, and then every new premium tier or advanced tier, whatever it is, gets its own entry into those table, 'cause we have to keep track. This is an example of some
+of the work you have to do. You have to keep track of which
+tenants have been allocated and with which models and
+where their resources are, so that when you come back
+to deploy all this stuff, you know where it needs
+to go and who gets what, including which flags might be on or off to know whether they get it. And then, here, you'll
+see AWS CodePipeline here on the right-hand side that is just going
+through, gets the source, does the build, and then
+it will do the deploy and it'll do the deploy creating whatever entry
+needs to go into the stack. And also using whatever
+configuration here. Like here, I have provisioned concurrency, 'cause it's a service environment and my basic tier tenants get zero and my premium tier tenants get 50. I dunno if zero is a good
+idea there. (chuckles) We should think about that. I just call it that in the diagram myself. And then, obviously,
+now, we have this stack that is this tenant1 stack
+and now we deploy it. And because we're using API gateway and each tenant stack
+gets its own API gateway, we have to keep track of the URL. That's the entry point for that. So, when workloads are
+being processed here, you get this going. This stuff is all the moving parts and I show it to you not to
+teach you what the stack does. I show it to you to make the point that if you're gonna scale,
+you have to scale in a way that all these mechanisms need to scale effectively with you. Are these the right tools to use? Is these the right mechanisms? You have to think about
+deployment as part of this story. Okay, resilience. And then, we're gonna get into validation and chaos at the end of this. So, resilience obviously, is
+key again to every environment. In this case though,
+resilience is more about what are the SaaS layers of resilience. We know it has to be fault-tolerant. We know it has to behave and
+have all these circuit breakers and all these other patterns in the architecture to be resilient. But what else? And to me, I tried to break it down into
+a few key areas for me. This is the first time I made this slide or tried to categorize these areas and it's an evolving area for me, but I thought if I have this
+whole SaaS architecture, it's got compute, it's
+got a control plane, it's got these tenants that
+are coming in from the top, what are the layers of
+this resilience story? And one of them is how do I
+just control the way tenants are in putting load on my environment? Classic sort of question which
+is just how do I make sure as they're coming in the front door, they're not coming in in a way
+that is saturating my system or putting a load in the system that's gonna just bring it to its knees and just gonna have it fail. The other thing we're gonna look at, and this is one that you could argue isn't part of resilience, but I think it's part of resilience, is we talk about tenant
+isolation all the time. To me, a part of resilience is making sure one tenant can't see
+another tenant's resources. So, I feel part of your resilience story is that you have to do everything you can to be sure that you've put
+all the pieces in place to make sure one tenant can't
+see another tenant's data. Because if they do, that again can be a huge
+event for a SaaS company. Then, the one we really
+have covered most here, and then I'm not gonna recheck, but I have to include scale
+as part of resilience, 'cause we do have to scale effectively, have to have enough resources. If we don't scale well enough
+and the system falls down, because we can't scale,
+that's gonna be a problem. And then, the one you
+might not be thinking of, do we have enough visibility into what the system's actually doing? How is it scaling? How
+are tenants scaling? How are microservices scaling? How are they putting load on the system? And how is the system
+behaving based on that load? If you don't have visibility into that, even though you haven't... It's mostly about surfacing that, you don't know if you're
+scaling effectively to me. You don't know if your
+system's resilient here. Resilience is partly is the
+ability to detect things before they actually go wrong. Well, if you don't have
+a way to detect 'em before they go wrong,
+you're not gonna be able to use all those other
+approaches to achieve resilience. And then, the last one here, I think that onboarding
+and deployment resilience. We have to think about those
+two bits of this as well. How well does onboarding withstand issues? How does it recover from issues? How does deployment handle failures and recover from failures and make sure that we're as
+sound as we can be there? So, now, if we start at that front door and we work our way in, we're gonna start with
+the most basic theme. And this actually applies to any system, which is if we're going to prevent users from just imposing
+excess load on our system and bring it to its knees, we have to put throttling
+mechanisms into place. And so, for me, I've shown one easy example
+here, which is API gateway. API gateway has this notion
+of lambda authorizers we'll look at in a second, that let me define policies
+and control the kind of loads that tenants are putting
+in my environment. But this goes deeper than this. This whole discussion of a throttling is a layered discussion. So, even after I get
+through the front door of the application, as I'm
+going service to service, service to storage, all of those parts and layers of my system
+should be asking how or if I'm going to implement
+some kind of throttling here. So, do I have provisioned
+concurrency on my storage or do I have some, what is
+the mechanism or the knobs and dials somebody's giving
+me, so that I can achieve and control the workloads and the demands that tenants
+are putting on my environment? And to make this a little more concrete, if we take this out of,
+and put tiers on it, so they've got four different tiers, it's actually three tiers with two tenants in the platinum tier. And I say they're coming
+into my environment and they're hitting the API gateway, I hit the authorizer, figure out which tenant
+maps to which API key, and then with lambda
+authorizer, I can have API keys, which are connected to usage plans. So, I basically have three
+different API keys here. Those three API keys map to usage plans. And all within the lambda authorizer, I resolve that incoming
+tier to a usage plan. And then, that usage plan
+configures the authorizer policy, and then applies that in the API gateway as we go downstream. And if you've exceeded the quota, your message won't go through. The other piece I wish
+I'd put on this diagram that isn't here is you can
+also use that authorizer policy to control which methods and
+entry points are visible. So, if somebody's trying
+to access an entry point on the gateway that's
+not valid for their role or for something else, you
+can block that path here, which to me is another great tool to have in the resilience story. But think about it here is I've actually equated
+tiering to resilience. I think tiering is part
+of your resilience story. If that basic tier tenant is imposing a ton of load on the system and they're affecting the availability of a platinum tier tenant, that's a resilience problem
+for me in my system. I categorize that and so I'm gonna put policies
+on that basic tier tenant that says you're gonna get cut off at a certain level and that's intentional. And so, when they call me and say, wait a minute, I'm getting
+throttle, what's going on? I'm gonna say, well,
+become a standard tier or move up to the platinum tier if you want better throughput. Most of the time, it's gonna be okay and I'm gonna set that policy somewhere where that's not happening all day long, but I'm still gonna set it, because I don't wanna
+be there that one day that they choose to just go crazy with it and they end up affecting
+all my other tenants. Just to show you one
+other approach to this, just not make this all
+about the API gateway. Here with lambda, you'll see that I can actually
+use a reserve concurrency. So, here, I could
+actually deploy my tenants into three separate tiers,
+separate copies of the functions, but with different reserve
+concurrency values. And this means how many current executions can I have within a lambda function? And here now with 100 at basic tier, you'll hit the concurrency wall there. With 300 advanced, you'll hit it there. And then, with premium,
+everybody gets more. So, for me, this is a just another way to implement the same mindset that I talked about in the prior slide. Now, the area of resilience
+that's a little harder to classify is this notion
+of resilient storage. How do we build resilient storage? This is one of the toughest and most difficult areas I talk about, because so many people who
+pick storage are also picking, some have to pick some compute
+size when they're picking it. So, they go out and say,
+hey, my tenant1 is a silo. They're gonna start out as a db.m3. Silo two is a db.m5. Then, I've got all these pooled tenants who are gonna run into db.m5 as well. Is it the right size
+instance? I really don't know. That's usually why we over-provision here. Is that's the only option we have. But that's not really resilience to me. That's just hoping that you've
+put enough capacity there that you're really not gonna fail. And then, what you're really trying to do is real-time for efficiency, this is efficiency versus scale
+fighting with one another. I don't want it too over-provisioned. So, then, you'll see
+on the right-hand side as they move over there,
+I start adjusting the size of the instances which organizations do. And I have no clue to
+do, what to do with silo, 'cause remember that graph
+for, I'm sorry, with pool, that graph for pool's all over the place. I probably can never size it down, 'cause who knows, on the one day when somebody goes wild with something, they might take out all
+my pooled customers down. That's not a good moment. So, then, what's the answer here? There is no magic answer
+for this one. (chuckles) I wish I had one for you. I do think a hint of the
+answer is serverless storage. There's lots of good
+storage options now on AWS that have serverless option,
+DynamoDB and Aurora Serverless. I think EMR has serverless,
+OpenSearch has serverless now. So, that more and more serverless is finding its way into the storage stack. And the more and more
+you can put your storage on those models, the more resilient your storage strategies are gonna be here, because you're not so
+tightly coupled to this. I will also say these storage mechanisms also have their own knobs and dials around provision throughput and what's the capacity you're given. Are you on-demand? Are you not on-demand? So, there's a lot of tools you can use there to deal
+with resilience as well. Now, the other bit of
+this is for resilience is, where are my fault
+boundaries in my environment? And for me, for example,
+I look at onboarding and onboarding may have
+interactions with identity provider, it may be have interactions
+with tenant provisioning, which is going off and ask another service to
+provision all your resources. And then, it may have
+interactions with billing, which may be a third-party
+billing provider. Well, all those potentially asynchronous, potentially third-party dependencies are a fault-tolerant point
+of contact for your system. If the billing system is
+down, what do I wanna do? This is where you've gotta
+have fallback strategies. If you look at classic
+resilience strategies, maybe I'll let the billing fail right now, and then come back later
+and I will retry again. But let the system go forward with the rest of the
+onboarding experience. Same thing is true for deployment. If I'm trying all these
+different deployment mechanisms and part of that deployment's
+running all this terraform, running all the CDK code to do this. And that's probably doing a little bit of that asynchronously as well,
+what do I do when it fails? Probably have more control over this, 'cause this is probably
+more your own code, but you still have to have a strategy. Are you gonna retry it? Are you gonna clean it up and retry it? What are you gonna do? You also have to have a, around this whole notion of isolation, I told you resilience is
+part of the isolation story. And to me, figuring out how
+you're gonna build resilience in for isolation depends on how you've deployed your environment. For example, if I'm account, I'm using some notion
+of account per tenant as my deployment model, then I have to think about how do I prevent cross-account
+access between these? Probably an easier one. If I'm a VPC for every tenant, then now what's my strategy and what's my resilience strategy and how do I make sure that these VPCs are successfully isolated from under. Good constructs available for you there. And then, when you get more granular, we get down to service
+and resource isolation. And that's where it gets way more tricky. How do I make sure one service can't call another service
+if they're both siloed? Some cases you want it to talk
+to, but some cases you don't. How for every other AWS
+service that I'm talking to, how can I make sure you're only talking to the view of that service
+that you're supposed to get for that specific tenant and
+that specific tenant context? You have to come up with
+a strategy for that. In general, we tell you tenant isolation is
+something you have to do. I'm connecting tenant isolation to the resilience of your system. I'm saying do tenant isolation like we've always said to do it, but think about it through
+the lens of resilience. The last bit of resilience here, and this one is maybe a little bit vague and maybe a little bit too hopeful, but I actually feel
+like part of resilience is moving code and policies
+away from builders. I don't want my isolation policy sitting in the code of
+every single microservice. I want there to be a generic
+mechanism that handle that. How do I unpack JWT tokens
+to get tenant context out? How do I record metrics and logs? I don't want my builders to
+be the applying that policy over and over across their code that is going to create issues. It's gonna create
+resilience problems for me. So, in this particular case, it's lambda. I've got a lambda layer. This could be EC2 with Java libraries. It could be any JARs or whatever. It just, my point is,
+you as the architect, are gonna move these policies
+outside the view of developers and just ask them to use them. So, in this particular case, you'll see I've got a
+product and order service and all the multi-tenant policies that are being applied here
+are being applied in a layer that's shared across all the services. So, now, if I wanna go change something about the way logs are
+injecting tenant context or the way that tokens are being handled or the way that IAM and policies are being used to assume
+roles to get tenant scope, that's all outside of their view. So, for me, that is a
+great defensive tactic that will lead to higher
+resilience in your system. It's also just a good practice. Finally, the last bit that I talked about, okay, we build scale, we build resilience. Most people just stop there. It's great. We wrote good code. It seems to work really
+well. That's enough. I feel like these mechanisms,
+they're so nuanced that if you don't know if they're working, you don't really haven't proved that you've achieved what you were after. So, here, if you look at
+the common nodes of this, and by the way, there's nothing
+uniquely sass about this. This is the sort of notion of chaos and just good testing here, which is I'm gonna go find
+the resilience profiles. I'm gonna go find the scale
+profiles that I'm after. What are those different
+consumption pofiles we talked about earlier? What are the different isolation profiles? I'm gonna use that as
+input to an experience and I'm gonna define all
+these different workloads and these different tiers. And I'm gonna use that data
+as input to my application. So, I'm gonna go generate
+some tenant population, go build out some population of tenants that matches the profile that I'm after. I'm gonna have some automated
+auth into this experience. And then, I'm just gonna run in this case, because we're trying to do
+something that's load-based, have all these parallel workloads exercising my environment and
+just stressing these bits. And the whole idea here is
+build all of these strategies. And be interested in the
+left-hand side of this. I think a lot of people are interested in the right-hand side. They wanna go right to the code that does the right-hand side of this. But the cool things that
+are gonna uncover issues with your scale and your resilience happen on that left-hand side. What kind of data is gonna
+be put into this process? How many tenants? In what profiles should
+I do tenants of one, like a bunch of premium tier
+tenants and very few pooled. And then, switch that and invert
+that in different patterns and see how it reacts and responds. Now, simulate real-time code
+executing that environment. And does it scale and respond
+the way you expect it? This will tell you a ton about how your environment's performing before it goes out into the wild, and then uncover things along the way that you may not realize
+have shown up as a problem. And I think it's really just going after the
+high-value scaling strategies. You don't wanna do this to
+cover every single scenario and every bit here, but you'll know where
+those bits of your scaling and resilience strategy are, and you'll know how to go after them. And so, if you look at exercising that write for noisy neighbor and scale and resilience here, we've got a bunch of, this is a noisy neighbor scenario. I've created a bunch of noisy neighbors with different profiles. The different colors
+represents the different people who are the outliers in these groups that are doing different things. I create some noisy
+neighbor orchestrator here. This is new code you're
+gonna have to go write. Or some third-party tool. There's good tools that
+do this stuff as well. It's gonna go out and provision tenants and provision the app
+plane for these tenants. And then, I'm gonna run
+these different workloads through this different load simulator. And then, the key piece
+of this that people miss, I'm gonna hit the application plane, is I'm going to observe
+the operational view of what happens when this
+happens when I run these loads. A lot of people ran it, it survived. I looked at New Relic or Datadog
+or AppDynamics or whatever and looks like everything's healthy. Good. We're thumbs up. No, I wanna go see whether or
+not inside of my dashboards that the ops person seem to look at. Can I create conditions where I can see, oh, something's getting saturated. Is it getting surfaced? Are the alerts and alarms going off that are supposed to be here? I wanna know that the
+operational view of this is going to be able to
+have the view into it that I expect they're gonna have when I put these different
+demands on the system. That's the missing piece I think for a lot of this is,
+people don't go all the way to the operations side of this experience. The other bit is these async
+integrations we talked about and having these graceful
+fault-tolerant experiences. This is like we already talked about. We have onboarding,
+hits tenant management, hits tenant provisioning, provisions the app plane,
+hits billing, goes there. I wanna handle these failures. And wherever else you have them. Anywhere you've got a
+third-party dependency, anywhere where somebody
+else's availability or resilience is outside of your control. What's your fallback strategy? And that's fundamental resilience, but more important in a
+multi-tenant environment. And more important, like
+in this control plane, you are orchestrating
+most of this experience. Your control plane's gonna have to be able to handle these bits. You also need to validate
+your onboarding experience. I said you need to have a scalable and resilient onboarding experience. This means taking different profiles of tenants with distributions, of loads across these
+in different make-ups and running 'em through
+your onboarding process, and proving to yourself that
+when we onboard platinum, which does a full-stack silo versus basic, which only configures a
+new environment settings, but doesn't really provision
+much new infrastructure. And we do those things
+in different combinations or some at the same time. Does a system handle
+all of that effectively? All the pieces they're doing
+what they're supposed to do. Most of the time, not by the way, a lot of people have a lot of confidence even when they built a full onboarding, and then they start doing this stuff and they start finding out, ooh, there's little things that go wrong. They just don't happen a
+lot, so we don't see them. The other one here, and I think this is
+one of the hardest one, is we set isolation as part
+of the resilience story. What do we do? How do we test for that? So, if I have this environment, it's using the token vending machine and I've got a tenant 1 that's coming into this environment and they're trying to
+access tenant 1 database, tenant 2 database are here. Tenant 1's obviously only supposed to see tenant 2's database. Well, what happens? I've done
+the token vending machine. It's assuming role. All
+those things are there. How do I prove that it's gonna
+work if something goes wrong? And really the only option
+you really have here is either in the code or
+through a third-party tool, you have to inject a context that says, nope, you're not tenant
+1, you're tenant 2. I'm gonna inject the JWT token. I'm gonna do something
+that changes the context, and then prove that
+you've injected at a point where the IAM policy's
+gonna say, no, you can't. You're trying to cross a boundary. And again, when somebody does
+try to cross a boundary here, does something land in the
+operations dashboard that says, ooh, there was an attempt to cross a boundary between tenants here. I wanna know if that
+happens in my environment. Anything that tries to cross the boundary, even if it's rejected, it
+means something's going on. Maybe somebody's trying to do something to corrupt the system. So, I wanna know what's going on. And then, I said we have
+this operations experience. Yes. Now, we have this
+awesome operations experience. How do we just feed it as
+much as we possibly can? What are all the tests that just prove that that operations experience is working the way we expect? See, this as part of
+what you and the ops are. If your ops, great, you already do that. See this as a combined sort of thing. And I would say to everybody
+that this is as valuable to dev and to QA as it is to production. You ever trying to build a
+system, a multi-tenant system and everybody's trying to build and everybody's pushing stuff, and of course it's
+broken, 'cause it's new. The tool I wanna go to
+in the dev environment is a tool like this that's
+like, why is it going on? 'Cause I'm still sorting out
+what my new service is doing and alongside all the other services, and I wanna see what's going on. And as a QA person, I wanna
+simulate these load issues and see, is it really doing
+what it's supposed to do? (attendee coughs) Okay, a few takeaways here. I hope that it's clear that
+the story for resilience and scale is not just the traditional sort of notion of scale and resilience. Multi-tenancy absolutely, to me, adds a whole new layer of
+considerations on top of that. And so, when you're thinking about scale and you're thinking about
+resilience for your solution, absolutely be thinking about what's the multi-tenant
+sort of version of this story and what's the new things I
+ought to be thinking about? Expect efficiency and scale to always be competing
+with one another here. Because they're always
+pulling at one another. We wanna be as efficient as we can. I told everybody to build
+good efficient environments, but you're always like, yes,
+but scale within reason. I wanna give myself a room to be sure we're not having outages or we're not scaling in a way that's meeting the needs of the system. And I will also say, everything in SaaS is a mix
+of business and technicals, but scale is absolutely it. If somebody's gonna tell me, go build a scalable SaaS environment, what's the right way to go build it? I'm gonna say, well, what are deployment
+models you're gonna have? I'm gonna ask a hundred questions about what they want it to do to figure out what
+version of scale is right. So, you have to lean
+into the business here to find the right answers. And then, I think you should be looking at how you can use different
+deployment strategies for scale and resilience tools. I feel like how do you deploy and exercise these environments to really prove that
+these things are working? And obviously, to me,
+throttling isn't just, throttling is a tiering strategy, but throttling is also
+just fundamental strategy in a multi-tenant environment. I wanna throttle and make sure nobody's pushing
+excess load environment that's gonna impact my environment. And by all means, build
+interesting workload profiles. Figure out what the workload
+patterns in your environment. It sounds so not like interesting in terms of what you might be doing. But if you invest time in
+stimulating these workloads and figuring out really
+interesting personas, get your product owners and
+others invested in that, you will have very interesting data to feed into your scale
+and resilience bits. And then, by all means,
+don't make validation of all this stuff like an afterthought. I would try to build it and immediately. It's almost like test-driven
+development or something. I built something really cool, it's supposed to do something really cool. How do I prove to myself it
+does that thing that's cool? And don't go overboard here, but at least do enough
+to prove to yourself that the fundamentals are doing what what they're supposed to. Okay. And now, just a few highlights here in terms of other sessions. Some of these, I think
+none of these have... I can't figure out which ones have happened
+yet and which not. It's all a blur to me at this point. But here are the breakouts that are related to
+SaaS that are going on. If you're interested, here's some chalk talks
+that are still going on. Federating identity's interesting. There's a chaos talk, which is a variation of
+what I talked about here if you wanna go deeper to that. But get in a chalk talk
+setting. I'll be doing that. and we'll go deeper into this notion of some of this validation and testing. Great workshops that are out there. This SaaS survivor I
+think is a really cool one that is about operations and testing all these
+operational tooling and so on. And that's it. Well, I really appreciate you
+being here for this session. I hope you got a lot of value out of it. I hope this gives you a general sense of the things you've gotta
+think about when you're thinking about scale and resilience for
+a multi-tenant environment. I hope this goes well with
+the prescriptive tools that would give you, that
+are a little more concrete. But enjoy the rest of your
+re:Invent and have a good day. (attendees clapping)

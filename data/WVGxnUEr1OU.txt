@@ -1,0 +1,441 @@
+- All righty. Hey everybody. Good
+afternoon, how we doing today? Ooh, good. I know we got
+the post-lunch crowd. So I appreciate y'all sticking in there. Hopefully you got some
+coffee in you after lunch. Thank you so much for being here. Very glad that you chose to
+spend this hour with us today to talk about one of my favorite topics, which is AWS Fargate. Specifically, we're gonna be talking about how you can build, deploy, and manage workloads in a
+very cost-effective manner with AWS Fargate. My name is Steven Follis,
+and with me today is Skylar. He's gonna be introducing himself in a bit more detail here shortly, but today our really focus
+is gonna be on how Skylar and the team at Smartsheet was
+able to leverage AWS Fargate. So we're gonna go on
+the journey with them, and they're gonna talk all
+about how they were able to adopt Fargate and how it was able to not only save them money, but also enhance their
+operational footprint, and then ultimately how you can take some of these lessons learned back
+to your organization as well. So for the agenda, I'm gonna start with a quick
+level set over what is Fargate, how does it work, what does it do, just to make sure we're
+all on the same page, and then the majority of the time is going to be Skylar sharing their story. So we're very excited to have Skylar and the Smartsheet team today. It's amazing what they've
+been able to accomplish, and we're very excited to hear more about how they're able to
+leverage this technology. To level set here on the beginning, Fargate is all about
+serverless containers. So historically, containers
+have involved needing to care about host operating systems and host nodes and virtual machines. We've gotta be worrying
+about custom AMIs, patching, maintaining those hardened environments month over month, over month. It takes a lot of time and energy for not always a whole lot
+of bang for your buck there. So from a serverless perspective, Fargate shifts that shared
+responsibility model. So everything underneath the container becomes AWS's problem, and
+it's AWS that makes sure that the underlying
+infrastructure is hardened, is secure, is up to date. We take care of the
+capacity planning needs, where if you need more
+containers with Fargate, you simply change a replica account. We give you more containers. It's lovely. So it really simplifies
+the operational overhead of adopting and utilizing
+container technology. So that serverless fashion
+operationally has a lot of benefits compared to rolling your own virtual machine nodes. Security is really a core
+foundational aspect of Fargate, really from the earliest days, we've built this in a way that
+comes in a very opinionated, hardened environment for those containers. And what I mean by that is that in a typical container world,
+we have virtual machines. We're bin packing multiple containers, 5, 10, 20 containers
+all into a single node. We do have cgroups and
+namespaces providing that isolation boundary
+between containers. Fargate takes that a step further. So every time I deploy a
+task at ECS with Fargate, that entire task is wrapped in a micro VM. So I not only have the
+cgroups namespace isolation, I also have a hypervisor,
+kind of a hard shell around that task that provides an
+additional layer of isolation compared to other ways
+of operating containers. Other security features include not allowing privileged containers, extraneous Linux capabilities. We come with some things you just can't do in the Fargate world. We do that for security. So all traffic coming in and out of a Fargate task
+is going through an ENI, it's going through a security group. We can really harden that ingress, egress traffic in and
+out of that environment. So one of the reasons why
+security teams really like Fargate is that it's a way to
+adopt container technology in a very structured, secure fashion. So security is always top of
+mind when it comes to Fargate. And then finally, one of
+the main talking points and stories today and narratives is all around cost efficiency. So one of the benefits
+of serverless is that with Fargate, we're able
+to have a very elastic pricing model. What what I mean by that is
+when I spin up a Fargate task, I'm paying, when that task exits and the container is no
+longer running, I stop paying. I'm not having to worry
+about capacity management and bin packing enough containers into a virtual machine to
+get that utilization up because I'm also sizing
+those tasks independently. So if I have workload A is a small web app that's just reading off of a cache, I may just need one VCPU all
+the way down to 0.25 VCPUs. I can make that very
+small and very affordable. Whereas my workload B
+might be doing monte carlo simulations, I need a lot of horsepower. 16 VCPUs, that's great. I
+can size those independently. There's no resource contention, and we're able to pay for those separately and also do things like cost
+allocation, charge back, and show back all through tagging as well. So there's a cost efficiency
+piece that comes into this before we've even talked about the number of human hours you get back in your month not having to deal with AMI
+management, capacity planning, and some of those more
+traditional infrastructure tasks that we've had to do as operations teams. So those are some of the
+core benefits of Fargate and why we see many customers choosing to opt into serverless containers when running with ECS. Fargate is available for both ECS and EKS. Our focus is really on ECS. Fargate grew out of the
+ECS team many years ago. So ECS, the Elastic Container Service, is our first party container orchestrator. We love ECS. This is an area of immense
+investment for AWS. We're one of the few cloud providers that maintain two separate
+orchestration options. So we invest heavily in
+both ECS and with EKS. Both are strong parts of our business. ECS is not going anywhere, continues to get to a
+lot of great features and capabilities, many of which we're
+talking about this week for the first time,
+which is very exciting. So the scale of ECS is great. We have customers that choose ECS for global scale mission
+critical applications. We have ISV partners that build their entire
+businesses on the back of ECS. ECS is a very compelling option, especially if you're coming
+into the AWS ecosystem. Knowing AWS's API layers, CLIs, kinda the way AWS does things, ECS should feel very natural there. So we love ECS. As far as workloads, we're saying, hey Steven, What runs in
+Fargate, what doesn't? And so Fargate is very
+purposely positioned as a very much general
+use container platform. We run OCI compliant containers. So if you can fit it into a container, we can run it on Fargate, so the exact same containers
+running on your laptop. We can move and push it into
+ECR, run it on ECS with Fargate and the same application will operate. So some of the commonalities that we see over and over again, web applications, things like HTTP call
+and response web apps, APIs, et cetera. And then the second one being
+the data processing workloads are probably our two most commonly talked about kind of workloads. Those can be things like queue processing, asynchronous data processing. We've got this nice run task API. So you can just fire off a
+container, do some stuff, and then poof, it goes
+away and you stop paying. Those kinds of processing
+workloads are great most of the time paired with
+things like auto scaling where we can scale the number
+of tasks based on queue depth if we're doing data processing, we do it based on number
+of people visiting, number of requests
+through a load balancer, any custom metric, load
+balancing makes that very easy and very elastic to align
+capacity with your demand. Other workloads that we see often, things like CI/CD pipelines, legacy app migrations are great. Throw it in a container,
+get it into Fargate. You get a lot of benefits
+of a modern container stack without necessarily having to go throw out and redo the entire application. Great things like Java apps
+even on Windows containers are available on Fargate today for older .NET framework apps. AI and Ml is growing in popularity. As you've probably seen
+this week at at re:Invent, it's a very popular topic. We see a lot of that with Fargate. More on the inferencing
+side, more on the CPU side, but very common use case
+for how easy we make it to get containers up and running. And then backends for IOT
+systems, gaming environments, dev environments, you name it. We're also seeing a big
+uptick in things like digital media asset processing. So FFMPEG in a container in
+Fargate works beautifully, seeing that more and more. So again, if you can run in a container, you can probably run
+in Fargate very broad. I've stopped being
+surprised now on hearing what interesting things
+customers are doing in Fargate because it's just like, oh
+yeah, of course you are, that's awesome, it's great to see what customers utilize
+this technology for, which is a lot of fun. So with that, that's kind
+of the piece I just wanted to make sure we're on the same page. What is Fargate, what's it used for? What are some of the value props there? Now I just really wanna transition over to hear more directly from
+Skylar from Smartsheet. So with that, Skylar, if
+you'd join me up here, the rest of the time is
+yours to talk about how you and the team have done some really great work over the last couple years. So thank you.
+- Thank you. We're gonna start with an exercise. So I'm gonna ask that
+all of you sit up nice and straight in your chairs. Bear with me, it'll be quick. Don't worry. Now, with your back straight, I'm gonna ask that you close your eyes. I don't worry, I'm not gonna
+make faces at you, maybe. All right, with your eyes closed, put one hand on your stomach and we're gonna do a series
+of three deep breaths. Ready? Breathe in, and breathe out. Breathe in, and breathe out. One more, breathe in, and breathe out. Go ahead and open your
+eyes. How do you feel? From a show of hands, who feels maybe like you
+have a little more clarity? We got something. We got one
+back, okay, we got a few now. All right, so there's a few of you. What about lighter, lightness? From a show of hands, who feels just maybe a tad bit lighter? All right, we have a few of, yeah, okay, we have a good amount. All right, well that same
+feeling of lightness. Oops, I was supposed to have
+this slide up by the way. So feel it anyways, that same feeling of lightness
+and clarity and focus, by the end of this talk I'm gonna show you how Smartsheet was able to
+unlock these same feelings and we still thrive with them day to day. This ability to be lighter,
+more agile, more focused. Every day we show up, and my goal, if I was to leave here and there's one thing
+you could walk away with, let it be our framework OPS. And OPS is just some
+acronym we put together. But the framework is very legitimate and this stands for
+Optimize, Propel, and Scale. And I'm gonna take you on a journey through each one of these, you're gonna see how Smartsheet was able to optimize, how we
+were able to just thrive and propel, doing more
+deployments every day, and then finally scale. When we look at a problem, how can we achieve a 50X,
+100X scale on top of it? And you're gonna see exactly
+how we did all of that. So it should be a pretty
+fun ride. Who am I though? Who is this guy up here talking on stage? Well five years ago I was sitting right where you are today, maybe
+at a different casino, and there was a customer talk introduced. And they were talking about
+how they just adopted Fargate and it was just a game changer
+for their ECS deployment. Why was it? Well, they're able to get
+so much more automation, reduce a lot of those day-to-day
+manual tasks, as well, it just created a great
+level of abstraction while not compromising control. So what did I do? I took that information, I brought it back to the
+company I was working with, and we got it adopted
+probably in three months. I had to get some buy-in from leadership. But once it did, it just
+manifested very nicely. It landed really well. And from there, probably six months after, we got acquired and I got
+acquired by Smartsheet, our company 10,000 Feet did,
+which is where I am today. And from there, I'm on the platform team and we kind of handle all of the very data-intensive
+compute-heavy workloads in our app and all the
+interfaces between them, we try to create some
+simplicity on top of them. So I'm coming from a
+place where I see some of the most data intensive and I'm gonna give you an
+idea of just what the scale is that we see here in a bit. And I thought it would be good to give you a little bit about me because I think creating
+some relatability could help. And I've been doing yoga
+for the last two years. I really enjoy it. I know you didn't come
+here to hear about me, but it helps me. So bear with me. Also, I've been doing some acting, I wasn't gonna put this up, but Steven's like, oh do it, you're good. And I'm not really, but I'm trying. But I love building things, which is probably why
+naturally I started doing 3D printing, any 3D printers
+in the house, any one print? Wow, more of you raised your
+hands on that than the clarity. Okay, cool. Well sweet. And then meditating. You'll find me on my Zafu
+meditating pretty much every day. And teaching. I love
+teaching, it's why I'm here. I'm pretty new to the
+whole public speaking, so cheer me on if I drop in energy. But yeah, if you wanna add me on Twitter, you can, or X I guess let's called now. So, all right, well you know about me. I wanna give you a little
+context about Smartsheet. So this is my plug by the way. My opportunity for Smartsheet. Smartsheet is the enterprise
+management platform that helps you plan the work, do the work, and scale the work. And Smartsheet is kind of what
+you can consider the solution to the day-old spreadsheet problem. Since the birth of the internet when spreadsheets got
+introduced, we needed a way to make those more effective rather than just sending them in emails and however zip drives,
+whatever you're doing, well, we've created a platform on
+top of that that allows you to collaborate but also
+automate on top of them and then be able to report up to all the different
+levels in your company. So if you haven't used
+Smartsheet, check it out. But what's more important
+is to give you an idea of the scale that we're operating at. Because anything that I
+talk about here today, I want you to feel like you can go and apply those to different services within your infrastructure. So we have over 100,000
+different organizations within our platform and about
+13.4 million collaborators. And from that, 6 billion active tasks, which you can consider
+a row in our sheets. And then finally, 2.4 petabytes of assets. And these are just the assets in our grid or our sheets alone. We have much more data if
+you factor in everything, and you're gonna hear throughout
+this talk, grid, sheet, and just know that they can
+be used interchangeably. We kind of call them both internally. So if you hear grid,
+just think spreadsheet. Before we get into some of the solutions, I want to also give you a
+little bit of background around the partnership with
+AWS that Smartsheet's been able to maintain over the last 15 years. And I'm just gonna skim through this. So since 2006, when Smartsheet released, we've been using AWS S3, that's kind of where we started. From there, we did a co-innovation in 2009 that was really cool with a service called Mechanical Turk. I don't know, do any of
+you know Mechanical Turk? That was actually more than I thought. And so for those of you that don't, it allows you to scale up
+your workforce just like you would scale up your compute capacity. And so we adopted it into our product. It's not there anymore, but it's still a great
+example of co-innovation and pioneering and what
+partnership can do. From there, we started
+to strangle the monolith. 2015 was a very big year, and this is where we started branching out into microservices. From there, we also
+strangled our large core DB, our monolithic database, and we broke it into what
+we now call as grid shards. So we were really excited yesterday during Peter DeSanto's keynote when he talked about how
+there's now this managed sharding layer for the database. Super excited for that. 2017 was also a very critical year. This is where we started to make our way into
+the federal government and we landed in the AWS Govcloud region. This was the first time that Smartsheet had been 100% deployed within AWS. Up until then, we were running
+in our own data center. And in 2019, that laid
+the foundation for us to migrate fully to AWS. So in 2019 we, completed our migration, everything we had, we moved off our data
+center and we were in AWS. Sure, it's a pretty common story. A lot of you probably already have done the migration yourselves. And from there we've been able to grow much faster than we'd seen when
+we were in our data center. To think that two years after we migrated, we'd be moving into multiple regions was something we just couldn't fathom. We couldn't understand the
+speed that it unlocked. And since then, it's been
+a good amount of growth. Before we get into our optimize section, I wanna start with a quote
+and this is from Praerit Garg, our CPO and EVP of
+engineering at Smartsheet. "The cost savings my engineering
+team has realized with ECS, Fargate, and Graviton are significant, especially in the current economic climate where we need to make every
+dollar stretch further." I'm sure most of you can probably relate with this quote and what the
+current economic climate is. And I'm sure that's probably
+also what brought you here. How can you do things to kind
+of add some breathing room? How can you shave down
+some of those costs? Well let's dig into it. So once again, this is the O of the OPS, and we're gonna go through each one. So optimize, what is it? Well
+it's about reducing costs. But there are a lot of
+ways you can reduce costs. For sure, there's the AWS bill, you can do things to slice your bill down. But what about being more efficient? That's a way of saving costs, isn't it? So being more efficient
+means doing the same thing you're doing today or more with less, which means less waste. And we're also gonna see how you can start to use things like Graviton and give yourself be more
+sustainable for the environment. We're gonna see how Graviton,
+by adopting it within a month, we were able to have 60% less power usage and able to pay less in the process. That's pretty significant. In the duration of about a year, we're able to have a 70%
+reduction in our cost. And this is including the AWS bill and also the operational hours that go into maintaining our platform. Like any good story, we
+need a optimization journey. I'm not gonna go through all this, I'm just gonna kind of skim through, and if you want to get a
+screenshot or a picture, I'll tell you when we're
+at the last little click, let me just click through. But we started in our data centers, we then lift and shifted. We got into the cloud,
+and once we were in there, we started figuring out
+the right instances, instance types based on our workloads. We were mainly on EC2 when we started. Then it was about figuring out
+how we can get to containers, and then from containers, serverless, even though a lot of
+engineers still think, well, there's a server somewhere. So is it truly serverless? I don't know. I still haven't figured that out myself. From there, Graviton,
+this was something that was pretty intimidating when
+we first went up against it. We thought it was gonna be a huge shift. And it ended up being really 30 days. And this is something, I think
+it would've been much harder if Docker version three hadn't came out. And now you can build an image in ARM 64 and X86 by just an argument,
+a command line argument, you're able to do that, as well, ECR has support for being able
+to upload the image with both architecture types without
+having to use separate tags. And that's pretty powerful. And so it really is a much simpler journey to extract huge savings
+while also being able to reduce your carbon footprint> From there, may be true AWS optimized, but you're never gonna really be there. You need to always be focused in on how you can optimize things. But it's a really good start and you can kind of set some
+of the cultural foundation for all teams and new services to come. I'm gonna grab some water, it's
+a pretty slide, take it in. So we're not gonna go through each one of these different services in the slide. What's important at this point is just the idea of specializing services. So you've made your way into containers, now it's all about figuring out how you want to kind of
+dice up your service, figure out these logical groupings, and have separate installments of those. You can think about it maybe
+like the analogy of the house. You can have a blueprint for that house and you can take that blueprint and build it in different places, different locations,
+that may change the cost. You put it by a road, a highway, versus putting it by a school. Similarly, we can take our app and the images that we build and run those in different flavors and distribute traffic to them based off of different circumstances. So here I think what's important
+is the batch versus the API and the batch processing is a way for us to use the same API image. But this is purely used to process some of our heavier workloads. We're just running it with
+different task resources and different task sizes. But it's the same image. And what this does, you would think it doesn't
+seem intuitive that by splitting into many services,
+you're gonna save money. But the benefit comes when you
+start looking at autoscaling and you can now start having specialized autoscaling with limited, basically you're trying
+to get as much of the CPU and memory utilized as possible and you have a lot more
+control when you can set up your autoscaling for
+that particular workload. So in our batch processing
+or the batch Excel, we need super, like the
+largest instances you can get. In fact, we process some
+requests that have formulas, it takes 1.2 terabytes of allocated memory
+throughout a five minute processing life cycle. That's a lot of memory. And how do you do that with a task that has a 120 gigabyte memory limit? Well you need a very
+aggressive garbage collection, bu you can, you can
+achieve it, and we have, but if we were to try doing all
+this within one ECS service, it would be very difficult to achieve. So by being able to specialize, you're gonna be able to
+configure your autoscaling appropriately for each of
+the different use cases. So very important. All of
+these are also run on Graviton. We're gonna touch into what some of these services do a little later when we get to the
+propellant scale section. But for now, just an idea
+about the specialization of services and the
+power that comes with it. Okay, what can you take away? What are three things
+that you can take away from this section on optimize? Well, embrace autoscaling. It sounds pretty simple, but autoscaling, figuring
+out how to dial that in, and how to get your
+services logically grouped in a way where you can
+actually have the control and the level of customizability around your autoscaling is very powerful. Next, also seems very basic,
+understand AWS billing. But it's very appropriate to just look at what are the main, like
+Fargate for example, CPU units and memory hours,
+CPU hours and memory hours, what are you getting billed for? Just by knowing that, you can take that and be more efficient in the
+cloud using this technology. So just understand some
+of the little specifics of the AWS billing and
+they'll go a long way, whether it's in a design review or you're just looking at adopting through a new POC or proof of concept. Lastly, eliminate some of
+these legacy overheads. Just because you started from a monolith doesn't mean you need to stay there. Going through the dockerization, the containerization is a good
+start, but don't stop there. Look at how you can further break that in to specialized microservices and start to really
+understand your workloads and how to do that successfully. All right, to the P. Propel. Propel is all about being
+more agile in the cloud. This is kind of where that focus that we talked about
+earlier, being more clear, just being more agile without all of the, I don't know, the constraints
+I guess you would have. And you can do this while also being much more operational excellent. So you can improve your reliability, your availability, your security posture, the amount of time that
+goes into your compliance. So you're trying to eliminate
+a lot of this overhead that comes when you're
+doing things more manual or using less managed services. And with that, that means you're gonna
+have a lot more automation. What if you could have
+your security automated? What if you just didn't
+have to worry about going through all the little
+checkbox on your SOC compliance because they're taken care of for you and you're able to ride on top of AWS's compliance certifications? That's pretty significant. All in all, this allowed Smartsheet to go from weekly deployment
+cycles with tens of hours of engineers' time to several minutes in deployments that are happening daily. Like literally an engineer told me when we first adopted our CodePipeline and Fargate infrastructure, like I can't believe I
+just spent two minutes and we got a deployment out, which was time just to
+review the merge request and approve it. The rest was automated. And I'm sure a lot of you
+have automated pipelines that are similar, but up until then, we had very complex pipelines that had so much custom Python code
+and they're hard to maintain. Several engineers maintained
+them, no one else could. We don't have that anymore. And so some of the benefits we really got to see from CodePipeline and Fargate are this. Coupled deployments, we got
+rid of coupled deployments and we moved to more
+independent deployments. So independent deployability, when you're in a
+microservice architecture, you can't be coupling your deployments where you make one
+change in your code base and you have to go out
+and deploy everything, no. Now this doesn't just come
+if you adopt CodePipeline, but it definitely helps
+and it's a great start because you're starting to strip away some of the baggage that
+you would have without it. This is probably my
+favorite, no more AMIs. Who here has a war story about AMIs and someone baking in some config and no one knew about
+it, something went wrong, and it took days to figure it out? Show of hands. Anyone have stories? Yeah, a lot of you, yes, that's done. Well there's one place we have an AMI, we'll talk about in a bit. Not too happy about it, but it'll go away. Maintenance, a lot of that
+day-to-day maintenance, security patches, what have
+you, that has been transformed with automation and we
+just don't have it anymore. So you're starting to see
+how we're stripping away and abstracting enough
+without compromising our configuration or our customizability. Next, complexity morph into simplicity and I don't think this
+gets enough attention because when I'm in design
+reviews with engineers, everyone wants to come in with
+a very sophisticated alarm, a very sophisticated solution. And that's okay. You can come in there. Yeah, you can kind of
+brag about it, show off. But at the end of the day, the team has to go and maintain this. And if you're the only one
+that knows how this works, it's not gonna help. So encouraging simplicity, and we'll talk more about this in a bit. Lastly, we had a culture
+of centralized DevOps and SERs and we broke away from it, and we moved to a model
+of T-shaped engineers. Does everyone know what
+a T-shaped engineer is? For a show of hands, who knows
+what a T-shaped engineer? Wow. Okay, I can do some education then. So T-shaped engineer is an
+engineer that is responsible for the testing, the full stack deployment,
+load testing, ops. So the DevOps, the database,
+you're an engineer that needs to be able to be successful all across the stack, even in ops. And since we embrace T-shaped engineers, we no longer have
+dedicated SREs and DevOps, which means every engineer
+needs to be successful. And to be able to do that, you have to have enough abstraction. You're not gonna be able to
+achieve it without ECS Fargate and with some of these
+additional managed services allowed us to really find that sweet spot, and we'll see that here
+in the next example. So let's take a look at
+how Smartsheet was able to apply automated
+deployments using Fargate in CodePipeline to our
+cell-based architecture. Now I've made this very general, as you'll see throughout this because it can apply to any one of our applications that support this. And similarly, it should
+help you kind of see how you could equally apply
+this and take from this example and bring it into your infrastructure. All right, so it starts
+with an engineer, us, you, maybe there's some of you that don't write code
+anymore, that's fine. But we need to make changes to the code. So we make that commit,
+we push it into GitLab. You may use GitHub, maybe CodeCommit, but what matters is the
+next stage, the CI/CD. And here we use GitLab CI, and we now need a place to
+build and do our deployment. So we use, this is where I lied, we do use one EC2and it's
+for our GitLab runners because we need to have these
+runners run inside of AWS so we can attach IAM roles and all the magic of talking with services during the CI can just take place. So we use an EC2 to support our build and upload of our Docker images, which then get uploaded to ECR, the Elastic Container Registry. Now this is where a lot of
+the magic happens. But wait. So ECR is where we push our images, and then from there, Codepipeline ties in, and CodePipeline has a way
+that you can listen to deploy or listen to pushes of images into ECR. And so when a new image comes in and you can have filters on
+tags or whatnot, in our case, we tag all of our deployments
+with the SHA, the Git SHA. And so a new image comes
+in, CodePipeline kicks off, and the first thing it does
+is passes it to CodeBuild. This is all part of
+the CodePipeline suite, but you can really just talk
+about it in CodePipeline. That's fine. So CodePipeline
+passes it to CodeBuild. CodeBuild puts together
+a deployment artifact. In our case, it's very simple, it's just a JSON file that has a mapping of container name to the image URL in ECR. And then it passes that to CodeDeploy and CodeDeploy takes it the final mile. And this is where a lot
+of the power comes in, because since we're doing
+a cell-based deployment, we have to ensure that we're deploying to each one of the different cells, which gives a lot of
+possibility that one might fail. And also there's a lot of
+configuration that needs to be in place about how these
+deployment types get set up. Whether we're gonna do
+blue-green, Canary, a rolling, and this gets facilitated by CodeDeploy and it allows us to have this
+just right out of the box. Since CodeDeploy integrates
+directly with ECS Fargate and probably EKS Fargate and many other of the
+different compute services, all we have to do if we wanna
+enable Canary deployments or blue-green is just pass
+through some additional config and switch a dial. To think that something that we had before was running with hundreds of lines of Python code to facilitate this that everyone was so afraid to touch and using manual waiting
+inside of our GitLab pipeline, just waiting and doing a polling to see if there's some
+signal that it completed, that's gone. And so now we have this
+solution that if we want to control or change the way
+if one of the cells fails during the deployment and
+maybe we wanna roll back everything or just retry
+that particular cell, we can do all that with just config. We use Terraform to manage
+all of our deployment of this. And so our Terraform, if we
+want to change how we deploy, we can just toss in a few
+different lines of config and it does that for all
+of our different cells. Complexity to simplicity,
+it's pretty important. So what can you take away from the propel, our P in our OPS? Well simplicity, I probably
+sound like a parrot now, but simplicity is so vital, and I challenge you the
+next time you're gonna be in a design review and
+you see some solution getting thrown by you
+that sounds super complex, see if you can challenge it,
+maybe even just a little, how can you make this
+maybe a little simpler? And it will go a long way. The next is very important. The AWS Shared Responsibility Model. Has anyone heard of it? From a show of hands, who's heard of the Shared
+Responsibility Model? Wow, it's like the whole room. Okay, cool. So I don't need to go too much into it. If you haven't, do a search in Google
+after this or maybe ChatGPT or Claude, one of those
+and see what you can find. But it kind of lends into the next piece, which is managed services. By using managed services
+like Fargate and ECS or EKS, they can now tie in with
+other managed services, whether it's for your
+login or your deployments. Very straightforward because it's seamless and they work out of the box. Just like we saw with CodePipeline, when you're using ECS
+Fargate or EKS Fargate, if you want a blue-green
+deployment or Canary, you can just change config and they know how to work together. Maybe you're using shared config through SSM Param Store
+or storing your secrets. That also works automatically
+with ECS out of the box or EKS out of the box. So it's really powerful
+when you start tying into managed services and
+what you can eliminate through doing that. All right, this is the fun one. Scale. In scale is where you're gonna see more and learn more about our
+cell-based architecture. And this all comes down to our design patterns that we apply. So the cell-based architecture is one that we put in place
+three, four years ago. And it's just proved to be
+so useful, so effective. And we're gonna deep dive
+into some of that solution so you can take some of that
+essence back to your companies. Now you can go and make
+your services 50X, 100X, the scale and support that, but if you don't tackle your dependencies, the downstream or upstream services, if they can't support that
+scale, you're back to square one. So you need to also be very
+aware of the dependencies. Maybe it's an auth service
+that you're talking to or what have you that also has to be able
+to scale as you scale, otherwise you'll hit a bottleneck. Next we're gonna take a look at how using effective load
+balancing and partitioning traffic or distributing it, making sure that you're
+distributing your traffic effectively is also extremely valuable. We're gonna look at performance
+monitoring using tools, maybe like maybe use DataDog or maybe you just do your
+APN from an open source app, but getting a good
+understanding and baseline of how your application is
+performing is gonna be vital for when you wanna start
+being able to configure and get it to the scale that you need. Finally, we're gonna take
+a look at how you can start to break things from just
+being foreground processing to also include async processing. You gain a lot of flexibility
+when you can start to piece off parts of the request in the processing that can
+be done in the background. You can then figure out
+maybe you can batch a lot of those together at once, and that becomes another
+way that you can start to consolidate and do the
+processing only one time. Oh, and with that, let me go back to this. And with that, we were able to achieve 50X our scale within a very short time. It was about six to 12 months and we were able to
+really 50X our traffic, the requests per second for
+our grid platform service. All right, this is a really great quote, and Ray Cole is a distinguished
+engineer at Smartsheet and he's been a mentor of mine
+for the last, I don't know, three years since I joined Smartsheet. And I've learned so much from him. So I wanted to kind of spread some of his essence here tonight. "Cell-based architecture
+enhances testability. Unlike ever-expanding monoliths, it allows setting and testing cell limits, ensuring predictable performance. For more capacity,
+simply add another cell." Powerful, huh? Well let's take a look. Let's dive into some of these solutions and understand our
+cell-based architecture. But starting with fleet partitioning. Fleet partitioning is
+all about figuring out how you can start to route the type, it's all about how you're gonna
+first understand the types of traffic and the types
+of scale of processing that is happening between your request. In our case, we had single requests that could use 1.2 terabytes of memory. That's very absurd first off. But also it starts to get
+in the way of the average, the majority of the requests coming in, they're competing with this
+and that has a huge slowdown on the rest of our traffic. So starting to figure out how
+we can segregate those two, that 0.1% of very, very large traffic, sending that to different queues. And in our case, we created a
+new idea called this XL queue. And we would figure out anything that's greater than this amount of memory, we're gonna send it to this other queue and have a separate dedicated process. And this is where the XL batch comes in. In this XL batch, we run at max resource. So max memory, max CPU, it has a very different auto
+scaling set up than something like our regular grid batch. Since it's processing very few, but it needs a lot of resources, we can scale that very
+differently than something that's processing a thousand times the amount of traffic. But they're doing it really quick. We didn't have that ability, we didn't have that control
+when we were doing this all within a single batch processing. So all we did was simply
+look at historic data, the last time we saw one of these sheets, how much memory did it require? From there, we just make a decision on that the last time we saw it and just distribute it to the right queue. Problem solved. We saved a lot of money, a lot of money just from this alone. I'm sure some of you have been waiting, like when are we gonna talk
+about cell-based architecture? Well, here we go. Let's build a cell. So what is a cell?
+Well, let's take a look. We need some way to route traffic in, so we're gonna add an ALB, from there, we need a way to process. So we're gonna add ECS Fargate, sorry for all you Kubernetes fans. he must have been a Kubernetes fan. From there, we need a way to process. Now we need somewhere we're
+gonna store this data. We're gonna add DynamoDB
+in Aurora MySQL. Great. Now let's add something we
+can use to offload traffic to be offline or background processed. So we'll add a queue and
+then we'll put ECS Fargate to process from the queue. You're probably thinking,
+why aren't you using Lambdas? It's a story for another day. But we also saved a lot of
+money by removing our Lambdas and just adding a sidecar to ECS Fargate to process from the queue. We've saved a lot of money. Okay, so we have one cell,
+let's now look at this if we have three cells
+or N number of cells. So we have these cells, great, but now we need a way to get traffic routed to the right cell. And this is where you
+need some routing layer. Here you can see our grid
+router and we have an NLB, but we need some way to
+look up for this grid, which cell is it in? And we have some lambda
+with DynamoDB that we go to and it maintains a
+dictionary shard lookup. And once we know what that shard is or what cell that is, we then route the user
+to the correct cell. From there it goes through,
+talks to ALB and whatnot. What can you learn from this section? What can you take away from scale? Well I have three things for you. First, anticipate your future demands. The next time you go into a design review, put on your 50X lens,
+maybe it's 100X lens. And when you look at these solutions, the ones that are vital and will need to achieve some scale in the future, probe and see what will happen
+if we did increase this load by 50X or 100X? Will this actually maintain it? Is it gonna be flexible
+enough to support it? Is it even gonna be cost effective? So starting to really have
+a way to dial that in, put that hat on, put your glasses on, whatever you need to do to be able to look at solutions through a new lens. Next, load testing, like we
+saw with the quote from Ray, you need a way to be able to
+effectively load test your app. And ideally that's something
+you're doing all the time, but you can't just do that and try load testing at 100% capacity across your whole platform. So if you can do this on a single cell, that's just as good because if you know what the balance of a single cell is, then you know how many cells
+you need at any given time and you are always testing the maximum capacity you can run at. And finally, really
+embrace best practices. So cell-based architecture is one. There's a whole builder's library on AWS and there's this plethora of information through Claude, ChatGPT. But there are a lot of
+ways that you can start to refine and achieve scale. So have a good idea and
+align with best practices for your company and put together common patterns that are gonna apply. So let's recap, what are
+you gonna walk away with when you leave this, other than like, why the hell
+did we do deep breathing? I didn't do a meditation course. Other than that, let it be OPS,
+Optimize, Propel and Scale. Hopefully from these and how you've seen Smartsheet apply it, you'll leave here
+passionate and want to go and plant some seeds in your org and make this work. If you haven't already or after
+this, do leave us a review. And once again, I'm just starting my journey
+into public speaking. So I would love to get a good, I think they call it the CSAT score. I'm not an Amazon guy, but
+yeah, give it a good rating. It'll help me be back maybe next year. That's all I got. I think Steven's gonna come close it out. So thank you very much. (applause) - [Steven] Thanks so much Skylar, appreciate you sharing with us. If you stay here, I think we
+do have some time for some...

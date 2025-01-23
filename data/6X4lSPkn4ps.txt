@@ -1,0 +1,487 @@
+- Well, welcome to the talk. I know about you, I feel like
+the first day first show. It's awesome to be here. And I'm so honored to be here talking about one of my favorite services, Amazon EventBridge. My name is Sheen Brisals,
+and I'm a Serverless Hero. And also happy to share that
+I am currently writing a book on serverless on AWS
+with my colleague Luke. It's expected early next year. Now AWS re:Invent is an occasion, a celebration of technology,
+and also an opportunity to share and learn from each other. Just curiosity, how many of
+you are new to EventBridge, new to event-driven architecture? Be brave. Perfect. So hopefully end of this session, you should be able to get
+inspired and take the message back to your teams, organizations, and have the event-driven architecture using EventBridge in place. It's a packed agenda, but don't worry, I will take you in parts
+kind of incrementally. I will stop you, recap, and move forward. So basically we will cover the basics of event-driven architecture. And then we will look at why and how EventBridge comes into the picture, and look at some of the best practices when you think of events
+before we dive deep into looking at some of
+the event-driven patterns. And I will close with a few of the FAQs, questions commonly people
+ask when they come across EventBridge and event-driven architecture. Now, before we move forward,
+I want you to go back not that long ago, last year's re:Invent when Werner mentioned
+these two important things: Asynchrony and event driven. Understanding of these
+two are crucial for us to move forward in today's talk. So let's look at the two important things, asynchronous and event driven. To understand asynchrony, you need to understand synchronous, right? So most of you must be familiar with this sort of a symbol pattern, an application requesting
+a service or, you know, get me the price of a product, and then it gives back the price. You as a customer with the app, happy. It's a synchronous flow. Now let's take it forward.
+And here we have two services. These are, you know,
+service-to-service communication. Let's say Service C order fulfillment. Service D is payments. So before an order gets
+shipped, you need to capture or settle or transfer the funds for the previously-authorized payments. So typically, Service
+C, once in a few hours, or depending on the, you
+know, busy of software system, it'll send a bunch of
+thousands of payment IDs to Service D to do the capture. Of course, service is not
+going to hang around there because it can take hours,
+days, or maybe even weeks. So what it does is it sends
+an acknowledgement back with maybe with the batch ID. Now we have a problem, right? Because how does Service
+C knows the progress of the batch of payments? And it can submit multiple
+batches during the day, okay? So typically Service D will
+have some kind of status pool and it'll open up an API
+endpoint for Service C to, you know, poll or query. Now it looks okay, but from
+Service C point of view, it poses challenges. How soon it should start polling, how long for and how frequently
+you should keep calling? So this is a situation with a typical command query CQRS kind of pattern. So let's take one step further. What if Service C, you
+know, submits the payments, like we did. Instead of Service C,
+asking for the status, D pushes the status to C as events. So here we are getting into this sort of event-driven territory, right? So rather than waiting,
+it sends every payment, whether it's captured, out goes an event, Service C can react, you know, perform the order shipment or et cetera. Now, equally, it is also common that services push messages on queues and for other services to consume. The point here is, like, you
+start to see the loose coupling or decoupling of these microservices. That is one of the fundamentals for asynchronous
+event-driven architecture. So what is EDA? It's an architectural concept
+where events communicate and do a asynchronous, you know, sort of invocation and implementation pattern. Now if you look at a simple
+event-driven architecture, there are four main elements. So here is a simple architecture. A service is publishing
+events onto a bus or a broker consumed by two or more
+consumers or target services, and then they kind of, you know, carry on what they're
+supposed to be doing. So the four things, there is
+a producer or a publisher, and there is a consumer or
+the target for the events. And two most important step,
+one is the broker or the bus, and of course, the events. When it comes to a
+producer or a publisher, the common concept in
+the industry is like, you know, the producer needs
+to be agnostic of consumers. You shouldn't know. Now, it's true if you have a SaaS platform or something like that. But typically if one
+of your colleagues team is your consumer sitting behind, obviously they get to know, right? So there will be kind of understanding and influenced by your consumers. But in general, it should be agnostic. And the other important point
+is, when you send an event, don't pack the entire thing,
+just share what is required. This is like the least data privilege, or you know, sharing principle equal into the security aspect. This is a mistake some, you
+know, commonly teams do. From the consumer point of view, they also have responsibilities. So they cannot always expect
+events to arrive in an order. So they should be able to cope
+with, you know, the orders, sorry, the events arriving
+in different orders. And most importantly, item potency. There is no guarantee
+every time that an event is going to be delivered just once. You may receive multiple events of the same type coming again. So you should be able to, you know, guard against those situations. Now that takes us to the next one, the event broker, or
+the carrier or the bus. So this is where EventBridge comes in. And often it, you know,
+supports you to ingest events from multiple producers or publishers and then safely deliver to several targets on the other side. In between, they may also
+provide you with the rules, transformation capabilities
+and other features. Now let's take you to EventBridge. And typically what happens is, when someone starts new with serverless, they start with an experimentation, because everything is new, they
+need to kind of experiment, that's fine. So they keep adding, probably
+start with the Lambda function on this, you know, growing
+the serverless thing. But thing is you get confused. The moment you have a SQS queue in place, your colleague will say, "Hey,
+now you need to have a DLQ, or dead-letter queue, to
+capture all the errors." So you add a DLQ. Once you have a DLQ,
+someone else will say, "Oh, who is gonna handle the messages coming to your error queue?" You need a mechanism for that, okay? So you add a Lambda
+function to cover that. Now you're confused, what do I do? Should I put the events
+back to the original queue or should I send to a
+destination EventBridge? So this is typically how
+the architecture grows. And all of a sudden you see a triangled event-driven architecture in front of you. Your architecture will come along and say, "Hey, you know, microservices, anyone?" So that's what you should be thinking of. Okay, let's do microservices. You then draw boundaries, and you push all the services
+around, and then you're happy. But the problem is you try
+to deploy one microservice, and you find everything else get deployed. So what we have is a tightly-coupled
+service architecture. This is where EventBridge comes in. So when you have few microservices, they all produce events
+rather than always, you know, crisscrossing to resources within their own kind of boundary, they share events via
+EventBridge, event bus. And then events can even
+flow between, you know, the buses and the whole
+situation, big, so harmonious. Microservices can be
+independently deployable and, you know, each one is
+separate, everything is fine. Now, what is EventBridge? So if you're not familiar,
+it's just an event bus, and it makes easy to
+connect with applications where events from, you
+know, publishers to targets. Right, so what makes an EventBridge? So in core, there are three parts. One, the main part, the event buses. So if you're completely
+new to EventBridge, go back and check your AWS console. You will find a default event bus there. So that is AWS event bus. All AWS services push
+events to the default bus. Then on top, you can create
+your own custom event buses. Then AWS also supports
+partner event buses as well. And on one side you have produces, they push messages or the
+events onto the event buses. On the other side, we have consumers receiving those events. But as I usually say, the power of EventBridge is in between. The filtering and routing rules, that's where the magic happens. That's where you identify,
+okay, I need this event to go to these targets and perform
+these sort of transformations or the logic and things like that. So that's sort of the kind
+of the core of EventBridge. But on top we have the several
+office features as well. Okay, let's move on to looking
+at the fourth main element of event-driven architecture, events. So every event should
+have a unique identity, carry just the data, as I said earlier. But it's hard when someone is new to event-driven architecture
+to conceptualize the event. So that's why you need to spend time to designing your events, because some of the
+teams make mistakes here. Now typically you hear, if you went to any event storming session, the first thing you hear
+from the (indistinct), "Guys, think in terms of past tense when you come to events." It's difficult for us to imagine that way, but that's how it, because
+it thinks something happened in the past. Now if you look at the
+EventBridge event schema pattern, so this is pretty much it. So it has bunch of things,
+and the most important part is the detail attribute. So that's where your payload
+even data goes in, okay? And you can provide any
+valid JSON in there. But if you spend some time
+thinking of restructuring, then it'll make a lot easier. Rather than just dumping everything or anything as you like,
+think in terms of a structure across your team or
+teams and organization. So split it, metadata and
+data. And what is metadata? And so in metadata you can
+carry your own event identity, your own version of the event schema. You can say which domain-emitted events, which service are coming from,
+what type of events this is. And also you can say TTL, how long the event should
+be kept by a consumer. You know, imagination is yours,
+you are your organization. So think that way, and then
+you know how something, structure working for you. And the data section is basically
+the instance of the data. So this is where your particular payment or specific order or an insurance, these kind of things go in. Now there are two ways I
+usually classify events. I mean, I know it's debatable,
+but it's worth remembering and kind of, you know,
+tailor it as you need. When it comes to categories, domain events are the pure form of events. These are the events you
+share across other domains, across beyond your
+bounded contact boundary. And this is the kind of, you know, the gold events for you. And then you have operational events. So these are the events that say, "Oh, this third party
+system is up or down, this service now, you know,
+race an alert or (indistinct)." These sort of internal
+within your boundary so that you can, you know, take actions. And then of course the
+local internal events, they are just, you know, flowing within. They never go outside of your boundary. And then transformation,
+transformed events are like more anonymous event, like source event comes into EventBridge. And EventBridge, as
+part of the event rule, you make some transformation. So rather than sending the
+everything from the data, so you just say this is the, you know, everything from the event,
+you just say this is the data, because you know that
+metadata is not necessary for this particular target. So that's the transformed
+event in my, you know, sort of way of saying. And then of course you
+have the AWS events. So except the AWS events,
+all other events we usually call as custom events
+because those are our events, we create and push mostly
+to the custom event buses. On the types, again, it
+depends how you classify it. You can mark as a data
+event or it's a query. So you know, you get back
+an answer or a response. Again, there's no hard and fast rule here. It's up to you how it
+helps your teams to have, you know, the structure in place. Okay, now, okay, quick recap. So we looked at synchrony, event driven, and we looked at the, you know, event-driven architecture, the elements, we took a look at
+EventBridge, what it provides, and how to structure
+events and all good, okay? Let's move on. So let's change gear and look
+at event-driven patterns. When it comes to patterns,
+I like this quote a lot. Because if you're familiar
+with the old gang of four design patterns or
+Gregor and Bobs patterns, microservice patterns,
+there's so many pattern books coming all the way. But thing is modern architecture is when you work with
+serverless and cloud. There are many patterns hidden
+within your architecture. Say for example, Amazon API Gateway most of us use every time, right? Do you know API Gateway
+itself is a pattern? Similarly, the dead-letter queue, DLQ, is actually a pattern,
+but we have a service, product we use all the time. And for us, we don't
+see that as a pattern. We see the outer
+architectural patterns, right? So that's why, you know, I like this code that we need to keep in
+mind when we work with the, you know, patterns in serverless. Let's start with one of
+the basic symbol patterns, choreography, it's a twin. The other side of this
+one is orchestration. Though they are twins, they
+are completely dissimilar. So they do different things. But when choreography and
+orchestration come together, we'll see later on, you
+know, you can do wonders with serverless. Right, so the name comes from, you know, these choreographing events. So when you choreograph, you
+have one or group of dancers, they know what to do when
+the tune or music plays. You don't need to instruct. Each perform as per the
+steps that needs to be done. Now let's take an example. So you bought an kitchen equipment, you want to register
+it and if you register, you get few loyalty points
+and also they also give you some discounts for your next purchase. And you know, they need to, you know, they inform the customer
+service for any issues and also inform the manufacturer. Looks kind of simple sequential. But thing is not everything
+needs to be this way. And there is dependency, because you need to register a product in order to generate your loyalty points. You need to have a discount code so that somebody can email, okay? And at the same time, there
+are things that can happen in parallel, like loyalty
+points computation or discount code generation
+can happen in parallel, and also, you know, some
+of the other things. So how do we check this in choreographed event-driven architecture
+with EventBridge? Let's see. So we have an app. And that kind of interacts with the product registration service. And product registration
+service emits an event to say that a product registered. Suddenly, there are different
+services coming alive. "Oh, I want to do that, I want something, I want something to do
+that with that event." So that's how event-driven
+architecture happens. And, you know, the EventBridge target sends these events to different services. And then once a promotion is computed, the discount-generated event comes up, and there is somebody
+else interested in it to send to customers
+or email to customers. And of course there is a, you
+know, manufacturing system, a third-party application
+that also needs to send, you know, to be invoked
+with the certain details. So that can be done even
+with the EventBridge rule. So what we can do here is
+with the API destination, which I will talk about later on. So this is a simple
+choreographed, you know, event-driven architecture
+with Amazon EventBridge. Okay, so thanks to remember. So this is like coordination. It's not like there's no controller instructing each one what to do. And then decouples, it
+allows you decouple. And also, tomorrow if you wanna
+bring up a new microservice, it's so easy to spin
+up a new microservice, make it part of the whole ecosystem. And item potency, and as
+I mentioned earlier on, important for observability, you know, adding tracing
+attributes or tracing values and taking the values all
+the way through are crucial. Okay, now you go to a
+developer conference, and they will say, "Code is a liability." And is it there, I wonder? I don't understand this, I
+know financial liability, but what is code is liability. And go to the next session, they say, "The code you write is legacy tomorrow." You think that, "Okay, I'm done. My job is over because I
+can't program anything." And go to the final session, and to someone like Werner will say, "The code you ever write
+is business logic." You think that's it. Business people, stakeholders
+taking over, my job is done. Not necessarily. What this implies don't
+do unnecessary programming or implementation, okay? Why? If you reduce writing functions, there are a bunch of benefits. So less code, less security
+worries and things worry about, there is less, you know, debugging hassles and all sorts of things help you, and, you know, reduction
+in your cost maybe. So this is where the
+next pattern comes in, functionless integration pattern. Now it's also known as low-code, codeless, you know, those sort of terminologies, but the concept is same. That means you don't write unnecessary custom functions when there is no need. Right, so what is functionless? For that you need to understand
+what is function-full. You must have come across
+this pattern architecture both hundreds of times. Now if you look at the Lambda function, you think what is its role? Is it doing any business logic, or is it shifting the
+data from the API payload onto the queue? If it is just shifting the data,
+then it's not its strength. Lambda functions are compute. You need logic to implement, et cetera. So this is an area you need to think whether I can be a functionless. So rather than doing
+a function, you think, "Oh, can I use native integrations to achieve the same thing?" And this is kind of the starting point of your functionless thinking. Now, if you think of API gateway, it supports over 40 integrations through several AWS services. And I'm sorry, and also
+the step functions, it provides so many opportunities, especially with the SDK integration, to interact directly with services without having the need
+to write Lambda functions. And last year's re:Invent, the EventBridge Pipes was announced. This is again, sort of
+a one to one pipeline where you can do transformation and connect with the target
+services, in most cases, without having to write
+a Lambda function, okay? Now let's take an example. Somebody registering an
+account with a online system, for example, so they add personal data, they give their payment details. And then these days you also
+need to capture the consent. Whether they can be contacted via email, can they get promotional
+stuff, et cetera, et cetera. So most business, this
+is not their strength, so they usually use a
+third-party application, send the data, only when
+necessarily they query and get the details back. And typically you will
+have some kind of API that you invoke, just send the data. You don't expect anything else back. Now, this is an asynchronous invocation because it doesn't need to happen when the customer registers. It can happen, you know, behind the scene. And you have API supplied
+and they have quota, and also they can have different
+authentication mechanism, open authentication or other mechanisms. So when you think of implementing
+this as a architecture, so you have simple API
+gateway that's returns as, you know, acknowledgement
+back and pushes the details into a queue, and then
+you may have a pipes. And for the logic, you have,
+let's say, a step function. So a step function workflow then has different steps for different things. And there is a Lambda
+function that is dedicated for conducting the
+third-party application. All looks fine, there's
+nothing wrong here. Now, what happens at one
+day, the system is down or there is a flaky network connection. So to take care of this one, your architecture now needs
+dead-letter queues in place. And when you have queues, you need to know how to handle, okay? So you add more complexity
+into your architecture. Now, this is where one of the, you know, native integrations of
+EventBridge comes in, and that is API Destinations. So you send an event to event bus, and event bus has a target rule, and the target here is an
+API destination that hits the endpoint on the third-party system. Now what is API Destination? Now API Destination, and
+sorry, before I go there, have a look at this Lambda function, in terms of the functionless
+concept we just discussed. Can you perform what
+this Lambda function does if it's just doing the transformation with the step functions,
+intrinsic functions, and things like that? Then you may be able to get
+rid of the Lambda function altogether and just have your step emitting an event onto the bus. So this, again, kind of
+refining or architecture, making sure that you use
+the optimum approaches or the patterns as you build
+your serverless applications. Now, what is an API Destination? API Destination is
+basically a HTTP endpoints where it's a target for
+your EventBridge rule. And you can use it to
+have a functionless way of sending or in working
+your external targets. So typically the customer-registered event comes in to the event bus. You have a filter to know, okay, so this is the customer,
+you know, registered event. So I need to do something. And you may be doing
+some event transformation and that, you know, give
+it to API Destination. So API Destination has two parts, so you need to have your connection. This is where all the authentication, the credentials and things happen. And then obviously you have your endpoint with all your headers
+and all sorts of stuff. And that can, you know,
+gets to the final target, which is your external application or a different service
+in a different domain. Now, if I show you the structure
+of your API Destination, so it has like a connection
+and target HTTP endpoint. And if you look at connection, EventBridge supports these three forms. I'm not sure if anyone is
+still using basic auth, but it's there. And then API key mechanism, and of course the OAuth
+where you can kind of supply your token credentials for EventBridge to deal with behind the scenes. And the endpoint side, you
+can hit any customer endpoints and also the EventBridge
+partner endpoints as well. So this is so cool that if
+one of your partners work with is part of the EventBridge, you know, destination partner scheme,
+it becomes so simple and easy. Okay, so that's API Destination. One of the important points
+with the destination is, when it comes to credentials, EventBridge keeps the
+credentials in Secrets Manager. When you hear Secrets
+Manager, you may thinking, "Oh, that's gonna be costly," because every secret is
+like 40 cents per month, and then API invocation
+cost, et cetera, et cetera. The good news is, irrespective
+you of how many times this invocation happened,
+millions of times or billions of time,
+EventBridge consumes the cost. So we don't pay for the
+Secrets Manager cost ourselves. It's all consumed by EventBridge. And then you can add rate
+limiting and it supports retry. Another thing you need to remember, you need to be mindful of is that the timeout is five seconds. If the target takes long, it'll drop and sort of
+get into the retry mode. And I had written a blog a while ago. It goes into the, you
+know, sort of details of how we can do this, the whole thing. Right, so let's move on. When you think of a reliable application, you think of resiliency,
+high availability, all sorts of things. These are crucial when
+it comes to serverless and event-driven architecture, especially distributed
+microservices and things. And there are different ways we can do. And why we need all these things? Because, as I just show
+you in the previous case, network connection can be flaky. And the system could be down
+for maintenance or whatever. And then the traffic pattern could vary and completely suppress everyone and take the whole thing down. So these are all eventual, is you come across in a
+production environment almost every day. So that's the reason why we need to build all the capabilities as
+part of our architecture when we design these solutions. So one of the patterns, it's
+a very common popular pattern that we can use is the
+event broker pattern. But what I'm gonna do here
+is explain event broker, sorry, event breaker pattern. And also I will add on how can
+you take care of the failures with the retry mechanism as well. So if you're new to a circuit breaker, it's simply the concept from the, you know, electrical circuits. So a circuit is closed when
+everything goes through fine. So in here the green
+arrow means it's closed, everything is happy, it's a 200 okay, going all the way through to your client. It's a synchronous invocation, happy. So in a open-circuit situation,
+so same kind of pattern, but there is a problem
+reaching your target. So you can't reach the target because it's down or something happened. So your circuit now is marked as open, so that means you're not
+going to reach the target, but you return a failure or error response to your client or a consumer. So this is like the
+more two common things. And there is half open, et cetera, but let's leave that for the time being to keep things simple. Okay, now, circuit breaker,
+I usually term this, call this as a manager because
+in our implementations, the manager's responsibility is to know when to declare a circuit
+as open, when to close, because the applications
+rely on this status before deciding what to do with the request they have in hand. So simple thing that we can do is we can store the status of
+your, you know, endpoint of the target system and then do or react based on its situation. For example, first you check the, before you invoke the third
+party, you check the status. Okay, if it's kind of closed, good to go. Okay, I'll call it. And
+then that goes through. And then another request comes along, and you check it's fine,
+but you try to hit it, you see that it's not going through. The circuit is, for
+some reason, it's open. So what happens is you update
+the status store to say that, "Oh, hang on, there's some problem." So you have some logic to identify when to declare that as,
+you know, open circuit. So that means the error response goes back and your system kind of, you know, takes care of those things. You're not kind of, you
+know, waiting for the target to come back alive and, you know, adding latency to the
+request and things like that. So usually when you decide, when your application or the logic decides when to declare as a closed or open is based on certain things. You probably won't declare as
+a, you know, closed circuit as soon as one request goes through. You may want to try
+out five or 10 requests within a short period of time. So this is part of your
+circuit manager's logic. So that's kind of the
+threshold that you usually set. And so this is the simple way of doing it. Now if you take it to one step further, you can even build this as a service. For example, you have a critical third-party or external application that many systems rely
+on, and what you can do is you can set up a dedicated status checker. So you have a simple scheduler that comes alive once in a
+while, maybe, I don't know, once every minute or two, et cetera, performs a heartbeat of
+the external application and sets the status in a
+Dynamo DTB table, for example. And every time an update happens,
+the table emits an event, the stream event, and there is a handler and looking for this or
+capturing all this coming along. And this is basically the manager because it receives the status
+updates as they come along. So it can then decide when
+to make the status changes, like, you know, what I
+mentioned earlier on. The benefit is the same manager
+can update other places. For example, it can also keep things in a SSM parameter store attribute. So if it's within your boundary, your service can check the SSM
+parameter to see the status. Or if it's, you know, another microservice or another application,
+you can emit an event, you know, the operational
+event I mentioned earlier on. So that can be consumed
+by different applications, so to get the status details back. And of course, you can also
+attach an API gateway endpoint that can simply query the relevant field from the Dynamo table and
+report the status back. So this is kind of evolving your simple circuit breaker implementation. Of course there are
+different ways to do it, but this is something, you
+know, worth experimenting if you have these sort
+of use cases in place. Now, as I mentioned,
+there are different ways for different consuming parties, especially within your own account, within your own bounded context,
+you can use certain things. If it's external, you can
+go via events or APIs, so makes everything simple and clean. Now, one of the common things you have when
+you have circuit breaker is to fail fast. So that means if your circuit
+is open, you can't go, you immediately fail back. That means you're not
+holding onto resources or you know, adding latency. For that, you do a simple service check, status of the service,
+and decide what to do. So it just goes back as an error. It's a simple and most common
+case that you will find. And it's fine in most cases. But the problem is if you are handling, if you got a customer's
+order in your hand, you can't simply fail back and say, "Sorry, and I can't do anything." You have to, you know, have the data and resubmit to your downstream
+application so they can, you know, get their orders
+delivered, et cetera, et cetera. So this is where we
+need to kind of think of not just failing first, you need to have the replay mechanism in place. So in this case, what happens
+is like, when it's a failure, when you can't get to the other end, you write somewhere, you
+write the fail request so that when the circuit
+is back, you can replay. Three common ways, two most common ways you will find this implemented,
+one is with the SQS queues, and then DynamoDB table based
+on your query requirements and access patterns and things like that. And the third option now you can use is with EventBridge archive and replay, okay? Right, stay with me. It's going to have a little bit trickier if you're new to archive and play. Now what is EventBridge archive and play? Is simple, like how you set the filter, but you identify a pattern for events and then say, "These events I want to keep in an EventBridge archive." So they go to this archive, and you decide how long you
+need to keep in the archive. And then you can replay
+events from the archive from a particular, you
+know, for a timeframe, from this time to this time. Okay, come on, replay the events from this particular archive. So it's a simple mechanism
+but really useful and helps in several situations. Now, you know, the simple
+thing, you do a status check, and then you think what you need to do. And so sometimes it's useful, especially when you work with events, to have this sort of
+status of certain things reflected in your event. So for example, a successful
+submission or invocation is 200, okay, fine,
+nobody's gonna question. But if you get into an error, and that is due to your data
+issue, validation issue, this you can classify as hard error. The situation is however
+many times you resubmit, this is not gonna go through
+because it's your problem, you have a problem with the data. And the third type is retriable status. So this is where your third party down, or you get a 500 servicer,
+et cetera, et cetera. You need to collect
+those things and retry. So it's useful if you can can, you know, kind of have this sort of
+classification your events. It helps to, you know, with
+the replay archive mechanism. So this is kind of a simple
+metadata I mentioned. So I show here with the status. And based on the status, you can now set a rule in EventBridge. So EventBridge, you can
+have a rule to capture those retriable status events and push them into an archive. So this is like a typical, you know, the filtered rule you may have. Of course, you know, situations will vary, but this kind of the basic thing. Now archive creation is simple. All you need is, you know, a bunch of cloud formation
+scripts, or you know, other ways of doing it
+with a filter pattern. And that's how it sets. Now replaying events from archive, so you have things pulled here. Now your status is your
+system is now back. So you have some kind of
+events flowing through. You can have a logic implementer, you can have a Lambda handler
+will kind of know that, okay, you know, this is
+up now I need to replay from this particular archive
+because this all part of how you set up. And you'll say that, "Okay,
+it was down last time. I mean, this point is up here, so I should be replaying
+the events from this point to this point onwards." So then EventBridge will
+replay those events, push those events back onto the same bus, and you can have your handler deal with the events to do this. One thing you notice here I
+highlighted is a replay name. You might be thinking that wasn't part of your event structure. So this attribute, AWS adds to the event when it replays it for a reason, so that you can differentiate
+the replay event from the original event and
+avoid this sort of cyclic nature of events going through. This is important, and you can
+kind of set the replay name so that you can kind of set the
+filter patterns accordingly. Right, so key points,
+there's no order guarantee, so as with the EventBridge, as of now. And speed, there is no
+way to control the speed. When you replay it just kind
+of, you know, push everything. So you need to have buffering or queuing mechanism downstream to, you know, cater for that. Now I usually recommend
+a granular archives. Don't just go one global
+archive, dump everything. Just keep one archive for
+that specific purpose, and that, you know, helps
+a lot with our managing, us managing the archives. Another crucial point, there is a delay between the last event that pushed the archive
+and you can replay that. So there usually, typically
+a five minutes gap or more before the latest event
+that went into the archive can be replayed. So keep that in mind, and if your use case is fine with that, then this
+is the best option to do that. And again, I have a blog detailing and going through all these things. Okay, let's move on to one of
+the other prominent patterns, orchestration. This is the tune of the
+(indistinct) I mentioned. Now with orchestration, it's
+again based on, you know, the name comes from the orchestra. There is always a controller, right? Instructing what to do, which part of the orchestra, et cetera. So there's a similar concept here. So usually when we say orchestration, immediately AWS Step Functions
+come into the picture because that's sort of the
+state mission orchestration. Now I usually talk about
+three types of orchestration. It's all about keeping
+things simple, clean: in-service orchestration,
+cross-service and distributed. Distributed and cross-service
+are kind of similar. I'll show you the way I differentiate. In-service is simple. Let's say you have a domain,
+and it has a microservice, and it has a step function. Let's keep it at a domain level. Don't go into the boundary context. It's fine's, an API, you know,
+invokes the step function. It does some logic. You see here everything is
+within that microservice. There is no arrow going outside the boxes. So this is event in-service. This is the perfect and simple form. There is no dependency, there
+is no hard wiring, et cetera. So in terms of the cross-service, this is slightly broadening the event, the orchestration. So here, similar service, but it has needs to reach
+out to other microservices within the domain or even other domains. So what it does is, like, it reaches out mostly via API calls. So typically you will have a
+Lambda function to do that. But recently, the last day
+or so there's a new feature or announcement like from Step Functions, you can directly hit HTTP targets now. So that again makes your
+functionless life simple and easy. Right, So this is like a cross-service. Let's move on to the next one, that's the distributed orchestration. Now let me, let me bring three domains to explain the concept. Stick with me, this probably
+can confuse some of you, but follow me. Let's say three domains, and each domain you have
+three microservices. So for example, Domain A, that
+is the kind of the controller or primary orchestration. Think in terms of say, I don't know, insurance claim processing, because there you have
+legal parties coming in or, you know, car dealers or manufacturer, so on and so forth. So it can be kind of
+a complicated process. Now say task here, 2, requires something to
+be done by Service B. So this could take hours to complete. And on the other side, so
+you have a different task in your primary orchestrator that reaches out to a different service. It may take weeks to complete. So the main orchestrator now needs to wait until it gets answers
+from these different, you know, services. It could be, you know, I'm just showing as orchestration workflow, but it could be, you know,
+other implementation as well. Now how can we do? So this is where orchestration and choreography comes together. So the way to do is, is
+like A2 pushes an event with what we know as task tokens, task tokens of step functions. So a token within an
+event goes to the service. And similarly, or for the other service on a different panel alarm, there's a different event goes
+out with a different token. And these tasks wait there until the respective tokens
+come back to the step function. And so the token comes back. I'm not showing the sort of event bus or EventBridge here just for clarity. So the event comes back,
+and the task move forward. Until that point, it'll just stay there. I will expand this in a little bit more detail for you to understand. So task emits an event with a token, it goes to EventBridge,
+and there's a consumer, which is Microservice C. And it consumes, it knows,
+okay, I have an event, I have a token, I need
+to kind of keep the token and send the token back in my response that goes back to EventBridge. And then EventBridge, this Microservice CA consumes that event with the token. So it has a handler to process that event, and the handler will submit
+the token to the step function, and the step function will carry on. So this is roughly how
+the task token mechanism is so powerful. If you haven't tried, I would
+recommend that you try it out. It's so cool. It's only supported with the standard, you know, state machines, so the step functions at the moment. Now, this is fine. Now, how do you add an event
+with a token to the bus? It's so simple. As part of your task,
+there is something called waitForTaskToken. So that is kind of the, you
+know, step that you emit, and it'll stay there
+until the token is back. And then you can inject a token
+by calling the task token. So that's sort of the, you
+know, step functions construct. You can attach to any of your attributes. It doesn't need to be
+task token attribute. You can call any of the attributes so your consumers know that, okay, this attribute carries a token. I should honor and return back. Right, so key points in
+terms of distribution. So multiple task tokens you can use. They are all unique. And you know, you can use
+SQS or SNS or whatever. For example, I shown the step functions on the other services,
+but could be anything. And the timeout, the heartbeat
+understanding is important. What happens is when you emit
+the token, you set a timer. I want to wait for, say, 20 hours. Now if the token didn't
+come back after 20 years, the task will time out. So this is where the retry status messages I mentioned earlier help
+because then the token handler can understand and increase the heartbeat. So it won't time, it'll wait for longer, allowing time for the
+other service to complete and the token to come back before it can kind of, you know, carry on. So you can say success or failure, or, as I mentioned, extend
+the time out as well. So again, there is a
+blog that you can follow if you're interested. And final one, bounded
+context we all know, right? Domain-driven design bounded context. Now how many of us respect boundaries with events as we do with APIs? With APIs we have all sorts of things, payload contract and security,
+et cetera, et cetera. But when it comes to
+event, we are so relaxed. We just send events all around. So that is a pattern we can use, what I call as a gatekeeper pattern. So this is a way of kind
+of guarding your domain or a bounded context boundary. So just to explain, so, for example, you have a payment processing system which has bunch of microservices. It has an internal bus where
+all the events flow into, but at some point this needs
+to send certain details and invocation to external
+targets or applications. So finance domain needs the
+domain events, for example. And then you have a
+third-party application that requests some data to be sent. And then you have a
+checkout bounded context that may be interested in certain events from the payments boundary as well. So this is a situation you can even simply manage with a single bus. So this is where a
+different thought process I usually recommend to
+teams is to separate the external communications
+with the different event bus within your bounded context,
+what I call the gatekeeper bus, or you can call as an external bus. So the idea here is that
+the internal event bus, that doesn't care anything
+about cross accounts or who are the external consumers. Its focus is purely within
+the bounded context, dealing with the microservice
+events, all sorts of events. Whereas the external or a gatekeeper bus only deals with the domain
+events that needs to go out or the cross-account rules
+that allows you to share events with other domains or
+other boundary contexts. It's just a way of kind of separating and keeping things simple, so that's it. Now, as I mentioned, it
+just kind of a mechanism to, you know, kind of clear the
+things, keep things simple in your implementation. So like I mentioned, the
+gatekeeper bus is the one that will have all the rules and stuff. Now the key points, as
+with the EventBridge, you know, it reduces complexity, but also you need to be
+thinking in terms of all the, you know, ordering issues
+with EventBridge, et cetera. So it can as like a typical
+anti-corruption layer. So you can easily set up a microservice to go with the gatekeeper bus and you can have all your
+transformation logic in there. So for example, when consumer requires the event to be transformed
+as cloud events, then you can have those
+things covered as well. Right, so we come to the
+end of the patterns thing. So let's look at some of the three of the common questions
+I get asked every time. First question often people ask is, "How many event buses should I have? Can I have an enterprise-wide bus or a domain bus or a bounded context bus?" I mean, you can have
+combinations of these things. The problem is with the enterprise bus, obviously, you can think of all the different events going in. So you need to have
+some kind of governance built on top of your EventBridge. So for example, how can
+you automatically onboard, off board producers and consumers? So these are the things you need to be, you know, mindful of. It's not that simple because
+when you have different domains and events, push events
+and consumer events. So domain-level event bus is a bit simple but still as complexity
+depending on the setup of your business domain. But again, would be useful have those sort of governance in place and the schema validation,
+et cetera, in place. Domain, sorry boundary context
+bus is a bit more easier because that's sits within your own two-piece team boundaries. So you decide with a gatekeeper bus how to share events, et cetera. The next common question is, "Should I use EventBridge or Kinesis? Can I replace Kinesis with EventBridge?" The way I say is, Kinesis has a purpose. It is there for cloud-scale
+event ingestion or streaming. I call as a streamer, whereas
+I consider EventBridge is a bit more refined, you
+know, even handling mechanism with your microservices or applications. You don't just dump
+everything into EventBridge. So it's more of a choreographer. And of course there are
+differences in payload sizes and how long the events can be kept. And these are the things,
+you know, obviously differ service to service, but have that in mind. Unless you have a valid use case, leave what is best for Kinesis to Kinesis, and do what is best for, you know, handling EventBridge events that way. Right. Finally, this again a common question. "There are three different services, which one should I use?" Again, there are commonalities, of course there're all asynchronous. There are commonalities in
+terms of purpose and things. SQS is for queuing, buffering. SNS is the typical pub
+sub model with the topics. EventBridge is a broker, is a kind of a choreographing
+your services, coordinator. And then message flow. In some cases with SQS, you can adjust, with its characteristics, you can adjust. Whereas with EventBridge, at
+the moment, there is no way. You need to put a queue or
+something on the other side of consumption to slow down things. And FIFO is another differentiator. As of now, EventBridge
+does not support FIFO or, you know, sort of the ordered events. And then the batching. So with SQS, when you process, you can pull one or up to 10,000 messages in one batch and process. We don't have that
+capability with, you know, EventBridge at the moment. So these are sort of the
+basic, you know, concepts and differentiators and similarities you probably would need keep in mind. And that's all. So thank you
+all so much for listening. Thank you so much. And
+please complete the survey. Thank you.
+(audience applauds)

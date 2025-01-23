@@ -1,0 +1,586 @@
+- Thank you for joining us today. You're gonna learn about
+resilient architectures at scale, and the way you're gonna
+learn about them is through real life examples, we're going to share with
+you today from amazon.com. My name is Seth. I'm
+really happy to be here. Really glad to see you here
+in this lovely theater, and I'm really thrilled to be joined by my co presenters today. Avinash and Tulip. They're gonna introduce
+themselves a little bit later, but I am a Developer
+Architect, Developer Architect, Developer Advocate. Alright. I know my own title. I was a solutions architect
+so I just put them together. And when I was a solutions architect, I was the reliability lead
+for AWS well architected. So I've worked with a lot of folks, and a lot of customers on
+the resilience challenges, and I've had about 12
+years total at Amazon, the last four years of those at AWS, but the previous eight at amazon.com. And that's the examples
+you're gonna hear about today. Those are examples of resilient, scalable architectures
+from the dot com side. And to get us kicked off, I mean the titles about
+resilient architectures. What is resilience? Resilience is when your
+application can withstand, or mitigate, or recover,
+from the kinds of faults and load spikes you're
+gonna see in production. If any of you're running
+applications in a data center, or the cloud, or any kind
+of production environment, you know it's chaos out there, right? There's always things happening, unusual user patterns, network issues. So you have to build resilience so that your application remains available. And towards that end, about a month ago, maybe two months, we released this. It's the life cycle
+framework for resilience because resilience is
+a continuous process. It's not the one and done kind of thing, you just don't do it and you're done. And we made this process such that it maps to like a software development life cycle. So you could be aware of that, and in your software development
+life cycle, being sure, make sure that resilience is part of that, and you can actually learn
+more about that later today. There's gonna be a breakout
+session about that. But if you, if you miss that, there's a link there
+you could read about it. For our purposes today,
+we're gonna present to you, as I said, multiple real life examples of resilient architectures from Amazon. And it's gonna fall into three
+categories on this framework. First one is about designing, designing and implementation, right? Designing for best the best
+practices for resilience. And we're gonna show you examples that show you things like fault isolation, using things like cells,
+show you auto scaling, they show you decoupled architectures. And then the next one on
+the lifecycle is about testing and evaluation. We're gonna show you examples of teams that have done chaos
+engineering and load testing. And finally, you know, sometimes
+people forget about this. You could design what you
+want into an application and make it resilient, but you have to operate it resiliently. And we're gonna show you examples of how teams are using metrics and observability across
+accounts, across services to ensure the resilience
+of their workloads, of their applications. And so the second part of the title is it's resilient
+architectures at scale. So I might as well define what scale is, I think we all know, but it's
+basically about, you know, when, when, when you get
+extra load, extra scope, and your, your system, your
+application accommodates that and remains available despite the amount of load or scope you're getting. And going back to amazon.com, which where our examples are gonna come from, Amazon was founded in 1995
+running on two servers. So it started out small, and
+they had a motto, get big fast. You could see that t shirt
+there from the 1997 picnic, get big fast, eat another hotdog. But the motto is get big fast. And so they started with two
+servers, right? But whatever, and they started with two
+servers running this website. One server was running the executable, the other was running the database. But they did get big fast. If you look at prime day
+from this year, the number of items sold, the dollars of sales are quite, you know, impressive. Now we're a tech audience here though, so this is the slide
+I really like to show. This is showing the AWS services and resources, some of them,
+just a few of them that Amazon teams are using to
+be resilient and to scale. You can see DynamoDB with
+millions of requests per second. You could see Aurora with
+billions of transactions and terabytes of data. I'm not gonna read all the stats to you, but the point here is to
+show you how if you want to be resilient and res and scalable at, and resilient at scale, using the cloud, and using AWS services are a way that could help you achieve that goal. And the point I forgot to make
+earlier about Amazon starting small and scaling up is no matter what scale your applications are or your enterprises, everything, almost everything we're
+gonna show you here today applies to you. You want to put in those
+resilience best practices, and you want to put them in so that you can scale when you need to. So fast forward, this is the
+architecture I said two servers before, now this is the services. Each dot on here is a
+service, a microservice or a a part of a solutions
+oriented architecture at Amazon. And there are lines
+between them showing the dependencies between the services. There's tens of thousands of services running at Amazon today. It's a micro, Amazon
+does like to use the SOA, and microservices type architectures. I'm gonna show you an
+example of that right now. There's our first example actually. This is just an Amazon webpage. It's called a detail page. It's the page where you buy stuff. In this case you're gonna
+buy a Kindle Fire tablet. Tablet, right? And when you look at that page, it has everything you need,
+you know, it has the reviews, it has the picture, it has the title, has the price, et cetera, right? But this is actually a
+framework, an internal framework that is supported and owned
+by a team inside Amazon. And the framework makes hundreds of calls to backend services called widgets. And those widgets are
+essentially microservices. And each widget owns a little
+piece of business logic, and a little piece of what's
+displayed on the page, and it's making those calls in parallel and rendering them very quickly. So if I took this page, and I run it through an internal tool at Amazon, it looks like this. Now you can see there's a microservice for serving the image. There's a microservice
+for serving the title, there's a microservice for serving the average customer reviews. And all of these are being called in parallel and being rendered. And this leads to both
+resilience and scalability because if one of these services
+to have a fault or failure, and not operate properly, as
+long as it's not the title or the image, or the price, the customer still has
+a usable experience. They could still get
+most of what they need, and make a purchase. So this is what we call
+graceful degradation. Rather than go down, we remain
+available to the customer and maybe, you know, not
+have some functionality. That's the resilience part of it. The scalability part is each of these backend microservices can be deployed independently. So that gives these
+teams the ability to play when they need to, and
+innovate when they need to, and put in features when they need to. Finally, the third point is, as I said, it's a framework owned by
+a centralized team that, that maintains the framework. The business logic is owned by the teams that own the widgets, and
+these are different teams that own each widget, right? So that means that the teams that own the widgets can
+focus on the business logic, and not have to focus on what
+the framework is doing that. That and that, basically
+takes the burden off of them, so they can innovate better. Okay, so with that we're gonna go to our next example with Tulip. - Thank you sir. So let's get a quick
+raise of hands to see, how many of you know about
+cell based architecture. I see a few hands out there. So in this part of the session
+I'll talk about the basics of cell based architecture, some use cases from Prime
+Video and Amazon Music, and how they were able to improve availability and fault isolation using
+cell based architecture. To start off with, I'm Tulip Gupta, I'm a Senior Solution Architect with AWS. I've been with AWS for the
+past two and a half years, helping Amazon customers like Prime Video, Amazon Game Studios, Amazon
+Music, Twitch and Audible. So, you might be familiar
+with traditional scaling, and in traditional scaling
+usually have your worker nodes, in this case eight worker
+nodes serving the needs of all your customers, and we have eight customers out there. But let's say, one of the
+customer intentionally or unintentionally sends
+in a bad request, now one of your worker nodes gets
+impaired, and so he retries again, and slowly all your
+worker nodes are impaired, and thus all your customers are impacted. So the blast radius is all your customers. And in cell based scaling,
+let's see how we can avoid that poison pill situation that you saw in the previous slide. So that same customer
+sends in a bad request, but in this case, what we have done is we have
+broken it up into cells, and each cell consists
+of two worker nodes. So now when the customer
+sends in the bad request, only two worker nodes
+are getting impacted, it's only one cell. And any customer that
+is being served that by that cell is also impacted. So as you can see, only two
+customers are impacted out of the eight in this scenario. So the blast radius has
+reduced con considerably, and there's a 4x improvement
+from entire system impact. So this is what a cell based
+architecture looks like. So you have cells, cells
+are a design pattern where a service is split
+into multiple deployment stacks called cells. They're independent instance of their own, and they can independently service the full workload of customers. One important thing to know
+that cells share nothing. So if we have like three cells
+in this case like cell zero, cell one, or let's say cell
+two, it's very important that cell zero, and cell one,
+do not or share any data. And the reason behind that
+is if there's any data that cell one needs, and if cell zero is impaired, then cell one would be impaired too. The other key important
+thing is the cell router. Now cell router routes
+the request based on some configuration logic. So request comes in, cell
+router routes it based on like maybe a partition key like customer ID. Maybe it'll do Round Robin
+from cell zero, to cell one, to cell two, and it's just router request to cell to different cells. One important thing about
+the cell router is ha, it has to be as thinnest as possible, and that the reason behind that is like because if if that's impaired,
+then your then it will not be able to route your request
+to the different cells, and your customers would be impacted too. So we are gonna look
+into deep dive into some of the use cases from Prime
+Video and Amazon Music, and I helped them adopt cell
+based architecture this year. So the team that adopted cell
+based architecture at Prime Video is the Prime Video analytics team, and it allows internal clients to deep dive into the external experiences of the external customers as
+they're watching Prime Video, and thus provide improved
+video delivery quality. One of the key reasons they were trying to adopt cell based architecture was simplifying global setups. They wanted to remove, they wanted to move their workload quickly
+from an underperforming region to a healthy region. And also if a region doesn't
+have enough capacity, they wanted to move it
+to a different region. So let's say they had their
+workload on US East one, and there was not enough capacity for certain instance types,
+they wanted to be able to quickly move to US East two. Well for Amazon Music it was for the team metrics ingestion service, and what it does, it collects
+a metrics for from different clients and helps improve
+music delivery quality. And what the, the key reason they wanted to adopt cell based architecture
+was fault isolation. They had different kinds of events coming in from the most critical to the least critical, and
+even coming in from different device types, they wanted
+that fault isolation so that if there's a lot of noisy
+traffic like on operational events, they didn't
+want their most critical customer impact events getting impacted. So I'll go through the key
+decisions that Prime Video took. One of the key decisions that
+they did was how they wanted to design their cells. So previously they had this
+one workload serving the needs of all their customers, and they had it across all
+the zones in one region, and they split it up into different cells, and they had three cells per region. And the, the reason they had
+it across AZs in one region because they had regional
+services like Lambda, and that's why it was a regional cell. And so the one of the key
+decisions you know when whenever you adopt cell
+based architecture is to look what services you're using. So if you're using EC2 or services like that which are AZ based, you could have cells which
+are, can be AZ based. And the second decision that they took is around cellular traffic policy. So when a request came in
+from the devices to route 53, they had traffic policies
+built in on route 53, that would round, route the
+traffic based on round robin. So the request would go
+into cell one, cell two, and cell three and so on. So let's say the request
+comes into cell two, and they had route 53 DNS
+policies out there as well, which would do geo proximity routing, and geo proximity routing
+means it'll route the request to the region that is closest to where the request came from. So let's say the request came
+from New York, it'll route it to the closest region,
+in this case US East one, and in and when it goes into a region it hits the application load balancer, and then to the
+corresponding cell behind it. And the third decision that they took was
+calculated health check. Now one of the things you
+to note that you don't want to route your request to a cell that's underperforming or unhealthy. So the way they checked
+if a cell is healthy, is they set up Route 53 health checks. They ping the bootstrap API
+for the individual cells. And if they got a 400 or a 500 error, they would know
+that that cell is unhealthy, and would not route the request. The second thing that they
+did is CloudWatch alarms. They looked at the, the ELB 500 errors, and if there were more than
+a 100 errors for a minute, they would know that a load balancer in that particular region is unhealthy, and would not route the request as well. And as a result of this, they
+were able to see an outcome of 99.9996% availability
+over a span of four weeks. And this is the percentage of events that were processed successfully. And the way they calculated
+availability was total request minus errors divided by
+total request into 100. And any failure was labeled as a server size failure
+like a ELB 500 error. And all of this came with
+improved availability, ability to fail over that comes
+with cellularization. This brings us to Amazon Music. In my one of the previous slide I talked about the cell router, and that's what exactly that they did. They had like a thinnest possible cell routing logic out here. So for them, when the request came in, and came to the application load balancer, the cell routing logic is built
+in their ECS cluster managed by AWS Fargate. It authorized the response,
+and it did the cell routing. The cell routing configuration is towed as a static configuration, it's
+config as code, they do plan to move it to an app config
+where it's more dynamic, and they, and, and the request get routed to different supercells, and supercells are a collection of cells. And the second key decision that they took was self mapping strategy. So when a request comes in,
+they routed based on from where the, based on the device type, that their partition
+key is the device type. So if it's an iOS, it'll
+route to a Supercell 1. Well for Android to Supercell 2. And these supercells can grow
+and shrink based on the TPS. So let's say like iOS has a lot of request coming in like 70,000
+while Android has more than that, like 80,000, the Supercell 2 would be
+a bigger SU would be have more collection of cells than Supercell 1. The other thing that they did
+was route the cell based on route, route to cells
+based on the event tier. So let's say they had,
+you know, customer events, and operational events,
+customer events were labeled as the most critical events,
+in this case tier one events, and this and so on like tier two and tier three were the least critical, which are operational events. And that way like if they
+have a lot of noisy traffic, let's say on tier three
+events for operational, that would not impact
+their tier one events. And all of these tier one,
+tier two, tier three get routed to a different set of cells
+inside that Supercell. The third key decision
+that they took was the cell size management model. Now there's two ways to design your cell. It can be atomic as well as non atomic. In a non atomic cell size
+management, you have your cells, individual cells grow if there's
+a lot of request coming in, and that's how you like,
+you know, scale up. But in terms of in, in
+atomic cell, you add the same size cells so you can scale it up by 10%. So all the cells are of the same size. And Amazon music chose to
+go the atomic cell route is because they can, they chose to like deploy the same
+stack in all the cells. And this is an overview of
+how it looks like overall. The request comes in from the product, producers has the
+application load balancer goes to the routing layer where ECS cluster and AWS Fargate is there, and it authorizes the response,
+does the traffic routing based on the device type
+as a partition key goes through the individual
+Supercells, where it's mapped by tier one, tier two, and tier three events going
+to a different set of cells inside a Supercell. And as a result the outcomes
+were high resiliency. They were able to control based on tiers, and they also saw a 92% reduction in the outage blast radius. And that's because now their
+tier one events were not impacted if they had a lot of noisy traffic on
+the operational events, which was the case before they adopted
+cell based architecture. And they also saw higher availability, there were fewer processing delays as events are isolated by device types. So if there's, you know, a bad deployment or something going on with
+ours device type, their Android and Alexa and so forth are not impacted. In summary, so Prime for Prime Video and Amazon Music, the both had their cells in a stateless system. So they, they had their cells
+contained like ALB Lambda, and SQS for Prime video while for Amazon music ALB, Lambda and Kinesis. And by stateless system, I mean they did not store any
+information in their cells and, and the routing
+policy for Prime Video was Round robin and your proximity while for Amazon Music, it was
+device type and event based. And as a result, they
+both saw similar outcomes. It was increased
+availability and resiliency. So with that I'll hand it over to Seth. - All right, thank you Tulip. All right, so we learned
+about the website. Excuse me, I need get a drink of water. We learned about Amazon music, learned about Prime video, so now we're gonna learn about Ring. And Ring built a massively
+scalable event driven architecture that could achieve six nines of availability while serving about 130,000 requests per second. So before I dive into what it
+looks like, I gotta, you know, make sure everybody knows what Ring is. I'm a Ring customer, I'm a Ring fan. So Ring's a set of doorbells and cameras, and alarm equipment that
+you could put on your house. And then you know, when something
+happens in your driveway you get a motion alert,
+and you look on your phone and see oh there's my driveway,
+oh there's my minivan, and oh there's my bunny. Oh that's not really my bunny, but it was a bunny crossing my driveway and it was still fun to see. So that's what Ring's about. And before I get into the
+129,000 request per second case, I wanna present a different service. This is their video encoder service. This is the one where that previous slide I showed
+you was a snapshot of a video. So there's a camera in my
+driveway taking raw video footage, and putting it into an S3
+bucket, object storage. But that's not what Ring
+wants to show me on my phone. They need to do some kind of
+post processing transcoding. So when they put the video in the bucket, it sets off an event that puts a wor a, a request on a queue, an SQS queue, where a fleet, that's
+those three little boxes, a fleet of EC2 instances
+running a transcoder service are pulling that queue. And when they get that, oh
+yeah there's work to do, they're gonna pick up that
+video, transcode it, put it in that other bucket and that's where I can look at it on my camera. So that's how the transcoder works. But like many services,
+Ring has to be able to scale up and scale down. Now with most services at Amazon, if you're looking at the website or video or music, they're gonna have
+big events around Prime Day. But Ring is different, right? So Ring is doing this video transcoding, what do you think the
+big event for Ring is, where they're doing video transcoding? Yeah, you got it, it's Halloween. So there's kids going door to door setting off the motion detection. I personally love it 'cause
+I take the kids out trick or treating, my wife stays
+home with the Candy Bowl, and I can get little alerts
+showing the kids coming up to our door and see that we didn't waste our money buying all that candy. So it's great. But they, Ring needs
+to be able to scale up. That's probably a massive scale
+there that's happening there to be able to transcode all that video. So how do they do it? Well here's that architecture again, and they monitor using
+CloudWatch, the queue and they monitor a metric
+called empty receives. Empty receives is interesting because if there's too
+many empty receives, meaning the polar is asking for work, and there's nothing there,
+it means we're probably overscaled, we can scale down. But if they're asking for work and there's never an empty receive, there's always work there. It means we're probably
+backing up the queue, and we need to scale up. So they feed that data
+into a step function, which is a state machine
+where they could take that data plus some other
+proprietary metrics, and decide whether to scale up or scale down to be
+able to serve that video as quickly as possible. And so that example,
+that's previous example, it's about reducing the
+latency to see video. So the next example is also
+latency focus about reducing the latency between everything. Basically Ring is built an
+event driven architecture between the devices and
+their backend services and the services to services. Everything's event driven. So they wanted to build a system that was gonna reduce the
+latency for those things to talk to each other by as much as possible, and make it as resilient
+and scalable as possible. What do I mean by like event driven? So for example, a camera might
+record an event like Stream start, that's the name of the
+event internally, you know to us that means the
+device detected motion. And that event then needs to get routed to a notification service 'cause that notification
+service is gonna send the push notification to me, and tell
+me there's someone at my doorbell in this case me,
+I'm at my own doorbell. But still as a user you want to know that
+as quick as possible. So that's an example. So they built the streaming event bus or SEB, SEB. So I love making architecture diagrams. This one looks a little complex but I'm gonna walk you through it, and we're gonna break
+it down piece by piece. So first thing, there's multiple, it's a multi tier architecture. Everything that's in gray
+is outside of scope of SEB. So there's event producers
+like the cameras, and various other services, and there's event consumers like that event like the event serv, the notification service
+I showed you earlier. So that's, that's in gray.
+Everything in white is SEB. So in that first tier is the API layer, and at the API layer it's
+doing some authentication, it's doing some logic but
+it's also doing routing, just like Tulip showed you. It's deciding which cell
+to send a given event to based on the event topic. At the processing layer you
+can see there's multiple cells here running Kafka, Apache
+Kafka is a high throughput, highly scalable event
+stream processing system. And then at this layer
+is the consumer proxy. They did something clever,
+they wanted to be able to onboard many consumers, and they didn't want all
+those consumers to have to be polling Kafka. So what they did is they
+built a consumer proxy that polls Kafka for them, and then serves them the events
+either by direct API call, or by putting it an SQS queue. So that's SEB. As I said it's multi cell, and you might notice that each of these pink boxes is
+a separate AWS account. They divided all these tiers and cells into different
+AWS accounts, both for blast radius and manageability. As I said, Kafka is a
+event streaming system. Highly scalable, high throughput. So what is managed Kafka or managed streaming for Kafka, MSK. Managed Kafka is a way
+you can run Kafka on AWS, and AWS takes care of setting
+up the cluster for you. You don't have to worry
+about setting up the servers that you know, you tell what
+server you want, it takes care of that you tell it you want
+encryption, it takes care of that you tell you want shared storage, it takes care of that. So it's managed. That's what manage means. And so they built SEB, Streaming Event Bus as a cellular architecture, right? So cellular architecture as
+tool have said those little pink boxes on top or different events coming
+in, thousands of them. Based on the event topic,
+they're either gonna go to cell one or cell two. And the thing about a cellular
+architecture is blast radius, Tulip already shared with you. If a cell goes down then only half the topics are affected, the other half are still gonna work. So that's pretty good. But the
+team found something really interesting after they implemented this. They found that if a cell goes down, they could actually
+scale up the other cell, and accommodate all the topics there. So it's cellular, but when it needs to be, it actually scales up to
+accommodate all the cells. So they get all the
+benefits, all the scalability of a cellular architecture. And now the blast radius is nothing because all topics are being served by the remaining healthy cell. And this is something
+really clever that they did that I really like. In this case you can see one cell one, and cell two are not
+healthy, they're down. Why might that be? Because Tulip said that a cell should be a fault
+isolation boundary, that's the whole point of it, that fault shouldn't go across cells. But it can happen, call that a correlated failure. There's some failure
+that has some correlated impact across multiple cells. Let's say Kafka's having an issue or they deploy a bug to
+their Kafka implementation. In this case a lot of services, a lot of implementations might choose
+to go multi region, right? Oh something's wrong with Kafka and US East one, we'll
+fell over to US West two but they didn't do that route. They created what's
+called a fallback cell. I call it cell three
+but I put cell in quotes 'cause a cell is really
+supposed to be the same stack everywhere. But cell three is not the same stack, cell three is not running
+Kafka, it's not running MSK, it's running SNS, Simple
+Notification Service. It's using simple notification service, and simple queue service to
+do the stream processing, not necessarily as efficiently as Kafka would do it in
+cell one and cell two, but to maintain availability, and this avoids the correlated failure. The correlated failure is
+something to do with MSK or Kafka, it's not likely
+to be affecting SNS and SQS, therefore they're able
+to maintain availability. The other pattern they
+implemented is circuit breaker. I think many people have
+heard about circuit breaker. We're just gonna cover it anyway so we're all on the same page, and show you how they did it. With a circuit breaker, the circuit starts closed
+and closed is good. Think of a light switch when
+you close, when you flip, when your light switch is
+on the circuit is closed, which means that there's
+electricity flowing, right? And that's a good thing. In this case, circuit closed means that the
+cells are accepting requests. But if you get a certain
+number of errors above, above a threshold that
+tells you that you think that cell is unhealthy,
+you open the circuit, and you can see with cell one, we've opened the circuit there. That way requests are not
+gonna go to an ailing cell, they aren't gonna go to a cell where they're not gonna
+be served, they're gonna go to the healthy cell. And remember, if you get a
+few sporadic failures in cell two, it's gonna fail back to that quote unquote cell
+three using the different technology and serve it from there. That gives you that extra
+layer of resilience. Now once a circuit's been opened, it's gonna go into a half open state. And in a half open state it sends requests, occasional requests. And if it gets enough
+healthy requests, it assesses that the cell is healthy and
+closes the circuit again, and the cell will be
+receiving requests again. So just I showed you an
+example of what these events and notifications look like before, but I wanna bring it home. For me, I learned from these
+examples by understanding what the service actually does. So in this case, here's another example. So remember the stream start example from before where a camera detects motion, and it sent me a push notification. Well here's another
+example, it'll actually send that same event to the event manager, and the event manager's gonna
+put together a nice timeline for me, so I could see
+when a person was detected or a package was detected in front of my door there, in this
+case a Amazon delivery driver. And here's a fun example,
+the Ring ding event. The Ring ding event means
+someone rang your doorbell, if you've configured it,
+it'll send that event to the bot service, and the bot service will
+do an auto response. The auto response can
+be something as mundane as please leave a message, or for Halloween, it could be like trick or treat, or something like that. You could read what they are
+there, they're kind of fun. And I promise massive scale. So you see on the right there, that's showing all those little pink boxes or messages, thousands
+of messages coming in. So how many messages per
+hour is SEB receiving? If you look at the graph on the left, it's actually showing
+the messages per hour for eight different regions. So SEB is deployed by Ring in eight different regions. In US East one, the biggest region where
+it's deployed, it goes up to that promised 129,000 per second, actually goes higher than that. That's just the highest it
+was for the screen grab I got. But that's, that's a good representation of how high it gets. But you can see it's actually
+multiple regions all running their separate sub stacks
+and serving all these events. And because it's eight different regions, when you look at it, it says
+299,000 total requests per second total across all eight regions, and being served at the promised six nines of availability averaged across
+all of those eight regions. And we look at each region
+break down each region. You look at even US East one for their three day period I
+was looking at here, was able to achieve a hundred
+percent availability on SEB. And that's because they
+implemented the cellular architecture, they
+implemented the failover, and the failback, and they
+implemented circuit breaker and took these actions, and applied these best
+practices to get that six nines, and even a hundred percent availability. And with that I'm gonna
+hand it over to Avinash. - Thank you Seth. Alright, let's do a quick hand raise and see how many of you are
+here using Alexa mobile app. Some nice few hands. Alright, today I would be discussing about how Alexa has improved their resiliency, and improved their developer velocity. And this is in particular with an example of Alexa mobile personalization. I'm Avinash Kolluri, I'm a
+Senior Solutions Architect with AWS. I'm, I'm supporting Amazon
+as a customer of AWS. I'm primarily working
+with Alexa and devices. Alright, so Alexa mobile
+personalization is basically a landing zone app for all
+these sort of smart devices that are integrated with Alexa. With that you can also go ahead, and arrange sort of
+actions that you wanted to quickly sort out on
+your favorite devices, or else you could also take
+certain shortcuts in order to do particular actions like
+controlling your ne thermostat temperatures, or switching
+on living room lights. And at the same time it also helps you to focus mainly on your daily routines such as weather updates or traffic updates. As Seth pointed out earlier,
+in the vast ecosystem of microservices that we support, Alexa mobile personalization
+is one among them which serves as a kind of a triggering point for many other downstream
+services across Alexa. Here are some of our resiliency goals that we wanted to focus for, and this is kind of like a snapshot of common goals across
+different organizations for us. We come from a customer
+obsession background, and improving customer experience is one of our key priorities. And at the same time, when
+we see a certain peak events as discussed earlier, it
+could be either a prime day or any sort of event. We see a lot of new devices being added, and when a new device is added, but at the same time we
+also would have to scale for corresponding downstream services and support their transparency. So it is necessary for us to scale and support all these peak events, and also the downstream services. The next is fault tolerant. We wanted to make sure that we identify pre pre identify the faults and issues before customers catch those, and then the same time
+take contingency measures. So that fault tolerance is
+another important key aspect for us. To do all of this, it requires a lot of developer efforts, and at the same time it involves a lot of resilience efforts
+within the developers still. We wanted to make sure of developers is always focusing
+primarily on innovation, and the development activities,
+but not more on operational or resilience activities. A quick refresher on
+what chaos engineering. Before we dive deep and
+understand about how what, what experiment templates or what fault actions we
+would be taking a look in this entire presentation. So chaos engineering is a
+discipline that helps you to uncover hidden issues, and also help you to
+improve the resiliency of your systems in a
+controlled environment. It often helps you to
+evaluate your observability and monitoring standards, so
+that leaving you to have a room of uncovering hidden issues, and also improving your
+observability posture. Usually a chaos engineering or resilience engineering
+starts with a steady state. And a steady state is
+basically the ideal state of your system wherein optimal conditions and how it behaves, and with followed by hypothesis. This is where actually you
+wanted to introduce the faults, and then start seeing how
+your, how your system behaves, how do you gonna introduce
+those faults, it's through this experiment. So experiments are basically actions and variables that you would
+take into consideration of your fault, and then
+introduce them onto your AWS resources. So that once, once you
+start doing this experiment, you constantly go ahead and verify how this
+experiment is behaving, and this verification is usually done against your steady state. So that making sure your steady state, is always in those optimal conditions. If not, then there is
+definitely a room to improve. While we had many challenges in this overall journey of resiliency, but here are again some
+of those challenges that we wanted to bring it to here. So we tried initially working
+with many different tools and technologies, we have built
+our own homemade scripts so that all of these scripts,
+tools, requires a lot of operational capabilities because you would've to go
+maintain them, patch them, and deal certain operational, well operational burdens as well. So while doing that,
+what we have observed is as we come from a
+diversified technology stack, it is equally important for us to go ahead and attain a compatibility. And when you have many tools, or agents, and libraries attending
+compatibility across all of this technology stack
+is another challenge. And at the same time we also wanted to make sure our security is tightened. We are not leaving a room
+for any sort of intruders or leaks when using different tools or agents within our production systems. And last is mimicking a real world events, a real world scenarios. To do that we would have to
+pull in different teams together and the workforces, and make sure all of them are aligning to a certain standard in order to mimic or simulate a set of event. Unfortunately, to do all of this, we are not an Avengers
+and just a developers. Alright, so with that we have started leaning onto AWS Fault Injection Service. This is a managed chaos
+experiment service that helps you to directly run fault
+isolation experiments or actions on your AWS resources. While it supports a lot of
+actions on various AWS resources, but today I would be
+showcasing about these two. One is about Amazon EC2 instances on how, how you could terminate stop or boot. And the other one is about how you could run systems
+manager run commands, and take an explicit control
+action on your resources. And one good thing is
+Fault Injection Service goes hand in hand with CloudWatch, so that you can set up your
+own monitoring and alarms, and make sure that you have your stop or an exit condition in, in a guardrails, so that you know when to exit while conducting this sort of experiments. Here is a quick view
+overview of our steady state. We wanna make sure that our
+CPU is always less than 50%, and with the memory of less than 20%, but at the same time we wanted to support at least 3
+million users within P90 latency of less than 100 milliseconds. Here is the first example what
+I would be discussing about on CPU and memory stress experiment. On the left side you're
+looking at a hypothesis. So what am I doing here? Here is within the Alexa
+mobile personalization we are injecting 40% CPU and memory load. And at the same time we are
+also scaling the traffic by our load generator
+with an additional of 30%. And when we do that, the outcome, what we have expected is there
+are no incidents reported, and at the same time our P99 latency stays within 100 milliseconds, and with an exception of having a spike of 130 milliseconds at sometimes. And the mitigation, what we are using here is, is autoscaling. The experiment templates is basically, JSON or YAML templates that you could directly use within your Fault Injection Service. And they starts with the name description and RoleArn. RoleArn is basically again used to give you an explicit
+control on the targets or AWS resources, that
+you wanted to go ahead and execute these actions for. As I stated earlier, we have
+stop conditions here making sure that we take the
+con controlled manner within our experiment. And the stop condition
+is the CloudWatch alarm. And the targets are is EC2 instances, and we are using resourceArns, to classify all our instances, and make sure that we are leveraging this experiment
+on those targets. And these are the actions,
+the actions includes with systems manager para command
+that, that's introducing CPU and memory stress. And these actions are
+executed against those targets of EC2 instances. And this is the whole template for you. So when we have executed this template, some, here is a quick
+snapshot again of many events that we have been capturing across our entire infrastructure stack. And we use CloudWatch to
+capture all of these events. And this is a particular,
+in instance of those events. We have observed,
+there's a CPU utilization because we have introduced
+additional 40% CPU, and at the same time
+the memory has grown up. And what we have also observed
+was there's a network spike of traffic out from these EC2 instances because we are also generating
+an additional TPS load. And when we do that, what we kind of noticed is our P 99 latency
+still stays within our mi, within our outcome. It's 130, 133 milliseconds,
+it's just one instance of it, but our P 90 latency still remains less than 100 milliseconds. So giving us a confidence that our infrastructure stack
+is ready to take extra load and extra traffic even though we have limited our CPU and memory. Here is a second experiment. So in this experiment what we are trying to see is we are trying to implement an availability zone outage. So in order to have a kind
+of a real time failure, what does it happen when an
+availability zone goes down, and how are you gonna deal with it? And again, the hypothesis over
+here is we are injecting an availability zone impairment, and the mitigation that expected
+is the outer scaling should get kicked in, in another
+availability zones. And the outcome is the traffic
+should be handled gracefully because now that we are cutting
+down an availability zone, we wanted to make sure that
+traffic is handed gracefully, and at the same time our P90
+latency is again in less than 100 milliseconds. Stated earlier, the experiment starts with
+role description and Arn. And the stop condition is again
+the CloudWatch alarm here, and the targets are your EC2 instances, and the actions over here is
+we are trying to stop a set of EC2 instances related to
+a specific availability zone. The beauty of using AWS
+FIS experiments is you go, you get to have the entire
+experiments conducted in either in a series or parallel at the LA end of year, you are looking at the CPU stress and memory stress
+experiments are gonna start after are, sorry, this chaos experiment of availability zone outage is gonna start after the CPU and memory stress. And here is another observation based out of our CloudWatch dashboards. What we have seen while executing
+this experiment is we have seen a constant increase in TPS. That's because we have taken down one of the availability zone, and then there is an immediate CPU spike because the other two
+availability zones has to start taking this traffic, and at the same time our
+average latency is still under 100 milliseconds. So this is something noticing
+as like giving a room that we could go ahead and make sure our infrastructure
+is always in a ready state, and we are able to serve
+the traffic even though there's an outage of
+one availability zone. So this is how we have started. We have started with our
+manual testing, load testing, and then we have moved to the Gamedays. Those are always evergreen. Yeah. And then we have introduced
+all the functional and traditional testing into the pipeline, baked into the pipeline and
+make sure they cater every time to your dev deployment cycles. And at the same time we
+also started the involvement with the designing our
+own where it set of tools and technologies along
+the side of scripts, to do these sort of resiliency testings. But we have understood all
+of this to include a lot of operational overload
+for us, and also the cost. And then we have completely moved to fully automated chaos testing using Fault Injection Service. Now that additional advantage
+of using AWS FIS is, these experiment templates can be shared across different
+developer communities. So the other teams may not go ahead and start this from scratch, whereas they could directly use this as an abstraction layer on
+top of their services too. Some of the key takeaways that
+I, that we have observed out of this entire experiments
+was, we were able to scale from three to four million
+users without the change of anything on our infrastructure side. That's improving a lot on
+our operational resilience, and now that our developers get more time to focus on innovation and new development activities
+that we, we got to know that as per calculation
+there's almost 640 hours of developers hours have
+been saved per quarter, and that's improving a lot of on the developer
+product productivity too. We also made sure that
+we have taken down some of the infrastructure that we
+have provisioned based on our experiments of 40% CPU and memory, and that has helped us to reduce 60% of the cost on the entire infrastructure, and also committing to
+a carbon savings of 30%. With that I'll land over to
+Tulip for the next use case. Thank. - Thank you Avinash. I'll get a quick sip of water. - Very dry up here. (laughs) - So you heard about the stories around chaos engineering,
+cell based architecture, and Ring's architecture as well. And so when you have this
+massive architectures or massive workloads running on AWS, observability, it
+becomes really important. You want to be able to
+monitor your infrastructure. And so in this part of the
+session, we are gonna learn about how Audible scales observability using the CloudWatch unified
+observability solution. So you might know that Audible is one of the largest producer of
+audiobooks in the world. And so they have a lot of services, and each of these services generates its own logs and metrics. So previously they lacked
+that holistic view to be able to pinpoint root causes. They weren't able to
+get down to the bottom of why a severity issue
+occurred very quickly, and it took them a long time. And so when the CloudWatch
+cross account observability was released last year as one of
+the features, they were one, one of the early adopters and were able to quickly realize the benefits. So this is what CloudWatch cross account
+observability looks like. Let's say you have three AWS accounts, and you're running your ECS,
+EC2 and Lambdas out there. And so you might have set up AWS X ray. Now what AWS X Ray does, is a is able to trace a request from one
+service to the other service and create this trace map. And it collects all this traces, and there's CloudWatch
+as well set up in all of these accounts which collects
+the logs and the metrics. Now with cross CloudWatch
+cross account observability, you are able to send this traces, logs, and metrics into one single
+AWS monitoring account, and that becomes your centralized AWS OB observability account. And all you need to do is log
+into that monitoring account, be and be able to correlate,
+correlate your logs, traces and metrics across all
+your source accounts. And now I'm gonna do a demo of
+tracing a severity issue walk basically step into an on
+call engineer from Audible and see how he would do it. So here's this trace
+map, what it looks like. So for folks who don't
+know what a trace map is, it's basically shows how your request flows from one service to the other service. So let's put ourselves in the
+shoes of an on call engineer, and let's say you're saying seeing a lot of error codes coming up because one of the clients is
+not able to see the request. And so how would you do it? This traditionally, like for, for an on call engineer at audible, they had to log into separate accounts, and to look at those logs and metrics. But now they can just log into
+one monitoring account out here, and be able to trace
+that request out here. And so in a trace map they're
+able to see the arrows as how the request is flowing from one service node to the other. While the circles out here
+are the service nodes, and on the top you can
+see a little red dot. And what that red dots
+indicates is there is an error or a fault happen in that
+one particular service node. So this becomes really
+easy to just go into that one account, look at the service map, and see where all the errors occurred. And you can also filter down. So this is collecting all the
+services from all the like the four AWS accounts out here, and you can filter down, and select one of the accounts
+in this case three two, and see all the services attached to it. Well if you wanted to, and select a different
+account like seven zero, you can see like two
+services that are attached to seven zero, and be able to like also
+like look at separate AWS accounts, also get an
+and get a holistic view. So let's go back. So you've, you're able to see the service node
+that has that error. So we click on that service node. And then it brings us to this view. What it helps you is to
+correlate your metrics to your traces. And you're able to see your trace map, and you can, are you able and you're able to see your metrics at the bottom. Now you can see metrics like latency, and you can also see metrics like faults, which basically indicates
+there are errors are out there. And if you want to deep
+down, deep dive further, all you need to do is
+click on view traces, which picks up the trace segment around the time when this faults occurred. So if you click on that, it brings us to something like this, where you can see the
+trace map at the top, and you can see there are some
+faults associated when this trace was collected. And then it also shows you what happened, what exactly was the cause. The cause was the customer
+ID didn't get propagated or didn't get sent from one service node to the other service. And so you're able to quickly deep dive and find out why the error occurred. And the other thing you can also do, the page where you clicked on view traces, you can also click on view
+container logs insights. And this brings you to this
+log in inside screen out here. And here it automatically
+selects the timeframe when that error is occurred, and you can see all the logs associated with that timeframe. And it also picks up the trace ID when this error is occurred. So we're able to get
+further information as to why those errors occurred. And as a result, after
+Audible implemented this cross account observability, they were able to correlate their logs, traces and metrics easily. They were able to only
+use one monitoring account to look at across all
+their source accounts. And as a result they saw over 60% reduction in debugging time. So previously they would spend around average, on an
+average two hours on any thread issue to debug. And now they're spending
+like almost 20 to 30 minutes. And this is one of the quotes
+from one of the developers who's, who's saying like previously he had to log into multiple windows, now he has to only log into one window. And so he's able to see, query all his services under
+one single pane of view and, and saves him a lot of time. And with this, I'm gonna
+hand it over to Seth. - Right. Thank you Tulip. I, I love seeing quotes from developers and that picture we had
+there is just, you know, licensed photography and
+it's the same one I've used with other developer quotes in the past. So somebody's gonna think
+that's the happiest developer in the world. Has all the
+happiest quotes for Amazon. The conclusion today is
+pretty straightforward. We wanted to show you how you could build resilient, scalable architectures. We wanted to do that by example. And we showed you examples
+from all these teams, from all these teams here
+showing you real life examples, to help inspire you and
+show you it could be done. As I I said, no matter what
+size you are now, small to large, a lot of these principles apply. A lot of these best practices apply. Want you to go out there and do them. Now to learn more, there's other sessions
+you could check out. This slide is from an
+earlier version of this talk. So some of these sessions
+might have happened already. If they're breakouts, they're gonna be recorded,
+so don't worry about it. That lifecycle I started
+out talking about, there's the link to it there. And there's a couple other
+things you can learn about cell based architecture,
+chaos engineering, x-ray, et cetera, from all of these links here. And again, this will be posted to YouTube eventually,
+you get the links there. And while Avinash talked about FIS, there's several different
+purpose built services for resilience at AWS you
+should be aware of, of of them. Resilience hub is another
+great one, and AWS backup, and Elastic Disaster
+Recovery and Route 53 ARC. So these are all good services
+that you might want to use for your resilience journey. And with that, we do have
+some time for questions. I wanna make sure you fill out the survey, but we thank you very much.
+Thank you.

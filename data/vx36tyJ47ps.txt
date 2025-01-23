@@ -1,0 +1,1150 @@
+[music playing] Please welcome Senior Vice President
+of Utility Computing at AWS, Peter DeSantis. [music playing] Thank you. Welcome to re:Invent 2024. [audience cheering] And thank you for joining us
+for another installment of Monday Night Live,
+or as I like to call it, Keynote Eve. We have a great band, good beer. Although I do want to apologize. I found out we didn't have any IPAs. I will rectify that next year
+for the IPA lovers. I apologize, that is my fault. All right. Tonight, we're going to do
+what we normally do. And we're going to dive deep on
+some of the technical innovations. And like any good Keynote Eve,
+we might get one present to unwrap. Maybe one, we'll see. But we're going to start
+with the most important thing, which is what we like to do here
+on Monday Night Live, is look at the how. And the how is important,
+because the how is how we deliver on some of the most important
+attributes of cloud computing. These are not simply features
+that you can launch. These are things that you need
+to design into the services, and that's exactly what we do. These are manifestations
+of the way we build. And tonight, I thought that it might
+be fun for me to explain a little bit
+about why I think AWS is uniquely good
+at delivering on these capabilities. And in preparing this part
+of the Keynote, I decided to try using
+an AI assistant. I've been inspired by the way
+my teams and the teams all across Amazon
+have been using AI assistants to do things
+like write code, create creatives, and I thought this would be
+a fun chance to experiment. So, I told my AI assistant how I wanted to start off
+this presentation, and how I might want to visualize it. And I got some ideas. The first idea I got was an iceberg. Because what I wanted to talk about
+was what was below the surface, but I didn't really like
+the iceberg analogy. With an iceberg, you only see
+the small tip of the iceberg, but the only thing below is ice. The second analogy
+I got was much better. It was a space flight. And the AI assistant said,
+I should explain that while we only see the brief launch, there are large teams of engineers
+and operators and designers behind the scenes. And that made a little more sense,
+but it still didn't quite hit the sweet spot
+of what I was looking for. So, after a little more back
+and forth with my AI assistant, we decided I was going
+to talk about trees. Trees represent the big
+differentiated technical investments that we discuss each year. Things like our long-term investments
+in custom silicon, which enable the highest performance and the lowest cost infrastructure
+options for AWS customers. Also, our investments in AWS
+custom hypervisors, which enables secure,
+serverless computing. Or our deep investment
+in database technologies, which allow us to provide
+differentiated database features and performance. But before we talk
+about the trees tonight, I want to talk about the roots, the critical structures
+underneath the trees that support
+and nourish them. And let's start with the taproot. Now, not all trees have taproots, but the ones that
+do enjoy unique access to water deep below the surface, allowing them to thrive even
+when conditions are harsh. And one of the most unique
+things about AWS and Amazon is how our leaders spend
+considerable time in the details and being in these details matter
+because when you're in these details, you know what's really happening
+with your customers and your service, and that empowers you
+to make fast decisions, possibly fixing or preventing
+issues before they even happen. Now, this happens other places, but often that information
+has to percolate up many layers of the organization. And this never happens
+quickly enough. Just think about how much fun
+it is to tell your boss when something's not going well. It's no one's favorite thing to do, and it usually doesn't happen
+nearly quickly enough. Now it's easy to say that you
+want to stay in the details. The hard part is building
+the mechanism that you need to make sure
+you do it at scale. And that's exactly what we do. A great example of this
+is every Wednesday we run an AWS-wide operations meeting
+where all of our teams get together and discuss issues, share learnings,
+and learn from each other. And this is a critical mechanism
+to keep our leaders, including me in the details. Now, being in the details
+also helps us in other ways. And one of those ways
+is making it easier to make the hard long-term decisions
+that we have to make. A good example here was the decision
+that we made to start investing
+in custom silicon. Now today, this seems
+like an obvious decision, but 12 years ago
+it was anything but clear. Being in the details, we knew
+that we would never be able to achieve the performance
+and security that we needed for AWS without something like Nitro. And so, we made the decision to join
+with the Annapurna team on what's turned out to be
+one of the most important technical enablers of our business. If it wasn't for our deep
+understanding of the challenges, we could have easily decided to wait. But fortunately, we didn't wait. And the AWS story is entirely
+different because of that decision. Now tonight we're going to share
+the next chapter in that story. Now, while I love the analogy
+of the taproot, deep roots are not what supports
+the most massive trees. Instead, trees rely on
+horizontal root structures. A fascinating example of these
+horizontal root structures are the buttress root systems
+of the Amazon rainforest. These above ground root systems
+support some of the world's largest trees
+growing in unstable soil systems. And buttress roots can span hundreds
+of feet from the base of a tree and they can actually
+interlock with nearby trees to create a foundation to support these
+massive giants of the rainforest. And that brings me to another
+unique characteristic of AWS, our ability to innovate
+across the entire stack, from data center power to networking,
+to chips, to hypervisors, to database internals,
+to high-level software. Few, if any, companies are invested
+so deeply across so many critical components. This week, we'll show you how
+that breadth of innovation enables us to create very unique and
+differentiated capabilities for you: our customers. But these buttress root systems
+are only one of the amazing ways that trees are interconnected. Perhaps the most amazing
+and unexpected is the wood wide web. We often think of mushrooms
+as these fungi that grow out of the ground. But mushrooms are actually
+the fruit of the fungi that grows below the ground, a massive organism that actually
+lives in the roots of trees. And trees have a symbiotic
+relationship with this fungus, and they use it to communicate
+and share information and resources with one another. And this makes the forest
+stronger than any individual tree. And this brings me to what I think
+is the most important and unique thing about AWS, the culture that underpins
+everything we do. Now, when I joined AWS or Amazon
+in 1998 as a young engineer, I was surprised by how much focus
+our leadership put on building culture
+at such an early point in the evolution of our company. Our senior leaders took the time
+to build mechanisms that would enable us to scale
+to the company that we are today. We took the time to write down
+our leadership principles. We took the time to build a bar
+raiser program to keep ourselves honest
+on holding the high bar for the people
+that we wanted to hire. We built mechanisms like the weekly
+operations meeting that I showed you earlier
+to make sure that we were not relying
+on good intentions as we scaled. Now, in hindsight, it's easy to see
+how wrong I was about the urgency
+of these investments. The thing about culture
+is you either have it or you don't. And if you don't,
+good luck getting it. And our culture is unique
+and it helps us scale while maintaining a steadfast focus
+on security, operational performance, cost, and innovation. And in the spirit
+of scaling innovation, I'm going to try something
+new this evening. I thought it would be interesting
+for you to hear about some of the innovations
+we talk about tonight from other leaders of AWS
+driving some of these innovations. So, please join me in welcoming
+to the stage our VP and longtime leader of AWS
+Compute and Networking, Dave Brown. [music and applause] Well, thanks Peter. It's great to be here. My AWS journey began
+nearly 18 years ago as part of a small 14-person team
+in Cape Town South Africa. And we were building
+what would become EC2, the Elastic Compute Cloud. And our mission was ambitious: architecting
+the foundational orchestration layer that would ultimately go on
+to power the cloud. And what we did not know then was
+that this was just the beginning of a much
+bigger transformation in computing. And since that time, we've been on
+a journey reinventing every aspect
+of our infrastructure and delivering maximum resilience, performance and efficiency
+for our customers. And a significant part of that
+journey has been rooted in our custom silicon development. When we first introduced Graviton
+in 2018, it wasn't about having
+the fastest chip. It was more about sending
+a signal to the market, giving developers real
+hardware to play with, and igniting industry collaboration
+around Arm in the data center. We then set our sight on
+something much more ambitious. Our first purpose-built processor
+designed entirely from the ground up. With Graviton2, we focus
+specifically on scale-out workloads because that's what
+our customers saw, and that they were pushing
+the boundaries with at the time: web servers and containerized
+microservices, caching fleets, and distributed data analytics. And this was the moment that Arm
+truly arrived in the data center. And with Graviton3,
+we expanded our reach, where we delivered substantial
+performance gains across the board. We zeroed in on specialized workloads that demanded extraordinary
+compute power, and the results were dramatic: from machine learning inference
+to scientific modeling, video transcoding,
+and cryptographic operations. We more than doubled the performance
+for many compute-intensive workloads. And today, Graviton4 represents
+the culmination of everything we've learned about
+building processors in the cloud. It's our most powerful chip yet,
+and with multi-socket support and three times
+our original vCPU count, it's a game changer for the most
+demanding enterprise workloads, like large databases
+and complex analytics. And with each generation
+of Graviton, customers have been able to simply
+switch to the latest instance types and immediately have seen
+better performance. Now, let's take a look at how
+we've optimized Graviton's performance
+for real-world workloads. A modern CPU is like a sophisticated
+assembly pipeline, with a frontend that fetches
+and decodes instructions and a backend that executes them. When we evaluate performance,
+we look at how different workloads stress the micro architecture
+of the CPU. Now, is the workload sensitive
+to frontend stalls, which are influenced like factors
+like the number of branches or branch targets or instructions, or maybe the workload
+is sensitive to performances impacted by backend stalls,
+which is influenced by data in the L1 and L2 and L3 caches
+and the instruction window size. Now, traditionally, microbenchmarks
+have been used to stress
+the process's architecture. But take this benchmark for example,
+it's hammering the L3 cache creating
+a huge number of backend stalls. In engineering speak, this means
+the CPU pipeline is sitting there twiddling its thumbs
+waiting for data that keeps getting
+kicked out of the L3 cache. And for years, the industry
+has been obsessed over optimizing benchmarks
+exactly like this one. But this is like training
+for a marathon by running a hundred-meter sprint. Sure, you're running in both cases, but you're fundamentally training
+for different challenges. And real-world workloads don't
+behave anything like these neat
+and tidy benchmarks. They're messy, unpredictable,
+and honestly, they're far more interesting. Let's take a look at what happens
+when we put this microbenchmark next to real-world applications
+like Cassandra, Groovy and NGINX, workloads that our customers
+are running every single day. Now, while the microbenchmark was all
+about the backend stalls, in these real-world workloads, they are bottlenecked on
+an entirely separate set of factors. The branch predictor is missing more. There are lots of instruction misses
+out of the L1 and L2 cache. There's TLB misses. And unlike the microbenchmarks, the frontend is causing
+all the stalling. And this sums up to the frontend
+stalls being higher, not the backend stalls like
+we saw with the microbenchmarks. And that's why at AWS, we obsess
+over real-world workload performance. When we're designing our processes, we're not trying to win
+a benchmarking competition, we're excelling at running
+your actual applications. And these are the results of being
+laser-focused on the real workload. With Graviton3 traditional benchmarks
+showed 30% improvement over Graviton2. Not bad, right? But wait for it. When we tested NGINX, we saw a
+stunning 60% performance improvement. Why? Because we dramatically reduced
+branch mis-predictions, something that those standard
+benchmarks barely cared about. And with Graviton4, we've seen
+the same pattern play out again. The microbenchmarks suggest
+a 25% improvement, but real-world MySQL workloads, well they're seeing
+40% better performance. Think about what that means for
+customers running large databases. And that's why customers love
+Graviton4. These aren't just numbers on a slide. These are real customers seeing
+real improvements which go on to benefit
+their customers. Now at AWS, we're not just talking
+about Graviton's benefits. We're experiencing it firsthand
+by migrating our services and we're seeing remarkable
+price performance improvements. Services like Aurora and DynamoDB
+and Redshift and more, they're all seeing significant
+benefits by running on Graviton. And on Amazon Prime Day, one of the largest
+shopping events in the world, we had over 250,000 Graviton
+CPUs powering the operation. And recently we've reached
+a significant milestone. Over the last two years,
+more than 50% of all new CPU capacity landed in our data centers
+was on AWS Graviton. Think about that. That's more Graviton processors than all the other processor
+types combined. But Graviton wasn't the first place that we innovated
+at the silicon level. Early on, we knew that if we were going
+to deliver world-class performance and security for the ever-growing
+number of EC2 instances, we would need to innovate down
+the entire stack. And that story is
+the AWS Nitro System. The AWS Nitro System is a complete
+re-imagining of the server architecture
+and has fundamentally changed and transformed
+how we build and secure the cloud. With Nitro, we removed
+the traditional virtualization tax that other cloud providers
+still deal with today. We also have the agility that we get
+from Nitro's architecture that allows us to turn virtually
+any computer into an EC2 instance. You want to run an Apple Mac
+in the cloud? Well, Nitro did that. You need direct access
+to the underlying hardware on a bare metal EC2 instance. Nitro handles that as well. But let's focus on where
+this journey began. Security. Nitro didn't just improve security. It revolutionized our entire approach
+to hardware supply chain integrity. Now, security in the cloud
+demands absolute certainty. At AWS, we know that we need to know
+that every piece of hardware is running the software we expect
+and the way that we expect it. This goes beyond simply
+updating software and firmware across the fleet. You need cryptographic proof,
+what we call attestation that tells us what's running
+on every single system. And our scale,
+that's an enormous challenge. Think about it. We're proving the integrity
+of millions of components across our global infrastructure
+in real-time. Let's think about the process
+of boot sequence as a series of carefully
+orchestrated steps. It all begins with the read-only
+memory or ROM, which activates most of
+the fundamental parts of the chip. And from there, the processor
+loads the next layer of firmware, then the bootloader, which hands
+off to the operating system and finally to your applications. But here's the critical insight. Each of these steps represents
+a potential weakness, a place where unauthorized code
+could potentially run. And even more fundamentally,
+this entire chain depends on a root of trust. So, the real question then becomes,
+how do you validate that very first link? And to do that, we have to go
+all the way back to the beginning, the manufacturing floor. A server’s journey is long from
+the initial manufacturing and then the assembly
+through our shipping lanes and to our data centers. And finally, to installation. At each step, we must have confidence
+that nothing has been compromised. This isn't about finding
+vulnerabilities after the fact. It's about creating an unbroken chain
+of custody and verification from the moment that the components
+are manufactured until they're actually
+running real-customer workloads. So, let's dive into the boot process of one of
+our Graviton4-based workloads. The foundation of our
+hardware security and that root of trust
+lies within the Nitro chip itself. During the manufacturing
+of each Nitro chip, a unique secret is generated
+and stored within the chip. You can think of that as
+the chip's unique fingerprint and one that never
+leaves the silicon. And this secret becomes the basis
+for a public private key pair. The private key remains
+permanently locked within the chip while the public key becomes part
+of our secure manufacturing record. And this is where our chain
+of custody begins. The private key in the Nitro chip becomes the anchor
+for a measured boot process. At each stage of the boot, we create
+and sign a new private key destroying the previous private key. This is like passing a secure baton. Each handoff must be perfect
+or the race stops. And this chain of signatures
+lets us verify everything from the chip's production
+quality to its firmware version, to its identity. A system has limited access
+to the rest of AWS until it passes this
+complete attestation process. And any failure means immediate
+isolation and investigation. But with Graviton, we've pushed
+the security boundary here even further. So, building on Nitro
+secure foundation, we've extended attestation to
+the Graviton4 processor itself. And this actually creates
+an interlocking web of trust between the crucial system
+components. So, when two Graviton4 processors
+need to work together, they first cryptographically
+verify each other's identity and establish
+an encrypted communication. And the same happens
+between Graviton4 and Nitro with a key exchange
+being tied to the host's identity and that private key. Think about what this means. Every critical connection
+in the system from CPU to CPU communication
+to PCIe traffic is protected by hardware-based security
+that starts at manufacturing. With Nitro and Graviton4
+working in concert, we've created a continuous
+attestation system. This isn't just an incremental
+improvement in security. The combinations of Nitro's,
+hardware-based security and Graviton4's enhanced capabilities
+creates one of our most secure computing offerings yet. For you, this means your workloads
+run on hardware that's cryptographically verified
+from the moment of manufacturing
+through every second of operation. Security that's simply impossible
+to achieve with traditional servers
+and data centers. But what other challenges
+can we solve with Nitro? Well, to understand that we'll need
+to look at the dynamics of storage. The evolution of hard drive capacity
+has been relentless. Every few years drive manufacturers
+have found new ways to put more data onto their platters. And if we look back at the early
+days of AWS around 2006, we were using drives that were
+measured in hundreds of gigabytes. Today we're deploying drives
+that are 20 terabytes and larger. Now, at the same time, the cost
+per terabyte of storage has dropped dramatically over
+the past several decades due to innovations in the design and manufacturing process
+and the materials. And so, to ensure that we're always
+operating our storage systems as efficiently as possible,
+we need to make sure that we're always ready
+to take the next drive size and the next storage innovation. Now, to better understand
+the complexities that this creates, let's take a closer look at the design
+of a typical storage system. When we think about
+storage services like S3 and EBS, they're made up of
+three critical components. First, you have your frontend fleet. These are web servers that handle
+the API traffic, authentication requests
+and manage the customer interface. And behind that is what we call
+the index or mapping service. You can think of this
+as the brains of the operation. It keeps track of every piece of data
+and exactly where it's stored. When a customer wants to read
+their data, this service tells us
+exactly where to go and find it. And finally, we have
+the storage media layer. This is where your actual data lives. So, let's zoom in on that
+storage server. Traditionally, our storage
+servers have been built with what we call
+a head node architecture. The head node itself is essentially
+just a standard compute server. It has a CPU, memory,
+networking capabilities, and it's running specialized software that manages all the aspects
+of data storage, including critical functions
+like data durability and drive health monitoring, and coordinating
+all the I/O operations. And connected to this head node,
+we have what we affectionately call a JBOD that just stands
+for 'just a bunch of discs'. And that's literally what it is. A chassis filled with hard drives
+all wired directly to the head node through SATA and PCIe connections. But here's the thing, with this
+design, the ratio between compute
+and storage is fixed at design time. Once we build and deploy
+these servers we're locked into the specific ratios of CPU, memory,
+and storage capacity. Now, as drive capacities have grown
+dramatically over the years, this fixed ratio has become more and more challenging
+to manage effectively. So, the net result is that we've been
+on a journey increasing the capacity
+of our storage systems by increasing both the drive size
+and the number of drives. And we started with relatively
+modest configurations, maybe 12 or 24 drives in a server. And as drive technology improved, we got better at managing
+larger drive pools. We kept pushing these numbers up,
+36 drives per host, and then 72 always trying
+to find the sweet spot between density and manageability. And then we created Barge. Barge was our most ambitious storage
+density engineering project yet. A massive storage server containing
+288 hard drives in a single host. Just think about that number
+for a moment. 288 drives. With today's 20 terabyte drives, that's almost six petabytes of
+raw storage in a single server. And that's more storage
+than some of our data centers had in the early days of AWS. Now, this was our attempt to really
+push the boundaries of what was possible
+with storage density. And while it was an impressive
+engineering achievement, it taught us some crucial lessons
+about the limits of density. The first lesson Barge taught us
+was about the physical constraints. And these were literally
+heavy constraints. Each Barge rack weighed at
+an unbelievable 4,500 pounds. That's more than two tons. And this created some real challenges
+for us in our data centers. We had to reinforce the floors
+carefully, plan the deployment locations,
+and use specialized equipment just to move these things around. Now, packing 288 spinning drives
+together not only increases the weight, it also creates what I like
+to call a vibration orchestra. Housing drives together
+isn't typically a big deal, but when you have 288 of them
+spinning at 7,200 RPM, the vibration effects
+can become significant enough to actually impact the performance
+and reliability of the drives. And then there's
+the software complexity. Managing 288 drives from
+a single host pushed our software systems
+to their limits. Think about all the different
+failure modes that you need to handle
+the complexity of data placement algorithms and the challenge of maintaining
+consistent performance across such large drive pools. But perhaps the most critical
+lesson was about blast radius. When Barge server failed, and servers
+do fail, the impact was massive. You're suddenly dealing with
+the potential unavailability of six petabytes of storage. And even with redundancy, the recovery process
+for that much data takes a significant amount
+of time and network bandwidth. And so, we knew that we had
+to say goodbye to Barge. [fog horn sounding] So, with those lessons learned,
+we had to take a step back. How could we reduce the operational
+complexity while increasing the agility
+of our storage infrastructure, while still delivering high
+performance for our customers? And for that, we turn to our
+storage services for insight. So, storage services like S3 and EBS
+and EFS were all built on our standard
+storage server architecture. But they had some
+unique requirements. Some services needed more memory,
+some needed less compute. But within the storage layer itself,
+the functions were identical. So, was it the tight coupling between
+compute and storage that was limiting us? The concept of disaggregation,
+separating the compute and the storage, started looking
+very, very attractive. If we could find a way to keep
+the direct access and the performance
+that our services needed while allowing independent scaling
+of compute and storage, we might be able to get
+the best of both worlds. And this is where we started thinking
+about leveraging something that we already had
+in our toolkit, Nitro. So, instead of connecting
+those drives to the head node, we're disaggregating storage
+by embedding Nitro cards directly into those
+JBOD enclosures. Think of these Nitro cards as giving
+our drives their own intelligence
+and network connectivity. Each drive is a securely virtualized,
+isolated network endpoint. And what's really powerful
+about this approach is we're preserving the direct
+low-level access that our drives had and our storage services needed,
+while we are completely breaking free of the physical constraints
+that we had before. And Nitro handles all of
+the networking complexities, the encryption and the security. And because Nitro is designed for
+high performance and low latency, we're delivering all of
+the drive’s native performance, even when we access it
+over the network. And this is what it actually
+looks like in our data centers. At first glance, you might think this
+looks like a standard JBOD chassis, but there's some key differences. Those Nitro cards we talked about
+are actually embedded here along with the drives. And the beauty of this design
+is its simplicity. When you look inside a rack
+of these, you'll see something that looks
+more like a network switch than a traditional storage server. And this also made
+maintenance simpler. Thanks to our disaggregated
+storage architecture, any failed drive can be quickly
+removed from service and replaced by another healthy drive
+just with a few API calls. And our hot swappable drive
+containers allow our data center technicians to easily service these units without
+impacting service availability. So, drive failures are no longer
+a concern, but what about those head nodes? Well, this is where things get
+really, really interesting. In the traditional architecture,
+a head node failure was a major event. You lose access to dozens or hundreds
+of drives until you could go and repair
+that server, replace the server. Remember our Barge example,
+a single server failure impacted 288 drives. Well, with disaggregated storage, a head node failure
+becomes almost trivial. Since the drives are addressed
+independently on the network, we can simply launch
+a new compute instance and reattach all the drives. And it's the same process
+we use for the standard recovery
+of an EC2 instance. And it typically happens
+in a few minutes. No data movements required,
+no complex rebuild process, just reattach and resume operations. And these failure scenarios
+highlight something crucial. We've dramatically reduced
+our blast radius while actually improving
+recovery speed. And this is just the beginning
+of what's possible when we decouple
+compute from storage. Another powerful benefit
+of disaggregated storage is the ability to scale compute
+and storage independently. In S3, when we land new
+storage capacity, there's typically a period
+of heavy compute load as we hydrate and rebalance data
+across the new drives. And now we can temporarily scale
+up and scale out compute resources just for this initial period and then scale back down
+for normal operations. And this kind of flexibility,
+it helps us to run more efficiently and ultimately deliver better value
+for our customers. But with disaggregated storage, we've successfully broken free
+from those fixed ratios that constrained our storage
+architecture for many years. By separating compute and storage, we can scale
+each component independently while maintaining high performance just like you'd expect
+in a cloud environment. We've dramatically reduced
+our blast radius. Now failures can be constrained,
+recoveries are faster, and our services are more
+resilient than ever before. And we're seeing real operational
+benefits from increased agility. Our service can right-size
+the compute resources based on their actual needs,
+not the hardware constraints. And maintenance is simpler,
+capacity planning is more flexible and we can innovate faster. But perhaps the most important, this architecture sets us up
+for the future. As drive capacities continue to grow, disaggregated storage
+gives us the flexibility to adapt
+and evolve our infrastructure. What started as a solution
+to our storage density challenges has become something
+much more fundamental: a new primitive that helps us
+build more efficient, more reliable storage services
+for you, our customers. And with that,
+I'll hand it back to Peter. [music and applause] All right. That was awesome. Dave gave you a great peek at some
+of the innovations on AWS compute. Now I want to spend a few minutes
+talking about an entirely different kind of workload:
+artificial intelligence. Actually, it's two workloads. There's AI model training
+and AI inference. And one of the really cool things
+about AI workloads is that they present
+a new opportunity for our teams to invent
+in entirely different ways. We will look at some of those
+innovations here tonight, like pushing ourselves to build
+the highest performing chips and interconnect them
+with novel technologies. But we're also going to look at
+how we're applying the innovations that we've been
+driving over the last decade to this new domain,
+bringing the performance, reliability and low-cost of AWS
+to AI workloads. And we talk a lot about scale-out
+workloads like web services, big data applications
+and distributed systems. Scale-out workloads
+run very efficiently when you add
+additional resources to the system. And we've invested deeply
+to create infrastructure that's optimized
+for these workloads. In fact, Dave just told you about
+some of these innovations earlier. But AI workloads are not scale-out
+workloads, they're scale-up workloads. And let me show you why that is. One of the things driving
+the emergence of AI capabilities is that models are getting bigger,
+much bigger. When I talked about this last
+in 2022, we were excited about models
+with billions of parameters. Last year we were excited
+about hundreds of billions. And soon frontier models are likely
+to have trillions of parameters. Why are we seeing this growth? Well, in 2020 researchers published
+a groundbreaking paper, which is called the Scaling Laws. And it hypothesized that
+model capabilities improve as you scale up certain things,
+namely the number of parameters, the dataset size
+and the amount of compute. And since then, we've seen a push
+to build bigger and more compute intensive models. And these models have indeed
+gotten more capable. You've experienced this
+in your day-to-day lives. Now, if you look carefully
+at these graphs, you'll see that something
+pretty interesting. These are log-log graphs, meaning that the graphs
+have logarithmic X-axis and Y-axis. And straight lines on log-log graphs
+can be misleading. Let's take a closer look
+at the compute graph. Now, we're accustomed
+to linear graphs where every time you add an X,
+you get a Y. It's a linear relationship. But in a log-log graph, straight lines represent
+multiplicative relationships such as if we quadruple X,
+we can double Y. And what we see in these
+scaling graphs is mind-boggling. In order to half the loss,
+the measure on the Y-axis, we need to use a million times
+more compute. A million times. Now, a model that's 50% better
+on this Y-axis measurement is actually going to be way smarter
+on a bunch of other benchmarks. But this relationship between
+compute and model loss explains why the industry is
+investing tens of billions of dollars in building better AI infrastructure. But what does better
+AI infrastructure mean? To understand that, let's look
+at how large AI models are trained. At their core, modern generative AI
+applications are prediction engines. You prompt them with a set of tokens,
+which are basically parts of words, and they predict the next token
+sequentially one at a time. And from this really basic skill
+predicting the next token, some pretty amazing properties emerge
+like reasoning, problem-solving. To build such a predictive model, you train a model
+on trillions of tokens of data until you found
+a set of model weights that minimizes prediction error
+across your training data. And this process of training
+on all those tokens requires massive amounts of compute. To train the largest models
+on a single server, even the largest single server would
+take centuries or maybe millennia. So, of course,
+we do need to paralyze. The obvious place to start
+is by splitting up the training data. And this seems
+straightforward enough. If you take something that takes
+a thousand years on one server and you're running on a thousand
+servers, it should take a year. And this would be true if
+the workload was a scale-out workload, but alas, it's not quite that simple. The process I just described, splitting up the data
+is called data parallelism. And like lots of good things in life, data parallelism comes
+with some fine print. If you take this simple divide and
+conquer approach that I described, you'd really be building
+a bunch of independent models and then trying to combine them
+at the end. And that simply doesn't work. Instead, when employing data
+parallelism, you need all the servers to share and combine
+their model weights continually, essentially allowing
+the massive cluster of servers to build one shared version
+of the model. And this is where something called
+the global batch size actually comes into play. Global batch size is the largest set
+of data that can be worked through before you need to combine
+the results from all your servers. And this global batch size
+is a real, real tiny fraction
+of your overall training data. So, here's how data parallelism
+really works. You grab a chunk of data, not bigger
+than that global batch size. And next you do is divide the chunk
+into a bunch of equal parts and farm it out to all your servers. Then, each server trains
+on their assigned bit of data, and when it completes,
+it combines its results with everybody else in the cluster. And when everybody's combine
+the results, then everybody can move on
+to the next batch of data. So, in practice, this limitation,
+this global batch size limit, means that you can really only scale
+out a training cluster to a few thousand servers at most. If you go much further than this, each server actually gets such
+a small amount of data that it spends more time
+coordinating its results than it does
+on actually processing the data. So, if you keep adding servers,
+you don't get faster, you just add cost. So, understanding this about
+data parallelism and the limits of this highlights two fundamental pillars
+of AI infrastructure. First, because we have
+this scale-out limitation from the global batch size, our path to building larger models
+is building more powerful servers. This is the scale-up part
+of the infrastructure challenge. Second, despite the limitations
+of scale-out in building AI models, we still get a lot of value from
+building these very large clusters. And to do that well, we need to take
+advantage of the scale-out tools that we've been building
+for many years. Things like efficient data centers,
+fast-scaling, and great networking. So, let's start by looking
+at the first part of this: the scale-up challenge. What does it mean to build
+the most powerful server? It means you want a coherent
+computing system that has as much compute and high-speed memory packed
+into the smallest space possible. Now, why does it matter if it's in
+the smallest space possible? Because getting all this compute
+and memory close together means you can wire
+everything together using massive amounts of high
+bandwidth, low latency connectivity. Now, the latency part's probably
+pretty intuitive, but the closer things are together
+you can also get more throughput. And the reason for that is if you
+have things closer together, you can use shorter wires
+to transmit data between them, which means you can pack more wires. It also means you have lower latency and you can use more efficient
+protocols to exchange data. So, this seems simple enough, but it's a very
+interesting challenge. Last year we announced Trainium2,
+our next generation Trainium chip. And tonight, I'm going to walk you
+through how we're using Trainium2 to build our most powerful
+AI server ever. Now, let's start with the smallest
+part of the system, the Trainium2 chip. I'll point out some of
+the engineering limits that we're going to hit along the way as we try to take this chip
+and build the largest AI server. Now, chips are manufactured
+on silicon wafers with an extremely impressive
+fabrication technology, and these processes
+are improving all the time. So, if you want to get the most
+compute and memory on a system, a great place to start
+is building the biggest chip with the most advanced packaging of those advanced
+fabrication technology. And that's exactly what we did
+with Trainium2. But here's where we actually encounter
+our first engineering limit. The chip fabrication process
+actually has a maximum size that you can produce a chip,
+and it comes from the lens that's used to etch
+the silicon wafer, it's called the reticle,
+and it limits the maximum chip size to around 800 square millimeters
+or 1.25 square inches. Now, you're probably thinking
+the thing in my hand looks a lot bigger
+than 1.25 square inches, and that's because the thing
+I'm holding my hand isn't the chip, it's the package. When most of us think
+of computer chips, we think of the thing that sits
+in the middle of the motherboard under the heat sink, but that's actually the package,
+the chip is inside the package. And a few years ago, the package
+was a pretty simple thing. It was basically a way of enclosing
+a single chip and attaching it to the motherboard. The package enabled us to move
+from the really small world of the silicon chip
+to the larger wire traces that connects everything together
+on the motherboard. But today, the package
+is much more advanced. You can think of advanced packaging
+as connecting several chips inside a single package using a
+special device called an interposer. An interposer is actually
+a small chip of itself and it acts as a tiny motherboard that offers the ability
+to interconnect chips with about 10 times
+the amount of bandwidth that you can get
+on a normal PCB-based motherboard. Now, we've been using advanced
+packaging techniques in the last couple generations
+of our Graviton processors. Here you see Graviton3 and Graviton4, and you can see both chips
+or both packages have multiple chips
+or chiplets inside the package. The Graviton4 package
+actually has seven chiplets. The big chip in the middle
+are the compute cores, and those smaller chips
+around the periphery do things like allow the chip to access memory
+and other parts of the system bus. Now, by separating out the compute
+cores, we were able to cost-effectively
+increase the number of cores on our Graviton4 processor by 50%. Now, this approach has been super
+helpful with Graviton, but it's table stakes
+when building a great AI server. Here is the Trainium2 package, which is what I was holding
+in my hand. And you can see we have two
+Trainium chips side by side in the middle of that package. Each Trainium2 chip is sitting
+beside two other chips. These chips are HBMs or
+High Bandwidth Memory modules. HBMs are specialized modules
+that contain stacks of memory chips. And by stacking the chips you can
+pack more memory into the same area. And this is possible because
+memory chips actually use less power
+and put off less heat. Okay, so if you look at this package,
+that's a lot of compute memory, but you might be wondering, why can't
+we make the package even bigger? Just keep going. And this is where we run
+into our second constraint. And to understand that,
+let's have a much closer look. Today, packages are actually limited
+to about three times bigger than the maximum chip size,
+which is about what you see here if you consider
+those two chips and the HBMs. Now in this illustration,
+we took a couple of the HBMs off to give you a peak at the interposer underneath you can see
+all the little tiny bumps that are used to connect
+the chip to the interposer. But there's a better angle
+to see this. This is a really cool image that
+the Annapurna team created for me. They took a cross section of the chip by carefully slicing
+along that purple line, and then they used the microscope
+to blow up that image from the side. And you can see some
+really interesting things. On the top left, you see
+the Trainium2 compute chip. And beside it you see the HBM module. And one very cool thing is you can
+actually see the layers of the HBM module. And both of them are sitting on
+a thin continuous wafer, this is the interposer
+that interconnects the chips. The other thing you can see here
+are the little tiny connections that attach the chip
+to the interconnector. And you can see those
+are really tiny little dots. Those electrical connections
+between the chip and the top of the interposer
+are insanely small. Each one is about 100 microns. That's smaller than the finest grain
+of salt that you've ever seen. And all these connections
+need to stay in place in order for that chip
+to stay connected. And that's why we have a limit
+on the size of the package because the package has to stay
+stable enough to keep all those
+connections attached. And don't let these tiny
+dimensions mislead you because these chips have
+a large amount of power and heat moving around. One of those Trainium2 chips
+can do enough calculations that a human could do in millions
+of years in a single second. And to do that work, these chips require
+the delivery of a ton of power. Now, by moving all that power at low
+voltages, we need to use big wires. Now big is of course a relative term, but you can see the wires here
+at the bottom of the package, chips folks
+would call these power VIAs. And the reason we need to use
+big wires is to avoid something
+called voltage drop. A semiconductor uses the presence
+or absence of tiny electrical charges to store and process information. So, when chips encounter voltage
+drops or sags, they typically need to wait until
+the power delivery system adjusts. And waiting is not something
+you want to do with a chip. While a chip needs low voltage power, it's more efficient to deliver power
+at higher voltages. So, data centers actually deliver
+power at multiple voltages. It's progressively stepped down as it
+gets closer and closer to the chips. And the final step happens right
+before the power enters the package. You can see how this is
+typically done by looking at
+our Trainium1 motherboard. The final voltage step down is
+done via voltage regulators positioned as close
+to the package as possible. Here, I'm highlighting them
+on the board. Now, to reduce voltage drop
+and optimize Trainium2, our Trainium2 team worked to bring
+these voltage regulators even closer to the chip. Here, we see Trainium2 board and
+you'll see no sign of those voltage regulators on the top of the board. Instead, the voltage regulators
+are actually under the perimeter of the package. And doing this is quite challenging because the voltage generators
+generate heat and so you have to do
+some novel engineering. But by moving those voltage
+regulators closer to the chip, we actually can use shorter wires, and shorter wires
+means less voltage drop. Here's a view of Trainium1 and you can see how it responds
+when load is increased. This is what happens when you start
+doing a large amount of computing, and you can see when load
+spikes voltage sags significantly. And while this is brief,
+that voltage sag means the chip
+is not computing optimally. And extreme variability like this
+can actually be hard on the chip, potentially reducing its useful life. Now, here's a look at the same load
+being applied on Trainium2. Notice you have no pronounced
+voltage drop, and that's because
+of those shorter wires and that means
+no throttling of the chip and it means better performance. Okay, enough about the chip. Let's look at the server. This is a rack with two Trainium2 servers,
+one on the top and one on the bottom. They're big servers. Each Trainium2 server is made up
+of eight trays of accelerators. And each tray contains two
+Trainium2 accelerator boards, each with its own dedicated
+Nitro cards. And just like GPUs on
+NVIDIA-based systems, Trainium servers are accelerators. They're designed to do the math and
+operations needed to build AI models. However, they don't support
+the normal instructions that you need to run
+an operating system or a program,
+for that you need a head node. And this is actually the engineering
+limit to our server. The number of training accelerators
+we can put in a server is actually limited
+by the ability of the head node to efficiently manage
+and feed those nodes. So, adding additional accelerators
+beyond what we've done would actually just add cost without
+adding additional performance; not what we're looking to do. Finally, you need a switch to connect
+all the accelerators and the head node to the network. So, how powerful is a Trainium2
+server? Trainium2 server is the most powerful AWS AI server providing 20 petaflops
+of computing capacity. That's seven times more than Trainium1 and 25% more than
+our current largest AI server. The Trainium2 server also has 1.5
+terabytes of high-speed HBM memory. That's two and a half times more
+than our current largest AI server. Now, that's a scale-up server. But having the most powerful AI
+server only matters if you can get it
+into customer's hands quickly. A few years ago, when a new chip
+or server would come onto the scene, you'd see an adoption curve
+that looks something like this, during the early months
+of a new server's life, some early adopters might adopt it, usually the largest databases
+and the most demanding workloads. And while those early adopters
+were moving their new workloads to the hardware, a lot of the early life manufacturing
+challenges could be worked through. But that's not how things
+work with AI. Because of the value of more powerful
+servers for building better models, customers want access
+to the best AI infrastructure and they want it on day one. Anticipating that unprecedented ramp,
+we innovated here as well. Let's have another look at that
+Trainium2 tray that we looked at a moment ago. Now, what's interesting here is what
+you don't see, and that's a lot of cables. And that's because the team
+went to great lengths to reduce the number of cables. Instead of cables, all these
+components are interconnected via wire traces
+on the motherboards below. Why did they do that? Because every cable connection
+is a chance for a manufacturing defect and manufacturing
+defects slow you down. In fact, one of the coolest things
+about the Trainium2 server is it's been designed specifically
+to enable automated manufacturing and assembly. This high-level of automation enables
+us to scale quickly from day one. So, Trainium2 is not only our most
+powerful AI server, it's also specifically designed
+to scale up faster than any other AI server
+that we've ever had. But that's not the whole story. A powerful AI server is more than
+just raw compute and memory packed into a small space. It's a specialized tool
+for optimizing AI workloads. And that's where the architecture
+of Trainium2 comes into play. The first thing to understand
+about Trainium2 is that it uses a completely
+different architecture than a traditional CPU or a GPU,
+something called a systolic array. And let me show you quickly
+how it's different. Here we've illustrated a few standard
+CPU cores executing instructions. While there are different types
+of CPUs, they all share some common
+characteristics. First, each CPU core is a fully
+independent processor. That's why you can run
+multiple processes concurrently on modern CPUs. And the other thing to notice here
+is that every CPU core does a small amount of work before returning to memory
+to read or write data. This makes the CPUs very versatile, but it also means that performance is
+ultimately gated by memory bandwidth. Finally, while core counts of CPUs
+have increased a lot over recent years, the largest CPU today
+may have a few hundred cores at most, the GPU is an entirely
+different animal. Modern GPUs have hundreds or
+thousands of computing cores and they're organized
+into parallel processing units. And GPUs can pack way more cores
+onto the same space by having multiple cores execute exactly the same
+operation on different data. That means each GPU core
+is not fully independent, it's actually tied to other cores, but it also means that each GPU core
+can be built with fewer transistors than a fully
+independent core on a CPU. The GPU architecture has vastly
+accelerated a number of workloads starting with graphics,
+but most notably AI. The GPU is undeniably a
+transformative hardware architecture, but we chose a different approach. A systolic array architecture is a
+unique hardware architecture because it allows you to create long
+interconnected computing pipelines. With A CPU or a GPU, each compute
+instruction needs to read memory, does its work,
+and then it writes back memory. With a systolic array,
+we can avoid memory access and between computational steps
+by directly handing off results from one processing unit
+to the next processing unit. This reduces memory bandwidth
+pressure and it allows us to optimize
+our computing resources. And with Trainium, we actually design
+the systolic array for AI workloads. So, we don't have a linear chain
+of processing units like illustrated before, but we have something
+that looks more like this. Our layout is specifically designed
+to accommodate the common matrix or tensor operations
+that underlie AI code. And this architecture
+gives Trainium an advantage over traditional hardware
+architectures in making optimal use of the memory and bandwidth
+available at the AI server, helping us get the most out
+of the compute and memory that we worked so hard
+to pack into that Trainium2 server. Another decision that we made with
+Trainium is to give you
+direct access to the hardware so you can optimize
+your application's performance. The Neuron Kernel Interface or NKI
+is a new language that enables you
+to develop and deploy code that takes full advantage
+of the underlying Trainium hardware, enabling you to experiment
+with new ways to more cost-effectively build
+AI applications. And we're excited a lot to let a lot
+more people experiment with Trainium. So, last month we announced
+the Build on Trainium program, which provides access Trainium hardware to researchers
+to develop new technologies. Researchers from universities
+like UC Berkeley, Carnegie Mellon, UT Austin and Oxford
+are excited to use Trainium and its novel hardware capabilities
+to conduct novel research in AI. And we're excited to partner with
+these research institutions to innovate on the hardware
+that will power tomorrow's most demanding AI workloads. Okay, so we built the most
+powerful AI server with a novel hardware architecture
+that's optimized for AI workloads, and we're ready to ramp faster
+than ever before. But what about the most
+demanding AI workloads powering the latest frontier models? For them, most powerful is never
+enough, and that's where NeuronLink
+comes into this story. NeuronLink is our proprietary
+Trainium interconnect technology. NeuronLink enables us to combine
+multiple Trainium2 servers into one logical server with two
+terabytes per second of bandwidth connecting those servers, and they
+have one microsecond of latency. And unlike a traditional
+high-speed networking protocol NeuronLink servers can
+directly access each other's memory, enabling us to create
+something special, something we call an ultra-server. Now, I've always wanted to bring
+hardware onto stage and every year
+I've been talked out of it. It's going to block the screen. By the way, I'm sorry
+it blocks the screen. But this year to show you
+what an UltraServer is, we brought an UltraServer
+onto stage. [cheering] This is one UltraServer.
+64 Trainium2 chips working together to provide
+five times more compute capacity than any current EC2 AI server
+and 10 times more memory. Now, that's the type of server
+that you need if you're going build
+a trillion parameter AI model. Pretty cool. Now I'm guessing there's at least
+one person in this audience who's thinking about building
+a trillion parameter AI model, but for the rest of you,
+there's going to be something as well. Let's look at something
+that everybody's doing a lot of, and that's AI inference. Large model inference
+is a really interesting and demanding workload
+in its own right, and actually it's two workloads. The first workload is input encoding where the prompt and the other model
+inputs are processed in preparation for token generation. This process is referred
+to as prefill. And prefill needs a lot of
+computing resources to convert that input into that data structure that gets handed off
+to the next process. Once prefill completes,
+the computed data structure is handed off
+to a second inference workload, which does token generation. And one of the interesting aspects
+of token generation is that the model generates each
+token sequentially one at a time. And this puts a very different set
+of demands on the AI infrastructure. Each time a token is generated, the entire model has to be read
+from memory, but only a small amount
+of compute is used. And for this reason, token generation puts lots of demand
+on the memory bus, but only a small amount of compute, almost the exact opposite
+of the pre-fill workload. So, what do these workload
+differences mean for you and for AI infrastructure? Let's start with you
+a short time ago, lots of workloads like chatbots mostly cared
+about pre-filled performance. And that's because when prefill
+is happening, the user's typically waiting
+and staring at a screen or a spinning wheel. But once tokens start being
+generated, you just needed to generate them
+faster than the human can read. And that's not very fast. But increasingly, models are
+being used in agentic workflows. And here you need the whole
+response to be generated before you can move on
+to the next step of your workflow. So, now customers care about fast
+prefill and really fast token generation. And that brings us
+to the interesting thing that's happening with the demand
+for AI inference infrastructure. The desire for really fast inference
+means that AI inference workloads are now looking for the most
+powerful AI servers as well. Now, the nice thing is these two
+different workloads we talked about are complimentary prefill needs
+more compute token generation needs more memory bandwidth. So, running them on the same powerful
+AI server can help us achieve
+great performance and efficiency. So, we asked ourself how can we bring
+the benefits of Trainium2 to AWS customers for inference? And I'm excited to announce
+a new latency-optimized option for Amazon Bedrock, which allows you to have access
+to our latest AI hardware and other software optimizations
+to get the best inference performance on a large variety
+of leading models. [applause and cheering] Latency-optimized inference
+is available starting right now in preview
+for select models. And one of those models
+is the widely popular Llama. And we're excited that latency
+optimized versions of Llama 405B and the smaller Llama 70B model now offer the best performance
+on AWS of any provider. [applause] Here's
+the performance of Llama 405B, the largest and most popular
+Llama model. We're looking at the total time
+to process the request and generate the response. So, it includes both
+the prefill workflow and the token generation workflow. Lower is better here. And you can see that Bedrock
+latency-optimized offering is a lot lower than other offerings. But what if you use other models? I'm excited to announce that
+in partnership with Anthropic, we're launching a latency-optimized
+version of the new and highly popular Claude 3.5 model. Depending on the request,
+the latency-optimized Haiku 3.5 runs 60% faster than
+our Standard Haiku 3.5, and it provides the fastest inference
+for Haiku 3.5 anywhere. [applause] And like Llama, Haiku 3.5
+is taking advantage of Trainium2 to achieve this performance. But you don't need to just take
+my word for this. I'm really excited to invite onstage
+one of the co-authors of the Scaling Law paper
+that I mentioned earlier. Please welcome Tom Brown, Co-founder and Chief Compute Officer
+at Anthropic to share how they're innovating
+with Trainium and AWS. [music playing] Thanks Peter. At Anthropic we build trustworthy AI. Each day, millions of people
+around the world rely on Claude for their work. Claude writes code,
+edit its documents and uses tools to complete tasks. And I'll be honest,
+Claude wrote like half of this Keynote I'm about to tell you. Now, thanks to our partnership
+with AWS. Businesses large and small can use Claude on the secure cloud
+that they already trust. I'm going to spend some time
+digging deeper into how our collaboration works. First, let's talk about Claude 3.5
+Haiku that Peter just mentioned. It's one of the newest
+and fastest models. Despite its small size,
+it packs a punch, sometimes matching the performance
+of our largest model Opus while costing 15 times less. As Peter mentioned, we work together
+to build this latency-optimized mode that lets customers run
+Haiku even faster On Trainium2. This means as of today, you can run
+Haiku 60% faster, no changes needed on your side,
+you just flip a switch on the API and your requests get routed
+to the new Trainium2 servers. Easy. [applause] Now, this speed is great for
+in-the-loop interactions. So, I'm a coder: imagine auto-complete
+where you need to tab complete the suggestions
+in the short time between keystrokes. A 60% speed up makes
+a huge difference here. It can be the difference between your
+completion showing up or not at all. So, how did we make it so fast? Well, first off, look at this thing. It's a beast. Look at that machine and then
+each of the chips in it has the serious specs
+that Peter told you. Over a petaflop of compute in those
+systolic arrays, plenty of memory bandwidth,
+fast interconnects; it's got great specs. But as every engineer knows,
+specs aren't enough. To get peak performance, we need to keep
+those hungry systolic arrays fed all the time. That means sequencing the work
+so that they're never blocked, waiting on their inputs from memory,
+from the interconnects, from wherever. It's like a game of Tetris where
+the tighter you pack it in the cheaper
+and faster the model becomes. So, how do we solve this Tetris game? Well, Anthropic's performance
+engineering teams have been working closely with Amazon and Annapurna
+on this challenge for over a year. We found that the compiler can do
+a lot, but it's not perfect. And at our scale,
+it's worth trying to be perfect. A single performance optimization
+for Anthropic can unlock enough compute
+to serve a million new customers. This means it's worth it to drop down
+to a lower level like NKI and write kernels as close
+as we can to the raw hardware. It's like moving from Python to C for the most important parts
+of a program. And we found that Trainum's design
+is great for this type of low-level coding. So, folks might not know this,
+but for other AI chips, there's actually no way to know which instructions
+are running in your kernel. This means you have to guess it's
+like playing Tetris with a blindfold. Trainium is the first chip
+I've seen that can log the timing of every single instruction
+executed anywhere in the system. Let me show you. Here's an example,
+of a real low-level Trainium kernel that
+we developed at Anthropic. You can see here exactly when
+the systolic arrays are running, when they were blocked, plus we see
+exactly why they were blocked, what they were waiting for. You get to take off the blindfold. This makes writing low-level kernels
+faster, easier,
+and in my opinion, way more fun. Okay, speaking of fun stuff,
+I have something to announce. You see, so far, we've been focusing
+on inference, but they don't call it Trainium for nothing. I'm excited to announce that the next
+generation of Claude with Trainium: Project Rainier, a new Amazon cluster with hundreds
+of thousands of Trainium2 chips. [applause and cheering] So, hundreds of thousands of chips
+means hundreds of dense exaFLOPs, over five times more than
+any cluster we've ever used. So, what does Rainier mean
+for customers? Well, the world has already seen what we've been able to do
+with our last cluster. Earlier this year,
+Anthropic shipped Claude 3 Opus, the smartest model in the world,
+four months later we shipped Claude 3.5 Sonnet even smarter than
+Opus at a fifth the cost. Then in the last month,
+we've shipped both 3.5 Haiku and an upgraded 3.5 Sonnet
+that can use computers like a human. Project Rainier will speed up
+our development even more, powering both our research
+and our next generation of scaling. This means customers will get
+more intelligence at a lower price and at faster speeds: smarter agents that they can trust with bigger
+and more important projects. With Trainium2 and Project Rainier,
+we're not just building faster AI, we're building trustworthy
+AI that scales. Thank you. [applause and cheering] [music playing] Thank you, Tom. Innovating with Anthropic this
+past year has been an exciting journey and we're energized by
+the possibilities of what's to come. Okay, I mentioned earlier that
+to build the best AI infrastructure you need to build
+the most powerful server. That's the scale-up part
+of the problem. But that's only half the story. If you want to train
+the largest models, you also need to build the largest
+clusters like Project Rainier. And this brings me to the second
+half of the story: the scale-out story. And this is where AWS's long history
+of innovating with high performance scale-out
+infrastructure really comes in handy. A great example of this
+scale-out innovation is on building
+an elastic AI-optimized network. Now a great AI network shares a lot
+in common with a great cloud network, although everything
+gets ratcheted up massively. If this were a Vegas fight,
+it wouldn't even be a close fight. [boxing bell ding] Sure, a cloud network needs lots
+of capacity to make sure the network
+is never in the way of customers. In fact, James Hamilton talked
+about this on our very first evening Keynote. But an AI network needs way
+more capacity. Recall
+that each Trainium2 ultra-server has almost 13 terabits
+of network bandwidth. And during training, every server
+needs to talk to every other server at exactly the same time. So, the network needs to be massive
+to make sure that it never slows down
+those servers. Cloud networks need to scale fast
+to accommodate growth. We add thousands of servers to
+our worldwide data centers every day. But as discussed, a bit earlier,
+AI is scaling even faster. When you're spending billions of
+dollars building AI infrastructure, you want it installed immediately. And cloud networks
+need to be reliable. They've delivered, providing
+significantly better availability than can be achieved by even the most
+sophisticated on-premise networks. Our global data center network
+has five nines of availability. But here too, AI workloads
+are more demanding. If an AI network experiences
+even a transient failure, the training process can be delayed
+across the entire cluster leading to idle capacity
+and longer training times. So, how do you build on
+the innovations of a cloud network to create a great AI network? Here's a picture of our latest
+generation AI network fabric, something we call the 10p10u network. This is a network fabric that powers
+our UltraServer two cluster, but, and we use that that network for both
+Trainium and NVIDIA-based clusters. We call it 10p10u
+because it enables us to provide tens of petabits of network capacity
+to thousands of servers with under
+10 microseconds of latency. And the 10p10u network is massively
+parallel and densely interconnected. And a 10p10u network is elastic. We can scale it down to just
+a few racks or we can scale it up to clusters that span several
+physical data center campuses. And what you're looking at here
+is just a single rack of 10p10u. Now, you might have noticed the switches
+are a beautiful shade of green. Green's actually my favorite color. I prefer a British racing green,
+but it's a nice color. So, I've never seen green switches
+in our data center before. So, I asked the team,
+why this shade of green? Well, this shade of green
+is called greenery and it was the 2017 Pantone color
+of the year and apparently one of our suppliers
+had some excess paint and offered us a very good deal. And I love this story because it
+captures our design philosophy. Spend money on the things that matter
+to customers and save money on the things that don't like paint. Now the other thing you probably
+noticed here is there's a lot of
+networking cables into this rack. The part of this that isn't green is the network patch cable
+or patch panels. To build a dense network fabric
+like this, you need to interconnect the switches
+in a very precise pattern. And that's what
+this patch panel enables. And these patch panels
+have served us well for many years. But as you can see,
+things are getting pretty messy with the 10p10u network because the cable complexity
+has grown significantly. And as discussed,
+we're installing things even faster. And so, this was a prime opportunity
+for the team to innovate. One of their innovations
+was developing a proprietary trunk connector. You can think about this
+as a super cable that combines 16 separate fiber optic cables
+into a single robust connector. And what makes this game changing is
+that all that complex assembly work happens at the factory,
+not on the data center floor. And this dramatically streamlines
+the installation process and virtually eliminates
+the risk of connection errors. Now, while this might sound modest,
+its impact was significant. Using trunk connectors speeds up
+our install time on AI racks by 54%, not to mention
+making things look way neater; those green switches really pop now. But the team didn't stop
+innovating here. Here's another great innovation. They call it the Firefly Optic Plug. And this ingenious low-cost device
+acts as a miniature signal reflector allowing us to comprehensively test
+and verify network connections before the rack arrives
+on the data center floor. And that means we don't waste
+any time debugging cabling when our servers arrive. And that matters because
+in the world of AI clusters, time is literally money. But it doesn't stop there. The Firefly Plug serves double duty
+as a protective seal, which prevents dust particles from
+entering the optical connections. And this might sound minor,
+but even tiny dust particles can significantly degrade
+the integrity and create network
+performance problems. So, this simple device improves
+networking performance as well. So, with one eloquent solution,
+we've solved two critical challenges. The illustrative feeding two birds
+with one scone. And it's innovations like this
+that helped us make the 10p10u network
+our fastest scaling network ever. And you can see the number of links
+we've installed in our different
+network fabrics on this chart. And the ramp of the 10p10u
+network is unprecedented even for us. We've installed over 3 million links
+in the last 12 months and that's before we've even started
+to look at our Trainium2 ramp. And that brings us
+to our final challenge, delivering higher
+network reliability. The biggest source of failure in
+an AI network is the optical links. Optical links are the miniature
+laser modules that send and receive optical signals on all these cables
+we've been looking at. Now, AWS has been designing and operating our own
+custom optics for many years. And as a result, our operational
+rigor and our massive scale, we've been able to drive down
+the failure rate consistently. And this is impressive progress
+that comes from scale. But no matter how far we drive
+down these failures, we're never going to be able
+to eliminate the failures entirely. So, we need to look at how we can
+make the failures less impactful. And every network switches need data
+to tell them how to route packets. These are basically maps
+of the network. And in an AI network, this map might need to consider
+hundreds of thousands of paths. And every time an optical link fails,
+the map needs to be updated. So, how do we do that quickly
+and reliably? The simple approach is
+to centrally manage the map. One brain optimizing the network
+sounds really appealing, but there's a catch. When your network is massive,
+central control becomes a bottleneck. Detecting failures is hard, updating switches
+can be painfully slow and the central controller
+is a single point of failure. That's why large networks
+typically go decentralized. Using protocols like BGP and OSPF, switches share health
+updates with neighbors and they collaborate to produce
+a network map that works for them. And these approaches are robust
+but not perfect. In a large network when links fail, it can take significant time for
+the network switches to collaborate and find a new optimal map
+for the network. And in AI networks,
+that's time you're not doing work. So, when faced with two
+suboptimal choices, you often need to forge a new path. So, with our 10p10u network, we decided to build an entirely
+new network routing protocol. We call this protocol Scalable
+Intent-Driven Routing or SIDR. And yes, for the networking people
+in the room, that might be a pun. SIDR gives you the best
+of both worlds. An easy way to think about SIDR
+is you get the central planner doing the work to distill
+the network into a structure that can be pushed down
+to all the switches in the network so that they can make quick
+autonomous decisions when they see failure. So, SIDR gives us central planning's
+control and optimization with decentralized speed
+and resilience. And the result, SIDR responds
+to failures in under one second, even on our largest 10p10u networks; that's 10 times faster
+than the alternate approaches that we use on other network fabrics. And while other networks might still
+be recalculating routes, the 10p10u network is back to work. All right, we've spoken a lot
+about a lot this evening. From core innovations Dave spoke
+about across our investments like Nitro and Graviton and storage,
+to how we're building our largest, most powerful AI server
+with Trainium2, to how AI is benefiting from our
+years of scale-out cloud innovation. Hopefully you'll leave here tonight
+with an understanding of how we're innovating
+across the entire stack to create truly differentiated
+offerings for you, our customers. With that, I want to say goodnight. Thank you and enjoy your re:Invent. [applause and cheering] [music playing]

@@ -1,0 +1,675 @@
+- Hello. Welcome, everyone. Thank you so much for choosing my session. I really appreciate you being here. You're here of course
+for reliable scalability, how amazon.com runs on AWS and how it scales in the cloud on AWS, and we're gonna talk a lot about
+examples of how amazon.com, a large, sophisticated customer, uses AWS. So my name is Seth Eliot. I am currently a developer advocate, principal developer advocate
+for developer relations, just that's a recent change for me. Prior to that, I was the reliability lead for AWS Well-Architected, and Well-Architected's
+gonna play a big part in the talk today, but even before that, I actually worked for amazon.com. So I joined Amazon back in 2005 and was working on the .com
+side before moving to AWS. So I always like to start off with a bit of a history lesson. Now, I wasn't there in 1995, but this is what the
+website looked in 1995. Take it in in all its glory. Quite amazing for the
+time period, actually, and this is the architecture used to run that website you just saw. So I want to draw your attention to the box that says Obidos. Obidos is the place in Brazil where the Amazon River is its
+narrowest and swiftest part, and back in those days,
+they named a lotta things after places in Brazil and
+things on the Amazon River, and that is the executable. That is a single C, not C++, but C binary running on a single server talking to a single Oracle database running on another server called ACB, for amazon.com books, that
+had all the data in it, and that essentially was the architecture. You could see there's CC motel.
+That's a credit card system. That was separate so that
+we could have limited access to that so that the credit
+card numbers could be secure, and there's a distribution center, later renamed fulfillment centers, from which your package would
+be shipped and show up to you. So that's the original architecture. Now, the motto of Amazon,
+especially back in those days, is get big fast, and you can
+see that there's a T-shirt from one of the picnics
+about get big fast, and to get big fast, you're
+gonna need scalability. So what is scalability? Well, scalability is the
+ability of a workload to perform its agreed
+function as the scope changes, as the load or scope changes. So to get there, they had
+to evolve the architecture. So the first thing they
+looked at was the databases. You could see they pulled
+out this Web database there. So that Web database
+interacts with the customer, does the ordering, and
+then asynchronously syncs back to the ACB database periodically. Similarly, we've added a
+new distribution center and they each get their own databases too. So this is one way to remove
+one of the big bottlenecks, which was the database,
+but that wasn't enough. So let's fast forward to 2000 and talk about a
+service-oriented architecture. Having a single binary, it eventually did become
+C++, like the original, the first engineer at
+Amazon insisted it stay C, but he couldn't control it after a time and eventually C++ libraries got into it, but still, it was a single binary. So if you wanted to make a change, so let's say you were in
+charge of implementing one-click ordering, one-click purchase, you would have to make
+your change to that binary and everybody else is making
+changes to that binary and you're building
+along with everybody else and you're deploying
+along with everybody else and it's just not a very agile system. If somebody else breaks the build, you're not deploying
+today, so that's not great, so what can we do? Well, in addition to
+splitting out the databases, you can see the customer
+data got pulled out of ACB and you don't wanna be
+calling the database directly, so you're gonna put a
+service in front of it, the customer service,
+and that customer service was originally just for select and insert onto that database, but it became the location for
+business logic on customers. Similarly, there became an order
+service and an item service and this is the first
+service-oriented architectures at Amazon. Now, get big fast. Now let's
+fast forward to the present. The previous Prime Day,
+Amazon did get big. We all know Amazon's big,
+100,000 items per minute, 12 billion in sales as
+of the last Prime Day, but you're not here to learn about that. You're here to learn about
+how they're using AWS, right? And so I won't read the
+numbers off of here. There's obviously billions
+and trillions and millions. Go ahead and read them. It just shows that Amazon did get big fast and they're doing it using
+AWS and they're letting, and they're using AWS to be able to scale and scale reliably. So if you fast forward to wanna know what the architecture looks like today, it looks appreciably like
+it looked back in 2000. Anybody believe me on that? No. See if you're paying attention. No. Okay, so this is actually closer to the actual current architecture. Each dot on there represents
+a service or microservice or tens of thousands of
+them running amazon.com and they're all connected to each other through various dependencies. I zoomed in on one of
+them here just to show you that there are indeed
+lines in that diagram. I think the diagram is
+quite beautiful, isn't it? But that is the current architecture with tens of thousands of services, with many thousands of
+teams owning those services. All right, so that brings
+us to reliable scalability. So reliability is the
+ability of a workload to perform its required function
+correctly and consistently. So as we're thinking about that, that's why Amazon needed scalability. They needed to get big
+fast and be reliable, hence they needed the scalability, and today we're gonna
+be diving into examples of amazon.com teams doing
+that and building on AWS, and we're gonna use the
+Well-Architected Framework as a framework to present that to you. So the Well-Architected
+Framework consists of six pillars and they're all important, but honestly, today we're focused on reliability. The reliability pillar has the, Well-Architected has best practices. Well-Architected is just a documentation of all the best practices
+for building in the cloud. It includes other things
+too. We have hands-on labs. We have a Well-Architected Tool where you could review your own workloads, but honestly in this case, we're gonna look at the best
+practices reliability pillar. There are 66 of them. We're not gonna look at
+all 66 of them, but today, as I show you the
+examples I'm showing you, I'm gonna talk about which best practice is being illustrated in the
+architectures we're looking at, and we're gonna dive right
+in with our first example. Oh, IMDb re-architected to
+serverless microservices. So IMDb, Internet Movie Database. Who here has heard of IMDb? Okay, and the rest of you just
+don't wanna raise your hand because you don't wanna
+raise your hand. (laughing) Internet Movie Database was
+acquired by Amazon in 1998. It is the number one location
+to go to learn about movies, TV shows, actors, producers,
+all that good stuff, and prior to the re-architecture, they were running a monolithic
+build with a REST API on hundreds of EC2 servers. So they're on AWS, but they're running on hundreds of EC2 instances, servers, and when they re-architected, they moved to a federated
+schema with microservices. Now, microservices are
+small, decoupled services focused on a specific business domain. As for what federated schema is, if you don't know
+already, I'll get to that, and they used Lambda for this. So they're using Lambda, which is the serverless compute in AWS, the ability to run code without servers, and now we get to the best practice and you're gonna see several of these slides throughout the talk. They have the
+Well-Architected logo up there and the format might be a little odd. This, what it is is a snapshot
+of the Well-Architected Tool which is in the AWS console, and the way best practices
+are shown in the framework is there's a question that represents a set of best practices. Then each of those check
+boxes are a best practice. So in this case, the best
+practices we're interested in is, how do you segment your workload, and then how do you focus those segments on specific business use cases,
+on specific business needs? And you can see I circled
+microservices there. You don't have to use microservices to achieve these best practices, but that is what IMDb did,
+so therefore it's circled. So these are the first two
+best practices to look at, and to look at that, we're
+gonna ask a question. You're on IMDb and you type in Jackie Chan and what it does is runs a query is, what is the top four shows
+that Jackie Chan is known for? Now, Jackie has an id. Every
+entity in IMDb has an id. This nm is a name entity and
+that's his entity there, 329, and so you as a user
+don't care about that, but you've just asked what
+is Jackie Chan known for, and this is the query
+that the client creates. It's GraphQL. GraphQL is a query language that lets you set up queries
+like this where you can, using a schema, request information and get all that information back at once. Like with REST, you'd probably
+have to make four calls. Here, you just do it all at once, and what is being requested here? You could see the name id on
+top and so that's Jackie Chan, and I wanna know the first four
+things that he's known for, and of those, when you
+gimme those four things, I wanna know the title text,
+I wanna know the release date, I wanna know the aggregated ratings, and I want an image URL
+so I could show an image. Okay, so that's the query
+that the front end is making, and this is where the microservices and the federated schema come into play. This request is actually sent to four different microservices, each fronted by an AWS
+Lambda in this case. So the first one is find
+me the top four things Jackie Chan's known for and
+it's gonna return the id of those four things,
+which begins with tt. Now, that first service doesn't know about release date or rating. It only knows about top four. So the next thing is the title
+text and the release date. That's metadata, so that's
+gonna go to that other service, and that service only knows metadata, so it's gonna return the metadata. The third one is the ratings, so that one only knows ratings. It's gonna return the aggregate rating, and the last one only knows image URLs, so it's gonna return the image URLs, and the reason it's a federated schema is 'cause even though the
+request is one big schema, each of these little
+microservices only knows its own piece to the schema. So when the front end gets
+that response to that request, it's gonna show it to the user like this. You could see Jackie Chan and the four things he's known for. You could see the release date. You could see the aggregated rating, and there's only one thing wrong here. "Kung Fu Panda" is
+missing. How could that be? I don't know and I really
+have a bone to pick with the IMDb team. I'll let them know
+about it after the talk. All right, so now let's
+get into architecture. Okay, so this is what the
+IMDb architecture looks like. It's a gateway-based architecture. So they redesigned their gateway into the serverless architecture so that it can call all of
+these backend microservices that each know their own
+little piece of the elephant. So here's those backend microservices. They're just sitting
+there fronted by Lambda. Some of them are completely serverless. Many of the newer ones are. Some of them, if there
+was like a legacy service or something that they
+just wanted to update, they'll front it with a Lambda
+so that they could be called, and the Lambda's
+responsible shaping the data so that the GraphQL query
+response is in the right format. Okay, over here, okay, so now
+each of those microservices only knows its piece of
+the schema and the gateway, that which a gateway is the
+front end that the client calls, the gateway needs to
+know the entire schema. You need a schema manager, so here it is. When you create a new
+service or update a service, it publishes its little
+piece of the schema to the schema manager, which
+publishes it into an S3 bucket. So the gateway has a
+full view of the schema, and here's the API for,
+the front end for the API. There's a Application Load
+Balancer. There's a firewall. There's a content delivery network piece and I'm gonna talk more about that later, so I'm gonna put that on hold, and this is when we diverge a little bit and talk about culture at Amazon. I think many of you already
+heard the two-pizza team. A two-pizza team is a
+team that could be fed with approximately two pizzas, so not too big, not too small. It's a cross-functional team,
+but it's all about ownership. The two-pizza team owns the service or services they're responsible for, from design to
+implementation to deployment to operation and the business around it. So there might be a
+product manager on the team that's a business expert
+working with developers there. So the nice thing about
+this with this model is that this model of creating
+these federated microservices is it moved the business
+logic for those services so that the team could
+own that business logic. So the team that owns the
+metadata is expert on metadata. The team that owns the
+ratings is expert on ratings, and this was organizationally
+a positive thing for the org, and what happened was, so they have something called on-call. They have a rotating on-call rotation where if there's any
+problem in production, they own in production,
+they have to respond to it, and the senior dev told
+me they were having ridiculously smooth on-calls after this and that's because the
+organizational change aligned with the technology change meant that the teams that
+owned the business domain and the service were available
+whenever a problem occurred, so that a problem occurred
+in the aggregate service, the rating aggregate service, that team would be the one called and they'd understand what's going on, and it also helped that
+going to serverless helped with scalability. All right, so the next best
+practices we're gonna look at is using automation when
+obtaining or scaling resources and obtaining resources upon
+detection that you need them, so detecting that you need new resources and obtaining them automatically. To do that, I'm gonna
+do a little divergence, just talk about Lambda. This is not an IMDb architecture. This is just a generic
+serverless architecture 'cause I wanna talk about Lambda. As I said, Lambda is a way
+to run code without a server, but the way it works is you
+deploy a Lambda instance with some code, and then
+for every request it gets, it spins up, invokes a Lambda instance. So here you can see six requests.
+Six Lambdas get spun up. They process the requests and
+if there's no more requests, they spin down. So it is automatically scaling. It'll scale up and down based on the number of requests you get, and this is the actual metrics
+for Lambda invocations. So these are the number
+of Lambdas being invoked per minute by IMDb and this
+could also be translated to requests per minute
+because each request, each Lambda invocation
+represents a single request. Note it peaks at 800,000
+requests per minute, which I also converted
+to requests per second if you want to know that, and it also goes up and down quite a bit. It's quite cyclical. I don't know, who saw my
+Twitter post about this? This is one of the things I
+posted on Twitter and said, "Which service is this?" Well, it's IMDb. Now you
+know, and so two things here. One is Lambda just scales, right? Like, every request it
+gets, it spins up a Lambda. It's auto-scaling, but that isn't quite the end of the story. The thing about Lambda is
+that with certain run times, when spinning up a new
+Lambda, it could take, there's some latency involved. That's called cold start. IMDb didn't want any cold starts, so they used something called
+provisioned concurrency. With provisioned concurrency, you specify a number of
+Lambdas you wanna keep warm and these warm Lambdas
+won't have cold start, and you pay for that,
+but you pay a fraction of what it'll cost to
+actually run the Lambda. So if they specified a
+flat number like 800,000, that'd be wasteful, right? 'Cause they're not always running 800,000. So what you see here is the gray line, this is not IMDb, this is a schematic, but the gray line represents
+a number of Lambda invocations and the orange stepwise line is the provisioned concurrency scaling up and then scaling down. So not only the number of
+Lambdas scale up and down, but the provisioned
+concurrency scales up and down, which brings us to our next best practice. So we're gonna talk about using highly available public endpoints. So that's that front
+end I was talking about, that actual API endpoint, and so I'm gonna zoom in on it here. So zooming in on that
+front end of that gateway, we can see a couple of things. Okay, they're using the web
+application firewall, or WAF. All right, so WAF is a
+firewall product offered by AWS and they really loved it. They said that the initial
+turn on was exceedingly simple, and as soon as they
+implemented it, it removed, they said no more high-sev issues. I'll just say vastly reduced
+their high-sev issues, and they didn't have to put the manual network blocks in place. So what was causing these high-sev issues? Robots, either malicious
+or non-malicious robots. That's constantly fighting
+against the robots and so WAF was a solution
+for them that really worked. There's also a CDN here, a
+content delivery network, called CloudFront, and
+what CloudFront does is you might know that AWS is in 30 regions, but we have over 410 edge locations. So using CloudFront, your users
+request, someone using IMDb, their request will be routed
+to one of those edge locations closer to them than a region possibly. That puts it right on the
+AWS backbone right away, gets better performance, and also being a content delivery network, it offers caching, so there's
+caching at that edge location, so if it could serve
+from the cache, it will, and finally, the ALB, the
+Application Load Balancer. That is the actual front end
+that's connected to the Lambda that's running the gateway. All right, that was our first example. I hope you enjoyed it,
+and we got a few more. So let's talk about Global Ops Robotics and how they protect workloads with a cell-based architecture. So to understand what
+Global Ops Robotics is, you have to understand a little bit about Amazon's supply chain. So as a user, you have this ordering layer that you're seeing, like I see something, I order it, it shows up on my door, but under that is a supply chain layer. There's the warehouse management piece, which is things going
+on inside the warehouse, or fulfillment center as we
+call them, as Amazon calls them, middle mile, which is moving things to the warehouse or between
+them, and last mile, which is moving things to your front door. Well, Ops Robotics is the
+warehouse management piece. That's what they call it,
+and with Ops Robotics, all of these are about scale. I wanna talk about the scale of warehouse management at Amazon. There's over 500 of these
+warehouses, fulfillment centers. They could be up to a
+million square feet big and there's millions of
+items per fulfillment center. Now, the Ops Robotics team
+that runs warehouse management has multiple services. So what kind of services? Well, they need services that understand when material is received,
+where it needs to go, stow, picking it when someone orders it, packing it and shipping it, and so all of these are services that are part of Global Ops Robotics, and behind these services
+are multiple microservices. So you have hundreds, maybe even 1,000
+microservices operating here, and the reliability pillar best practice we're gonna talk about is
+using bulkhead architectures. Bulkhead architectures mean
+setting up compartmentalization that you have multiple
+of these compartments, and if a failure occurs in one, it can't affect the others, and we're doing this with
+cell-based architecture. Again, this is not Global Ops Robotics. This is not warehouse managers. This is a generic slide on
+cell-based architectures. With cell-based architectures
+what we're doing is stamping out a complete
+stack multiple times isolated from each other, they don't share data with each other, and putting a thin routing layer on top. That routing layer
+deterministically assigns clients, I put, see clients in quotes, to a cell. So a given client, and when
+I say clients in quotes, you could actually, it could be user ID. It could be whatever. It could be several different things, some partition key to each cell so that you have a
+certain number of clients going to each cell, and if
+there's a failure in one cell, yes, the clients in that
+cell might be affected, but the clients in the other cells are isolated from the failure. Now, in their case, they're
+fulfillment centers. They're the warehouses and their client ID would be the fulfillment center ID. Each fulfillment center
+does not share data with the other fulfillment centers. It's a discreet data set for them only. So it makes sense that
+when we're just using, deciding about that routing layer, how you assign requests to cells, we do it by fulfillment center. Each fulfillment center is assigned a cell and all their requests go to their cell. They might be sharing with
+other fulfillment centers, but their requests always
+go to the same cell. So in this case you could
+see three fulfillment centers sitting near each other
+and each one assigned to a different cell, and this, the thing they wanted to establish was this geographic redundancy. So you notice that these three
+are kinda clustered together and they're serving this
+area of the United States, Ohio, Indiana, I think that is. So what happens if there's a failure? It's contained to that cell, Cell2. That FC might be offline, but there's still two more
+FCs in that geographic region and the trucks continue to roll and people get their products still. Now, when they're deploying these cells, they're actually using
+separate AWS accounts for each cell and they're using pipelines, pipelines to deploy the infrastructure, pipelines to deploy the code. So the first deployment
+goes to a pre-prod cell that's not really used in production but used for testing
+and before it rolls out, and then subsequently it gets deployed to each of the three other cells each in a separate AWS account, and there's also another account that's a centralized repository
+of all the logs and traces that the other cells are exporting to so you can get an all-up
+view of the system 'cause you don't wanna
+look at it cell by cell, or you do wanna look at
+it cell by cell sometimes, but you also wanna look at it all up, so that's an aggregation point where all the logs and
+traces could be aggregated. Now here's what it looks like. Each of the green boxes is a cell. Each one of the yellow
+circles with a letter in it is a fulfillment center and
+they each have their own ID. They're lettered in this case, and this is a cellular architecture. We're showing Service 1 and Service 2. Service 2 depends on Service 1. Service 1 is an upstream
+dependency of Service 2, and this is cellular wise. This is a cell-based architecture. What they found the problem here is, if there's a failure in
+cell one in Service 1, the way this is architected, there are negative impacts
+on the cells and services in Service 2 because of the dependencies, how each fulfillment center
+can be swapping cells based on the service. So what they wanted to
+do was establish this. Each fulfillment center is
+assigned to a given cell and it's only in that cell for
+every service in the stack, and now if there's a
+failure, like we saw before, it's not the greatest thing in
+the world to have a failure, but it's constrained and those
+other fulfillment centers continue to operate normally, and the way they did this
+was they designed a system to assign fulfillment centers to cells. They did this using DynamoDB, which is our NoSQL, very fast database, and this had two effects, aligning fulfillment centers to a cell but also allowing them to
+load balance between cells 'cause fulfillment centers
+are different sizes. So you can't just put three per cell or whatever like I did here. So this system also runs
+various rules and heuristic to balance out the cell so no cell is particularly bigger than another one, and that's our cellular architecture. Now I wanna talk about Amazon Relay and how they use multi-region
+to keep their trucks moving. So trucks are involved here. So we're still in the supply chain world. So we talked about warehouse management. Now we're gonna talk about
+middle mile management. Spoiler alert, I do not have
+an example for last mile. So if you're expecting
+that, come back next year. I'll have one next year. All right, so this is about middle mile. So middle mile is the semi
+trucks you see on the road with the Amazon Prime symbol on it. This is about moving stuff into warehouses and between warehouses and making sure that all the millions
+and millions of items in Amazon's inventory
+are in the right place to be able to serve customers. Now, this example I'm gonna show you focuses on North America, but middle mile exists around the world, and I'm gonna talk about the Relay app. The Relay app is an
+app for iOS and Android that the truckers use. So if you could think of middle mile as having this really sophisticated model that determines where stuff should be and when it should be there
+all over United States, this is how that model's realized. That model is just
+something in a computer. It's meaningless unless
+you can get trucks rolling and moving stuff around. This is the realization of that model. This is the model that truck drivers use to know where to go, when to go there, what to pick up, where to take it, and you could download this
+app today on your phone. I did it and it's pretty useless unless you're a truck driver. So truck drivers in the audience,
+feel free to download it, but everybody else. (laughing) Okay, so best practice
+I'm gonna talk about is using highly available endpoints. All right, so we talked
+about that already, right? Highly available endpoints. Oh, we talked about that
+when we talked about the IMDb gateway. Well, same thing here. Amazon Relay being an
+app has a gateway too, again, a single point of
+entry that the app is, the iOS app and the Android
+app are both calling into, and just like IMDb, there's a gateway and it's fronting
+several backend services. In this case, they call them modules. So I'm gonna call them the modules too. So there you can see the modules there. The modules are mostly serverless consisting of Lambda and
+DynamoDB, and there's the gateway. So unlike IMDb, they're not
+using Application Load Balancer. They're using API Gateway. API Gateway is a highly
+scalable managed API and you can see there's
+multiple API Gateways there 'cause the way this
+works is you could use, well, see, you could use Route
+53, which is not shown there, which is DNS system, to
+create a domain name, and then based on path-based routing, like what's after the slash
+and what's after domain name, it goes to a different API Gateway and then API Gateway fronts
+one of these backend modules, and you can also see there's also some authentication logic in there too. So that's important and it's calling into the Amazon authentication
+system to do that. Now, what they really
+liked about this model when they went to it is
+there's no shared ownership of code or infrastructure
+between the gateway and the backend modules. So they could deploy independently. They could make changes independently as long as they don't break any contracts and it gave them a lot more flexibility. Now, the other best
+practice we wanna look into with these two teams are
+to deploy the workload to multiple locations and
+choose the appropriate locations for those deployments,
+and to talk about this, we need to go back to December of 2021. As many of you know, in
+us-east-1 in December 2021, there was an event that
+caused several services to experience service issues, and one of the services affected was SNS, or Simple Notification Service, and Relay app does depend on that and you can see the effect. All right, so some truck drivers could not get their load assignments. They couldn't get the
+assignment of where to go and what to pick up and
+you can see it wasn't 100%. It went up to about 30% at its peak and it was for just some
+limited period of time, but that's still an
+impact on our customers and Amazon does not wanna
+have that kind of impact. So what could you do? You could redesign to either not use SNS or make SNS a soft dependency or you could take the approach
+they did and use spares. Spares is where you set up
+multiple instances of a resource so if one of them is not
+working, you could use the other. Now, in this case, SNS
+is a regional service, so in order to be able to
+use a different SNS service, they had to go to another region and I'll show you how they did that, but first I gotta introduce you to another cultural thing at Amazon, the COE, or correction of error event. So when something like this happens where 30% of the truck drivers are not able to get
+their load assignments, that's customer impacting,
+the team does a COE. A COE is a deep dive as
+to what caused the issue and how it could be avoided. It's blameless. It's not
+there to point fingers. It's not there to find
+the culprit as a person. It's there to find the
+actual cause of the issue and to come up with solutions, actions so that issues like this, an issue like this or related to this can never happen again, and here are some of the
+ones they came up with and the ones I'm gonna talk about. I'm gonna talk about how they did a app, a review of the resiliency
+of the Relay app and how they then deployed
+to multiple regions to enact what was found in that review. So in that review, their primary goal there was to preserve physical operational continuity, even if the experience is degraded. So what do I mean by degraded?
+Let's talk about that. So the three steps they did
+was they had to articulate the minimum critical workflow. So which parts of this have
+to work, while other parts, if they're not working, it's not optimal, but we could still keep
+the trucks rolling. Two, design solutions
+that those critical parts remain operational, and three, adapt the system so that when the parts that are not so critical stop working, the system could still operate. That's what we mean by
+the degraded experience. It still works, the critical
+functions are there, and they just, as I said before, they went with a multi-region approach. So they were already
+deployed in us-east-1, and fun fact, they'd been running out of what was the predecessor to
+us-east-1 before AWS existed. Amazon had data centers there and that's where they ran out of, but they also decided to deploy
+to us-west-2 over in Oregon. Amazon has, AWS has 30
+regions all over the world. You could see those are
+the ones in North America, and the solution looked like this. So this is the backend modules, okay? So the backend modules weren't
+as necessarily as simple as a Lambda and a DynamoDB, but the thing about them is
+that they all were fronted by Lambda so they could
+integrate with the API Gateway and they all persisted
+their important data, the data that needed to
+be shared, in DynamoDB, and so in this case, you
+could see they deployed to us-east-1 and us-west-2, and the nice thing about DynamoDB, it has something called global tables. With DynamoDB global tables, you can deploy a table in multiple regions and write to any of those tables and those writes will be
+replicated to the other regions. So they found that just
+to be an easy solution just to put right in there. Now, each of these modules
+is owned by a two-pizza team or a two-pizza team might
+own more than one of them, but they're all owned by a two-pizza team, and the two-pizza teams, based
+on the criticality analysis, decided whether they were
+gonna go multi-region or not. Not all of them did
+because you have to pick where to put your resources
+right, where to invest. Now, the gateway part of
+it, the part in front there, also was deployed to two regions. You could see that API Gateway which is representing the gateway going to us-east-1 and us-west-2, and now we put Route 53 in front of it. So Route 53 is our DNS system. This is called an
+active/active architecture. What it means is that each
+of the two regions here actively receive requests. A given request doesn't
+go to both regions. It goes to one or the other. How does it decide which one to go to? Well, Route 53 offers
+several routing policies. In this case, they decided
+to use latency routing. So Route 53, based on past experience, will determine for a given request which one's gonna give the lowest latency and route the request there. There are other routing policies. There's weighted routing.
+There's geolocation routing. So it routes it based on
+where the request came from. So there's all kinds of different options. This team, Relay, went with
+the latency-based routing, and so this is a request to us-east-1 and you can see the
+module called module A. They are a module that
+did go multi-region. So the request goes to
+their us-east-1 version and then module B there
+did not go multi-region, so the request also goes to us-east-1. However, requests that went to us-west-2, this is where it gets interesting, for module A, it's gonna go to us-west-2, but module B, a less critical module, didn't set up anything in us-west-2, so it's still gonna receive
+its request in us-east-1, and we'll see how that
+just plays out later in various failure scenarios. Yeah, so that's how it works. All right, so the next best practice is to implement graceful degradation to turn hard dependencies
+into soft dependencies. Now, I talked a little bit about what graceful degradation is. It's about maintaining the
+critical parts of your workload while the less critical ones
+might fail, but overall, the end users still can do
+the things they need to do. So this is that analysis they did when they wrote up that report. From going left to right in order, these are the things that a
+truck, a delivery goes through, the various business
+domain specific things that middle mile goes through,
+and what the red lines, the red bars represent are criticality. So by creating a graph like this, they're able to identify
+which modules are critical and which ones are less critical. So for instance, it's
+critical that they be able to complete a delivery. It's critical that you
+could assign drivers to pick up their loads. Then what's not critical?
+What can we do without? Well, the app provides
+turn-by-turn navigation. So if that goes out, again, not optimal, but there's other GPS systems. The app also has this long-term booking where you could book next week's loads. Well, that's important, but
+it might not be important now while there's some kind of issue going on, and eventually, whatever
+the issue is going on, it's gonna be solved and
+then you could assign next week's loads. So I really like the subtitle
+here, "The trucks keep moving, no products backed up on the docks." That's what they told me,
+"The trucks keep moving, no products backed up on the docks," and that's what they're aiming for, and so the next best practice we're gonna look at is fail over. Okay, being able to fail
+over to healthy resources. So what happens if they have another event where they want to fail out of us-east-1 and be purely in us-west-2? So in this case, using the routing policy, they could turn off all
+traffic to us-east-1, send all the traffic to us-west-2,
+and this is what happens. So, I'm sorry. I'm gonna actually go back. So notice that for module A, it's gonna use the version of
+module A that's in us-west-2, and that's a critical module and it's gonna continue operating. What happens to module B? Remember, module B never
+set up a us-west-2 version. So one of two things is
+probably gonna happen. Either one, the request is gonna, well, the request is gonna go to
+us-east-1 where we failed out of, but we failed outta there
+because we're seeing some issue that we think we wanna fail
+out for but doesn't mean, the region's never hard down. That doesn't happen. So the service in us-east-1
+still might respond and that's a best-case scenario, but worst-case scenario,
+it doesn't respond, and because of the way system's designed and graceful degradation, it's again a less than optimal experience but an experience that allows the users to do their critical functions, which is to keep the trucks moving, nothing backed up on the docks, and the last one we're gonna look at is about testing your
+disaster recovery strategy 'cause you could have a
+disaster recovery strategy, but if you don't test it,
+you don't know if it works, and so they ran a game day, a
+game day basically to exercise this disaster recovery strategy. They wanna be prepared for peak 2022. Peak at Amazon represents
+the holiday season. I think we're already
+in it with Black Friday and Cyber Monday already going on. So what they did was they initiated a fail over in production. They acted as if they needed
+to get out of us-east-1. They didn't need to, but
+they acted as if they did, got out of us-east-1, failed over, sent all the traffic to us-west-2
+and this is what happened. You notice that the increase
+in traffic in us-west-2 is way over 100%. If it was evenly balanced, you'd expect it to be 100% increase, but it was more than 100% increase. So this represents that most
+of the traffic's still going to us-east-1 and that's
+probably just the nature of population density
+in the United States. The other thing I forgot to mention is when they went to the active/active model, truck drivers in the West started seeing much lower latencies 'cause their requests were being sent to the West region. Also, when they failed over, they actually were able to
+successfully run the service without any significant customer impact or failures, et cetera. It took 'em about 10 minutes
+to execute the fail over. They did see an increase
+in latency and it was, they're working on it and
+they're still re-engineering to try to get that down, but
+the increase in latency still, again, maybe less than optimal, but enabled everyone still able to do the critical functions,
+kept the trucks rolling, nothing backing up on the docks. All right, our next example is the Classification and Policies Platform and how they use shuffle
+sharding to limit blast radius. So basically similar to
+before, similar to before, blast radius is about
+containing the failure to an area, to a cell,
+in this case, a shard, so that it doesn't affect
+other parts of the system, and so what is Classification
+and Policy Platform? Well, they're part of the catalog service and the catalog at Amazon is massive, millions and millions of
+items in the Amazon catalog, and every single one of those
+items needs to be classified. So what do I mean by classified? Well, there's 50 different
+classification programs. It could be as simple as what type is it. Is it clothing? Is it electronics? It could be what kinda
+taxes should be applied. Can this thing be put on an
+airplane? Is it hazardous? Is it something that we can
+sell in a certain state? Is it something that
+children are allowed to use? I mean, there's all kinds
+of classification going on, 50 of these programs which are actually not necessarily part of this team. This team runs the platform to host all these classification programs and applying classification
+to all the millions and millions of things
+in the Amazon catalog, and why is this important? Well, I kinda gave this away
+a little bit because I said, all right, so here's an item that I, living in Washington, can buy, but when John living in California
+goes to buy it, it says, "No, you can't have it
+because California restricts this item or says you can't have it," and that's an example of the
+classification was applied to the item and the
+ordering service was able to read that classification and say, "No, I cannot sell it to
+people in California," and again, it's about scale. So there's 50 programs across Amazon doing this classification
+that are using this platform. There's over 10,000 machine
+learning models being applied, 100,000 rules, so that's
+like if this, then that, so less sophisticated
+than machine learning but still important, and there's 100 model updates every day. So of these 10,000
+machine learning models, 100 are being updated every day. Millions of products are
+being updated per hour. So this is what it looks like. All right, so this is, if you're dozing off,
+time to pay attention 'cause this is where it
+gets a little complicated. I wanna make it simple, all right? So you have the millions of items that need to be classified
+and we're breaking them up into batches of about 200 each, but apparently it can vary quite a bit. So that's not so important. What's important is that
+we need to apply about 100, not all 10,000 machine learning models, but about 100 machine learning models to every item coming in and we do that in batches of 30 models. So that means there's gonna
+be three requests made, three batches of 30. Why 30? I'll get to that in a minute. So these requests to process these items for 30 machine learning
+models go to a classifier. In this case, it's an Elastic
+Container Service service that's running machine learning
+models against these items, and what it does is it pulls
+the models down from S3. So it says, "Oh, these
+items need these 30 models. I'm gonna pull these 30
+models down and run them," and it can cache the
+models and that's important 'cause we want to actually
+try to use workers, these are all workers, these classifiers, that already have those models cached. So pulling the models down and swapping 'em out is inefficient, and then after it does the classification, it writes it to DynamoDB. So this is the logical view. Let me show you the architectural view. Oh, wait, I promised to tell
+you why 30 is important. Well, two reasons. They found that that's a nice size where they could take 30 related models, so like one model might actually use the output of another one. So they're sort of related in some way, but the other reason is about that caching I was talking about. There's only so many
+models that these services can keep in cache. So if you told it to
+be running 100 models, it can't possibly keep those all in cache, so eliminating to 30, again, allows you to avoid the swapping out. Remember, trying to
+avoid that swapping out. So this is more an architectural view. So taking one of those requests, which again is for 30 models, goes through Kinesis where
+Kinesis reads the metadata on the request and decides what
+models are gonna be applied, and this is important. This is the part where it
+sends it to an AWS Lambda which is acting as a router. It's the AWS Lambda that says, "Oh, you need these 30 models? I'm gonna send you to this worker," and it puts it on an SQS
+queue where then the workers, the ECS services, read it off the queue. So in other words, there's
+60 of these workers. The workers are dumb. They'll process whatever you give them. You say, you tell 'em to process these 30 machine learning models. They'll check is in cache. Yeah, all right, I'll do it. Is not in cache. All
+right, I'll pull it down. They don't care, so all the
+smarts are in that Lambda. That Lambda is attempting to keep each of these 30 model requests in the same worker or workers that have processed those 30
+before to avoid the swapping, and so we're gonna talk about a best practice we talked about about using these bulkhead architectures, only we're not talking
+about cells in this case. We're gonna be talking about shards and specifically shuffle sharding. So I'm gonna take about three slides to explain shuffle sharding. Now, warning, shuffle sharding at this, I've seen one-hour
+talks at this conference to explain shuffle sharding and I'm gonna do it in three slides. So hopefully I land the message.
+If I don't, don't sweat it. I think you can still follow along. All right, so this is just an example of some service that has multiple workers. They could be EC2 instances, or like in the case of CPP,
+they could be ECS services, and on top, those different
+symbols are different clients or different callers of the service and there's no sharding going on here, and the thing about no
+sharding is that if I have, one of those clients does
+what we call a poison pill. It makes either a malformed
+request, a corrupt request, maybe even a malicious request, something that kills the service,
+the process running on it. Maybe it tickles a bug
+that we didn't know we had. It takes down that worker. Okay, no problem. We have
+load balancing, right? That worker's down.
+Let's try another worker. Oh, it takes that one down. It takes the next one down too and eventually will work its
+way through all the workers until there are no workers
+and everybody's outta luck. All the clients are now red. Nobody's able to call the service. That's no sharding. So let's
+introduce sharding, okay? This is sharding. It's just taking a resource unlike cells. Cells were entire stack. This is just taking some resource layer and dividing into chunks,
+in this case, chunks of two. Shards of two workers each, and in this case, the cat does its thing, kills its two workers. It and the dog are unhappy,
+but everybody else is happy. That's the bulkhead architecture at work. It contained the failure to that shard and you could see number
+of customers impacted is customers, 8, divided by shards, 4. 2 customers impacted.
+It checks out, right? Okay, now shuffle sharding. This is where it gets interesting. Each client in this case is assigned its own unique pair of two workers, but they can be sharing workers. So what do I mean by this? If you look at the bishop here, bishop has these two workers. That's the bishop shard. The
+rook has these two workers. They are two unique pairs,
+they're not the same pair, but they're sharing a worker. Same thing here. The cat has these two workers, but again, it has its own
+unique pair of workers. None of the clients, none
+of the eight clients here shares the same two. They each share with other shards, but none of them share the
+same two with another client. So in this case, what happens
+is the cat does its thing, kills its two workers. It's down, but even though the rook was sharing one worker with it, it still has a healthy worker. It has its own unique pair of workers. Same thing with the
+bishop and everybody else. So the number of customers impacted is customers divided by combinations, which in this case is 8 customers, and I made 8 shuffle shards, so only 1 customer was affected, which means that if at scale, our scope of impact is
+12 1/2 percent or 1/8, meaning that if we had 800
+clients, 100 would be impacted, but it gets better than
+this 'cause actually, I can make more than 8
+shuffle shards out of this. With 8 workers and
+making combinations of 2, some of you might recognize
+this math, it's 8 choose 2, and you can actually make 28 combinations, so the actual scope of
+impact is much less, and if you don't know that
+math, don't worry about it. This is how many combinations
+of unique sets of 2 workers you can make given 8, and if
+you really wanna go crazy, there's Route 53, over 2,000
+workers making shards of 4. Your scope of impact is 1 in 730 billion. The math gets kinda crazy at that point, but getting back to CPP. All right, so CPP has its workers. Its workers are tasked with
+processing these workloads of 30 machine learning models at a time. There's over 10,000
+machine learning models and we need to process
+them in batches of 30. So that's 400 total groupings,
+400 shards we're gonna need, because a given shard
+we want to be processing given machine learning models
+and not swapping them out. So we're gonna need 400 shards. So if there are 60 workers,
+we can do shuffle sharding. The blue shard, the green
+shard, and the orange shard, can you see they share
+workers with each other, but it's each one's a unique combination of three in this case. So what happens if we have
+that poison pill incident where the orange shard goes down because those 30 models
+were somehow corrupt and something happens and
+that shard is poisoned? If we had no shuffle sharding,
+just standard sharding, we took our 400 machine learning groups and distributed 'em over 20 shards, 'cause if we take 60
+divided by 3, that's 20, then 20 of those machine learning
+groups would be affected, but if we use shuffle sharding,
+we can create 400 shards. So 400 groups of machine
+learning models, 400 shards. One of them gets poisoned,
+then only that one is affected, and again, to remind you, it's the same case as we saw with the cat. It's because each one
+has its own unique group of three workers, and just to go crazy, actually you could create
+a lot more than 400 shards. 60 choose 3 is over 34,000. All right, and to bring this home, the other thing they're doing is to implement loosely coupled dependencies. Let me show you how that
+works. So remember the router? All the smarts are in that Lambda there. It decides which shard. So remember, before I said worker. The Lambda actually decides which shard it's gonna send the request to. Remember, it's putting
+things on an SQS queue which are then being
+picked up by the worker. So that Lambda is actually
+monitoring those queues. It's actually looking at the
+age of the oldest message. If the age of the oldest
+message is pretty old, it probably means that queue
+is pretty slow and congested. So it's actually using back-pressure to decide which worker inside
+a shard it's gonna call. So as a shard of three, it can choose the worker
+that's the least busy. So you can see there the
+middle one's the least busy so that's the one it chooses. So that Lambda is not just a router. It's also a load balancer
+using back-pressure to route along those workers in a shard. Now, what if the load is too high? What if there's a spike
+and all of the workers, all three workers in the
+shard are overloaded? This is where load shedding comes in. It'll send the request
+to a load shedding queue and come back to it after 15 minutes. Why 15 minutes? Well, those
+ECS services are auto-scaling. They're based on CPU levels. So if there really is a spike going on, those ECS services are
+gonna see elevated CPU and they're gonna scale out. So 15 minutes later, we'll come back, reprocess that request and
+it should work at that point. All right, this is actually
+our last example of the day. It's about Amazon Search and how they're using chaos engineering to be ready for Prime Day, any day. Amazon Search, I think you've all seen it. You have probably all
+seen the search bar here. Why don't we search for chaos engineering and see what we get? All right, over 1,000 results. Okay, the top result there is
+the "Chaos Engineering" book by Casey and Nora. That's sort of the
+chaos engineering bible. So that's a good result. I also want you to notice the SLO, the service level objective
+book there with the doggy on it 'cause that's gonna be important too, and we're talking about scale here. So we're talking about
+millions of products. We're talking about 300
+million active users. We're talking about last Prime Day, 84,000 requests per second
+peak during Prime Day. Again, the whole point is to show you the scale of these services
+and how they're using AWS to meet the need of that scale, and Search, like everything
+else I showed you, consists multiple backend services and using multiple AWS resources, and what I really like
+about the Search team is they have their own resilience team. So they have your builtin
+team dedicated to resilience doing operational resilience and site reliability engineering for the Search org
+across those 40 services, and their main goal, their main motto is, "We test, improve, and
+drive the resilience of Amazon Search services." How do they do that? They do that by promoting
+resilience initiatives, helping with load testing
+and helping to promote and orchestrate chaos engineering, and that's the part I want to talk about. So the best practice in this
+case is use chaos engineering to test your workload,
+to test your resilience. So what is chaos engineering? I'm gonna read a slide for you. "Chaos engineering is the
+discipline of experimenting on a system in order to build confidence in the system's capability to withstand turbulent conditions in production." Turbulent conditions in production. I think we could all identify with that, unusual user activity, network issues, infrastructure issues, bad deployments. I mean, it's a mess out there and we need to be resilient to that. So the thing to know
+about chaos engineering, it's not about creating chaos. It's about acknowledging the
+chaos that already exists and preparing for it and mitigating it and avoiding the impact of that chaos. So that's the way you gotta be thinking about chaos engineering. So how do you do chaos engineering? This is a one-slide summary of
+how to do chaos engineering. Chaos engineering is
+ultimately at its core a scientific method. This is a circular cycle, but I'm gonna start with steady state. What the heck is steady state? Steady state means your
+workload, the workload under test is operating within design parameters, and you have to be able to measure that. You have to be able to
+assign metrics to say what does it mean to operate
+within design parameters. Then is the hypothesis. The hypothesis is if
+some bad thing happens, and you specify the bad thing,
+if an EC2 instance dies, if an Availability Zone is not available, if a network link goes
+out, then my system, because I designed it that way,
+will maintain steady state. It will stay within those
+operational parameters. Now, if you didn't design it that way, don't do the chaos engineering, but if you designed it that
+way, you're testing that. So you run the experiment.
+You simulate that EC2 failure. You simulate that network link outage, and then you validate. You verify was the hypothesis confirmed. If the hypothesis was
+not confirmed, oh, okay. We experienced some sort of outage. We went outside of the
+established parameters. We did not maintain steady
+state. You need to improve. You improve by redesigning, applying the best practices
+in the reliability pillar, and then you test it again. You run the experiment again. Oh, now the hypothesis is confirmed and we're back to steady state and the whole thing
+repeats all over again. So service level objectives, I told you this would come
+up again, so here it is. This is an example
+service level objective. This is not one they actually use. They didn't really wanna share those, but they did want to
+share the format of it. So this is the format of it. In a 28-day trailing window,
+we'll see 99.9% of requests with a latency of less than one second. That's an example of a
+service level objective that might be used by the Search team, and with this service level objective, we've established something
+called the error budget. So what's the error budget? Well, 99.9% means that .1%
+can be greater than a second. So that's the start of our
+budget. That's our budget. However, with every request
+that exceeds one second, we're consuming that budget. Eventually that whole
+thing will be consumed and we'll be out of budget
+and you can actually look at how fast that budget's being burned. It's called the burn rate,
+but there's good news. There's a 28-day trailing window. So that means the oldest failures, the oldest requests that
+are greater than a second will eventually time out, will eventually age out, I should say, be older than 28 days and
+your budget replenishes. So that's the concept of the error budget. So they wanna do customer-obsessed
+chaos engineering. Chaos engineering is not
+for the engineering teams. It's not for the developers. It's so we can establish an
+experience for our customers that's gonna serve their needs, and they thought SLO was
+the best way to do that. It's very customer focused. It's focused on what
+the customers experience and so the experiments must
+stay within the error budget, and the stop conditions for an experiment, you must always have stop conditions on your chaos engineering experiments, are if the burn rate is too
+high on the error budget, the experiment stops. If the Andon cord is pulled. So the Andon cord goes back
+to the Toyota factories where they had a actual cord that anybody on the
+assembly line could pull if they saw a quality issue. Same thing here. Several people across the
+org can push this button and will stop and roll back
+any experiment at any time, and then the last thing is if there's something going
+on at this kind of event happening across Amazon IT,
+then that's not a good time to be doing your chaos engineering, so let's stop it and
+roll it back then too, and this is what they designed. We're here to talk about architecture. So on the right, I just wanna
+point out it's all centered on Fault Injection Simulator. Fault Injection Simulator is a AWS service that you can use to run chaos experiments and they did build around that. So on the far right,
+you can see ECS and EC2. That's the search services. Remember, there's 40-plus search services. So they're using Fault Injection Simulator to do chaos engineering on those services. What they built was the part on the left. That's the orchestration piece. Okay, now follow me
+down to the API Gateway in the lower left-hand corner. You can see two APIs. The first one's the Andon
+API and the Andon API establishes and configures
+the Andon cords. It does this by setting up
+various CloudWatch alarms that FIS will respond to. FIS has guardrails. Remember, I said a good experiment
+has to have a guardrail. So FIS has guardrails based on CloudWatch and so when someone pulls the Andon cord, it sets the CloudWatch alarm which then stops the FIS experiment. Okay, the other API is the run API. It has the ability to run an experiment, to schedule it for later, so there's a Lambda
+there that's a scheduler that can store schedules in DynamoDB, and it provides orchestration. You see on the right
+there those three Lambdas. So not only can you run the experiment, but it gives you the ability to do things before the experiment. What might you wanna do
+before an experiment? You might wanna send out an
+alert to various personnel. You might wanna stop any
+in-process deployments. So there's various
+things you might wanna do before an experiment, then
+run the experiment using FIS, and then do post-experiment operations, like for instance, cleaning things up, like especially some experiments, fault injections aren't self-correcting, so then you actually have
+to go in and correct them, so it might do something like that, and so FIS exists, it's a great service, so why did they build
+this orchestration piece? This is why. Number one is they're
+serving 40-plus teams. They wanna provide a single pane of glass, a consistent experience across those teams and make it super easy for
+them to do chaos engineering. They also wanted to add the
+ability to do scheduling, to be able to run it with deployments, which FIS can do, but remember, all these 40 services are using
+a pipeline system in common so that the orchestration is
+able to design around that and make it super easy to
+do, run it with deployments, provide it consistent guardrails. Remember, the SLOs are
+the important guardrail. So they actually have
+as part of their system storage of all the various SLOs so that it uses that
+during experimentation to provide a guardrail. The Andon cord functionality
+is not natively part of FIS, so they're providing that,
+and metrics and insights. Of course FIS emits metrics, but now they could roll up all the metrics from all 40 services and provide them as a single report to management about what kinda chaos
+engineering they're doing, and plus, in addition to FIS, they wanna be able to run
+other kinds of faults. Let's talk about that. Oh, well, no. When they're doing this
+all, why did they do it? Why did they build the orchestrator? 'Cause they wanna be ready
+for Prime Day, any day. All right, type of faults.
+First, there is the FIS faults. These are all supported by FIS, things like dropping ECS
+nodes, killing EC2 instances, injecting latency, doing very, SSM, or Systems Manager, lets you run any kind of automation you want, so you can maybe even simulate
+an Availability Zone outage, but what kind of faults are
+they doing that's not FIS? Well, there's load
+testing because, actually, internal to Amazon, across Amazon teams, is a very popular load test tool. They wanna be able to use that as part of their experimentation, and there's emergency levers. So emergency levers are things you can do as an operator of a service to
+help a service under duress. For service under duress,
+you pull the emergency lever and now the service can operate well, so for instance, blocking all robots, and ultimately, I'm running
+a little low on time, so I'm gonna speed
+through this, ultimately, they wanna provide a
+benefit to the end user. I just wanna point out that
+it's about higher availability, improved resiliency for the end customer, and so I wanna talk about
+graceful degradation and emergency levers. What does the emergency
+lever look like for Search? Well, one of their
+emergency levers is the, actually, they pull the lever and it causes graceful
+degradation on purpose. So this is what Search looks like, a full Search experience
+if I'm searching for Lego, but if I pull the emergency lever, it'll turn off non-critical services. So critical services like the image, the title, the price are all still there, but non-critical services like the reviews or the age range are not there. So for a system under
+duress, this can help, and they test this
+using chaos engineering. The hypothesis is the lever works and it enables Search
+to handle the stress. So they literally generate
+load during the test and then pull the lever and validate that, yes, the system's able
+to handle the duress. All right, so in summary, these are the five services I covered. This part's important to me. Okay, so to get all this information so I could share it with you,
+and I hope you enjoyed it, I had to work with many smart
+engineers on multiple teams, and the thing about smart engineers working on cool stuff is
+that they're really busy, and they took time out to spend with me to explain this to me so
+I could share it with you, so my deepest appreciation
+to those engineers and my awe at the
+engineering that they did. I really am impressed by it. Hopefully you're impressed by it too. Some resources. I won't
+spend too much time on here. You wanna take a snap of that real quick? Upcoming talks that might cover
+the things we talked about, and also, two of the examples I covered actually have some external resources you can check out if
+you want to learn more.

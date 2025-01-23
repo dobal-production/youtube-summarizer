@@ -1,0 +1,396 @@
+[Julien] Over the years,
+cloud has given builders the opportunity
+to create environments on a global scale. Automation profoundly changed how companies approach
+IT environments and new practices have emerged to support the growing needs
+for reliability. This session will dive deep
+in one architecture topic called cell-based architecture. It is an architecture presentation. Multiple services from AWS
+will be used together and you are expected
+to have an existing knowledge of the platform's core principles. All services will be introduced
+for further reference. So let's introduce
+Example Corporation. It's a fake company that operates
+control systems for office buildings. They work with large customers
+across the globe to better utilize resources and improve the comfort
+of their workers. The platform gathers data
+from elevators, air conditioning units,
+lights, mirrors, smoke detectors,
+and many other sensors and equipment. It provides monitoring, analytics,
+recommendations, alerting for facilities teams
+on the ground. Example Corporation customers
+have offices in different continents and the platform gives them
+a single-pane-of-glass view of their estate at every moment. The core team designs, implements, and operates
+the smart buildings platform. They adopted DevOps principles and the application is designed
+following cloud-native practices. The microservices architecture is hosted on Kubernetes
+orchestrated containers in Amazon Elastic Kubernetes Services
+or EKS. Interservice communication
+is managed through a service mesh with AWS App Mesh. Application data is stored
+in a NoSQL data store with Amazon DynamoDB. An event bus
+allows for loose coupling between the services
+with Amazon EventBridge. And finally, services
+have a caching layer with Amazon ElastiCache Redis. The application is deployed
+in multiple Availability Zones, with one active Region
+in the United States and one failover Region in Europe. AWS Well-Architected Reviews
+of the application are done regularly and while there's
+still some findings to be remediated, the core team is confident
+of the reliability of the platform. This confidence is based on the fact that the latest version
+of the application has been in production
+for about a year and has a good track record
+of uptime, with only minor incidents
+over that period. On January 2nd, now referred
+as "that day" by the team, the platform experienced
+a catastrophic event. Here is the summary of the events
+of that day. And all event times
+are logged in Paris, as is European Paris, time. The application works well and the team sees countries
+getting back to work after the New Year's break. Early in the European afternoon, the first customers
+from the US East Coast start their day,
+while European customers are back from lunch. At 1:37 P.M., the first alerts
+are raised on the platform. And the situation kept degrading
+until the US Region became unavailable at 2:15 P.M. The team operated a failover
+to the EU platform that came online by 3:12 P.M. Alerts started nearly immediately and the platform
+stopped functioning at 3:58 P.M. for all of the customers. The team then had
+to diagnose the program, deliver and deploy
+an emergency patch, and the platform was finally
+brought back online at 9:29 P.M. The team identified
+the actual root cause in the authorization service. A new feature activated
+for new customers on December 5th added authorization control
+at a campus level. It's a group of buildings. One of Example Corp's
+global customers activated these features
+for their US campuses. As an existing subscriber, the modification took effect
+on the next billing cycle, in this case on January 1st. But as it was New Year's Day, the users only connected
+on January 2nd. On activation,
+the flag of this feature was only set on the US users
+of the platform and the update was not made
+on the EU users. When a user would connect,
+this flag would trigger a different code pass
+for different users. But as for the same customer, there were users both
+with and without the flag. Having inconsistent values
+caused exceptions, which triggered a cache refresh
+from the database. There also was a faulty clause
+in the cache invalidation mechanism that would clear the entire cache instead of just the keys
+for this customer. As the EU and US customers
+were still active at that time, the situation kept happening over,
+and over, and over again. This generated a large volume
+of requests at the same time on the backend system, creating a surge that we call
+a "thundering herd problem." And the backend table
+started struggling with requests. The latency spiked
+and the services became unresponsive. The downstream services'
+circuit breakers initially managed the errors, but their own caches
+eventually expired and the fault cascaded
+to the entire platform. When the platform
+was activated in the backup Region, the same behavior happened again, as the same users were repeating
+the same pattern on the application. The patch addressed the cause by only expiring the impacted keys
+for one customer on the target commands. It fixed the symptoms
+while the root cause was still being determined,
+and eventually fixed the next day. Example Corp uses
+an active/passive pattern, with an active platform
+in the US and a failover passive platform
+in the EU. This pattern is traditionally chosen, as it is supported out of the box by most database engines
+through replication. On the top are the customers
+and on the bottom, the environments and data sources
+for these customers. When an event happens
+on the active environment, a failover happens
+and after some time, Example Corp's customers
+can keep using the application. The failover environment
+is initially passive so it has to be fully activated
+before serving traffic. While this pattern works,
+there are some drawbacks, specifically around failover
+and activation processes. If the failover environment
+is in pilot light mode, where most of the services
+are scaled down to a minimum, it takes time to scale up and be ready
+to accept the incoming load. If it is in warm standby,
+where the services are already scaled up
+and ready to serve traffic, the cost implications are important, as there is a lot of unutilized
+infrastructure running. And finally, the initial activation
+of the failover platform conveys a higher risk of failure,
+as it has not been used before. It is a concept called
+as "early failure rate." Another way to deploy the platform is to use an active/active pattern
+across Regions. In this model, Example Corp
+activates both environments, each serving 50% of customers. This model addresses
+the core concerns of the active/passive pattern, as both environments
+are scaled up and already active. and the amount of unused
+server capacity is limited. This requires most thought around the
+replication of the data, as the traditional
+all-on/all-off approaches and replication processes
+don't handle this model directly. In this model, when an environment experiences
+an operational event, the platform initiates a failover, but only if the customer
+is in this environment, and moves them
+to the second environment. The second environment being
+already active and serving traffic, these customers can resume
+their activity must faster than in the active/passive model. This environment
+will have more important load as it scales out
+to handle the entire traffic. There may be
+a temporary performance impact for the new customers but automation and capacity planning
+can mitigate this impact. In the previous example, the failures came
+from the execution environment, such as machine, database,
+network configuration, or other operational event that led
+to the platform being unavailable. In this example, like on January 2nd,
+Example Corp's customer behavior becomes the source of the problem. The major difference
+of such customer-generated events is that while an environment
+can be failed over and isolated from the root cause, users will keep using the platform
+and will trigger the same problem. This repetition pattern
+is called a poison pill. Some common events
+that impact customers and can be called poison pills are a customer's usage pattern
+disrupts other customers, also known
+as the "noisy neighbor problem." Or a denial of service attack
+on a customer of the platform that will impact other customers. Example Corp's customers, by having
+both EU and US teams present, generates
+a critical failure condition, or poison pill,
+on their assigned environment. As expected,
+the failover process kicks in and transfers the impacted customers
+to the other environment. Up until there,
+everything's working as expected. But the EU and US teams
+of that customer are still connected and active
+and the critical failure condition is repeated
+on the failover environment. As a result
+of this cascading failure, the platform becomes unavailable
+and all customers are impacted. The platform in itself was built
+to be reliable and it tries to avoid failures
+and handle failures from the underlying environment. But quoting Werner Vogels, "Failures are a given
+and everything will eventually fail." The platform has to evolve
+to become more resilient to failures when they happen
+but not if they happen. Sharding is a pattern where
+instead of having a single database for all customers, the data is stored
+in a collection of isolated and uniform data stores
+called shards. When a customer is created,
+the data from that customer is stored in one of the shards,
+grouped with other customers already present in that shard. For reliability,
+customer data is replicated to at least one other shard. As each customer's data
+is stored alongside only a few other customers and even, such as the one
+Example Corp experienced earlier, would impact only a handful
+of customers. This reduces the blast radius
+of failures. Knowing which shards to use
+to store a customer can be done using many techniques. The technique presented here
+is shuffled sharding, where shards are randomly assigned, much like drawing cards
+from a shuffled deck. On the bottom
+is a collection of cells. Cells expand the concept of a shard. There are instances
+of the entire application with a data store shard and all the associated
+business logic with it. Here, each customer lives
+in two randomly-assigned shards, hosted in distinct cells. And then the replication process
+synchronizes the data for safety. When customers
+access the platform, they are automatically routed
+to the cell hosting their active environment
+and their shard. The goal is to minimize or even avoid the possibility
+of two customers sharing the same underlying cells. In the case of Example Corp,
+in a cell-based platform, the incompatibility created
+by the presence of EU and US teams triggers
+a failure condition. The underlying cells
+become unavailable and the customers
+that were active on that cell failover to their backup cell. Using shuffled sharding
+and cells derives some benefit. Only three customers, these three customers that were
+in the first cell, are impacted, of which only two had to failover
+as the third one was a passive shard. And they are now hosted
+on distinct cells so scaling requirement
+on these cells is minimal, as they have active workloads and each receive
+only one extra customer. But the underlying condition
+has not been fixed with the failover. The customer's EU and US teams
+are still active and they will trigger
+the same behavior in the failover cell. That cell then becomes unavailable. The failover process kicks in again and moves the impacted customers
+away from that cell, into healthy cells. As a result, the customer
+that caused the failure is now unavailable, as it's exhausted the cells
+in which it can be hosted, but no other customer
+is negatively impacted. For each customer,
+the number of shards that will host that customer's data are randomly selected
+from a list of cells, just like drawing cards
+from a shuffled deck. The chances of one customer being
+on all the same shards than another customer
+and impacting them due to a poison pill are pretty much the same
+than drawing twice the exact same hands of cards
+from randomly-shuffled decks. It is inversely proportional to the combination
+of number of shards selected of the number
+of cells available. Statistically, with eight cells
+and two shards per customer, only 3.6% of customers
+would be severely impaired by a poison pill
+generated by another customer. Scaled to 100 cells
+and five shards per customer, there is one chance in 130 million that a coordinated failure
+would happen. Scaling further, Amazon Route 53, a service for hosting
+internet domain names with 100% availability
+service-level agreement uses shuffled sharding. With 2,048 cells
+and four shards per domain name, there is about one chance
+in 730 billion that an impacted domain
+will impair another one. The placement algorithm
+is a foundational component of cell-based architectures. It keeps track of the cells,
+their configuration, and where the customers are located. It can be context aware. For example,
+customers based in Australia would likely prefer
+the initial active cell to be in Sydney
+with a failover in Singapore, rather the Frankfort and Ohio. Some other customers
+will have more specific compliance requirements, for example. The placement engine
+has to be reliable and services
+such as DynamoDB Global Tables, NoSQL Data Stores,
+or Amazon Aurora Global Databases for relational databases
+help achieve these in a low-latency global fashion. Once customers are placed
+on the cell, they need to be able to conveniently and transparently access
+their environment without having to know
+the details of the platform. The router is a core component
+of the availability of the platform and requires
+a high level of reliability as it should not become
+a single point of failure. It needs to be connected to the cells and checked for their availability
+to effectively route the customers. A requirement
+that will be placed on the clients is the ability to do retries
+gracefully if the underlying platform
+fails over. Route 53 has many features
+required for the routing layer. For example, distinct domain names
+can be assigned per customer, route to the appropriate cells,
+use health checks to monitor them, and redirect to a failover cell
+in case of need. For API-driven platforms,
+Amazon API Gateway, a managed service for creating,
+maintaining, and securing APIs, can be used for publishing the APIs and route the request
+to the appropriate cell. Now that customers
+are deployed on cells and are able to be routed
+to their active cell, they need to have the data replicated
+to other cells for high availability. Database replication technologies support some of the requirements but can introduce a tight coupling
+between the cells. Core practices
+for the replication engines in a cell-based architecture
+or data-driven replication by using, for example,
+streaming technologies to extend the data from one
+active platform to the replicas. Services such as
+Amazon DynamoDB Streams, providing near real-time stream of all the modifications
+of a database, supports these use cases. We're going to use
+event-driven replication, where techniques
+like event sourcing propagate changes from one cell to another
+using a journal / ledger technology, such as Amazon
+Quantum Ledger Database. Or they can use an event bus,
+such as EventBridge. As an example, a listener service
+hosted on AWS Lambda, a fully-managed serverless
+computing platform, listens to the events emitted
+by the source DynamoDB Stream. It routes these messages
+to the appropriate endpoints in the other cells through APIs
+to be persisted. The fourth component
+of cell-based architectures is the migration service. The migration service
+can transparently migrate customer data
+from one set of cells to another. Example Corp
+has a three-tier model for customers, where they can
+configure their equipment and access the dashboarding
+features quickly at no cost. For economic reasons, three-tier customers
+have limited controls and are stored on cells
+alongside many other customers, a pattern called oversubscription. But as customers grow
+and eventually sign a contract, they need more options
+for data placement, performance, and reliability. These options could be available
+in another set of cells with a different configuration,
+for example. When customers then outgrow
+the cell capacity they're in, they may need to be stored
+on another set of cells where there's more capacity
+for them to keep growing. In the case of Example Corp
+in their operational event, once the customer responsible
+for that event has been identified, the data of all
+other customers impacted could also be migrated
+back to healthy cells and make sure
+that there's no impact for them. The migration service
+ensures the platform remains in full operational health
+when applications, customers and use cases change. Managing these components
+and updating them by hand with dozens or hundreds of cells
+quickly becomes a bottleneck. The control plane
+is the cockpit of the platform. It controls the creation
+and configuration of all the cells, pilots the other components,
+and automates most of the actions. The control plane gives operators
+a set of APIs and tools that enable
+advanced scenarios on the platform. For example, continuous integration
+in deploying pipelines will interact with the control plane to know where
+to deploy safely the software. And A/B testing can
+be made available in a controlled environment. The AWS platform provides
+a wide set of automation services. The AWS Cloud Development Kit, a programmable model
+for infrastructure as code, or AWS CloudFormation, an infrastructure
+as code execution engine, are commonly used to deploy
+complex services. AWS CodePipeline
+can be programmed to target cells. And Amazon CloudWatch
+can provide the monitoring and observability needs
+for the cells. Let's put these components
+in context. First is the data plane,
+where the customer's data lives. This data plane contains the router,
+all of the application cells, here shown in a simplified format, and the replication mechanism
+between the cells. Then the control plane
+holds placement information, has a consolidated
+monitoring platform, deploys and updates the cells,
+and controls the migrations. Example Corp has a partner
+providing facility services for many of the customers and that partner
+needs a centralized dashboard. But as these customers
+are hosted on different cells, the partner needs to issue queries
+on multiple cells. In cell-based architectures,
+cells are isolated from one another, much like services
+are isolated from one another in a microservices architecture. And as such, issuing queries
+in multiple databases is completely out of the question. A common pattern
+is to use a scatter-gather approach, close to what MapReduce frameworks,
+such as Hadoop, utilize. A service contacts the cell
+on their external APIs, has them do the computation
+locally, in parallel, and the results are sent
+back to the service who does the final aggregation
+centrally. Services that act on multiple cells
+usually live outside the cells and interact with the cells
+like any other third party, through the APIs. AWS provides a model where, From the ground up,
+it is easy to select the right deployment practices
+for cells, depending on your application's
+reliability criterias. Inside an AWS Region, cells can, for example, be deployed
+in each Availability Zone. And thinking about it, AZs are a great example
+of how cell-based architecture are used in AWS. If the focus is on reliability
+of each individual cell, cells can be deployed each
+as multi-agent platforms. If the focus is on fine-grain control
+of the environment, multiple cells can be deployed
+per Availability Zone, giving you full control. But cells can also be built in all publicly-available
+AWS Regions. AWS provides services that make building
+global-scale architectures easier. Here's a few of them, for example. With Route 53, a global, 100% SLA
+domain-name service that provides
+all the core functionalities for deploying and monitoring cells. Or Amazon CloudFront,
+a content delivery network that can serve content
+as close to your users as possible, anywhere they are. With Aurora relational databases and DynamoDB for NoSQL databases, providing secure, highly-reliable, fast, and cost-efficient
+data platform that will sale
+with your business needs. Once the core functions
+of a cell-based architecture are implemented, the platform can be optimized
+based on its specific constraints and business objectives. Having smaller cells
+and more shards per customer will give higher resiliency
+for users and small environments
+mean less operational burden. But customers may not need
+to be the unit of a cell. Some customers may be too big
+to be stored in a single cell or, in the case of Example Corp, have distinct requirements
+for different campuses. Cells can have a grain that is adapted
+to a specific context. Security is a core priority. And cells can be deployed
+in multiple accounts, providing an additional
+security boundary around the environments. Strategies for secure rollout
+of new features across environments are available, benefiting from the granularity
+of cells to continuously innovate
+for customers. Cell-based architectures
+provide multiple added benefits. They give the chance to address both
+the reliability of the platform, its ability to avoid failures,
+and at the same time, to address the resiliency
+of the platform, its ability to sustain failures
+when they happen. Scaling the platform
+will result in simply creating or deleting a new cell, an activity that is fully automated and at a scale
+that is completely controlled. Smaller cells mean easier management
+of individual cells. And each unusual behavior
+will be serviced a lot faster. And the other cells
+can be used as a baseline. Failures, when they will happen,
+will have a much smaller impact. Cells should share as few underlying dependencies
+as possible so the impact of failures
+will be contained. And finally, by having
+an intelligent placement algorithm and having enough cells,
+the application code is simplified. The configuration of the cells can remove the complexity
+of having the runtime code handle everything
+and the control plane is going to be your best friend
+for simplifying your application. You can now address
+location constraints for customers, or maybe encryption requirements,
+easily. Advancing the state of the art
+of cell-based architectures, Amazon EBS, the storage engine
+for all the volumes of Amazon EC2 instances, has been working
+on a new database model for storing Amazon EBS volumes. The architecture has
+been documented publicly and is called Physalia. This model is
+a cell-based architecture pattern where there is millions of cells
+and each cell stores information for just one single volume. Physalia is a platform
+that was built to work around and scale
+some of the limitations imposed by the CAP theorem on consistency, availability,
+and partition tolerance. To dive deeper,
+the Amazon Builder's Library, a site where AWS's engineers
+share their best practices directly, has an article on shuffled sharding
+and its usage in Amazon Route 53. Physalia is presented in details
+on Amazon Science, a site where Amazon research teams
+present the state of the research done in the organization. The Builder's Library
+also contains an article on how to design applications
+and clients who handle failures
+in an effective way. The AWS Well-Architected Framework is a guide to architect secure,
+reliable, performance, and cost-optimized, and operationally-excellent
+platforms. Hands-on labs are available
+to discover these practices. The AWS Architecture Center
+provides a large number of resources to help architect cloud applications. And the AWS Solutions Library offers a wide collection
+of reference implementations for many use cases from AWS
+and AWS owners, documented and directly-executable. Thanks for listening to this session and discovering
+some of the capabilities of cell-based architectures. Please contact us to learn more
+on how AWS can support you in architecting
+next-generation applications. As always, make sure
+to fill the survey. We really value your feedback
+and insights.

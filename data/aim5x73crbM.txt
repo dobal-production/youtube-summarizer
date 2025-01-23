@@ -1,0 +1,1466 @@
+[atmospheric music] Take one. And action. Werner, today,
+we are exploring the concept of how complexity grows
+from simple origins. Can you tell us more about it? Many of our original services
+have to moniker 'simple', like S3,
+the Simple Storage Service. Simple, maybe in the name,
+but the reality is, by making things simple,
+it can be terribly complicated. In this episode of Simplexity,
+we tell the story of one of the world's
+largest storage systems and the team of innovators
+working to keep it simple. You know, it was back
+in the early 2000s. There were, I think four,
+maybe five of us: me, Werner, Al, a few others
+that they're just not here anymore. It was a REST API
+and a handful of features. So, Alex inspired lots of
+the simplicity behind S3, right? Alex, the pizza guy? -Al?
+-Al. -Alex?
+-Ax, Alex. Alex?
+Hey, hey, welcome. As usual, Werner, he saw something
+in him that no one else did. I think he really appreciates
+my approach. I'm all about keeping it simple. Just, you know? This one night, we'd ordered
+some pizzas, and… He comes in. He's is holding this stack
+of pizza boxes, you know, like 20 feet high. Oh, God! I think I know what this is. Something different, what is this? He trips onto the ground,
+drops most of the pizzas. Oh, oh, and utters the words,
+two pizzas per team, I guess. Managed to save two pizzas. Good on him. And we developed two pizzas per team. The two-pizza team, yes. We broke down our functional
+hierarchies and restructured our organization
+into small, autonomous teams, small enough that we could feed
+each team with only two pizzas. Together, we make one pizza. Oh, plus Jeff and Kevin. Two pizzas per team. Back when we were looking at ways
+to reduce storage costs… I devised this very simple plan. And Alex just shows up
+with a pizza cutter, and he starts
+sharding the slices. Right now, I'm working
+on the Franken Pizza. It's a Frizza. Boom. Welcome, erasure coding. We had to rewrite
+our entire storage engine. Well, he had to. Yeah. Did you hear of
+the glacier incident? Alex kept making people
+put half of their pizzas straight into the freezer, and there were so many leftovers, so many leftovers. Can you tell us
+about the Glacier Incident? Glacier storage classes, you mean? Different cost tiers
+for different access patterns. We're always looking to keep things
+simple for our customers, no matter the complexity
+it adds for us. This is just something
+we have learned to live with, embrace, cherish, even. Who really knows if Alex sparked
+all of these innovations? He became part of the furniture. Ooh, that's pungent. That's 2016. Here he is. This is the guy. -This guy loves you.
+-What, I… what? What's up, Alex? So, all this success was fueled
+by the humble pizza. Pizza? I thought
+this was a documentary about complexity and simplicity? Yes, absolutely, in fact, we have
+your long-term collaborator here, the maverick, who you hired
+to inspire simplicity. Alex? Werner. Oh, great, this is fantastic. Who the fuck is this guy? Didn't you hire Alex? He inspired the two-pizza team. -Alex?
+-Alex. Al. I told you to get Al. Al V., the main developer
+on S3 in the early days. Can we cut there, please? [intense rhythmic music] [orchestral music] [orchestral music ends] Please, welcome the Vice President
+and CTO of Amazon.com, Dr. Werner Vogels. [music playing] [music fades] Good morning. Every year, I get more
+humbled by your enthusiasm. I hope I can meet your enthusiasm of queuing here at
+6:00 AM in the morning, already,
+to come and hear my stories. I hope I can live up
+to those expectations. This year has been a bit
+of a special year. You know, 20 years ago,
+a not-so-young kid of 45 decided to give up
+his academic career to go and work
+at a bookshop. Yeah, and if you would've
+asked me in those days, if I would ever worked for 20 years
+for the same employer, I would've carried you off
+to the insane asylum. Yeah, but 20 years at Amazon,
+it's just mind blowing. Every year has been different. And the amount of technology
+achievements that we've made
+in those 20 years are just… I don't know.
+I still can't believe it. And I'm not done yet either. Now, one of the things
+for these 20 years has been continuously learning
+and learning and learning. Because actually, as an academic, I didn't really know
+what I got myself into. I may have thought that,
+in academia, I was building systems
+for real people, but to be honest,
+I never had to deal with customers. There were some really hard learned
+lessons with respect to that. I really needed to get my head
+around it. But learning and learning
+and learning was definitely something I did over the past 20 years. I was so gung ho, so full of energy,
+so opinionated and so arrogant,
+to be honest, in those days. But my academic background really
+hadn't really prepared me that well for what was about to come. You know, the luxury
+academic assumptions, like machines fail by stopping, or failures are not correlated turned out to be
+completely unrealistic. And then a few months into the job,
+Jeff Bezos and Rick Dalzell asked me whether I wanted
+to take the CTO job. You know, I really couldn't
+pass up the opportunity to build the world's
+largest distributed system, that was going to be used
+by almost everyone. You know, Al Vermeulen,
+who was the CTO at the time, he didn't want the job. He didn't want the job,
+and he really wanted to return to being an engineer and hand code
+the next generation of technology. And we should be
+extremely grateful for Al, because he built
+the foundation of AWS. All the hardcore technology behind
+the scenes have been of his hands. And the technology culture within AWS is definitely something that you see
+Al's fingerprints all over. So, I had really big shoes to fill, but given that actually nobody
+really knew what the CTO job entailed,
+my arrogance got the better of me. And I did take the job. Now, in those 20 years,
+there's been a lot of highlights. Yeah, and one of them absolutely
+was the first re:Invent. Because I got the opportunity
+to talk to you and to sort of lay down principles
+of what I thought was going to be the next generations of development, how we are going to,
+radically different, build these applications in ways that
+we always knew we wanted to build, but just never could. And so, you know,
+in this first presentation, I laid out sort of
+four different categories in which I think
+I gave you advice. And now, why don't we take a quick
+look back at it, you know, how well did
+all of this turn out? I think some of them
+went out really well. I'm really proud that many of you are running your production
+workloads in at least two AZs, and I think,
+you know, continuous integration and continuous deployment
+and things like that, they're just,
+everyone's doing that today. Not necessarily
+because I told you to, but I'm very happy to see
+that those things made it into everybody's, you know,
+package of development. There a few things that were maybe
+a little bit more controversial, or took a bit more time. Now, decomposing into small
+building blocks, loosely coupled, stateless was… at Amazon, this is something
+we've been doing all the time, and it allowed us to scale and be reliable and evolve pieces
+independently and things like that. However, it was stepping
+in the middle of some form
+of religion, right? Whether you do monoliths
+or services or microservices
+or nano services, all of these seem to be
+so controversial. Yet, you know, architecture
+is something you do based on the requirements
+that you have, or maybe sometimes, you know, you do it based on
+the technology you decided to use. It is very hard to build a nano
+or microservice if you run over rails, and as such you automatically
+choose for a monolith. So, I wrote this article
+on all things distributed, sort of laying out what I think
+are the differences between monoliths and microservices and what you do
+in this particular scenario. Another thing that I suggested
+that you do is work with the business. After all, we don't build
+technology just for ourselves, just for us as technologists. We build it for customers. And whether those customers
+are internally your business, or they are really
+your customers externally, you build it for some reason. And as such, you need to
+collaborate closely with the business and build your architecture
+in such a way that they can have control over that,
+one way or another. Now, I gave you advice to break up
+your applications into tiers, then have a conversation
+with the business, for example, how reliable should
+each of those tiers be. Now, of course, the business will say
+everything needs to be 100% reliable. And then you explain to them
+how much that will cost them, and then you can have
+a conversation. And definitely that point,
+as I said, now we can architect
+with cost in mind was blatantly ignored by everyone because suddenly, suddenly
+you could do all these things. You could move so fast. You were no longer constrained
+by sort of the physical hardware in your own data centers. And it wasn't until last year
+that we really saw a desire to sort of start to think and integrate cost
+into your architectures. And I hope that last year's
+Frugal Architect actually gave you
+some guidance in that. Actually, we've been revamping
+the Frugal Architect website with a lot of new content, very deep content
+from a number of engineers, how they've been applying
+frugality in their work, a number of podcasts as well. If I look then over
+at the resilient part, you know, there is this famous quote
+that always gets attributed to me. Unfortunately, the quote
+is always incomplete. It's not just everything
+fails all the time. The most important part was
+actually the second sentence. So, plan for failure,
+and nothing will fail. You know, survival isn't something
+that you leave to chance. You have to plan for it. So, looking back at that
+first presentation, I think, you know,
+many of the principles still hold. Although I probably would add
+a few things to today. Now, evolvability,
+definitely the ability to accommodate changes
+over time, and probably,
+how do you choose you database. I mean, in 2012 we didn't have
+the host of different choices, but now, with the whole range
+of purpose-built databases, you probably need
+some guidance around that, what to use,
+in what particular case. However, there was
+one thing in 2012 that I clearly hadn't fleshed out. In those days, I presented it
+to you as Occam’s razor. Objects should not be multiplied
+beyond necessity, for those of you who didn't
+get Latin in high school. What it actually really means
+was to keep things simple, The KISS principle,
+Keep It Simple, Stupid. I don't know why that stupid
+is at the end of that, because I don't think you're
+stupid if you can't keep simple, because complexity
+sneaks in all the time, and it's something that you
+really need to control. You need to think about
+how to manage the complexity, and indeed, you know, complexity
+for many of us is inevitable. Those systems become
+more complex over time, which is a good thing
+because in general, we're adding
+more functionality to it. We need to scale. You need to address security issues,
+all of these kind of things. And AWS, remember, many of the AWS
+services are still called simple, SimpleDB, you know,
+Simple Storage Service, Simple Queuing Service,
+Simple Notification Service. None of these services are simple
+under the covers anymore. They're all really complex. But we, some reason,
+managed achieve that, we managed to manage the complexity. And many of them have achieved
+this complexity very successfully. There's some stumblings
+along the way, though, but we managed to manage
+complexity the hard way. And I'd like to spend today
+actually talking to you about the evolution
+of these complex systems at Amazon, how we do it safely, securely,
+and simply, you know, Simplexity. Complex systems built against simplicity principles
+for manageability. A very relevant law in this context
+is Tesler’s law, yeah? Conservation of complexity. Complexity can neither be created
+nor destroyed. It can only move somewhere else. And interesting was actually
+that Larry Tesler was at Amazon when I joined,
+and I learned a lot from Larry. He was mostly concerned about
+user interfaces and the functionality behind it,
+what you expose to your customers. But it was really fundamental to think
+about that complexity is a given. However, not all complexity
+is created equal, yeah? There is clearly intended complexity. That's the kind of that's necessary. It helps systems scale,
+adapt to new features, meet changing customer demands,
+yeah, and it's intentional and it serves a clear purpose. But then there is the unintended
+complexity, the kind that sneaks in,
+often through changing technologies or a lack of architectural
+oversight. And it slows you down, and it
+makes systems harder to maintain. The key is to recognize both types. And if you don't, the systems
+quickly go from flexible to fragile. So, what are the signs of unintended
+complexity sneaking in? We all know this.
+I mean, we've all been here. Declining feature velocity
+is definitely something. If I look at Amazon, when we went
+from monoliths to services and from services to microservices and from microservices
+to shared services infrastructure, every time, the key there was, the driver for that was that we saw
+that innovation was slowing down, but the kind of hard things,
+the behind the scenes things that we needed to do made it harder
+to implement the next features. But you'll know this now. Frequent escalations,
+more and more tickets. The code base is so big that actually
+nobody understands what's going on. And so, all of these patterns
+actually get in your way of making progress,
+of keeping the system flexible but reliable at the same time. And so, a good example of how
+complexity moves around that you can't sort of escape it
+is this particular example. This is sort of an abstract way of how
+I think about customers and AWS. So, customers will have
+an application router. They have a bunch of domain specific
+apps underneath there and all of that runs over AWS. Now, most of our customers actually
+implemented some foundational services,
+some shared services, that actually are domain specific but
+shared by each of their applications. We always work with our customers to look at sort of the complexity
+in the shared services layer. Are there things that they have to do because we didn't make it
+simple enough for them? Now, one of those things
+is absolutely event of consistency in Amazon S3. Now, we launched with that,
+because in 2006, that was the prevalent thinking about
+that was the only way that we could make systems
+reliable and survive failures. Many of our customers, however,
+found it very hard to deal with that. You may have created a bucket,
+then that then tried to write to it immediately, and it would turn out that the bucket
+wouldn't be available yet. Yeah, not a good customer experience. So, many of our customers tried to
+implement strong consistency over S3, which was risky, because implementing
+strong consistency is, first of all, hard. But it's also making sure
+that you catch all the edge cases. And so, the right thing to do there
+was not to remove that complexity, but to move it where it should be. So, we implemented Amazon S3
+strong consistency inside S3. It's moving the complexity
+to where it needs to be. And by the way,
+it's also the right place to be, because we could use automated
+reasoning to prove to ourselves that,
+actually, everything was correct. That every edge case
+was being handled. Now, I'm not the only one, of course,
+at Amazon, that Amazon's not the only one that actually handles complexity
+in that particular way. You all deal with complexity,
+and there's a reason for it, because our applications
+continuously evolve over time. There is a need for that. Now, many of us, if you look at sort
+of these signals of complexity, there is one signal that often
+is understood wrong, yeah, where many would think
+that complexity is the number of components
+in the system. That's not the case. It's absolutely not the case
+because, yeah, counting components doesn't necessarily mean
+how chaotic your system is, yeah, and there's a great, great analogy
+by Colm McCárthaigh that I love. If you think about riding a bicycle,
+yeah, in this particular case, think about simplest form of cycling
+being that of a unicycle. It's simple, very limited
+number of components. And if you can master riding it,
+it is amazing. You can turn on the spot, but it's really hard to ride one. And just counting the number
+of components isn't a measure of
+the overall simplicity of the system. Now, you could also take a tricycle,
+which is very easy to ride. You won't fall off that easily, but actually, most of us learn
+how to ride bicycles on a tricycle. But it doesn't give you
+much flexibility, because turning corners
+is actually pretty hard on one. So, the ideal solution for cycling,
+is that of a bicycle, it is more complex
+in the number of components, but it gives you great flexibility. Now, mastering it is harder
+than riding a tricycle, but definitely much easier
+than riding a unicycle. And it's the overall experience
+that signals complexity. A bicycle has more components, but it is the simplest form
+from a holistic point of view. And believe me, if you look at
+the place where I grew up, bicycles are everywhere. And yes, we do package delivery
+in Amsterdam, using bicycles, and the postal service actually delivers
+your letters at home using bicycles. If you think about simplicity,
+it isn't accidental. Keeping things simple while adding
+complexity requires discipline. If the design makes sense to a team
+that is not part of your original design team,
+it's a really pretty good sign. Now, there is one company that
+I really admire in terms of keeping things simple while hiding tremendous
+complexity under the covers. And let's hear from that company now. Please, welcome the CTO of Canva:
+Brendan Humphreys. [music and applause] Thank you and good morning. Canva was founded over
+ten years ago with the mission
+to empower the world to design. We've built a product
+that makes it easy for anyone, regardless of their skill level, to create stunning visual content
+at scale. Today, Canva is used by more
+than 220 million users in 190 countries
+to create and collaborate on everything from presentations
+to videos to whiteboards and more, but we're all engineers here. So, please, allow me
+some vanity metrics. Our platform handles about
+1.2 million requests per second. We have over 162 petabytes
+of media under management, and that's growing by
+about 230 terabytes every day. To date, we've had over 30 billion
+designs created, and our users are adding over
+450 new designs every second, but I want to take you
+all the way back to the very beginning
+of this journey, when most of these numbers
+were very close to zero. I joined Canva back in 2014,
+when there were just a handful of us. Here, you can see most of the backend
+engineering team back then. And around this time,
+we're in a single room, it's cheap rent,
+and there's a dodgy fuse box. And in winter we could choose,
+do we run heaters, or do we have external monitors? And naturally, we chose monitors,
+and we adapted. And I took this photo
+around this time of me literally coding
+in fingerless gloves, because it was so freezing. Now, top of our minds around this
+time was the architectural quandary. How do we build something quickly
+and get it into market, but build it in a way
+that allows us to rapidly evolve
+our architecture to scale? We knew we would eventually need some kind of
+microservices architecture. This would ultimately allow us to scale the number of components
+that we had independently, and it would allow us to scale
+in the number of engineers productively working
+on our platform. And so, we planned
+for this microservices future, and we built
+and shipped a monolith. But baked into this monolith’s
+design was a pathway to scale. It was completely stateless, which allowed us
+to scale horizontally, using elastic load
+balancing and auto scaling. And it was carefully modeled around
+the key entities we had identified. And we implemented this model
+with some simple rules to make it decomposable
+in the future. Each entity was encapsulated
+by a service interface, and our service interfaces
+strived for consistency around a really simple set
+of CRUD verbs. All the business orchestration
+has to happen above this service abstraction. These rules allowed us to tease
+apart this monolith relatively easily
+when the need for scale came. Our service interfaces
+became RPC stubs, and one execution unit
+evolved to one per service. Now, our initial architecture
+was backed by a single RDS MySQL database,
+but in designing our schema, we similarly tried
+to anticipate scale. We maintained strict isolation
+of entity relations. If you needed to perform some
+business orchestration that involved
+more than one entity, you must compose that using
+the CRUD operations on the services. As tempting as it was, cross-domain joining at the persistence
+layer was strictly forbidden. This meant that our one MySQL
+instance was easily
+decomposed into multiple MySQL instances as the need
+for scale came. And each MySQL instance
+we could add more scale, we can scale out
+through read replicas and we can scale up
+through instant sizing. And then finally, as our exponential
+growth exploded, many of our services
+migrated over DynamoDB, which continues to give us
+global scale. Now, I would love to tell you
+that this process of evolving our persistence was always smooth. It was not. The thing about exponential growth
+is that it can be hard for humans, even engineers, to grasp. And we felt this acutely
+in our media service. The exploding popularity of Canva
+meant that our media service MySQL suddenly got like really,
+really big on us. We knew we had to get over
+to DynamoDB, and to buy time to engineer
+a seamless transition, we raced to put an obstruction layer
+over our persistence. And at the same time, we milked
+every last bit of life out of MySQL, which by that stage,
+was groaning under the weight of tables
+hundreds of millions of rows in size and growing by tens of millions
+of rows every day and hitting new and exciting
+RDS limits on a regular basis. And the joy of building Canva in
+Sydney, Australia is that the U.S. traffic peak is
+just after 1:00 AM Sydney time. So, we'd often discover these limits
+in the haze of a middle-of-the-night
+on-call alert. Now, stretching the capacity of MySQL
+involved lots of database, dark arts. We first removed all foreign keys, because they prevent
+zero downtime schema migrations. Then we started de-normalizing
+a bunch of the schema, because at that size, even joins
+become prohibitively expensive. And finally, we started consolidating
+data into JSON blobs in text columns,
+so that we could lift the schema management
+up into the application layer. By the time we were ready to switch
+over to DynamoDB, we had morphed my SQL into a dodgy
+KV store, and the middle of the night wake-up
+calls were getting pretty boring. But get there, we did. And today our DynamoDB
+backed media service manages 93 billion items,
+and it's growing at around 90 million items per day. And we get really impressive
+performance and reliability. Fundamental to evolving
+for scale at Canva is investing carefully
+in the abstractions we provide within our architecture. We strive to make them powerful,
+consistent, and composable. We've now carried that focus and care
+forward in developing a powerful API that lets anyone
+build functionality on top of Canva. We offer the Apps SDK, which lets you build
+embedded functionality in Canva, and the Connect API, which lets you embed Canva
+functionality in your platforms. Today, thousands of developers
+in more than 120 countries are building on Canva and contributing
+to a thriving marketplace of over 300 apps and counting, and these apps have been used
+over a billion times by our users. On the screen is one of my favorites:
+the Crikey 3D animation app. During its first month on Canva,
+Crikey saw a 10% conversion rate among Canva users who tried it. Thank you for letting me
+share a little snippet of Canva's engineering journey. Our founder, Mel, wants to put Canva
+in the hands of all 8.2 billion
+people on the planet. She loves to say,
+we're only 1% of the way there. Now, I don't want to quibble
+with Mel, but at 220 million monthly actives, my math tells me we're actually
+closer to 2.72% of the way there. I can't wait to see what the next
+ten years and beyond will bring, and I really hope that you will
+join us on that journey. Thank you. [music and applause] Thank you, Brendan. Isn't that an amazing story? You know, but if you look at
+behind the scenes, the evolution of it, it's something
+that many of us go through. They have an amazing, relatively
+simple app, simple application, but behind the scenes is becoming
+more and more complex over time, to provide their customers
+with additional functionality. And I think it's something
+we all go through. Evolution is fundamental. Even Darwin had already figured out that the only way to
+a successful complex organism was through numerous successive
+slight modifications. And Heraclitus, way before,
+500 years BC, already had this famous
+statement that change is constant. Now, the idea that we can stop
+our world, and nothing ever changes again,
+it's just an illusion. The real world always changes. And digital systems
+are subject to that as well. Heraclitus also had this famous
+quote, saying that
+the world is in constant flux. You never step
+in the same river twice. And changes occur constantly in
+our environments, in our requirements,
+and our implementation. And actually, that's not some new
+discussion or something like that. Now, in the 60s already, Lehman laid out
+a whole series of laws that have to do with the laws
+of software evolution. Now, it's nothing to do
+with distributed systems or, or the way that we build things now. Because he was thinking
+about mainframes. But it is the laws of software. Software becomes irrelevant
+if we don't evolve it. If there's no new functionality, customers will perceive our systems
+as declining in quality, and as such, now,
+we are in our digital systems continuously confronted
+with the fact that we need to evolve. And so, to help us with that,
+I kind of put six lessons together that I think are sort of
+the fundamental lessons that we've learned at Amazon. And I hope that they will help you
+as well to think about how to manage
+your environment to prevent complexity getting out of control. But remember, simplicity
+requires discipline. From day one, when you start making
+your designs, you need to start to think about
+that maybe it's simple on day one, but it will become
+more complex over time. So, lesson number one,
+it's actually, as always, I think the most important one, yeah? Make evolvability a requirement. You need to know that your systems
+will grow over time, and that you may need to revisit the architectural choices
+that you've made. I think if we did one thing really,
+really well with Amazon S3 on day one was that we knew
+that we were not running the same architecture a year
+from there or two years from there. And often, I think, in the early days
+have thought that, whenever you change
+an order of magnitude in scale, you'll need to revisit
+your architecture. Constructing architectures that
+can be evolved in a controllable way, is crucial
+if you want to survive complexity. And I define evolvability as
+a software system's abililty to easily accommodate future changes. Now, this differs
+from maintainability. Evolvability is long-term,
+coarse grain, radical, functional,
+or structural enhancements, where maintainability
+is fine grained, short term, local changes. Often, they're corrective
+or they're adaptive or preventive, or maybe you just want to make
+your system more perfect. But those are maintainability,
+not evolvability. Evolvability is long-term,
+having a strategy, of how to deal
+with complexity over time. I think that when we built
+evolvable systems there are a number of sort of
+hardcore lessons that we've learned. Now, make sure you can build
+focused components. That means you have to model
+the business concepts. hide internal details
+with fine grain interfaces over it. And then you build smart endpoints, use decentralization,
+independently deployable to allow these pieces
+to evolve separately. High evolvability, high observability
+supports from multiple paradigms, we get the insight,
+and we are flexible in how we actually implement
+the different pieces of our systems. I often like to talk about Amazon S3 and even in, you know,
+the video upfront, S3 played an important role. Because I think it is such
+an amazing example of how a simple service
+grows more complex over time under the covers,
+but keep it simple for our customers. If you look at S3, isn't it amazing? This is, what is it now,
+18 years ago, that, you know
+the evolution of cloud storage. It's just a simple API,
+was focused originally on durability, availability, cost effectiveness, but the original principles
+founded a foundation for all these new innovations
+that were happening after that. That is somehow driven
+by customers, and also, requiring
+significant rewrites. That high availability
+and durability, we maintained that
+while the system was evolving. There's a great analogy
+someone once told me. You know, the evolution of S3, something like we started off
+with a single engine Cessna, moved over to 737, then eventually ended up
+with a whole fleet of 380s, moving customers along the way
+without them noticing it and refueling in midair, and that's how it felt
+with building S3. And you see that every year
+we added new functionality, without any impact
+on the functionality we were delivering
+for our customers. That strong consistency, means that we were no longer
+compromising on the core attributes. Modularity allowed us to experiment
+with languages like Rust. Now, from the start, we had
+a very clear strategy for complexity, a microservices architecture. And if you look at the evolution of the microservices
+underneath there, it is quite spectacular. We started off with six
+microservices on day one. Now, we've well over 300 of them,
+and they have grown over time. And we all use S3 without noticing that its complexity
+grew significantly under the covers. Now, it's not only, by the way,
+software is easy to evolve, because you have
+total control over it. One of the things that
+actually we really had to make changes into was sort of
+the hardware infrastructure. If you think about network devices
+in general, all the functionality
+is built into ASICs, In every change you need to make, you often need to completely
+swap out your networking device. That was definitely, in 2006,
+sort of common knowledge. But our customers were reconfiguring
+the network the whole time, and our network boxes were actually
+not even built for that. So, we needed to find,
+to create a foundation on which we could evolve, because we knew that
+whatever networking capabilities we were giving you in 2006 will be
+radically different in 2010, and definitely, in 2020. So, we created
+a foundation for innovation. We called it Blackfoot. This was a device, basically
+a whole bunch of line carts, originally Linux kernel
+on the site. But it allowed us to evolve
+our networking over time. Maybe the earliest device will give us
+ten gigabits a second line speed. Now, we are in the hundreds
+and hundreds of gigabits a second for you,
+while evolving these devices and while evolving the security
+of our network over time, as well. So, create a foundation
+for evolution. Same as for the hosts. At some moment, we realized
+that the way that we were building our hosts were actually not
+a good platform for evolution. Separating a number
+of functionalities into a separate box with carts,
+like Nitro, was crucial for us to be able
+to evolve our host systems. In those days, in the early days, you know,
+processes were getting so fast that virtualization or the virtual
+machines were getting in the way. So, moving networking out of the box,
+for example, allowed us to continue
+to do virtualization while getting access
+to full line speeds. And we could actually
+do encryption at line speeds, and we could build
+PCIe interfaces for access to EBS. Again, evolvability
+is a conscious decision. You have to create an environment
+in which you can evolve. You have to make
+evolvability a requirement, because it's a precondition
+for managing complexity. Now, if you think about
+how complexity grows over time, I like this analogy, again,
+one by Colm, if you put a frog
+in a pot of boiling water, it'll know something is wrong
+and immediately jump out. However, if you put the frog
+in cold water and then slowly start to heat it up,
+it remains comfortable. Small warning signs are there,
+but they're being ignored. They just adjust to the nicely
+increasing warmth. By the time the frog realizes
+that there's danger, it is too late to escape. By the way, no frogs were
+harmed in this analogy, yeah? The lesson there is do not
+ignore the warning signs. Small changes seem manageable,
+easy to absorb at first. But if you ignore the warning signs, systems become more complex and more
+harder to manage and to understand. To be able to do that,
+really manage that, you have to
+break complexity into pieces. A good example there is
+Amazon CloudWatch. Now, we all use CloudWatch, but today, this is a massive service. Really, hundreds and hundreds
+of trillions of metrics observations a day. You know, almost half an exabyte
+of logs being ingested every day. This is a crucial,
+fundamental service in AWS. Didn't start off like that, though. You know, in the early days, CloudWatch was a very simple service. This was what it looked like
+when we just launched it, yeah, and it was just a service for storing
+and receiving metric data, just a couple of backend services,
+a small team of engineers, who understood
+every part of the system. But over time,
+the system starts to grow, and the content
+was actually the place where everybody was implementing
+the new functionality. And this grew over time. And we became more complex
+and complex, and actually, a sort of an anti-pattern arrived,
+what I call a mega service. A mega service is an anti-pattern
+in that you get complexity that you need to start breaking up. Now, the frontend only handles
+the core functions, and the complexity of the whole system
+is moved into individual pieces. The principles we use,
+over and over again, you need to disaggregate your system. You need to build components
+that have high cohesion but are loosely coupled to others
+and have well-defined APIs. This is how CloudWatch looks
+these days, yeah, a very simple frontend service. Actually, probably, the only code
+that is left from the early days is something about handling
+the original requests. But for the rest, everything has been
+rewritten and rewritten over time. And new functionality gets handled
+all the time as well. And there's many different reasons
+why, you have to change the system, not only adding new features,
+but for example, one complexity issue that we have is around
+engineering here. Many of our high-volume
+data stores in CloudWatch have been written in C
+programming language. It is very hard to hire C programmers that can actually operate
+at this particular level. So we are actually starting then
+to think about, you know, how can you have
+disaggregated everything, these small components
+that are individual. It doesn't really matter
+which programming language you pick. So, in this particular case,
+we started to use Rust to start implementing
+these high-volume interfaces. And again, it's one of these things
+that you can do if you decompose your systems
+into smaller building blocks. They can evolve over time, not only with respect
+to functionality, but also, for example,
+with respect to the libraries and the programming languages
+that you use. Now, the question
+I always get is: if you think about
+breaking into pieces, how big should
+such a service be? Now in general, you know, you don't have that
+much choice about it. Things are often from the outside
+that determines it, yeah? How many teams do we have? You know, how much success
+do we have, customer demand, and in CloudWatch
+we have a lot of microservices, and the size of each of them
+is actually dependent on the path, and it's organic. So, I don't have really good advice
+for you to say, this is how big it should be. Now, you have two options
+where you get new functionality. You either extend existing ones
+or create a new microservice. Extending is often faster. It reuses code, and you risk… but you risk all of these,
+these mega service antipattern. You create something new, it keeps service manageable,
+but it requires more effort upfront. So, the warning signs are
+a microservice turns too large
+for an engineer's mental model. If you can't keep it in your head,
+your service, in general, is getting too big. Now, someone who grapples
+with these challenges on a daily basis is Andy Warfield. So, please, join me
+in welcoming Andy, who will share
+how Amazon S3 organizes itself to handle this sort of complexity. Andy? [music playing] Hi, everyone. I'm Andy. I'm an engineer on the S3 team,
+and I'm going to talk to you a little bit today
+about organizations and complexity and how we structure
+our teams and organizations to deal with complexity. Now, as Werner said, S3 has
+been around for 18 years, and I find this remarkable. It's kind of the coolest thing that
+I've ever worked on in my career, the idea that a single
+distributed system and a single team has actually
+run continuously for 18 years. And so, I'd like to make
+a couple of observations about some things that I think
+are interesting and successful about how the organization works. But I got to start with a disclaimer, because I would hate for the team
+to feel like I got up here today and told you that we had
+figured this out, that we'd solved the problem
+of organizational complexity. I think that we actually haven’t. I think we still have a lot to learn,
+and we're learning every day. The system continues to evolve,
+the team continues to get bigger. But when we are at our best, I think we get
+a couple of things right, and I think they're worth sharing. So, before I tell you
+about the two things that I think we get right,
+I have a question for you. Does anyone know what this is? Has anyone ever seen one of these? There's no wheels at the front. This is a sled from a tractor pole. When I was a kid,
+I grew up in Ottawa, Canada. We had family that lived
+about an hour from town. And at the end of the summer,
+every year we would drive out and go to a country
+fair in Falwell, Quebec. And the fair had, you know,
+all this stuff that's awesome about country fairs,
+contests for the largest vegetables, a midway, and of course,
+a tractor pull. And so, the tractor
+pull involved farmers bringing their tractors out,
+they'd attach it to this sled, and there'd be a track. It was especially awesome
+if it was rainy, because it'd be muddy. And through a combination
+of the power of the tractor and the skill of the driver, they'd pull the sled as far
+as they could down the track. But as the sled pulled,
+the bucket on top that was full of weight would make
+the sled heavier and heavier. So, this is a weird diagram,
+but this is basically how I think about
+software development. There is this, like, incredible
+commonality between tractor pulling and developing
+large distributed systems. The commonality is that, as you pull,
+it gets heavier and heavier. On the first day,
+staring at that empty buffer, it's the most awesome time in terms
+of the openness and possibility and the lack of burden. But as you pull, it gets heavier
+and heavier and heavier. You accumulate complexity,
+and you can go a certain distance through sheer power
+and force of will. But ultimately, you have to
+acknowledge the weight of the sled. And so, I think as a sort
+of general observation, we need to acknowledge
+that our organizations are at least as complex
+as the software we build, and we need to give them
+the same attention. So, the first observation
+that I'd like to make, that I think the S3 team
+does a pretty good job of, is that successful teams tend to be
+at least a little bit scared all the time
+that they're getting it wrong. They're always looking for the things
+that aren't quite right, and when things are
+going really well, that's when you're kind of the most
+scared that you've missed something. And so, being a little bit scared
+and asking questions and trying to improve
+is a thing that the S3 team, I think, does a good job of. I'll give you one example. About six years ago,
+we were going through this period where we were growing a lot. We were bringing on a lot
+of new engineers to the team. And S3 cannot miss, ever,
+on durability. Durability is so central
+to the engineering team and the way that we approach things. But we were concerned that we had
+to maintain this focus and this sort of investment
+in durability as we brought on a whole bunch of new folks
+that were great engineers but hadn't worked in
+this kind of environment before. And so, one of the other PEs and I,
+Seth Markle, sat down and talked a lot about
+how we were going to do this. And we decided to build a program,
+where we borrowed an idea from security engineering,
+the idea of a threat model, where you write down
+your security threats, and you assess whether
+the model matches your defenses. We came up with the idea
+of a durability threat model and built a structure, where when the teams were going
+to make changes to S3, they wrote down the durability risks
+that they could anticipate and what they were doing to make up
+for them, to counter them. And then we could take a smaller
+number of engineers, that had been on the team
+for a long time, that had tons of operational
+and engineering experience with durability, and we got them to act
+as durability reviewers. And we would sit down and have
+these awesome conversations around the durability threat model,
+where we'd try and poke holes, and we'd find stuff,
+and we would improve, but we would also teach as
+the consequence of that thing. And so, it's one example. You know, there's hundreds
+probably of examples of mechanisms that we've done
+to sort of scale the team, but the bottom line is that
+we are encouraging questioning, right, consciously
+challenging the status quo, and to borrow quote
+from Grace Harper, right, when we start to see things like
+people saying, we do this this way, because we've always
+done it this way, it's an example
+of a warning sign that maybe you should be
+asking more questions, and maybe you should be
+a little bit more scared. So, that's one. The second observation
+that I'd like to call out, that this idea of ownership. And I think ownership is something that is absolutely
+fascinating about S3, but AWS engineering all up, right,
+the way that Amazon builds. And ownership is really hard
+to describe. So, I'm going to try and do it
+to you with a quick exercise. I'd like you to think of a time
+in your career, in your life where you've worked
+on something that you really,
+really loved, that you cared about. And in that instance
+of working on that thing, I'd like you to think about
+how hard you worked, how invested you were in quality, and how much you really
+were excited to deliver it. And now, I'd like you to flip
+and think about a time where you were working on something
+because you were told to do it. You were working on something
+that you didn't necessarily feel that you understood
+the benefit of, or the outcome for, but you had to do it
+because you were told to. And I'd like you to think about
+how much you worked on that one and how eager
+you were to land it and how the quality
+of that one worked out. The difference between
+these two things, to me, is kind of the property of ownership. A team that owns what they're working
+on is in the first category. And when I look at the most
+effective leaders that I work with, they're incredible
+at driving ownership. And I see them do two things. The first one is they build
+a sense of agency within the teams
+that they work with. Agency means letting the teams feel
+that they've got the breadth and the support to really deliver. And so, the first step
+in building agency is to not tell the team
+what or how to do, right? It's to bring a problem to the team,
+to explain the importance, to get the team involved,
+and to ultimately trust them and to give them ownership
+of what they're building. And in giving it, we're actually
+letting them own the idea and letting them celebrate the win,
+because it's theirs. So, that's the first thing that
+I've seen leaders do that's super, super effective. When you have a team that has agency,
+the second thing that really effective leaders
+that I've worked with, especially in S3 do,
+is they drive urgency. Because even the best teams
+will find ways to slow down. They'll find surprises. They'll find things that
+they're worried about shipping. And you're always, always having
+to make decisions and compromises as you ship. And so, moving fast as a leader
+means establishing ownership, stepping back, letting the team run,
+but keeping your foot on the gas, and making sure that you're checking
+in and helping problem solve and helping the team feel
+that there is a need to deliver, but they're supported to deliver. And so, really, ownership is this
+combination of agency and urgency. And that's it. The two things that I discussed were that you should be
+a little bit scared, and that you should push ownership
+all the way down to the level
+of two pizza teams and let those teams
+really own what they deliver. Focus on letting them love their work but drive them
+to deliver with support. Thank you very much. [music and applause] Thank you, Andy. Amazing stories in how AWS evolved, not only from
+an architectural point of view, but also, from
+an organizational point of view. And we have many of these stories
+and Andy, as being one of our distinguished
+engineers, really focused as well. And I hope that, over time, we have so many of these
+distinguished engineers that have great stories
+to tell to you. I hope that we're able to sort of
+bring them in front of you over time. Now, lesson number four is we've just broken things down
+into smaller building blocks, and we've aligned our organization with how we want
+our architecture to look like, but then we get to the point
+that we not only actually need
+to sort of build them. We also need to run it. How can we make sure that
+the operational complexity also remains handled? In Amazon, we do this by organizing
+these applications into what we call cells,
+cell-based architectures. You've built your application. You know, you have some frontend, you maybe have some containers
+in the middle, you have some data storage
+in the backend, and then you start
+to become more successful. Things start to grow. And any form of disturbance
+in the operations of that will affect all of your customers. It will impact performance, yeah,
+or when a customer gets hot, or, you know, some failure somewhere
+will take down your overall service, all your customers
+will be impacted. And so, managing this is actually
+highly complex in this architecture. So, you need, again, to break things, to decompose them
+into smaller building blocks, that each operates
+independently. The goal here really is to reduce
+the scope of impact, which is essential
+in a complex system. Cell-based architectures, where you define the system
+in isolated independent cells, and you pick a
+deterministic algorithm, often a hash function, that maps customers
+to specific cells, and that these cells, they create order
+in a complex system. They isolate issues
+to specific units without impacting
+the other units. And so, to be able to implement
+this, of course, you need some
+sort of simple router. And this router is very simple,
+because the only thing it needs to do is forward requests
+to the right cells. By the way, a very cool algorithm
+to allocate customers to cells is called shuffle sharding. And there is a great article
+in the builder's library on that, if you're interested. It's a unique way to maximize
+availability of the overall cells. Now, how your cells look depends
+a bit on what you started off with. Now, if you have a regional service, then your cells
+remain regional as well. They're just smaller building blocks. If you had a zonal service, you may
+end up with many more of these cells, but still, decomposing them
+into smaller blocks so it's complexity
+becomes manageable. Now, if you look at some of
+the different AWS services, how did they use cells? What is the sort of the ID
+that they're routing on? CloudFront does this
+on distribution ID. Route 53, does this on hosted zone ID, and the Hyperplane,
+which is sort of the backend of EC2 and the load balancers and things
+like that, do it on customer id, which is by the way,
+a great default if you have it. You also need to develop a little bit
+of a control plane next to it, to be able to sort of manage
+the different cells. And as new customers get onboard,
+you may create new cells, or you may split them
+over the existing cells. All of this is something
+you have control over. Now, just like with services,
+how big should a service be, the question is:
+how big should a cell be? Well, a cell should be so big
+that it can handle, you know, the biggest workload
+that you can imagine, but then it also
+should be small enough, so that you can actually test it
+with a full scale workload. And probably, you know, the right
+answer is somewhere in the middle, mostly because you want to benefit
+from economies of scale. The bigger the service is,
+the higher the likelihood is how many more customers
+are impacted by an issue. And the smaller you make them, the less impact
+of economies of scale you have. So, it is, as always,
+a balancing act. But the one thing, whether we add
+of course, additional complexity, when we think about
+cell-based architectures, because now you have to manage this. This is something you have to do
+upfront, but you have to remember
+that the time to build a system is often minuscule compared to the time
+that you're going to run the system. So, investing in
+manageability upfront is crucial, just like you need
+to invest in security upfront, and you need to invest
+in cost control upfront. Decomposing into cells is something
+that will help you over time, maintain reliability
+and security for your customers. There's a great article in a
+Well-Architected Framework Review that actually deals with all
+the different sort of ins and outs, if you want to build
+a cell-based architecture. If you're interested,
+I urge you to read that one. So, we organized into cells,
+because a complex system, you need to reduce the impact
+of any issues that you encounter. Another lesson that we've learned is that you need to remove
+uncertainty from your systems, because uncertainty
+is very hard to handle. So, you have to design
+your systems upfront, with reducing complexity in mind. Imagine you're tasked
+with designing a configuration system for something like hyperplane, yeah, where you have
+all the load balancers, and customers are continuously
+reconfiguring their load balancers. Especially if you have millions
+and millions of customers, this happens all the time. Sort of a common approach would be to use
+an event-driven architecture. Sort of the configuration changes
+are being stored in the database. You know, we then send out events,
+maybe a queue. You fire up a Lambda that then
+reconfigures the load balancers. But if this is continuously
+happening, it becomes quite unpredictable
+how much reconfiguration load these load balancers have to take. Plot twist, this is not what we did, because the processing
+at the load balancers becomes totally unpredictable. What we did is a much
+simpler approach. Basically, we push all the changes,
+we keep them, we write them in a file,
+store them in S3, and the load balancers,
+on a fixed loop, every few seconds, pick up the new configuration from S3. And this file has a fixed
+set of entries, and they always process
+all the entries. As such, reconfiguration
+is completely predictable. It's very simple. Now, this is really using simplicity
+to build a system that is highly predictable. Now, this doesn't look like some
+magic architectural change, but simplicity will help you here
+to create predictable processing. It's a pattern we call constant work, yeah, consistently pulling a file
+from S3, avoids spikes, avoids backlogs,
+avoids bottlenecks, and it's also naturally self-healing, because the availability of S3
+is unparalleled. Now, let me give you an example
+of another service that makes use of constant work, which is Route 53
+and, you know, the health checkers. So, we have a whole fleet
+of health checkers that you have configured
+for yourself, whether a node is available or not. And so, instead of doing pushes
+every time for every change that is happening,
+periodically, the health checkers will just push out a complete
+configuration file to aggregators of all the nodes that
+they're responsible for. The aggregators
+merge all these requests and then pushes this
+into a bigger table and pushes this to Route 53,
+which does nothing with it. Nothing happens on the arrival
+of that table every few seconds. Only when a DNS request arrives, and it is being resolved
+to a set of IP addresses, you check this table,
+whether hosts are available or not. Processing in this system is
+no longer driven by the event. It is highly predictable, and as such, the complexity goes out
+of the window, and it remains simple. But again, this is intentional. Simplicity requires discipline. Now, you have to design predictable
+systems, which mostly, it's really to
+reduce the impact of uncertainty. Now, the last lesson in this realm of how to manage complexity
+is to automate complexity. It is essential for managing
+complex large-scale systems. AWS uses automation
+for durability, for capacity, actually building new regions, is completely automated. There's no hardly any humans
+involved at all, or you know, the examples
+you gave around networking. Customers continuously reconfigure
+their networking capabilities. And as such, we need
+to completely automate that. Now, the question is:
+what should you automate? Which is the wrong question. The right question is:
+what don't we automate? Only those decisions where humans
+really need to be in the loop, need to be made explicit. Automation for everything else. If you consider what do we automate, it is much more like the common
+and standard behavior, instead of humans in the loop. Now, automation
+should be the standard, and the exception should be
+where we have humans in the loop. Manual input should only be
+required in those areas that truly require
+human high judgment. And actually, a common practice
+or a really practical approach there is that not let have
+one human type in commands. Always let another human
+actually look over each shoulder to actually make sure that we,
+as humans, don’t make mistakes. One area where we do
+a lot of automation, a lot of automatic processing,
+is that in security. Now, of course, at AWS,
+everyone has a security job. We are all security engineers, because security needs to be
+first and foremost in your mind, if you want to protect
+your customers. And by designing the security
+from the outset, we embed security into our services
+as they are created, instead of sprinkling
+something over it afterwards. And so, our security teams not only
+help us build secure services. They also build technology
+themselves, and for example, around automated
+threat intelligence. Now, we have such huge network
+over the world, and we have such an impact. You see such an impact
+of changes there. You know, literally trillions
+of DNS requests a day, and we easily identify well
+over 100,000 malicious domains on a daily basis. That is all through
+an automated process, right? It is a neural network that these
+requests are being pushed through, and then automatically, we detect
+which ones are actually malicious. Then that information automatically
+flows into GuardDuty, so they can protect
+our customers. This will be, if it would be by hand,
+it would be an enormous process, overwhelming, yeah,
+and automation here helps us sort through
+the ever-growing volume of data, and they're able to feed
+this intelligence into GuardDuty. Now, another area, and it's
+definitely something that I've seen inside
+the security team, is something we are all focused on. We all have support tickets,
+well, at least we have, and I assume most of you
+have as well, and most of these support tickets were actually intended
+to be processed by humans. But I believe that sort of
+newer technologies will allow us to actually do a lot of automated
+processing of these support tickets. You can implement an agentic workflow
+to automate some of these processes in a way to reduce
+the complexity of resolving tickets. An agentic workflow looks
+like something like this. It is a system that operates
+independently to accomplish tasks. The agents are specialized
+for very well-defined, narrow use cases. They're capable of sort of planning, iterating, using tools,
+to sort of automate this. This is sort of an example of how we use
+an agentic ticket triage system. Basically, the goal of the agent is to efficiently
+resolve support tickets, and the process then
+becomes read the ticket, use the tools,
+iterate, it categorizes, it prioritizes the tickets
+based on analysis, and it determines the action. It could be to resolved
+automatically, or it could be to escalate
+for human review. Now, how many times having
+to actually open up a ticket and looked at all the different
+information pieces that you needed to look at,
+database here, information about
+the customer over there. We should be able to actually
+present you with a complete picture of the world,
+if you as a human, needs to use your high judgment
+to resolve this ticket. Now, if you're interested
+in this agentic workflow, Claire Liguori
+has a very interesting GitHub repository that allows you
+to give you a really good base for doing this sort of serverless
+prompt chaining. And there's also a great
+self-learning course that is about creating serverless
+and agentic workflows with Bedrock. It allows you to focus
+on automatic resolving issues. That's really great, you know,
+because many of these tasks, especially resolving tickets,
+is kind of boring. Some of this hard work that you
+absolutely just need to do, which you prefer not to. And as such, the quicker you can
+use your high judgment to create this, is perfect. So, automate complexity. Automate everything that
+doesn't require high judgment. So, these were
+sort of my 20 years at Amazon in thinking about
+sort of the many lessons, but definitely,
+lessons in complexity. And these are
+the most important ones. I'm pretty sure, if you talk to
+distinguished engineers at Amazon, you'll get many more lessons, because all of us
+have scars around this, and we've learned this the hard way, but simplexity allows us
+to scale our systems to become more complex over time
+in a safe manner. So, make evolvability a requirement,
+break complexity into pieces. Align your organizations
+through your architecture, organize into cells,
+design predictable systems, and automate complexity. And so, I shared my lessons here, but I'm pretty sure
+you have your lessons here as well. And I, as always, actually really
+would like to compliment the heroes in the audience. Because the heroes are a group
+of people that continuously share their lessons
+with the rest of the world and build communities. Heroes, can you
+please stand up. Where are you? Come on. Over here. [applause] There are now 257 heroes
+under the 53 different countries. They're the feet on the ground that help everybody else
+be successful on our platform. Please, listen to them. Engage with them, because
+they have lessons to tell you that are valuable
+in building your own systems. Now, they're sharing their lessons, but a company who uses technology
+to do a lot of good, yeah, specifically addressing food
+waste in this world, is a company called
+Too Good To Go. I'd like to welcome their VP
+of Engineering, Robert Christiansen, to talk about
+their evolution. Robert? [music and applause] Hey, everyone. A quick show of hands. Put your hand up if you've ever
+thrown good food in the trash, come on. Well, you're not alone. Did you know that 40%
+of all food produced around the world is wasted? That is like going to
+your favorite pizza place, taking four slices out of the box,
+dropping it on the floor, walking away,
+leaving it there to rot. Food waste accounts for 10% of all greenhouse
+gases emissions worldwide, four times more than the entire
+aviation industry. Of all of the environmental
+challenges we face together, food waste
+is by far the dumbest. Too Good to Go was founded
+in 2015 in Copenhagen by a group of young entrepreneurs. And they had a vision: finding a solution for
+the massive amount of food wasted by preferred restaurants. They knew people preferred
+to buy the food at a discount, rather than seeing it
+tossed out. That simple idea grew into
+the world's largest marketplace
+for surplus food. In the first few weeks
+after launch, hundreds of businesses
+uploaded their surplus food to the marketplace app,
+and thousands of users collected their surprise bag
+of unsold surplus food, a win-win for the planet
+and their pocket. Our founders were entrepreneurs
+that started out with a strong conviction
+and a smart idea, but one thing:
+they were clearly not developers. The technical foundation of the app was not the most resilient
+back in the day. And that created problems
+as we grew, and we grew fast. In 2018, after we had our first
+million registered users, the platform started to struggle. Our application was a classic
+PHP application with a single MySQL instance. Our systems was overloaded daily. We did not want to build
+a space shuttle. All we wanted to do was to scale and keep things simple
+for our ten engineers. So, what did we do? We started out with the easy
+options available to us. We could buy ourself a lot of runway
+by using Amazon Aurora's built-in support
+for up to 15 reader nodes. We identified our read-only use cases and used separate connection
+tools in those instances. Then we chose to rewrite
+the application into a spring application
+one endpoint at a time. That way, we could take advantage
+of better resource management, connection pooling, caches, message queue integration,
+and processing. We did not have to build a spaceship. We could simply take components
+off the shelf. We only need to customize a little, mainly to achieve scalable
+high-performance endpoints, specifically those
+that could be treated as eventually consistent
+with lots of traffic. At one million users,
+we have almost been overwhelmed. But with these small improvements,
+we made it to ten million registered users
+just four full years after launching. Our user growth continued
+to accelerate, and at the same time,
+the business wanted new features, and that brought us new challenges. When developers were facing
+the same scaling requirements, we wanted them to take
+from a central toolbox. Remember, we wanted
+to keep things simple. We went with a focused architecture, where language
+and framework were fixed. Common patterns,
+like transactional handling, caching, messaging, security,
+and background processes were given requirements,
+and the same for our services. Fixing the language
+and architecture in these instances lowered the technical complexity. This made the life
+of our engineers a lot easier. At this point, we are serving
+most of our traffic from eventually consistent sources,
+caches, and Amazon OpenSearch, protecting
+our transactional databases from large amounts
+of re-traffic. And it allowed us to grow. By 2020, we had 24 million
+register users across 16 markets, but food is wasted
+everywhere on this planet. More impact for us
+meant more growth. After Europe, we expanded
+to our first new continent, North America, in 2020. Different partners, different habits,
+different time zones. We wanted to be local
+from the first day, low latency, and a great customer experience, but we didn't want to build a new app
+or infrastructure in the U.S. Remember, keep it simple. Being on AWS made it possible. They have regions around the globe, so we could process
+locally in North America. But what does it mean to be
+in multiple regions? Do we duplicate everything? We wanted to expand on what we have,
+keeping it simple, but that did not mean
+it was easy. We went with our approach
+that fixes transactions for customers or partners
+in their home region. And we spread out the data we used
+to serve most of our re-traffic. It required us to plug in Amazon SNS
+Topics and Amazon SQS Queues to spread out updates
+to foreign regions whenever data was updated locally, creating additional patterns
+our developers could use. It worked very well,
+but it took a lot of work, and as you might start
+to imagine how it looks when the number of regions grow. With this, we continued our expansion
+across North America, launching in Phoenix, Detroit,
+and Cleveland this year, just to name a few. We were able to use
+the same blueprint to launch in
+another continent, Australia, this time with minimal effort. And today,
+we are a thriving comunity with more than
+100 million registered users and 175,000 active business partners. So far, Too Good to Go has helped save over 400 million
+meals from going to waste, and we want to make
+an even greater impact. This year, we launch a new product:
+the Too Good to Go Parcel. You can get groceries
+close to the end of the shelf life, avoiding food
+at the manufacturing level. Growth is what you want as a startup,
+but from a tech perspective, it can make for rocky ride. One thing in certain: saving food with Too Good to Go
+must remain simple, because right now, we are saving
+four meals per second. But every second, 80,000 go to waste. There's a huge opportunity ahead. The health of our planet
+depends on it. So, let me leave you with a question. How will you save more food
+from going to waste? Thank you. [music and applause] [playful music] So, tell me, Dr. Werner, what's next? What innovations are customers
+looking for now? Well, we just finished working
+on an interesting database right now, which is beautiful
+in its complexity. Multi-region, multi-active,
+distributed, but enables synchronous
+data replication with zero data loss, simplex. Three words: pizza, friend, Chaz. Idiot! Maybe it's just easier
+if I explain it. Okay, great. I love hearing from customers
+like Robert and Too Good to Go. He really articulated
+the sort of complexity that they faced, growing, expanding, and dealing with data
+across multiple regions. As always, I think that, you know,
+we look at these kind of companies and the challenges that they face
+in evolving their architecture, and then we look
+at what kind of technology should we be building to make
+this much easier for you. Now, if you think about sort of
+the burden of complexity, we always sort of want
+to make sure that, you know, we can take on more
+and more of the burden of complexity that you're facing by actually
+building simple systems ourselves. The goal is to make
+the customer experience, dealing with databases, for example,
+as simple as possible. But if you look at
+the complexity burden over time, you know, when we
+started off first AWS, you were probably running
+your own databases, or, you know, quite often,
+customers still do lift and shift with their architectures
+that were on premise into the cloud, and they will be there running
+their own databases on EC2 and running read replicas
+in other AZs and things like that. The complexity burden
+was really on our customers. The first step, we did
+is actually managing those databases for you with RDS, it significantly reduced
+the operational complexity. No more patching,
+upgrades, backups, read scaling. And it definitely handles
+the complexity of maintaining
+high availability, for example, and it simplified
+recovery processes. But we were still running
+standard databases inside our RDS and to be honest, that wasn't
+a really great foundation for doing innovation
+in database work. So, because you know,
+most databases are built as one big monolith that is very hard
+to make changes into. So, the first thing we did
+was actually start building Aurora by decoupling compute
+from storage. Suddenly, the log
+became the database, and that allowed us
+to move much faster, you separate the storage
+from the engine, so it could scale
+more seamlessly without having to worry
+about your storage. And then we're able
+to do innovations in this world, like Aurora Serverless
+and Aurora Limitless. And they took this even
+to a step further, yeah, basically, on demand scaling, removing capacity
+requirements upfront, and the ability, now,
+also to scale down to zero. But, and on Tuesday,
+Matt announced Amazon Aurora DSQL, the next era of Aurora, yeah? DSQL enables applications
+that can serve customers worldwide, like something
+that Too Good to Go had to deal with, because their architecture
+look differently if it would've had
+DSQL available to them, and it allows for failover
+without disruption. And you can do some sort
+of optimized data placement, both for performance
+as well as compliance. Yeah, it provides you
+with the tools to build globally
+distributed applications, with the resilience required to serve
+hundreds of millions of customers. Now, I'm not going to go into
+all the features and functionalities and whatever of DSQL, but I want to use DSQL as an example of how we apply the lessons that I talked
+to you about early on to manage complexity upfront
+in the design of DSQL, to make sure it is the right
+foundation for evolution over time. It is a hierarchy
+of independent components that are each distributed
+and resilient. And we used the same principles
+that we've talked about before: system disaggregation, decoupling
+into smaller building blocks, each of those building blocks,
+having high cohesion, functioning on one particular task,
+low coupling, so it can individually
+scale those components, and have very well-defined
+APIs between them, because that's
+how they communicate. This gives you very fine grain
+control over your system, and it allows you
+to individually scale the different components
+based on their needs. And it also allows you to tailor
+the security for each of those components dependent on the specific
+requirements of them. Now, if you look at the high-level
+building blocks in DSQL, there's a frontend,
+there's query processor, which is handling actually most
+of sort of the SQL processing. There's an adjudicator
+that coordinates with respect to whether transactions
+can actually be committed. There's a journal that supplies
+short-term storage. There's a crossbar
+that actually sort of merges this thing to its long term storage. Each of these components
+scale in different ways. The query processor scales
+with the number of sessions. The adjudicator scales
+with the number of transactions. The journal scales with the amount
+of throughput that you can actually have
+in one of these storage systems. And the crossbar, again, scales with the number of journals
+that you have, as well as the size of the database,
+which goes through storage as well. So, each of those components
+scale individually. If you would've put them together
+into one big monolith, as the traditional databases are, you would have to scale everything
+at the largest scale of one of these components,
+massively overscaling and becoming extremely inefficient
+and much harder to manage, because now, we have components that
+we can also evolve independently. So, let's take a look how some of
+these components work together. Let's start off with doing
+a simple read transaction. Imagine a user that is looking
+to order a pizza here in a local restaurant,
+here in Vegas. You have all written
+these SQL queries, yeah? Select from restaurants where
+the rating is more than four. So, what happens behind the scenes
+at this point? Your application makes
+a connection to the frontend, which actually allocates
+a query processor. Query processors are a very small,
+independent components, that we allocate
+for each of these sessions. The SQL arrives there,
+we get a timestamp to put at the beginning
+of the transaction. It reads the local clock,
+and it then sends out these requests. Oh, no, first,
+it does something else. It actually consults something
+called the shard map. Now, because in storage,
+the storage is actually sharded, according to, for example,
+database keys. So, it needs to go to the shard
+map to understand which of the storage engines
+actually holds this data. And given that this is a read, it doesn't need to go
+through the transaction path. It goes directly to storage
+to actually retrieve the data. Now, the storage in DSQL is not
+your typical database storage. Typical database storage
+would basically be that you would retrieve a page, and in that page
+would actually contain the data. The storage in DSQL is database
+aware, meaning it can do, for example,
+do something like filtering. That means that
+if I go to the storage engine, ask for this particular row, I only get that row back,
+or that set of rows, not actually sort of
+the complete page that may hold all of this data,
+and that they then need to lock, and that's one of the biggest sort of
+bottlenecks in traditional databases. So, the way that they interact
+with storage. So, these results are then merged
+and returned to the user. So, what happens next? At this point the user figures out
+they actually want to buy a pizza, and this is what we call
+an interactive transaction. And if you're a SQL developer,
+you're already familiar with interactive transactions. You start a transaction,
+you get some data, you do some work in the client,
+you make some decisions, you write some more SQL,
+you go back to the customer, and eventually,
+you'll actually sort of do a commit. And this is a very different type
+of transaction from what you would have,
+for example, in DynamoDB, where you need to do
+all your work in one shot. So, the query will look
+something like this. It will become a bit longer. Yeah, you would select a restaurant, you would choose an item
+from the menu. You then place an order, and what
+you'll do, you'll hit commit. Then the SQL, as a whole package, is being sent to the query processor
+that you've been assigned to you, and they actually merge it
+all together, and in DSQL, the query processor
+functions as a holding tank. They use a snapshot isolation. So, it can do actually read
+and writes on the data that it has in local memory. And it waits for commit before sending the full transaction
+to the adjudicators. The adjudicators are also… yeah? So, basically what happens,
+all the sort of simple SQL statements are handled within one region,
+where the query processes sit, and the only cross-region
+interaction happens when you actually
+are running a commit. If there are adjudicators that are
+running in a different region, you may need to involve them. And this means that reads and writes
+and updates are just as fast as they would
+be in a single region database. Now, the query processor is a very
+unique beast in that sense, and so, a processor actually runs
+inside a small Firecracker VM, and it's placed on the query
+processor host, which is bare metal, and we can literally run thousands and thousands of these
+query processors inside these micro VMs
+on the bare metal host. If the connection between the client
+and the customer, between the customer
+and the query processor actually goes dormant for a while, because the customer
+isn't making a decision, and as such,
+you haven't seen a commit yet, we can actually sort of suspend
+this micro VM. And if then the customer resumes
+this action, we can actually restore
+the snapshot of the micro VM, and we can do that
+within a few milliseconds. So, now, we can really optimize
+for long running transactions. As I said earlier, in the query
+processor, we use snapshot isolation, which means that
+each transaction operates on a consistent snapshot
+of the database, as it existed
+at the start of the transaction. And this allows reads to progress
+without blocking writes, and vice versa. The transaction begins, proceeds
+through the SQL execution phase, and reads see
+this consistent snapshot. And when a write operation occurs,
+like an insert or an update, they may not immediately
+be applied to the storage. Instead, we spool these writes
+locally, creating a sort of a private
+workspace of the transaction. And this allows for, for example,
+reads your writes capability, where subsequent reads
+within the same transactions see all pending changes. Now, the transaction, actually,
+both the write set, as well, a complete post image, meaning that the review of the rows
+in the database after all these updates
+have been applied. So, the write set,
+as well as the image, is being sent to adjudicators, plus time,
+we'll will get that to that. The adjudicators then sit on
+the write path of DSQL, and they decide whether transactions
+can be committed or not. The job of the adjudicator
+is to detect and resolve conflict
+between transactions and ensure that writes
+are consistent. Now, to do this, you know, the create processor created
+a payload to send to the adjudicator, containing all the information
+that needs to make a decision. A payload contains a write set, yeah,
+all the items modified by the transaction,
+and a post images set, basically copies
+of all the table rows that are applied to the effects
+of the transaction. Now, the payload also contains
+the transaction start time, T-start, which is a crucial element
+in committing or aborting the transaction. Now, look at two concurrent
+transactions. Both are sent to the adjudicators, and they're roughly going
+at the same time. Although transaction A was sent to
+commit slightly before transaction B. So, what happens in this case? The adjudicators compare the payloads
+from the query processor, examining the transaction
+start time and the write set. They're looking for any writes
+after T-start, proposed for table rows, indexed
+by overlapping or matching keys. If they see that both transactions
+are trying to update a row identified by key three. So, they can't both change the row
+at the same time. As such, transaction A can commit. Transaction B must abort. Now, if the write sets
+from the transactions do not intersect with each other, the adjudicator
+allows to commit to proceed. In this case, transactions
+are allowed to proceed and are assigned
+a commit timestamp, T-commit. Now, remember I told you earlier
+that, in traditional databases, durability happens
+in the storage layer. Transactions are considered committed once they are durably written
+to the storage layer, and they're then expected to do
+all sorts of things, like recovery committed
+transactions after failure, and they need to be keeping
+the memory and the storage sort of in sync
+to be able to recover things. It's just very hard work. And we decided to make this
+a lot more simpler. In DSQL, the journal is responsible
+for short-term durability. Transactions are considered
+to be committed once they've been written
+to a journal, and the journal
+can scale horizontally, and actually, the scale is based
+on the throughput capabilities that each of these
+storage engines can have. Yeah, but what we see there is
+the total order stream of committed transactions
+in the journal. And this ordering is crucial
+for maintaining consistency across the system. We then actually have the crossbar that starts pulling
+the transactions of the journal and actually move those
+into the storage engine. So, here, we see,
+here's the adjudicators, goes through the journal. At that moment, we can send
+an acknowledgement back to the customer
+that the transaction has completed. As you can see, each of
+the components in this system operates independently. Now, this is absolutely a great
+example of an architecture that follows the principles
+of managing complexity. Now, there was something in here
+that I kind of glazed over. Remember these two things
+T-start and T-commit, and it's an amazing example of
+taking, really doing this complexity, but actually being really simple in how we do coordination
+with different components. T-start and T-commit
+have read the local clock, but in a distributed system,
+that is almost impossible. You can't use a clock
+in distributed systems. And remember, the concept of time
+is fundamental in our lives. Now, you all knew that I started
+at 8:30, and you're all looking at your watch
+now when you see going to finish. And so, time is fundamental. We all, almost all of us
+carry time on our wrists. And for us, sort of more or less, the accurate time is fine. Your approximations is fine, and if we would want to use time
+in our distributed systems, that was always considered
+to be impossible. And we've seen incredible, amazing
+algorithms being developed over time to create consistency,
+to do leader election, to do two-phase commit, all these kind of things
+that we needed to do, because we couldn't use time. And there's a very famous paper
+by Leslie Lamport at the end of 70s
+actually, very famous paper. It got the Turing Award
+for work in and around this. Time clocks and the ordering
+of events in the distributed system, which basically says
+we cannot use time, and we actually have all these
+other kind of capabilities that we need to think about,
+because we cannot use time, and if you look at
+all these different algorithms, distributed locks,
+vector clocks, all these mechanisms
+that have been invented over time, because we couldn't use time. A few years later, very interesting,
+in ’91 Barbara Liskov, another Turing Award winner,
+actually wrote this paper on the practical users
+of synchronized clocks. And it's amazing, because she started
+describing all these algorithms that you could do
+and you could build much more simpler if you would just have access
+to clocks, to time. She also wrote in the paper So, only recently,
+these distributed clocks, these synchronized clocks
+have become in available systems. Well, most recent means
+30 years later, yeah? 30 years later, we finally have
+high-accuracy synchronized clocks. And that allows us to build
+our systems, our complex algorithms,
+in a much more simpler fashion. Now, we have a complete
+different infrastructure, a third backbone
+inside our datacenters, that is dedicated
+to only one thing: to serve you accurate,
+synchronized time, and what we do, and it actually comes
+from the satellite to synchronize that,
+bring that over, this complete separate backbone
+to a cart that sits in Nitro, and where you, making use
+of the Amazon Time Service, can get an accurate time. And this clock accuracy is in
+the order of microseconds. Now, last year, Peter already
+in his keynote, talked about how we improved this
+to microsecond-level clocks, and how this is available
+on each Amazon EC2 instance. This is sort of a graphic
+of how this looks like. And so, satellites reach
+the atomic clock. And then on this complete
+third level backbone, we use FPGA hardware
+and specialized Nitro carts, eliminating, you know,
+drivers and network buffers and things that always burdened NTP,
+as a network time protocol, where you could not
+get any accuracy, except for sort
+of tens of milliseconds. The accuracy of these clocks
+are in microsecond range, single microsecond range. Now, at this point, what you did see
+there is that, actually, you know,
+T-commit and T-start were retrieved
+from this hardware clock. That means that you can
+make accurate comparison about when transactions started
+and when they were committed. That is unique. Now, there's almost no environment
+in this world where you can get this
+except, into AWS. Now, let me be honest, by the way. As much as that I can prove say that these clocks
+are highly accurate, highly accurate clocks
+actually do not truly exist. There is always maybe a slight drift. There's maybe a little
+communication difference. There is some delay somewhere, and as much, there is an error bound
+on each of the times that you get. And we've built ourselves a system
+called Clock Bound. It's a daemon that runs
+on your EC2 instance. And there's a library
+that is in GitHub that you can make use of that will give you not only
+the accurate current time, but the potential error
+bound around it. And you can make use
+of that error bound. You can think about
+what is the earliest time, and if this is the accurate time,
+actually what we think, but what could be the drift off
+the earliest time, or what could be the latest time
+at this point. You determine which of these clocks
+you actually are going to take. So, this actually doesn't
+give you microseconds. It actually gives you
+a nanosecond clock. And you also get the bounds
+in where we think, you know,
+what is the potential error on this? And that's not bad. You can actually make use of this
+error bound to actually consider to be
+what is the most possible latest time that this happened at,
+and what is the earliest time. Now both Aurora DSQL makes use, and it becomes extremely simple
+into the coverage, because we can make use
+of synchronized time. And it's the same technology that we
+used in Amazon DynamoDB global tables that now also provide
+strong consistency. Much simpler, we can do
+worldwide strong consistency, because we have access
+to synchronized time. Precise clocks reduce
+complexity significantly. Look at all these algorithms. I've worked on many of these,
+because I never had access to time. Distributed transactions, conflict resolution,
+leader election, you know, two phase commit,
+Paxos, Raft. All of these will be so much simpler
+if you just use time. And I know Matt also started
+his presentation on Tuesday by talking about how we always wanted
+to give you the building blocks for building
+the next generation of systems. Yeah, and originally,
+they were really compute, storage, databases,
+network, and security. Those were the original
+building blocks. But now we've added a more fundamental
+building block to all of this. And the fundamental building
+block is time. I urge you all to look at sort of
+the algorithms and the mechanisms that you're
+building in your applications, and whether synchronized time
+can actually help you to significantly reduce
+the complexity of your systems. So, that more or less are my lessons
+for you today. Thank you for listening
+to all of this. And you know,
+we all have time to spend. So, I'm about to let you go. I am actually going to spend my time
+in the coming year about something that I actually want
+to raise your attention to. We, as you know,
+also if you've watched the Now Go Build TV series, I'm very passionate about younger
+businesses and organizations that try to solve some of
+the world's hardest problems. If you look at the sustainability
+goals of the UN, in, by about 2050, we're supposed to have two billion
+more people on this planet. How are we going to feed them? How are we going to provide
+healthcare to them? How can we make sure that they have
+an economically sustainable future? And there's many, many young
+businesses and organizations that are trying to attack
+these problems, and I really want to help them. So, one of the things
+that we're doing is we have an organization
+called Tech to the Rescue. We have a cohort system for AI
+for Change Makers. And I've created a fellowship
+for their CTOs. So, I'm helping them,
+and my team is helping them sort of really beef up
+their technical capabilities. And I've been very grateful for the Heroes,
+actually also stepping up, and helping to advise
+these young businesses how they can actually use technology
+to do good in this world. So, thank you very much, guys. By the way, one of these things
+that these organizations tell me, they often have a very small unit
+of technologists, right? If you, and what they could really
+use sometimes is just two weeks or a month of someone's time. If you are looking to do some good in
+your work and make use of your technology
+capabilities to really make a difference, start looking out
+these organizations, and so, donate some of your time. Donate some of your experience
+in building really big systems to actually truly
+make a difference in this world. As technologists we created
+not everything beautiful, but it's also our responsibility to actually solve some of the world's
+hardest problems, using technology. Now, okay, the serious part is over. I'm going to spend my time tonight
+on actually going to this party. I hope to see you all tonight
+at the Las Vegas Festival Grounds. Weezer and Zedd tonight. So, see you there. Party! [music, cheering and applause]

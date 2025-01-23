@@ -1,0 +1,329 @@
+- We appreciate you all coming out to watch about an architecture framework of extreme resilience called Camada Zero. Camada Zero is a proper
+name in Portuguese. So to simplify our communication today, we will be using a nickname C Zero. So anytime we say C Zero, we
+are meaning our framework. Before we get started, I kindly ask you to answer some questions that I will ask to you raising our hands in a (indistinct) response. So who of you here have been building and operating mission
+critical applications in production environments? Yes, so we do as well. From who of you during
+a situation of failure have been little or no
+control to fail away from a failure on a mission
+critical application? Yes. So is resilience a key topic
+for you, I imagine, right? So it is for us. That's why C Zero is not only a framework but also a collection of
+technical products and principles, especially when we are dealing
+with a reasonable amount of customers requests. In it Unibanco, we have nowadays more
+than 65 million customers out of which 20 million
+are digital only customers. Those customers are
+servered by what we call business services. As business services, you can
+understand as for example, opening a banking account,
+executing an electronic payment or contracting an insurance package. We have more than 4,000 of
+those business services. And as one of the largest
+financial institutions in Latin America, we are a 100,000 employees by now, out of which 14,000
+are technology specific like myself and my friend over here. We are right now 98 years old, so almost a centenary organization and along the years,
+we have been perceiving at changing the habits and
+expectations of our customers, especially in the last
+years where we went through tough times during Covid pandemic where we were not able to leave our homes to go to physical stores
+and buy our goods. We had to buy them online. And it changed the way our
+customers are interacting with our products. So by now they are not restricted anymore to opening hours of those stores. They can buy anything anytime. And it required us to change
+culturally our organization and especially realize that technology is not here to support our business. If not, it's the core of our businesses. And as a (indistinct) organization, we still have some monoliths
+running on premises requiring us to establish
+a modernization strategy so we can meet our customer's expectation. So therefore, we entered
+in a partnership with AWS, a 10 year partnership with AWS to build this structured roadmap starting with peripherical applications so we could learn with them developing and deploying
+those applications in a single AZ deployment afterwards evolving to a multiple AZs deployment and so on up to moot region
+and mooch AZ together. The compounding the
+architecture of our applications into microservices so we
+could speed up the velocity. We deliver new features to our customers through those business
+services I mentioned to you. Back in 2016, we started our experiments in the cloud by using a private cloud. And in 2020, we defined mandate
+to be publicly cloud first. Meaning that every single
+new application in Itau has to be done on the cloud. In 2021, we speed it up the pace of our cloud migration. When I say cloud migration,
+I'm not mentioning he hosting, if not he architecting and
+rebuilding our applications. By the end of this year, we will have 45% of our
+applications running on AWS. And by the end of next
+year, we will have 60%. Throughout those years,
+especially the last two years, we have been learning a lot. In one of those situations,
+back in December, 2020, there was a situation hap that happened in South America East one region of AWS where one data center
+of one availability zone got air conditioning problems. In that situation, the
+data center got overheated and therefore shutting down
+automatically some of its racks. Therefore, some of our applications that were exposed through
+endpoints using load balancers, we were able to fail away
+from that failing AZ. It's a normal situation. It's expected on the cloud where you have multiple AZs
+and one of them can fail. But for some other applications where we had an API
+gateway as the entry point, as the error rates increased, that AZ was took away from the pool and then no more requests being servered with the (indistinct) customers. But when the error rate decreased, it was put back on
+against serving air horse to our customer's requests. So in that situation, we had no control for those specific applications. Considering Brazilian market where there is a
+consolidation of the market, just a few players process
+the whole set of transactions in the country and Itau being the biggest, we are responsible for processing 30% of the all the transactions
+in the country daily. And that situation back in December, 2020 hit us in one of our mission
+critical applications impacting our most 14% of our customers. That impact for us is not affordable because for our applications,
+we consider any impact equal or higher than 10% of our customers are high risk impact. We are impacting our customers and we also have implications, regulatory implications in some cases. (indistinct) and I generated the report saying that Brazilian e-commerce market will double in size by 2025. Could you imagine if that
+situation could happen in December, 2025? We would have impacted
+much more customers. That's why from now and on for our mission critical applications, we're gonna be naming them
+as C Zero applications where 100% of uptime is highly desired. So we can guarantee we are up and running. With that in mind, I will
+switch over to my friend here to present more details for us. - Thank you, Luciano. Hello, my name is Jorge. I'm also a distinction engineer in Itau and today I'm here to present to you something that we expect that will change irreversible your life forever, at least in terms of
+thinking about resilience. As Luciano my friend told us, the context that we are in Brazil is critical for some of our applications. It's not for everything of course. Most of our applications, I will say the majority
+of our applications can live in the standard
+architecture in Brazilians that we have in (indistinct) AZ and (indistinct) region solutions. But some of those applications,
+decor of our modernization, those type of applications
+are extremely critical. And for those type of applications, we design this framework. It's not just one application, it's like hundred of applications, but it's not thousand of applications. So it's basically 4%, 4 to 5% of the applications that we have. In the beginning, to achieve resiliency, we started thinking to build a platform. So let's build up extreme
+resilient platform. Let's put all the applications
+on top of this platform and we should be fine. But then when we started
+thinking the applications, the applications has many
+different requirements. So we have, some of the applications
+are low rating applications, some of the applications are
+high to put applications. So it's gonna be very hard
+for us to have a platform that could afford all the requirements for all the applications. And then, we started
+rethinking our strategy around resilience. Then we came up with
+a C Zero, Camada Zero. C Zero is then a framework. And our approach for extreme resilience, it's not just an architectural approach, it's something that goes beyond, goes to the engineering side and also goes to the operating side because the combination of everything will you delivering the
+end, the extreme resiliency, the stability, and the high
+availability that we want. So to sum up, C Zero is this framework we think in principles and this framework we are going to show
+and we are going to show the principles of all the three pillars. We will dive into one principle per pillar and of course we are more than
+glad to have a conversation aside about the other
+principles if you want. But keeping mind that all the
+principles that we designed are not just principle. We thought that principle with this extreme resiliency mindset. And our mission here today is try to explain to you this mindset. As Luciano mentioned,
+we wanna have control. We don't wanna fight against failures because they will happen, but we wanna have control to
+fail away from those failures. Minimizing MATTR and
+in the end of the day, minimizing customer impact. Okay? Let's take a look in the
+architectural principles first. So those are 12. 12 architecture principles. We will explore this first one, which is the scale unit
+based architecture. Who of you have heard about
+a scale unit approach? None? Okay. So we will get there. We will explain why do you, how do we approach this architecture which is in fact a
+cell-based architecture. But instead of called cells,
+we call them it's scale units. Let's put this concept of a
+scale unit a little bit aside and let's treat the C Zero architecture as a cell-based architecture. I will explain to you what is our approach on our cell-based architecture design. And then in the end I will come up with, I will bring back the scale unit concept. Let's dive deep into all these components. This is not an architecture, okay? This is an archetype of an architecture. Each application that
+we design in the score we design with everything that is that has in this slide in mindset. So let's start with the cell. What is the cell? The cell is the application. So the application lives inside the cell. The application should be self contained. What I mean by self contained
+is everything is there, the compute layer is there, database layer is there,
+messaging layer is there, everything that we need to deliver. The purpose of that
+application lives in this cell. So let's take an example. If this application is
+an API based application and we will expose this
+API through some services running on Kubernetes cluster, there will be one
+Kubernetes cluster per cell in this design. If this application has a DynamoDB table, there will be one DynamoDB
+table per cell and so on. That's the idea of this cell. This cell has to be decoupled
+with the other cells. So if we have a failure in a cell, it should impact just that cell. It should not impact all the other cells. If there is a dependency among the cells, it should be loosely
+(indistinct) in order. If it's healthy, okay, if it's failing, does not
+impacting the other cells. In this case, we represented the cell 1A as
+green, meaning it's healthy. So this cell is healthy. But in the application, what we can have is some of the cell failing, like this cell won't be
+I represented in red, meaning it's failing. So cell 1A is healthy, cell
+1B is failing, that's fine. And it is going to be good
+if we can route the traffic of that API, for example,
+to the cell one way. So if we route the
+traffic to cell one way, customer will not see
+the failure happening in the cell 1B. So that's how we approach cells. So far, good? Let's move to another
+concept in this architecture, which is the shard. The shard for us is a
+partition of the system. It's really a physical
+partition of the system where we put some of the customers in one shard for instance, and other customers in other shard. So application per application,
+we design the shards. So we think, how can we put the shards in order to provide resilience? Let me give you an example
+of one of the applications that we have that we design is
+shards to improve resilience. We have one critical API,
+which is our withdraw API. This withdraw API is
+used in all of our ATMs. So if you go to Brazil
+and you go to a branch and you see like five ATMs and if a customer wanna withdraw cash, it will reach this API. If you go to a supermarket and you have two partner ATM's there and the customer wants to withdraw cash during in the supermarket, it will reach the same API. So it's the unique point of authorization for withdraw money for us. So this API is very critical. We don't wanna have
+failures on this system because we don't wanna avoid our customers to get their money if they need to. So we approach the shards
+thinking in spread the ATMs, the terminals in each specific location into different shards. So in the same example in the branch, if there is five ATMs, each of the ATMs will be
+routed to one different shard. Meaning that, if we have a shard problem, full shared problem, just one ATM of that location will be down and customer will be
+enable to withdraw money in that location without having
+to move to another location trying to figure out if
+another ATM is working or not. This diagram also shows us that we have a different
+shard design in this case. So the shard can have different
+designs with the cells. So in this case, this shard number two, it has the cell 2B and the cell 2C. The green means healthy and
+the white in case of cell 2C means that it's not active
+yet, which is a not active, not active design for that specific shard. The reason why we do this
+is to have static stability. In case of a failure, we don't wanna have to spin up new cells to afford the request that isn't coming, that is coming from a
+speci, to a specific shard. So in this case, if cell 2B has some problem
+and start becoming unhealthy, the (indistinct) is routed for cell 2C because those two cells
+lives in the shard too, meaning they can answer the request for that specific terminal ATMs in the case of the sample
+of that specific shard. In addition to full tolerance
+in case of the cells, so we use the cells in the
+shard for full tolerance, but in addition to that, we
+also can use for scalability. So for instance, this shard
+has a different shard design. It's not just two cell,
+there are three cells and it's not in the
+active, not active design. But now it is in the active,
+active, active design meaning that we do have in this case for tolerance because we
+have more than one cell and it's mandatory for C Zero
+to have more than one cell. But we also have a way to
+spread, to divide the demand among the three different cells. So if we have something
+like a week in the month that is that there are some seasonality, we can spin up more cells
+in this type of shard. It'll override application
+per application. If the application supports
+the active active design, then we can implement
+the active active design and we can have scalability as well. And that's the concern that we have. When we talk about cells, just cells, there is one thing that
+can break the whole shard, the whole system which is scale. So if we design the application
+that lives in that cell, that Kubernetes cluster for instance to support 1000 TPS for instance,
+and we receive 2000 TPS, then probably the active cell will break, the router will send a traffic
+to this, to the healthy cell, the other cell will break
+and all the cells will break. And that's the reason why we take care with just the cell concept. And we came up with a scale unit concept. So since the beginning, when we start designing the application, the cells, the shards, we think about this scale. What would be the scale
+of that cell, that cell, that scale unit. What would be. Are we going to design 400
+TPS, 1,000 TPS, 10,000 TPS? We decide. Are we going to design
+for one gigabyte of data, 10 gigabyte, 100 gigabyte? We decide during design phase. We should have a comfort
+on that, on the design of the scale unit. So when we take a look
+into the application and we see our peak in
+the on demand was x, we design the shard for the cell, the scale unit for double x because we should be comfort with that. It will be not easy to increase the scale unity scalability, we gonna have to split the shards or we gonna have to rethink
+the application design to support a higher
+throughput in this case. So that's the reason why we
+take care with the scale. The scale is very important
+in this type of application and we treat the cells as a scale units in order to avoid breaking everything. Of course, I spoke a lot about routing. And it became easy to
+understand that we need a router in this architecture because
+we needed to properly route the requests not only to the proper shard where the application has to end but also to the healthy
+selling that shard. If we route the the request
+to a unhealthy shard or unhealthy scale unit,
+it will be, you know, we will impact our customers. So we, for that, we design a tech product which is a router, we
+call this router compass. This is a thinnest possible router. It holds all the route logic
+and it checks all the cells, all the scale unit healthy. And with this two information, the routes routing table
+and the health table, it decides for from the request that is coming where it is routed to. In addition to that, it
+could become of course, a single point of failure. So in addition to that, the router is also a
+cell based application. So we deploy this router
+in multiple cells in order. If we have something wrong
+with one of the cells, that's fine, we take that cell away, we take that cell out and the
+other cells of the router, we will receive the traffic. Another thing that we can see here is the role that an AZ
+does in this archetype. You can see that the cells
+lives in one specific AZ and that's the reason why
+we wanna do this of course and we wanna do this because we wanna bind our failure domain, which is a cell with the AWS
+failure domain for domain, which is the AZ. So I wanna avoid that
+as a single AZ problem impacting the whole system. We wanna definitely avoid that. So if all the cells were
+spread across the three AZs, they are failure in one of the AZ would impact all the cells. And we don't want to do that. So when we spin up clusters like a, a Kubernetes cluster in cell 1A, we give to this Kubernetes cluster as subnet that lives inside just one AZ. It will become this cluster
+will sit in that specific AZ. And that's quite important because the story that
+Luciano mentioned to us brought us this idea of have
+the maximum placement control. Again, C Zero is about having control. We wanna be able to move away of failures that is happening in the system. But now, when we take a
+look into this architecture or archetype of the architecture and we think simple things
+like deploy a new version of the application, it became like much more complex because now it's not just one application. In this case we have seven applications and we also have three routers or three main deployments in three different clusters of router. And in addition to that, deployment is also something
+that can introduce failure to the application and
+that's the reason why we wanna orchestrate the deployments in a way that we avoid
+to introduce the failure to all these cells at same time. For that reason, we
+designed the control plane. So a control plane, the C Zero control
+plane is attack product. I represented here as a single box but it's not a single component. In fact, is a complex system that orchestrate all the deployments. So the control plane will
+control a deployment stage like starting from shard one, waiting for some time before stabilized, applying changes always in
+cells that are out of load. So the control plane can work together with the compass router and put the cells on load or out of load and once the cell is out of load, the control plane then we will deploy, the control plane can
+do tests on the cells that are not in production. The control plane can
+orchestrate with the compass to shadow traffic to the new version of the application and the old
+version of the application. We can move the deployment using cannery and control plane also will avoid us to deploy in every shard at same time. Because if we do that
+and we introduce a bug, we will introduce a bug
+on the whole system. In the control plane logic, we also try to have a cell
+ready with the old version. Meaning that the rollback of a version is something that we need just to switch on the router layer. We don't need to spend time
+in fact deploying things to roll back. So all these things are the responsibility of the control plane and control plane is a key piece for all these architecture to work and to reduce complexity as well because otherwise with the
+common tools that we have, it's going to be very complicated to have a simple bug fix
+deployment in this architecture. I will hand over to Luciano that we will explore
+the engineering pillar. - Thank you so much Jorge. So as Jorge was saying, we also have some engineering
+principles as well. And when we think about
+engineering principles, we have a bunch of patterns
+already pretty well defined and then documented through books, white papers and articles
+related to resilience. For example, we can name a few of them. Retry patterns, time
+outs or leader election when we need to choose
+and pick one service to answer specific request or a sequence breaker
+where inside a service we can decide if a failing dependence should be called or not. And therefore keep
+serving customer requests with partial of the functions available. All of that help us on this situation. But let's speak an example of
+calling an external dependence from a service. And that's where there is our extreme resilient mindset of C Zero. For example, over here
+who have already created a service that call an external dependence as a synchronous with a
+message queue in between? Yes, so do we have done that as well? And with that in mind, we are gonna choose over
+here one of our principles to discuss a little more. Small service with a well-defined purpose and without sharing your sources. Let's think for example, in Java programming language,
+using spring booth framework, our developer can just use an annotation on top of a method to turn that
+method in a message consumer and also with a single method call, turn that very same method
+as a message producer, which in case for us in C Zero
+means a super responsibility because we are increasing
+the testing surface and also troubleshooting
+surface of that service. In case of any problem, we will have to troubleshoot both ways. With that in mind, let me show you a simple diagram of an example of a C Zero application. With this approach over here, we separate in a more granular
+view the responsibility of that very same service
+I give as an example. First, we have a controller responsible for processing the business
+lodge behind the orchestration of the call of the external dependency. So every single change we
+need over the business logic will land on that very specific service. No other part of the
+excel or the application will need to be changed. In the same way, there will
+be an educated repository for that controller, meaning that every change of the state or consumption of the state of the data will be responsibility of the controller. No other service will have access directly to the repository. So we can guarantee that
+any change on the data will be done through the controller. Another part of this small
+example is the retry logic. We put a retry logic in a service outside through a delayed message queue pattern where any change we need on the retry will land on this very specific service and it'll also help us
+out to monitor that queue and understand if the flow
+of the messages in that queue is high than expected, meaning we are retrying more
+than we should on that service. The other part of the service is separating the
+producer from the consumer because on the producer flow downstream to the external dependency, we could implement there
+for example a validation of a schema so we can be
+compliant to the request, downstream to the external dependency. In the same way, the
+consumer, we could do the same and in case of any change
+required, we do it isolated. So we are gonna reduce the troubleshooting and testing surface of those two services and we can validate in
+downstream and upstream flows how they are going, if they're in the way, we are expecting that. With that, this simple diagram
+seems to be more complex at the beginning on the build side, it will be a little more complex, but afterwards for
+evolutionary maintenance it will be easier because
+we have some specific parts of the application to change in case we need some specific change. Also, as I said, it makes easier to test and to
+troubleshoot the application. In the end of the day,
+turning it more resilient, which is what we are looking
+for this C Zero applications. With that in mind, I hand over to Jorge to
+continue through the operations. - Now let's get into the
+hard part operations. Usually, when we think about resilience, we don't think in the operation side. And most of the time, when we
+not properly operate a system is when we introduce
+failure to the systems. There are a couple of principles here and changes is one thing that important. Design and implement changes
+is sometimes complicated when we wanna extremely
+avoid introduced failures. But as we saw in the architecture, having two different cells and
+have some restricted policies where we have, we always
+have a old version of a cell ready to be switched back. Then the risk in the
+exchange in implementation of a change reduces a lot. So that's the reason why, instead of speaking about change besides it's very, very important, I decide to dive into
+the observability part. And observability is something that we, we know there is a lot of ways to make an application observable. It's needed for sure. A mission critical application
+should be observable and we should understand
+if it's working or not as soon as we can. But in fact, the application
+should be observable, which is the first principle. But in fact, the top that I
+brought here today to cover is something related to the alert platform that is coupled to the observability. One of the things that we usually see is that we have a mission
+critical application, and then we have metrics for everything. Infrastructure, network,
+application, business, everything. And then we put a lot of alarms. Threshold, (indistinct), CPU memory, Q length, Q latency, everything. And then when we have a problem, we receive a storm of alerts
+and we don't know what to do because there are too many alerts coming that we don't exactly
+understand what is happening. What I, what we've saw
+also, we've seen also is something that we put a lot of alarms and then we leave with
+some of the alarms firing. We leave production. Hundreds of alarms firing. And then you go to the engineer, hey man, there are
+hundred of alarms firing. Oh that's common, that's okay. The alarms are there since the beginning. I can tell you the application is working. Oh, okay. That's not what we want
+in C Zero applications. So here, I'm going to show how we approach especially how can we prioritize alerts that are more important and in fact, can represent a real impact
+on the customer side. And we are using SLOs, which is also a pretty common concept of having an objective for
+some of the service levels that that we wanna have. But to make it more clear, I will switch to a quick demonstration. How we are approaching SLOs. First thing, we start
+measuring everything. So we have measured for everything, but then we have to understand
+what is the user journey. So here is an example. It's one of the applications. This application has this
+journey called discovery. This is a pretty important discovery in this pretty important
+journey in this application and it impacts the customer
+a lot if it's not working. We start mapping this journey. So for this energy
+point discovery to work, what do we have to make it
+happen properly with healthy? So there are a couple of
+components that we do cause and request (indistinct)
+and things like that. Okay, then we design the contract. So we are using definition
+of SLO contract. And in this definition of the contract, we have something related
+to, we have some metadata, but here we having exactly how we are going to calculate this SLO. And here is the objective of this SLO. This SLO is a latency SLO for this journey for discovery journey. So we put as an objective to have in P90, less than 500 milliseconds
+in this API call. This is our objective, this is what is implemented in
+this con, into this contract. Then we can start monitoring. Of course, first thing. We do have dashboards that will show the food discovery journey. So these are pretty common. SLIs and we have alerts
+for everything here, which sometimes are part of those alerts that we don't care (laughs). And here, we do have an example
+where (indistinct) testing this cluster and during the test, you can see that the
+latency went up a lot here. And of course the throughput
+went down during this test. At that same time, the
+calculation of the SLO showed us that the SLO was not met. So here's the first thing that we've done. We transformed that metric P ninth less than five milli hundred
+second into a percentage. So everybody that are
+in the operations today don't need to understand what is the SLO, but it can understand that
+we are not meeting the SLO because we are delivering
+less than 100% of the SLO. So this is standard
+thing is very important for the operations or in
+the teams that are running, quickly understand we are meeting or not and they don't need to
+think what is the SLO? Oh it, this latency is less
+than 500 or less than 200. They don't need to think about that. So we calculate the SLO and
+put the SLO into a metric that is based on 100%. Then we can see here the SLO, how the SLO have over and over time and we see the SLO
+decrease, the SLO decreasing during the experimentation, the KO's experimentation
+that we did actually in fact as we have the target of 9%, then we can calculate DAR budget. And this shows how DAR
+budget is being consumed during the test. So here easily we see during 10 minutes we burned all DAR budget, which is and during that
+specific period of time we were impacting the customers. Of course, we also do
+calculate the DAR in numbers. But here is how we approach the alerts. There are third metric that we calculate, which is the burn rate. Which is in fact the
+velocity that we are burning that is specific effort budget. In this type, in this application, the one hour window, one hour time window is the window where we can, where where we want to alert our engineers and make them act. And when we have the
+burn rate going over one, means that if we don't
+do nothing at that time, we will burn the rest of AR budget for that specific time window. So that's the trigger. Wen we want a fire alert, an alarm, this alarm should alert the engineers and then the engineers should come up and understand what is really happening. Probably at this time, we are going to see a
+lot of technical alarms firing as well. Probably CPU somewhere, memory somewhere, (indistinct), a network,
+(indistinct) somewhere. We don't know. It will be just a matter
+of investigate actually, in fact in C Zero we don't
+fight against the problem. So we will just identify
+which cell is presenting this latency problem and we will move away the traffic of that cell. And then we try to understand
+what is happening there. But this is how we approach the alerts. So our alert systems for this
+mission critical application is based on the burn rate of
+the AR budget of our SLOs. And how, probably you are thinking how they calculate that thing, where do they calculate that thing? So we develop a component
+that lives inside the cell. So very close to the application, there is a component that
+keeps calculating the SLO. The SLO, the AR budget and the burn rate. The SLO, the AR budget and AR rate. And this component is part
+of the healthy status, meaning that if this component fails, we consider the whole cell failing. So then we cannot
+calculate the SLO anymore. So we should move away of that cell because we don't know what's
+happening there, right? So that's how we approach
+SLO's for operations of C Zero, which are critical applications which we have critical applications. Let me switch back to the
+PowerPoint to the presentation and let's sum up. So C Zero, Camada Zero, is a framework of
+architectural principles, engineering principles
+and operating principles. Hope, I hope that you could understand our extreme resilience mindset, not only in the architecture
+using this scale unit but architecture approach, but also in one of the principles that we have in engineering, the small responsibility principle and also in the operations principle. And in Camada Zero, again, we wanna have two, basically two things. The extreme resilience mindset
+and the maximum control. In fact, we don't wanna
+have be in a situation where we have a failure happening and we have to troubleshoot that failure. Users, customers being
+impacted at that time and we trying to understand
+what's happening. So in Camada Zero, there
+is no situation like this. We just move away in the cell
+and everything should be fine. And even if we have like a complete shard or partition with some sort of failure, it doesn't represent the
+whole system failure. So we reduce the blessed
+ratios as much as we can. So I hope you enjoy, I would like to thank you all. If you had time, there
+are a couple of more hours in our booth. It's going to be a
+pleasure to have you there and discuss more about Camada Zero or other products that
+we have in the bank. And I hope this presentation
+could change a little bit the way of your thinking on resilience. So thank you very much. - [Luciano] Thank you so much. (audience clapping)

@@ -1,0 +1,1400 @@
+[thunder claps] Have you ever thought
+about the world? All of its goings on? How chaotic it might be? You probably see it when you get
+your coffee or when you turn on your laptop or when you detangle all of
+the wires underneath your desk. Of course, I often say
+the world is asynchronous. Now imagine a world that is ordered,
+synchronized, one by one. Would you like to see that world? Nope. Where's your sense of adventure? Look, if you take the blue pill,
+our story ends here, and this conversation
+never happened. If you take the red pill, I'll show you a more ordered world
+one that is synchronous. What about the yellow one? Oh, that's just a jelly bean, banana. All I'm doing is offering
+the simulation. [electronic music playing] Here you go. Thank you. [music playing] - I'll need a minute.
+- Oh, take your time. - Burger and fries.
+- One at a time, please, sir. Burger. [music playing] Anything else? Fries. [music playing] Excellent. [elevator music playing] This place is crazy. No, this place is synchronous. Well, this place sucks. And how did you get that so fast? It's not how, but where? shall we? [phone ringing] It's for you. Please welcome Vice President and Chief
+Technology Officer of Amazon.com. Dr. Werner Vogels. [electronic music playing] Hello, Vegas. I really should have taken
+the blue pill to be honest! There's absolutely nothing
+that is synchronous in this world. And if there was, we really
+wouldn't have like it. And think about those things, when
+you're building your computer systems. And actually, I think the example
+there is actually really good. What I've really learned is that
+if you even want to build good computer systems,
+you have to look at the real world. And what I've observed is that
+the real world is asynchronous, it’s not deterministic. There’s so many events
+happening around you, trillions of events all the time. Yet we seem to function
+pretty good in an environment that is not
+so terribly controlled. And so when I think about asynchrony, what I think is that it's similar to
+that the world always keeps turning. That just no matter
+what happens in the world, our planet keeps turning. And so if I think about asynchrony, it is that we should make progress
+in all circumstances no matter what happens
+in our world. In our digital world,
+we should still be able to make progress
+under all circumstances. And actually if you think back
+about 16 years when we launched S3, we had a whole series
+of distributed systems principles where we built S3 against
+and one of them is asynchrony. We wanted to make sure that
+the system would make progress under all circumstances, no matter what the load,
+no matter what is failing, no matter what new functionality
+we are introducing in the system, it should always make progress. Now, of course, you know,
+a lot of it is synchrony because we enjoy synchrony,
+because it seems so much easier. Now, the things we really care
+about are latency and throughput. And in this particular case,
+in classic synchrony. Now, as you can see,
+throughput is one, and latency, if that one worker has to go through
+the whole chain of everything that it needs to do
+and fry one fry by one fry, that was actually pretty amazing, then you see that latency
+as well as throughput will suffer. Now, of course, you know, you can add
+more parallelism to it. You have multiple workers. But they still actually have to – they are probably blocked on the
+shared resource, which is the fryer. And maybe it looks like
+throughput will improve, but latency will definitely suffer. So getting closer to the real world
+is asynchrony, that you have one or more servers
+all they do is take orders and then they write the order
+on the slip and put in a rail
+where the chefs can pick up. You have multiple chefs,
+each of whom are at the station. And so they all see the order
+coming by, and if they need to work on it,
+they pick it up. You can have these things
+happening in parallel, behind the scenes for you. It is parallelism but without blocking
+on any of the shared resources. Now, if you really want to improve
+latency and throughput, You can have some of these stations introducing actually
+additional workers. So there was actually a system in the
+‘90s that Matt Welsh developed, which was called staged
+event-driven architectures, where basically you have
+all the benefits of an event-driven
+architecture, but you have controlled parallelism
+in each of those individual units to make sure that they're
+not blocked on any resources. Again, coming back to the
+design principles of S3, we took that into account. We wanted to make sure that there
+was controlled concurrency and controlled parallelism. That control concurrency
+really means that you have to think about where are the blocking
+resources that you have in mind. Now, sometimes the world
+looks synchronous. And one of those examples
+is bird murmurations. They look so beautiful. They are absolutely amazing
+and mesmerizing. And it looks like there is
+a centralized controller that tells all these starlings
+where to go and what to do. Our ancestors actually thought
+that there was telepathy in the birds
+that kept them going. But nothing is more untrue. This is not a singular system
+because its nature, and nature is asynchronous. So all the actions that the birds
+take are based on local observations. Now what it does, it has three,
+maybe four objectives. One of them, it wants to stay
+close to its mate, but it doesn’t want to fly into them, and it would like
+to avoid predators.. And so what you see there is that
+if the other birds get further away, you accelerate. If you get too close to the other
+birds, you switch direction. And if you are sort of in a nice
+spot, you make sure that your speed matches the speed
+of the other birds around it. And this actual behavior
+of attraction and repulsion, looks like a spring. Now, in the ‘60s/’70s,
+there was some fundamental thinking, what's called systems thinking. Donella Meadows is one of the most
+famous authors of these books about systems thinking, and she already came up
+with the notion of positive and negative feedback loops. And what you see here with these
+birds are positive and negative feedback loops. They continuously move back
+and forth. Actually, in my academic days,
+I built simulations to do this. You have X, Y, and Z axes
+and basically Pitch, yaw and roll. So what you see here is that
+it's purely driven by local decision making. The bird is completely autonomous, even though the overall system
+looks like it's working in synchrony. But it's not. This is a pure asynchronous system. So the world works asynchronous. If you look back at those S3
+design principles asynchrony, autonomy, local decision,
+make decisions on local data, simplicity, controlled asymmetry,
+symmetry, simplicity. All of those were
+distributed systems principles, but we derived them
+from how the real world works. And if you think about synchrony,
+synchrony is a simplification. It's just something that makes it
+easier for us to write our programs. But you know what? Synchrony is an illusion. It's something that we've built
+over a world that is asynchronous. Systems as we know,
+there are asynchronus as well. Now let's go to some of
+what our digital world, the base of our digital world is,
+our operating systems. What does an operating system
+really do? In essence, it just manages
+all these devices and adds a number
+of abstractions on top of this. So how do these devices work? Basically you have a device driver to make sure that sort of all disks
+look kind of the same. But what happens is
+the interaction between the devices and the operating system is based
+on interrupts, event-driven systems. If you want to write something
+to a disk, you put it in a shared memory buffer,
+you write something into a register and maybe you can enter it back
+when the write has completed. And so the underlying processes
+in an operating system is purely asynchronous. And for a very long time –
+by the way, the clock is probably
+the most important device that generates interrupts
+because that drives the scheduler and drives which process
+actually gets executed. But, you know, for a long time,
+because everybody thought that asynchronus programming
+was so hard to do, the operating system
+had an asynchronous interface. If you wanted to write to the disk,
+you got blocked until actually the block was written. Well, throughput absolutely suffers
+from that and latency on the other actions
+that you want to take as well. Now a number of operating systems
+in the nineties actually were designed
+from the ground up to expose asynchrony to the world. Windows NT was probably the first one that had asynchronous communication
+or interaction with devices as a first principle
+in the kernel. Linux didn't get any asynchronous
+though until the early 2000s. And actually, the order AIO mechanism
+didn’t really work that well. And it wasn't until I think 2019
+that we got io_uring in Linux to actually give us truly
+asynchronous interaction. And why do we want this
+asynchronous interaction? Because it's natural. Synchrony is just an illusion. And so if you look at your
+distributed systems and the way that we build
+our systems, synchrony leads
+to tightly coupled systems. Now, you cannot make any changes
+to this environment that the shopping cart
+issue forthwith without actually changing
+the shopping cart itself. If anything fails, probably
+the overall system will fail. Now, if you look at an
+asynchronous system that actually is driven
+by an event broker. You see that everything is decoupled. There is no tight coupling
+between any of the components. And so the shopping cart
+will post an event, the order system will pick it up, and in the payment system will
+actually pick up the work after that. The most important thing is that this is an architecture
+that can evolve very easily without having to change
+any of the other components. Now, if you want to add something
+like a reporting or an invoicing service, you can do that
+without changing the overall system. And so why do we want
+these loosely coupled systems? First of all,
+because they are natural. But they have a number of advantages. Fewer dependencies, you can
+actually change the system change the depending components
+without having to change the others. It is a natural way
+of isolating failures. If any of these components fails,
+as we saw in the previous picture, actually, the whole system
+continues to work. And if the new version of, let's say
+the reporting service comes back up, it just replaces the events
+that it has missed and executes. So this is what's called
+an evolvable architecture. That's really what I want you
+to walk away with, right? We build systems, but we don't build
+the end system in one shot. You start off with a story of a
+smaller system that can do the work. And then evolve it into the eventual
+complex system that we had in mind. So the great thing about the loosely
+coupled systems is it's easy
+to evolve your architecture. Look at S3, in 2006
+when we launched it, it consisted of eight
+separate microservices. Now, these are well over 255
+different microservices that we could add to the system
+without taking the system down, without any impact
+on the other pieces. We have new storage methodologies,
+we added new policy mechanisms, we added different storage tiers, all of that while the system
+was running and could evolve. So evolvability is extremely
+important when you think
+about designing your systems. Again, we knew what we were
+doing in 2006. Decomposing into small,
+well understood building blocks is the sort of the fundamental part
+of building these asynchronous, loosely
+coupled, event-driven systems. And actually in Amazon,
+Amazon the retailer, we went through
+a similar kind of history, but we started off as a monolith, and one that had reached
+the end of life because we couldn't scale anymore,
+we couldn't evolve the system. Because he will have those old driven
+by short a shared resources in the backend a whole battery
+of databases that were direct access. And so when we wanted to actually
+innovate more, we couldn't do that because
+we couldn't evolve the system. So we moved over to service oriented
+architecture with core services, we learned from that. We went through a microservices
+architecture in now Amazon Retail is basically a very large
+collection of microservices running over a shared infrastructure. Actually, about a week or two
+weeks ago, I published this document. This was out in 1998. It shows
+the Distributed Computing Manifesto. And it's actually how our engineers
+were thinking at the end of the ‘90s about how to deal with the fact that they couldn't evolve
+their architecture. And how we got moved over
+to a service-oriented architecture. This was way before anybody knew the service-oriented
+architecture was. Engineers in those days at Amazon,
+and still are, are absolutely amazing
+on the frontend of engineering and basically invent
+their way into the future. I urge you to read this document. It's dated. I know. But for many of you you'll
+recognize things in that document because it’s reality
+for many of you still now that have
+to work in monoliths. And next to service orientation,
+there is a big chunk that says, and some of our work
+is workflow oriented. How do we build these workflows? It's an amazing document. I urge you to read it,
+just for fun to see how engineers almost 25 years ago
+were thinking about this. Now the workflows are important. It enables us to build
+these applications from loosely coupled components. How can you compose them? How can you bring them together? How can you evolve it? And so to be able to build workflows,
+you need to have these platforms. Whether you need to
+execute things in sequence. Or how to do retry handling,
+error handling, routing based on data,
+all these kind of things. And in AWS we have two services that basically provide
+these basic concepts for you and you already know them. There’s Step Functions on one end that handles all the different
+types of execution and EventBridge the systems,
+the spider in the web, being the event broker. And one of the patterns here
+is really that you should be using
+serverless components to combine, to stitch together, to get
+the overall system that you want. Now, we've been looking
+at our customers that are building these workflows. And as always, customers start
+doing things that you never expected them to do. And so for us, it's always really
+important to learn to listen, to learn from it,
+and then try to improve our systems. And so, for example, there was
+a particular pattern that we hadn't anticipated
+when we were building Step Functions and it’s that customers
+actually would like to do Map Reduce with their Step Functions. I go, like, What? After all, we have Kafka
+and we have EMR. The customer is saying,
+No, no, no, no, no, no, no. We want something way more simpler. I just want to write two
+Lambda functions, and that's it. And so one of these examples,
+is for example, the. And so NOAA publishes the measurements of weather data
+stations around the world and then puts it on a daily basis
+in a public dataset. And the dataset is about 37 gigabytes and can be spread out
+over 500,000 files. But imagine you would just want,
+from all those files, you just want to get the average, the station have the average high
+temperature at that particular month. It's a very simple operation. And so to do this, they just wanted
+to have two simple functions, two simple Lambda functions
+to do this. So I'm happy to announce today that we're now giving fundamental
+support through this pattern AWS Step Functions Distributed Map. Now basically [applause] I didn't build it. Go talk to the guys that actually
+built this stuff and give them the applause. Because listening to our customers
+is really important. So what we can do with these
+Step Functions and actually
+in the Distributed Map is basically do a map
+and reduce step very easily. So it starts off with using the
+Step Functions Distributed Map, which then will fire up maybe
+a thousand instances of your Lambda functions
+to process the data and then summarize
+that data in the final Lambda step. This allows you very easily
+to process very large amounts of data using very simple Lambda functions. Now, as we said earlier,
+the world is event-driven. The world is asynchronous,
+there's nothing we can do about it. That is, no matter how much you would
+want it to be not as chaotic and how you would want it to be
+all deterministic, it's not true. So the best way to handle that,
+to handle uncertainty, is to build event-driven systems. Event-driven architecture
+leads automatically to loosely coupled systems. Now, what are the sort of the
+components, the patterns in there
+in an event-driven architecture, you have the event,
+you have event producers, event records that get distributed
+and an event broker that decides where
+these events should go to. These are just the basic components
+of event-driven architecture. And if you look at the
+communication patterns in there, it's either point to point, which can be a queue in the middle
+or EventBridge, or a publish/subscribe
+which EventBridge also supports, and then a streaming pattern,
+which is actually really interesting because it means that any
+of those consumers, C, D or E,
+can actually fail, come back, and replay the event
+that they had missed. All of these are very important
+patterns, and actually, EventBridge supports
+all of them. If you look at one of these sort
+of simple kind of architectures of an event-driven system,
+you have API Gateway,
+you have three different APIs there, creating accounts,
+create an order, list the orders. Create an account is just
+a simple thing of let’s say, create order,
+store something in DynamoDB, post an event
+to the event broker and then the order the service
+and shipping service basically go off
+and do their work. Let's see a really good example
+of that is something that Martin Fowler gave
+and you must all know Martin
+Fowler, if not, look him up. He's one of the most famous
+architects in our entire world, and he's really a big proponent
+of event-driven architecture. And this example that he normally
+gives shows that, you know, services can be end
+consumers, end producers of events. The shopping cart request an order,
+the payment service probably does an authorization
+against your credit card, gives an okay. Order service picks it up. Post order event,
+shipping service picks it up and shipping events happen,
+it actually pushes it out again. It communicates basically with itself
+through the event bus. And then it goes back
+through order service in the end. Now, this is great. Now, all these components are loosely
+coupled, fail independently, and most importantly, the whole
+system can evolve very easily. If I want to add an email
+notification service, it's easy, you just plug
+it into the Event bus. If you want to add
+an invoicing service, for example, you can have a little process
+sitting there that picks up the events,
+put it on the queue, and then maybe you have
+some commercial software running in an EC2 instance that then picks up the work
+from that queue to create invoices. It's all very –
+you can easily involve this. Actually I’ll make a little sidestep
+here because I recently saw
+an event-driven architecture that that I was amazed
+by how simple it was and how important it is
+at the same time. If you make APIs, probably
+you're familiar with readme.com. There you post descriptions of your
+APIs so that others can use them. But if you change your API, you need to remember
+to also change the description. Now you can actually automate that. If you change the API in API Gateway, it generates an event
+that goes to CloudTrail. CloudTrail then posts an event
+to EventBridge which triggers a Lambda function. This Lambda function picks up sort of
+the configuration information from AWS System Manager
+and it gets the secret API keys from
+the AWS Secrets Manager and then posts the updates
+that you’ve just posted to API Gateway on readme.com. This is a very simple thing. It's actually on one of the blogs with example code for SAM, you can immediately start using this. And I know this seems simple, but it is an important part
+of the way how we evolve our systems. If you evolve your API, immediately
+the documentation gets updated. But again, with event-driven
+architecture and you want to add something to it,
+like a notification to your customers or whether or not things actually
+have failed or worked out, you can easily add Amazon SNS to it. With all of this, Gall’s Law
+is extremely important. All complex systems that work evolved
+from a simpler system that works. In event-driven architectures,
+asynchronous systems are so close
+to the natural world that you can actually
+make complex systems work. Because remember, this here
+is a pretty complex system. We're able to make it work because
+we have independent actions to be taken without total control. And it's actually not just
+the architecture. If you remember the Amazon Two Pizza
+team approach is actually built on this. It allows you to have teams to be
+focused on one particular component and one particular component only. They don't need to know
+the big picture. You're ordering service
+doesn't need to know that there is an email
+notification service present. So you can evolve the overall system
+and move really fast by focusing on building
+your local components. Really, it is really evolve or die. Because if you want to really build
+your complete system from scratch on day one, that's probably not going
+to be a simple system that works. Build systems that can evolve. And the best way to make
+evolvable systems is to focus
+on event-driven architectures. If you've been in the Expo hall, you've probably seen
+the Serverless Espresso stand, and what you can do
+with serverless Espresso, the serverless architecture
+behind it. You place your order
+on a mobile device. Order appears on the monitor,
+you get a notification when your drink is ready. This is what the architecture
+looks behind it. It uses Step Functions,
+it uses EventBridge, it uses a whole
+execution pattern over there. You can see how this easily works. Maybe you think it looks a bit
+too complex for just an ordering application. But the cool thing about this
+is that it's easy to evolve. If you’ve used the app, you know
+that there is a mechanism there where you can actually see
+the journey that each of the steps of
+the architecture are going through. And the developers could just
+add this without changing anything
+in the overall system. Now I know, you know, sometimes
+synchronous systems, because it's a convenience,
+they look so much simpler. In asynchronous systems, you have
+all these components in the event bus,
+how do they work together? It can sometimes look
+a little daunting. And so I've been thinking about
+how can we simplify this? How can you make it easier for,
+for example, developers that never used
+serverless before, how do they know where to start? Which services do they need? How do they work together? We really wanted to make this easier. So today, very happy to announce
+AWS Application Composer which simplifies and accelerates
+the architecting, the configuring and building
+of serverless applications. [applause] It starts off with a canvas, a visual canvas where you can drag
+and drop serverless resources into. You can connect these resources together to create a serverless
+application architecture. That really makes sort of the common
+tasks such as generating either SAM or transformation
+files from this very easily. So you build this together. You build these sort of different
+components together in your canvas. One click of a button, you've got
+a CloudFormation file or a SAM file. And of course, it can interact
+with your local disk. So you can store all the files
+to your local disks, so you can either continue
+to work in the canvas or you can just use your usual IDE to start continuing
+to build your application. And so it's also, of course, because you now have a visual model
+of your serverless application, it's really easy to share this with
+your colleagues or with customers. And so you can really quickly deploy
+from this environment, from the Application Composer
+as well onto AWS. And it makes development
+so much faster. If you can just,
+especially those of you who don’t have that much experience
+with serverless applications, I urge you to start
+AWS Application Composer to make it easier for you
+to get started with building
+these applications. Now, another concept for nature
+is the spider in the web. It's amazing. Because the spider is the most
+central thing in this web. And in our world, the event bus
+is the spider in the web. And EventBridge is that. It does routing of events,
+it does coordination and it does scheduling and EventBridge is one of the fastest
+evolving services that we have. This year for example,
+they added Schemas, they added Event Archiving
+and they added the EventBridge Scheduler, which is amazing. You can basically have either cron
+like functionality all the way over to actually
+scheduling millions of events. So EventBridge is an extremely
+powerful spider in the web. And important in all of this is that
+if you think about events, events are composable. The way that you've seen this event
+broker systems work is that you can actually
+stitch things together to create a bigger
+application out of that. And there is extreme power
+in composing. Unix has shown us that. The power of composing in Unix
+was pipes. Pipes make it very easy. And McIlroy, who led Bell Labs
+in the early days of Unix, came up with this concept. That you should have small components
+with a standard interface and a standard format of interaction
+and as such, you could build bigger applications
+out of smaller components. It's extremely powerful. Thompson and Ritchie actually
+picked that up and started to implement that. They actually had already thought
+about a unifying mechanism to actually be able to interact
+which are file descriptors. So in Unix, the composability happens because these small components
+all use standard in and standard out to communicate with each other
+and use text as the standard format. So this is a – this is just
+a joking line that I put together. Now imagine you have an access log. You want to filter out the IDs of
+customers that experienced an error. So you get the API lines
+from the access log. You look for the 500 errors. You reverse that, for some reason, the customer ID
+is the fourth field from the back. So you reverse the lines. You cut out only the fourth number. You reverse them back and then you do
+sort and unique, which is not necessarily necessary. But it looks really good
+in this line here. So basically what you get is you get
+a list of your customers that experienced this error, sorted and with only unique,
+no duplicates in it. Easy to do. And you can build many, many,
+many different applications using these very simple components. Now, I am still amazed, what is it,
+40 years later, 50 years later, that this was
+such a powerful concept? Now the question is of course,
+can we do this with AWS services? However, that's a bit harder. You know, Thompson and Ritchie
+had it easy because Ken Thompson actually, after the night that they figured out
+that they wanted to do pipes, rewrote all the applications
+that they had. Well, that's not as easy to do
+in a AWS. We have no uniform way
+to compose events. And it's also an all
+or nothing approach. You know, if I connect to Kinesis,
+I get all the events. Or through DynamoDB stream. And so many of our customers
+that want to actually build these sort of connections
+between different services have to write a lot of glue code. And so I kept thinking, why can't we
+just use the pipes principle here? So happy to announce today,
+Amazon EventBridge Pipes, which allow you [applause] Which allow you to easily to stitch
+AWS services together. And it's a new feature
+specifically designed for integrating messages
+from different AWS services. So it is a point to point,
+event producers against consumers and a way to manipulate the events
+that actually flow through the pipe. So the idea is that you should be
+able to no longer have to write the glue code. You can easily stitch
+these services together. And if you would want to actually
+manipulate the event before they reach the consumer, you can actually provide
+a Lambda function or a point through
+Step Functions or API gateway to actually run some code
+to manipulate the events that are flowing through your pipe. And it has built-in filtering, meaning that if you only want
+to get a real subset of the events that needs to flow to the consumer,
+you can add that too. So basically this is pipes
+on steroids now, because it's not just easily
+composable, it's actually also an ability
+to manipulate the events that are flowing through your pipe. This would definitely reduce
+significant costs for quite a few of our customers that have been building
+this kind of systems or stitching AWS services together
+and no longer have to do that because now we have
+Amazon EventBridge pipes. Now, if you think about events,
+actually, let me take another sidestep,
+as I usually do. I recently wanted to go to a football
+game, in this case Arsenal
+against Liverpool. Arsenal. [faint cheering] London is ready. Now I'm not, yeah, I'm a bit
+of an Arsenal fan because they just
+look like Ajax. Play beautiful football,
+but forget to score. [laughing] Yep. But you need to be
+an Arsenal member to buy your ticket
+for the game. And so I went to one of
+these third-party brokers that actually offered
+these tickets for sale, but had never used them before. So I wanted to figure out
+whether they were trustworthy or not. And I actually used for one
+of the first times, Trustpilot. I went to the Trustpilot site. And they actually gave me
+really valid reviews of those tickets as a broker
+and I actually bought the tickets. I later learned that Trustpilot
+is an AWS customer and they actually have
+a very interesting, event-driven architecture. And I've invited them to come
+and talk to you to give you some
+real world examples of asychonry
+event-driven architecture. Please welcome Angela Timofte, Director of Engineering
+at Trustpilot. [cheering and applause] Thank you. I love the energy in this room. I am here today to talk
+about a single word. It can be hard earned
+but has the power to shape our relationships
+and fuel business growth by increasing consumer’s
+confidence. That word. is TRUST. At Trustpilot, we enable
+people to read and write reviews and find companies
+they can trust. Because reviews help people
+like you and me to have more confidence
+in what we buy. They are also an opportunity
+for businesses to learn and improve from
+the feedback they receive. Trustpilot is an open
+and transparent service that brings both sides of
+this community closer together. We help ignite trust
+within this community and we are on a mission to become the most recognized symbol
+of trust on the Internet. Since 2007, we've grown to house
+over 190 million reviews. However, our growth
+hasn't been linear. In 2021 alone, we have received
+over 47 million reviews. And the number of reviews
+is constantly increasing, while their importance
+is becoming more critical. With the large volume of reviews, our service must be
+trustworthy for us to succeed. And to scale trust, we need to have
+both reliability and integrity. However, scaling trust
+is no mean feat. Today we are in a strong position, but our journey
+hasn't been without effort. If we look at where we started, our platform was built on a monolith
+and on prem databases. Our experience started well, but we soon found we were
+unable to handle our growth. Hiring more people wasn't the answer. Immense planning, alignment
+and reverting changes due to bugs
+were all a headache. And more usage caused
+more reliability issues resulting in product outages. Not the best experience
+for our users. Now, I still remember Trustpilot’s
+Christmas parties in their early days
+where all of us developers were prepared
+to go back and work. Because it became a tradition
+for some outage to happen during this event. And of course, what better way
+to stabilize our platform, then after a few cocktails? We knew we needed to make a change. So we transitioned to
+an event-driven architecture. But how does that work? Reviews are obviously
+at the core of our business. But now let's look at one. Meet Sylvia, who had a great
+experience with a flower shop and wants to share it
+by writing a review on Trustpilot. When Sylvia submits her review,
+behind the scenes, an event is being published
+on Amazon SNS topics. The review submitted topic
+has over 20 subscribers, with each one of them completing
+a different asynchronous process using Amazon Lambda, Amazon ECS
+and other Amazon services. One of those processes
+is to publish the review, which is another Amazon SNS
+that stands out for Amazon SQS to consume and trigger
+other processes. One of them being storing the data. Now, choosing the right data store
+has been a challenge in itself as the number of reviews
+being read daily increased from thousands to millions. We had to find a scalable,
+flexible and cost effective database. And Amazon DynamoDB stood out
+as the right candidate. We all know we can plan for expected
+increases in traffic for events such as Black Friday
+and Cyber Monday, which just passed, even when having
+a monolith architecture. But our latest event-driven
+architecture and the use of Amazon DynamoDB provides us with
+increased flexibility. Meaning both expected and unexpected
+traffic increases can be easily dealt with. One of those unexpected events
+that we can probably all still remember, is COVID-19. Everyone was forced to buy online. We all needed to know who to trust. As a result, searching and reviewing
+on Trustpilot became more important than ever. This increased our traffic more
+than we could have ever predicted. But thanks to the cloud elasticity and the use of an
+event-driven architecture, our platform is able to scale
+for expected and unexpected traffic increases while our teams can continue focusing
+on product releases and innovation. Dealing with the scale and growth
+of reviews on Trustpilot is one challenge. But maintaining authentic, useful
+and trustworthy information is quite another. If we go back to Sylvia's review,
+by treating everything as an event, we are in a position
+to easily integrate and evolve
+our existing architecture. As an example by subscribing to
+the Review Submitted topic and using Amazon Kinesis
+for real time ingestion to send data to our compliance
+and fraud detection models, we are able to scan
+100% of reviews coming through. While by using Amazon Step Function, we can orchestrate workflows
+to take action on abusive behavior or unusual patterns in reviews,
+just to name a few. Having an architecture
+that can scale, adapt and react to an event is exactly what we need
+to meet business requirements, protect the integrity
+of our platform, as well as increase
+team productivity. But what about the future? We live in uncertain
+and rapidly changing times. We all need to spend wisely. This makes Trustpilot more relevant
+as we help people make better and more trusted decisions
+about who and what they buy. We won't stop here. We will invest to bring more features
+to help and with that,
+I want to say thank you AWS for helping us create
+a more trusted world. and thank you, everyone,
+for listening. [cheering and applause] Thank you Angela. I forgot to mention earlier, Angela is part of our AWS
+Heroes program. [cheering and applause] The AWS Heroes program
+recognizes 253 AWS experts across 53 countries
+whose enthusiasm for knowledge sharing and making the community
+better is unparalleled. They have a real impact
+on the community. I'd like to thank every one
+of the heroes here today for all the effort that they put in
+to actually make all of us better. Thank you. [cheering and applause] They’re all over there. It is one of these things
+at our AWS events, we give hundreds of thousands of
+classes to you where you can learn. But the best way to learn sometimes is from the people
+that sit next to you. Because you really hear
+sort of the struggles, or the obstacles or, you know, this pattern worked really well for us
+in this particular situation. Sometimes stories that you can't
+hear from us as the AWS experts. So really, I always urge you,
+everyone in the room, to talk to each other,
+to learn from each other, because that's absolutely the best
+source of information that you can get. Now, one particular architecture that I think has become
+more prevalent is to think about how we can run
+our architectures at global scale. We now have 30 regions
+around the world. And it means that you can
+actually get your applications as close to your customers
+that you can get. How do you do that? What is an easy way or easy, the most convenient way to actually
+build those type of architectures that need to operate
+at global scale? I believe, and I strongly believe,
+that event-driven architectures are the ones that you should use
+to build applications that need to work
+at global scale. And we've been doing that ourselves
+for quite some time already. And let's dive into how one
+of these global systems actually works for Amazon, for AWS. So DynamoDB is, in my eyes,
+one of the powerhouses of databases. It routinely does trillions
+and trillions of requests today while maintaining
+single digit latency and is able to operate
+at global scale. And so there's many things we can
+learn from taking a look under the hood of DynamoDB. And in this case, I only want to
+actually look at one particular feature, that is how are global tables
+actually implemented, because I think we can all learn
+from that if we built our own applications
+that need to operate at global scale. So global tables, it gives you
+the ability to just write to your local DynamoDB instance, and it will actually
+automatically replicate those updates to other regions
+that you've indicated where you need to have
+global tables available. Then it gives you a multiregion,
+multiactive database. You still do local reads,
+very quickly and fast, while actually having
+the tables globally available. And so what's underneath there
+is what they call an active, active architecture, meaning that you can write to any of
+the instances of DynamoDD in any of these different regions
+and updates are automatically propagated
+to the other instances. Now, there is no synchrony here. It's a purely asynchronous
+environment. By the way, the alternative would be that you would have
+sort of a controller and actually one
+set subscribes to it? That is not a very reliable
+architecture. Because how would you build this? Would you really use
+sort of synchrony in that? Maybe if you would want to. But if you want to have a really
+highly available system that can operate at global scale where interruptions
+happens all the time. Yeah. If you need to run some form of two
+face commit over the instances, then it's most likely
+that a significant number of your transactions will fail. Now, if you build it then
+using an asynchronous approach. And so we just like anybody else
+in this room, can make use of a number of features
+that DynamoDB has to offer. One of them is DynamoDB Streams. So we built a replication feature
+on top of a feature that DynamoDB already offers. Basically, the replication service
+reads from the DynamoDB streams for the updates and then propagates them to the
+other regions where it needs to. Also, the other regions also have
+a replication service, if you get rights in Europe, it will automatically propagate
+to America as well. So what sits in this
+replication service is basically a whole collection
+of replicators, thousands of them, because you may actually
+replicate many different tables. And we use and SQS queue
+as the coordinator for this event-driven architecture. If any of the replicators fails,
+it easily gets restarted again and can re-read from the queue
+to pick up exactly where the failed
+replicator had stopped. So we can have thousands
+of these replicators. And so they would take care
+of replication to any of these other environments. It's a purely event-driven
+architecture. Now, if you think about the patterns
+that we see here in event-driven architectures
+that make this work, you need to have
+a change data capture facility. Being able to see what were
+the changes in the data that you would need to propagate
+to other regions. You need to make this asynchronous. Running this as a synchronous system
+is close to impossible. Asynchrony will give you
+failure management, it will give you the ability
+to evolve the system very quickly and it will actually deal
+with replication. So self-healing replicators here, using the queue is something
+that makes it very easy for you to build these systems
+in a highly fault tolerant way. Now, of course, you know,
+we see many of these patterns. After all, the world
+is built out of patterns. You see them everywhere in nature. So we should follow these patterns. And of course, us as computer
+scientists, we have all read
+the book on design patterns from the famous Gang of Four. At Amazon though, we keep our
+patterns in the builder’s library. And I once again, urge you to take
+a look at the articles in the in the builder’s library because they are the collection
+of knowledge of Amazon engineers that have been
+building highly reliable, scalable global systems
+over the years. So the two new articles
+that I would like to point you to one by Claire Liguori and it's my CI/CD pipeline
+is my release captain and the second one
+is by David Yanacek and it's called Using dependency isolation
+to contain concurrency overload. Brilliant articles. A number of the articles deal
+with architectural patterns, but quite a few of the articles
+also deal with what I would say
+the heavy lifting around development. About having to set up
+your environment, how to maintain your environment.
+How to do rollbacks, how to integrate your CI/CD pipeline
+into your pipeline. All the things that are basically,
+in my eyes, sort of the heavy
+lifting of development that have nothing to do
+with writing code? And so imagine you have to work off
+a different code bases or, you know, everything slows down
+if you have to deal with different types of tools
+that sit in different environments. So we were really thinking about,
+as always, how can we remove
+this heavy lifting for you? I'd like to announce today
+Amazon CodeCatalyst that takes away all the heavy lifting
+that sits around development. [applause] Now we've built this with developers,
+teams and cloud in mind. It really helps you to sort of
+plan and develop and collaborate and deliver applications on AWS. It has all the tools you need to go
+from idea to production much faster. The basic concept there,
+is blueprints. Here for example,
+a single page application, that's what you want to build. And you will get all the help you
+need to actually set all of this up. You can actually add also your
+own blueprints or your organization can have a set of standard blueprints that they want you to follow,
+in a way to develop applications. And the blueprint not
+just creates codes, right? It does everything else. It sets up project files. It configures integrated tools, source control CI/CD
+issue management. And the service allows you to do
+actually swap in popular tools like GitHub. And so an important part, of course,
+in all of this is how you can easily
+set up the CI/CD pipelines or you don't have to set it up,
+the system will set this up for you. And you can define build action,
+or if you really want to, you can actually import
+your GitHub actions. And it's a very easy way to deploy
+on AWS, across services, across regions,
+across accounts in a global manner. And it has built-in support for code
+coverage, unit testing, automation,
+report generation, all of that stuff that I consider
+the heavy lifting of development but actually doesn't help us
+to build applications faster. It will hopefully take away
+all that heavy lifting for you now. One of the problems I always see
+is that's engineers, developers, builders, need to actually work
+with many different code bases. You may have one version that
+actually needs to run against Python 2.7 versus 3.9. They're not compatible. And actually being able to switch
+the two environments, building the same application using these two environments
+is pretty hard. CodeCatalyst makes this
+very easy for you to switch
+between these environments, without having to do any of the heavy
+lifting required for that. And so, you know, you can auto
+populate your project with this code and dependencies and you can use your favorite IDE
+like Cloud9 or VS Code or Jetbrain. You can replicate and share
+your development environment really simply. Actually inviting people
+to join your project, the only thing you need to do
+is fill an email address and immediately
+that particular teammate has now access
+to all the code, to all the issues
+and to all the deployment reports. We realize, of course, always, that AWS is much more
+than just the AWS services, especially when it comes down
+to development. So we've extended the core
+of CodeCatalyst with JIRA, then Slack, and of course
+the popular IDEs is like Cloud9 or VS Code and Jetbrains
+and GitHub is of course, integrated into all of this because those are the services
+we all use right now, and CodeCatalyst integrates that
+into your environment by default. And indeed, you know,
+it's all about moving fast so that you can focus
+really on building the code and not spend too much time
+on all the issues around it. And so thinking about
+event-driven architectures, one of the things is not
+only it evolves easier, it evolves much faster. And so, for example, I met recently
+a company in the UK called Cinch. They're an example of a company that makes use of 3D technology
+to show you cars. And so you can basically be at home,
+look at this car, you know, decide whether
+you want to buy it or not. And actually, they built
+this in six months. And so for example,
+it is a really great example of an event-driven architecture. When Vehicles get updated,
+you get the vehicle update and then it’s consumed
+by the search services which puts it
+into open source, OpenSearch. And then all these components can
+publish events and retrieve them and it's an easily extendable
+environment for them. One thing actually that's
+very interesting in that world is a pattern
+that I see arising more and more. That they actually have all of
+their cars available for you in 3D. Every car is captured in 360 degrees and with the interface
+on their website, you can just look around the car, you can walk around it,
+you can look inside. And this is sort of a pattern that I see really arising
+in our digital world. The world after all is multi
+dimensional. It's not just one line. It's not just we're used to 2D, why?
+Because of the machines we have. Keyboard, screen, mouse finger, that's how we have built
+our digital systems and how we interact with them. But it's not the real world. The real world is multi dimensional. So how can you get a digital system as close to the real world
+as possible? And we've really seen great,
+great strides in that. Alexa and other voice systems
+allow you to access digital systems without knowing
+that they’re digital systems. You can use the thing
+that we all use. This is not a Slack channel
+where we’re sharing things. You sit here and I talk. And so it's normal, it's a normal way
+of interacting with each other, and as such, we should use
+normal technologies to access our digital systems. Soul Machines is a company that have actually taken
+this a step further. They actually have digital
+personalities that can express emotion
+while you're interacting with them, which is another very normal,
+natural kind of way of interacting. It's not sufficient to hear
+what I say, you're all looking at my face. What do I think is important? What do I not like? Liverpool, for example. And so Alexa and Soul Machines
+are really the first steps in this. And our real world
+is multi-dimensional. And as such, we should be
+looking in our digital systems to present the world
+as multi-dimensional. Again, I had a really
+great experience recently. I was given a birthday present
+to have a new pair of shoes made. Now my feet are ugly. And so I was amazed that I now
+would have shoes that would exactly fit my feet. So we went to this story
+of James Taylor and Son, and they were very –
+they’re a cobbler out of 1857. And they use the same
+techniques and processes today as they used
+a hundred years ago. They produce what is called a last, which is a physical
+representation of my shoe, in wood, against which
+the shoe is being made. And I was really surprised,
+actually, that this 165-year-old company
+actually was using very modern
+technology to get this done. I get to sit on a chair
+and put my feet on a device that had a bunch of cameras that actually made
+a 3D image of my foot. And then they were using
+that image about sort of then to make the last out of that and make a pair of shoes
+that exactly fit me. And it seriously made me think
+how 3D technology has permeated our world already. We're getting there. It's really great to see
+actually also after 165 years, this business is innovating and using
+digital technologies like 3D to actually improve
+their products. And they're not the only ones. Remember, this is
+how you buy a product. Jeff Bezos once described our
+customers as defiantly discontent. Meaning their expectations
+are never static, they only go up. And this is true, especially in
+the shopping patterns that we see. Just a few years ago,
+if you wanted to buy a pair of shoes or some furniture for your house,
+you had to look at static pictures. That you had no idea how these
+would fit on your feet or how it would look in the house. What customers would actually do, they would order four variations
+of the same shoe, have it sent to their house,
+actually try them on. Pick one and send
+the other three back. This is, in my eyes,
+a very bad customer experience and also a bad experience
+for the retailer itself. So what can we do better there? We need to make sure that the way that our customers can interact
+with us is like in the real world. I need to have 3D images
+on a 2D screen to make sure that it can happen. Fortunately, browsers have started
+to introduce things like WebGL that make it easy for you to have
+3D images to be displayed anywhere. It needs a lot of math, though,
+actually, to create these images. Now, what you can see here
+is something that we've built in Amazon
+called Virtual Try-On. Basically using augmented reality to see how the shoes
+would look on your feet or how it would look like
+with other clothes that you have. This really makes sure
+that customers can actually buy the products
+that they want to instead of having to order a lot of them
+and then send many back. The production is called
+Virtual Try-On. Now 3D models are worth
+a thousand pictures. Actually, about 130,000 pictures. You want to make a 3D model,
+using 2D imagery, you would go one degree over each of
+the axes of the X and the Y axes, you actually end up
+with 130,000 pictures. And actually if we add
+a third axis to it, you would get to millions
+of images that you require. Now, it's used over all industries
+and we really want to make sure that this becomes much easier. You can't take 130,000 images
+to create just one 3D image. You have to get close as possible. Now, it was necessary to have these
+sort of complex CAD drawings to then create
+a 3D image out of it. But there’s a technology
+actually that’s already a hundred years old
+called photogrammetry. And this is the science of how many
+images do you really need, 2D images, to create a very good approximation
+of the 3D world. And so many of our customers
+already have these kind of pipelines where they take a whole set of images
+and then make use of, for example, machine learning
+to stitch them together. And then, in event-driven
+architecture, of course, and then stitch them together to create
+the many different object forms etc. There is no PDF for 3D. There's about six or seven different
+popular object models that you need to create
+out of all these pipelines. Quite a few of our customers literally have thousands
+of these products, and so they really pump
+these things through this pipeline. Now, there's a lot of research
+happening in this world. There's something called NRF,
+which is a Neural Radiance Fields. And this is the science that
+how many images do you need and then use machine learning
+to actually fill in the gaps. Actually, it's a bit like
+how we as humans work. We all think we have brilliant
+peripheral vision. It's not true. Actually, we don't really see
+that real in peripheral. It's our brains however that stitch
+these things together and fill in the gaps. That's what's NRF is as well. Now, how can we make use of machine
+learning to fill in these gaps? You actually only need about
+12 images of a 3D object, if it’s not too complex,
+using NRF to create a 3D model. And given that this is becoming
+so prevalent, I honestly think that 3D
+will be soon as prevalent, as pervasive as what video
+is now on the web. Five or six years ago,
+3D was still much more exclusive. These days, everyone is putting it
+everywhere. 3D will be the same. And they are, of course,
+much more useful than 2D images because they're close to what
+the natural world gives us. And also how these objects
+interact with the real world. And remember, augmented reality
+for the shoes. But what if you buy this lamp? Now you can put it in your living
+room, what does it look like? By the way, not just how it looks
+like, imagine you switch it on. What effect does it have
+on your room? What if you move this lamp
+to the other side of the table? All of these things you can do,
+actually, by now in a product called View In Your Room but it's something that actually
+will become way more prevalent soon,
+in all sorts of other settings. So, of course, it means that you not
+only need to create a 3D object of the object
+that you're interested in, but you also need to have
+an accurate representation of the environment where it is in. And so we already have a number
+of engines that work really well in that. Unreal, Unity, and actually,
+we've been investing significantly in the open 3D engine,
+O3DE, which is maintained
+by the Linux Foundation, which gives you the environment
+to actually present you a 3D environment for you. And actually part of that is also
+Epic Games who control Unreal. They’re also participating in this? We want to make sure that there is
+a 3D engine available for you that works really well in the cloud. There’s also partners
+that actually work in this space. One of those is Matterport. Matterport allows you to actually use
+your cell phone to make a 3D representation
+of your room. You have a device you can put
+your cell phone on and it will turn around the room, make an
+accurate representation of your room, or you can actually use some of
+their cameras which have LIDAR in it to build an accurate
+representation of the environment. Then all the data goes
+into their 3D platform and they can build different
+applications on top of that. For example, if you want to do
+a virtual walkthrough for a particular environment. You can also tag your objects
+that are in this 3D environment. And by the tagging, it's easy then,
+for example, to connect it to AWS IoT TwinMaker. What you see here is an environment
+that has been scanned by Matterport. You can go in there and you can look
+at the different devices that are in there
+and actually click on them and get the accurate state
+of the device in real time. You do this by actually combining
+Matterport with AWS IoT TwinMaker. The dashboard, by the way,
+is just Grafana – the one that we all love to use. So you have all of this fusion
+of models and sensors and data that is all coming together. But you know what? It is not enough. Because there is something that we
+humans can do that is actually pretty tricky
+in a digital world. If you have ever tried to put
+suitcases in your car, thinking in 2D won't help you. You really need a good sense of 3D
+to be able to stack all these suitcases in your car. You need what's called
+spatial intelligence. Now, most of us have this, not all. And so it helps humans understand
+the physical world through a digital lens. And the world is made up of
+lots of these digital objects and we have to understand
+how they relate to each other. And for that,
+we need spatial intelligence. If you think about maps, maps are
+pretty basic, we all use them. They're really good,
+how to get from A to B? By the way they are two dimensional, so they're not really an accurate
+representation of the world. I know we were on the road trip
+once in Croatia, and the maps told us that, yes,
+we could go through that street, but it all didn't tell me
+how wide the street was. Believe me, backing out of
+that street was a major adventure. And if you're driving a truck,
+you may want to know how to get from A to B, but you also need to know
+the height of the overpasses to be able to make sure that you can
+actually drive underneath it. And especially in a world like,
+for example, autonomous driving, these simple 2D maps are not enough. You should think about maps as being
+layered, layered with different timeframes. Roads probably won't change
+for years, lanes on them may change
+on a yearly basis. Then you may have roadworks
+that take for months or stalled cars that are actually there
+on an hourly or daily basis. You need to have all of
+that information if you want to build things
+like autonomous driving cars. And so one of these examples is,
+for example, Zoox. Zoox are building a fleet
+of autonomous vehicles to serve as Ride/Hail sharing. And in a city of course,
+there's lots of dynamic aspects. Zoox is able to predict
+the trajectory of vehicles, of people and even
+animals around them so they can make sensible
+and safe driving decisions. These vehicles need to have
+spatial intelligence, and it requires a fusion of sensors
+and custom ML models. And the perception system has
+these data comes for I think cameras, and LIDAR and infrared radar
+and things like that. And all these sensors together create a 360 degree field
+of around it. Now here you see
+a visualization of it. The car doesn’t use
+that visualization. Maps need to be software accessible
+for these systems to work, not just visual. We, however, we like
+to visualize things. And we want to visualize actually
+everything that we can think of, even in our consoles, we love to visualize
+the state of our systems. Systems don't need visualization
+by themselves; they’re all for us. Humans need to visualize
+these things. And I think a company
+that understands this challenge best is Epic Games. Please welcome Nathan Thomas,
+the VP of Unreal Engine, to show how their technology
+is being used to create the experiences
+of the future. Nathan. [music playing] Hey, everyone, it's great
+to be here today at re:Invent. I'd like to talk a little bit
+with you today about Unreal Engine, which is the game engine that we use
+to build our own games like Fortnite, in which we make available
+to thousands of game developers around the world to build everything from
+small independent games to the biggest triple-A titles
+that we all know and love. Unreal Engine is built
+by creators for creators. It's a really important
+symbiotic relationship where we can drive innovation
+into the engine through our own game development and then make that available
+to the folks using Unreal Engine. Over the last few years, we've really focused on
+increasing the level of photorealism and Cinematics in Engine, which has helped it
+really go beyond games into a wide range
+of additional industries. We're seeing users
+lead a real time 3D revolution through their own creativity
+applied to our tools. They're doing all kinds of things we couldn't have
+even imagined were possible. Now, Unreal Engine
+is part of that story. Our tools like Metahuman,
+Twin Motion and RealityScan are another part of that story
+that are really helping us make it easier than ever to build
+and share real time 3D experiences. So I'll be talking a little bit
+about those as well. Now, of course,
+all of these tools use AWS in their development
+and operations, which helps gives us the flexibility
+and scale that we need to grow. Now, when you're building the world's
+most innovative game engine, you don't get there just by
+launching a grab bag of features. You've got to use
+that technology yourself to build experiences
+that push the limits and demonstrate what's possible. That's why we built
+The Matrix Awakens, an Unreal Engine 5 Experience. This is a large scale,
+photorealistic, open world environment. It's dynamic and AI-driven,
+and it really shows the limitless storytelling possibilities
+of Unreal Engine 5. And we shipped it on next generation
+consoles like the PS5 and Xbox X to show you can get this level
+of fidelity in real time on hardware
+that's available today. The world is pretty impressive. It's about 16 kilometers. It's got 40,000 cars that are
+drivable and destructible. It's got about 35,000 metahuman
+pedestrians wandering around. It's about 7,000 buildings
+and it's billions of polygons. And a lot of this is
+procedurally generated by Houdini, which means that it's
+a lot easier on artist workload. It's a logically consistent
+and believable world. And we really believe
+it represents the underpinnings of a lot of the future
+of the 3D experiences we're all going to have together. Historically, this type of large
+scale open world creation for 3D generation is challenging
+and Unreal Engine is solving that in a lot of ways. But as I said, Unreal Engine
+is only part of the story here. For one thing, you're going to
+want to put characters into that world
+that you're building. So we launched Metahuman Creator,
+an online web service which allows you to generate high
+fidelity digital humans in minutes. And those are free for use
+in Unreal Engine. This is something that used
+to cost millions of dollars to do. We use EC2 GPU instances to
+help us do the data processing, moving from petabytes of backend data down to hundreds of gigabytes
+running on instances and then down to a mesh
+you can export to Unreal Engine. And of course when we did that,
+we needed data protection and we needed instant availability
+and a high quality user experience. So we're using Pixel Streaming
+to get those properties. That really lets us
+reach our users at scale. And of course, that high quality
+experience and scale has helped make it a huge hit. We've seen over 2 million metahumans
+created to date. And to give you an idea,
+if you go back to 2017, we estimate there were maybe
+75,000 of these in production. So we're seeing a massive uptake based on the availability
+of the service. Now, also, as you develop
+your experience, you're going to want to share and you're going to get
+to collaborate on it. And so Twin Motion is our 3D
+visualization tool, built on top of Unreal Engine
+with a simpler interface. It lets you share high quality
+images, panoramas and 360 degree videos. And on top of that,
+we built Twin Motion Cloud, which is a web service running on AWS that lets you stream interactive
+experiences and shared in a browser, which means that you don't have
+to have any additional hardware or any additional software installed. And like metahuman creator,
+this is running on EC2 GPU instances, G4 and G5 in this case. This really allows us to get
+the high engagement that we want from the highest need projects
+which need things like G5 instances while still supporting G4
+instances for projects that don't need that much hardware
+and saving some money. And then, of course, you're also
+going to want your experiences, your building,
+to have the highest quality assets and environments inside of them. So photogrammetry is the art
+and science of creating 3D assets from 2D images
+instead of creating them by hand. Much simpler, much faster
+and higher quality. The gold standard for this has been
+Epic's desktop application RealityCapture, which really makes it
+simple to create those ultra
+realistic models from images. RealityScan is our new phone
+application that brings that same
+incredible pipeline to smartphones. It uses AWS for processing
+on the back end to help us generate a point cloud and a preview mesh so that it's easier for you
+to figure out if you're building the right set of images
+to get a high quality asset. And then at the end, that asset that you're building
+can be shared in Sketchfab for our environment,
+for sharing collaboratively. In private beta we've had over
+100,000 sessions. Tens of thousands of models
+have been generated, and we've seen this from millions
+of photos being processed. And to handle that, we use RDF
+PostgreS for the session information. We use S3 and CloudFront
+for file storage. We do all of the processing
+on G4 instances and then we use ElastiCache
+for an accelerated experience. We've seen some really exciting,
+high quality models in beta, but I'm really excited
+to announce today that we are publicly
+launching RealityScan on iOS. [applause and cheering] So Android will follow soon,
+but I encourage you to download and give this a shot now. The combination of the innovation
+that we're driving in Unreal Engine and these other tools
+has really helped the outputs become almost indistinguishable
+from reality. This is really bridging
+the uncanny valley and unlocking a huge range
+of new use cases for these tools like
+Project Antoinette you see here, which is a new set of tools
+for creating flight simulation on top of Unreal Engine. We're seeing an increasing number
+of new SIM types coming out, augmented reality,
+non motion SIMs, and it's really helping increase
+the number of training hours available in the aviation industry,
+which is really critical. We are incredibly excited for this
+real time 3D future that we can see in front of us. But that transformation is not
+going to happen without you. All of the innovators who are going
+to push this technology to its limit, which is why so much of the tech
+I'm describing today is free
+for a wide range of use cases. For example, the city sample
+based on The Matrix Awakens, an Unreal 5 Engine experience
+is available for download today. AWS Ambit Scenario Designer is
+another great starting point. So you can use that to jumpstart
+your simulation applications built on top
+of Unreal Engine. Our mission at Epic is to empower
+a new generation of creators. We really want to see you push
+the limits of the experiences that we can have in ways
+that we really can't even imagine. You have that power, the power
+to bring people together and to bridge imagination
+with real life. If you're curious about that
+and excited about it, I invite you to jump in right away. Thank you so much. [music playing] Thank you, Nathan. Absolutely, mind blowing. Our digital systems may not
+need visualization, but we definitely need
+and what he showed is just amazing. Actually, one of the things
+that Nathan mentioned was Ambit and I really would like
+to make you aware of this because it's something that you can
+get started with today immediately. I love Ambit. Again, it's one of these things
+that makes our work so much easier. So the AWS Ambit Scenario Designer is a set of open source tools
+that is available with GitHub that allows you to create
+3D content at scale by just the click
+of a few buttons. So the first functionality of that
+is world generation, you know,
+the 3D environment that you need. They make it easy. You just point to a city
+in OpenStreetMap and immediately Ambit will create the 3D world
+out of the data in OpenStreetMap. You don't need to do anything
+with that. It blows my mind every time
+I try it out. And then what you can do is you
+can place obstacles in that world and you can use rules for that,
+how these obstacles should be placed or how they should evolve
+over certain parameters. And then you can add
+environmental effects to it. Do you want daylight, night,
+weather patterns, things like that, all these different kind of scenarios
+you can actually add to it. And then with one click of a button,
+it can generate scenarios for you. And these scenarios that can be
+JSON or JTLF, and you can then import that into any of your your popular
+simulation or visualization tools. And actually, you can set a set
+of parameters in scenario generation that they can literally generate thousands of different scenarios
+for you that you can immediately use in your
+simulations or your visualization. And I was always I think,
+you think about innovation, I love this particular pattern, which
+is in the fundamentals of Amazon. If you go back to the 1997 letter
+to shareholders that Jeff Bezos wrote, this is key in it. We will continuously experiment,
+we will measure and we will learn from that. And that means that whether
+it's positive or negative, you need to learn, but you also need
+to be able to experiment. And of course, experimentation
+in retail is easy. We've always decided that we would
+bring things in front of our customers. They're allowed to vote
+with their feet. It doesn't work out,
+we'll start over. But most important from that, be able
+to experiment, measure and learn. Now, at larger scale, especially
+in a world where you can maybe not immediately manipulate
+the real world, simulation is key. And there's all sorts of companies
+that are using simulation today for many different scenarios. But it all started actually
+very long ago. In 200 B.C. Roman generals were giving
+wooden swords to their fighters to simulate battles and test
+all sorts of different strategies. And then much later, Leonardo da
+Vinci, the amazing innovator, actually started building
+small scale models, first of his innovations
+before he started building them. In our world, in our digital world, the pioneers of simulation
+have been Von Neumann and Ulam. They were two mathematicians who pioneered simulation
+in the digital world and they used mathematical models
+to understand behavior of neutrons, for example. This was the world's
+first computer simulation. They were also the inventors
+of the Monte Carlo simulation. Monte Carlo simulation, the name
+already says it, you can model risk in casinos.
+Serious! Of course, now it's being used
+for multiple financial risk modeling way
+beyond the casinos. But it was one of the first
+simulations that was built. Very primitive,
+but it worked really well. And if you get closer
+into the world in the 2000s, we had these massive workstations and desktops
+with the latest hardware. But most of these simulations
+were sort of limited to the hardware that it would run on and the memory
+that you would have available. And as such, many different types
+of simulations were being built. Almost every vertical has
+their own type of simulation and whether that’s in life sciences
+to do drug discovery, financial services risk modeling. Oil and gas that actually takes
+seismic data in and then do all sorts
+of modeling on top of that. And we have many of our partners
+actually, that have systems that run on AWS that provide
+these kind of simulations to their particular customers. And take, for example,
+a company like Ansys. Now they have specialized simulation
+software for engineering companies, civil engineering companies, and many of the students that
+actually take civil engineering, this is where they build
+their systems in. And so this is sort of the state
+of the art today. So why do we simulate? What is the reason for stimulation? Well, first of all, there are just
+physical limitations that you can't play with
+in real life. If you think about sort of
+a very large city, if you think about how traffic
+moves through that and you want to change
+how the traffic moves, it's not something
+you're going to do in real life. And just try and to figure it out. Now, for example, I was involved
+with a project during the COVID pandemic about one
+of the busiest shopping streets where people weren't keeping
+distance from each other. So the question was, can we put
+flower pots in the middle, in certain places
+in this shopping street so that people naturally would keep
+a one and a half meter distance? Well, that's not something
+you're going to just experiment with in real life
+and then try to measure it. In simulation, you can do this. And simulations are naturally
+three dimensional because they have
+to simulate the real world. And if I think about how I learned
+geography, I learned them from Atlases. And I was it was mesmerizing. I would dream about faraway countries
+and hills and things that. But the atlases in reality were 2D. I was still amazed by it. Today, kids learn geography by flying
+through these simulated 3D worlds. They can see around them
+how high Mount Everest is. Or you can see the tigers in Nepal. All these kind of things are possible
+in a world of simulation. And you do this in cases where,
+of course, you can't just fly yourself
+to the Himalayas. And so simulation plays
+an important role in that. We have physical limitations. And then, of course, there's many
+hazardous situations where you don't want
+to try this out in real life. And so, for example, many of the
+autonomous cars these days that we see on the roads or where we see these companies being
+built around all use simulation. So think of Aurora, it’s one of these
+companies that are building technology
+for autonomous trucking and they use LIDAR and cameras and radars to see hundreds of meters
+in front of them. And but they are crucial using
+this information is simulation. Because you can't just go messing
+around in the real world with trucks, because that would be
+seriously hazardous. And so, for example, their system
+performed over 2 million unprotected left hand turns virtually
+before it did one in the real world. And then the other reason, one of
+the other reasons for simulation is that you can manipulate
+the fourth dimension. That of time. And in essence, you can do
+millions of simulations in parallel, doing years of testing in just hours. Here you see the deforestation
+in Bolivia happening. And of course, this happened
+over decades, not just in seconds. But in simulation, you can speed up
+time to see the results of things that would normally take years
+and years and years to complete. Then obviously, you can speed up time
+or slow it down if you want to get
+a much more fine grained control. But there’s another type of
+simulation we want to look at today, and it’s that of spatial simulation. So the real world around us
+is enormously complex. This for thousands of events
+in there’s thousands of entities continuously around it. Think about urban traffic with
+hundreds of thousands of instances. Think about and you know this big
+football game going on and a pop concert
+not far away from that, how does traffic go through
+the city to reach that? How do you manipulate? What do we have to do to make
+all of that safe? And each of these, think about
+if you would simulate that. You literally have hundreds of thousands
+of different entities in there. And each of these entities
+has its own position, velocity, behavior,
+interaction behavior. And we used to run these type
+of simulations on a single machine because it requires
+a significant amount of memory to be able to do this, because
+the large number of simulations, the large number of entities
+take up a lot of memory and especially how they are
+moving through the spaces. And Adam on Tuesday already
+announced SimSpace Weaver, and I want to dive a little bit
+deeper into this with you. So SimSpace Weaver makes spatial
+simulation accessible for everyone and it really lowers
+the barrier to it. And so maybe the best way
+to talk to you about that is to go through an example. Yeah, a number of years ago,
+early last year I went to Hawaii to meet with
+a company called Terraformation. And they are working to combat
+climate change by wanting to build a trillion
+trees around the world, as trees are the best carbon
+capture engine that you can imagine. And so I got to thinking about
+how can simulation help a company that actually is focused
+on reforestation. What are the kind of questions
+that you would want to ask, or answers that
+you would really need? You know, where do you place
+your resources? Where do you plan your seeds? What type of tree
+should we plant here? How much carbon capture is
+actually happening over the years? And can we encourage biodiversity? Because it turns out that
+biodiversity is extremely important for the health of an ecosystem. You need to consider where seeds
+are what type of seeds? Where you source your plants from,
+the density, the planting method, how far away from each other, and what kind of impact
+this forest will have on wildlife and what impact wildlife
+has on the forest. And so let's start off
+with this example. So this is a piece of barren land,
+right? And so this is a huge space that
+could actually inhabit hundreds of thousands
+of trees and plants. So a simulation is - imagine we would
+take this area as a simulation. And this is many miles, actually. So we divided up into grids. And in a simulation, we may ask
+questions like where might be the best place to plant our seeds
+to achieve the best biodiversity and overall growth? What if we planted here? The simulation is then able to
+speed up and we can see the future. Because it's just a simulation
+and we can experiment. Imagine you would start
+in a different area. Imagine what would happen
+if you start here? You see that the trees will grow
+in a very different pattern, mostly because the water around it, you know, supports it and actually
+also helps with germination. And every object in our simulation
+is a separate entity. And some of these entities move
+and interact with the environment. Trees don't move, of course. But our simulation shows
+how germination happens, how the seeds travel
+throughout the world. And what makes SimSpace
+Weaver unique is how this simulation
+is distributed. Our spatial simulation
+is broken up into a grid. The simulation logic operates on each of the individual cells
+in the grid. Each cell tracks the logic
+for that area and for all the entities
+in that cell. And every object
+is a separate entity. The trees, the seeds, the animals. And the cells are distributed by
+the cluster of compute instances. These instances work together
+to process the entire simulation as if you have one
+very large memory model. And it appears as a single integrated
+space with everything in it. You have clients that can
+connect to it and visualize it like we do here. SimSpace Weaver handles
+all the networking and handles the memory management
+and handles the synchronization. All of that is being done for you. All the heavy lifting
+that you would need to do for spatial simulation
+is handled by SimSpace Weaver. Now we can track millions of
+entities, the trees, the shrubs, the wildlife, the deer and birds,
+they're all entities. Animals cross boundaries in the grid,
+and as they cross boundaries, they're actually transported
+to other cells in the grid. They are actually freely
+being transferred. And it appears that trees were actually not growing
+in the middle part. And I honestly think that
+that's because of the deer. I've lived in an environment
+with lots of deer. They eat everything. And so it appears the trees
+are not thriving there, and it might be because indeed
+the deer are eating the saplings. So what would happen if we built
+a fence there? You see then that more trees
+will grow because the fence is there and the deer no longer
+has any impact on it. These are things that are not easy
+to try in real life. Trees may take 15 years to grow. Simulation is a true
+representation here of what would happen
+in real life if you would actually
+take this approach. And this is just one way a company like Terraformation
+could use simulation. So what are other things
+that you could simulate? What are the other things? Now you can simulate
+with SimSpace Weaver traffic patterns or public transportation networks
+or supply chain infrastructure? We can do this because
+of the millions of entities in the spatial intelligence world
+that SimSpace Weaver gives you. So why should you care about
+all of this, except for the nice pictures
+that we make? I think simulation plays
+a crucial role in innovation. Because you can play all these ‘what if’ scenarios,
+even with your digital systems that you can't do in real life. And, you know, you can do you
+can experiment as much as you want without actually having impact
+on the real world before you take out your system
+to the real world. And I think there is a true pattern happening where the border
+between digital systems and the physical real world
+is slowly disappearing. We’ve already seen that before,
+Alexa. Many of our customers
+don't realize that behind Alexa sits a complex distributed system. And so this is becoming vague. And as such, the more of us
+that actually build systems that need to act with the real
+world simulation is crucial there. Now, what about the future? Is simulation really the magic key
+to build systems in the future? Now it helps us understand of course,
+the laws of reality underneath. But this simulation,
+despite being highly realistic, with complicated physical engines,
+they’re just approximations. They will get more complex
+and more realistic over time, but still, there will be
+a lot of unsolvable problems. Now, take, for example, if you wanted
+to simulate very small things like the configuration of molecules. The computational effort needed
+scales exponentially with the number of models
+in your simulation. Today we often use Monte Carlo
+simulations or DFTs to simulate
+the behavior of molecules, and they're incredibly helpful
+and successful in helping us understand the world. But it is still significant
+approximations of the real world now. Given that we are living
+in a simulation as well, I can now easily
+fast forward 20 years. What if you wanted to simulate
+without using approximations? You would need a lot more memory
+actually than exists in the world. But this is only a problem
+with the computers of 20 years ago, or our current computers. It might be possible with quantum computing in ten
+or 20 years from now? Quantum simulators, Quantum
+based chemistry simulations are not as accurate today
+as our supercomputers are, and that's because quantum hardware
+is still in development. But to try the state of the art
+quantum computers, the prototypes of that you can use
+AWS Brackets. There’s a range of young businesses that have been building
+quantum computers and they're all available through AWS
+Brackets for you to experiment with. Now, the world of quantum computers
+doesn't have, for example, our rich set
+of development tools yet. What are the tools
+that are necessary? How are you thinking about algorithms
+in that particular world and Bracket really democratizes
+the access to quantum computers so we can help innovate definitely
+the software side of building on quantum computers. And they have actually the ability
+to answer the questions that would be impossible
+for classic computers right now. So let’s play this little
+this little test. Imagine you have a fundamental
+quantum object, like an electron. You need two bits
+on a current computer. For collection of two electrons,
+you need two to the power of two. And for collection of N electron,
+you need two to the power N bits. Now, remember, if you take,
+for example, a molecule of penicillin,
+it has 41 atoms. And to model that,
+you would need 285 electrons. That is two to the power, 285 bits. That is more memory than we have
+available in the whole world. It's this. I'm not going to pronounce this. Now, I did put it through Polly,
+by the way, and it took a minute
+to pronounce this. I'll post it somewhere
+and you can figure out, you know, what this really,
+really, really big number is. So the memory you need is going to
+double for each new object that you add to the collection. So the memory you need
+is exponential. It's impossible to date on
+in our current world and the way that
+we build our systems. In a quantum world, however,
+you can represent an electron with some other quantum object
+and you can manipulate that at will. You don't need this large
+amount of memory. A qubit is a fundamental unit
+of quantum information. And it can be used to encode
+quantum objects from your collection. For 285 fundamental objects
+like electrons, you can use 285 qubits directly. And this allows us to start thinking
+about simulations and understanding the world without actually having to go
+through these approximations. Let me give you an example. A common application, when you think
+about quantum simulation, is that of producing fertilizer. Well, we would think that's a well
+known process by now, yeah. We've been producing
+fertilizer forever. It's a process called Haber-Bosch. Unfortunately, the process uses
+about 3% of the world's gas to create ammonia. Now, if you've ever taken food out of
+your fridge and put it on the counter
+and forgot about it, you know that rotting food
+creates ammonia with no gas. If we could simulate that process,
+we would be able to copy it. And this can only be solved
+with quantum computing. Because of the complexity involved
+in the realistic simulation of this, which really would require
+a quantum computer. Now, I understand that
+for many of you, you think you're not really familiar
+with quantum computing, but it is real, and it is the reality of the future. It is how we are going
+to build our systems. Now, I understand that not everybody
+has a grasp of quantum computing. So I had an interview
+with John Preskill, who is an Amazon scholar, and he is the Richard Feynman professor
+of theoretical physics at Caltech. And his mind is full of quantum. And the way he talks about it,
+is even for me, mind boggling. So we did this interview with him
+and interspersed that with sort of going back to the fundamentals
+of what quantum computing really is. So this is a video.
+You can find it on YouTube. I've done a few of these curiosity
+videos about really hard problems that we are tackling in the AWS. And if you want to learn more about
+the fundamentals of quantum computing and what the realistic state
+of the art is right now and what we expect it to help us
+with, please watch this video. But don't watch it tonight.
+We’ve something else to do tonight. Once again, we have the number one
+DJ in the world playing at our re:Play party. Martin Garrix, yeah,
+it's going to be fun tonight. I love seeing you out there. So what do I want you
+to walk away with? Use simulation. Start thinking about how in your
+systems that you're building, which is both customers and maybe
+interaction with the real world, how can you use simulation? And despite these great leaps
+in the space of computer simulation, we're still at the beginning
+of what is truly possible. But what was impossible with pen
+and paper and da Vinci sort of scraping these
+little models is now the norm today. Remember, for me to get my shoes
+is no longer someone that actually makes these lasts
+by hand, it is a digital process. And so start thinking about
+what you can do using simulation
+to improve your systems. I started the keynote by saying that you should think
+about the world as asynchronous. And why should you think
+about it like that? Because it is. And I ended it by showing you how you can model
+the world more accurately and use it to build
+better systems and products. I hope that you can all agree
+that we can learn from something
+like looking around us and observing the greatest
+system in existence, the universe itself. The universe itself
+is extremely fragile. It is extremely fault
+tolerant as well. And resilient and robust. We should learn from sort of
+the principles that we see in nature and the world around it when we start
+building our computer systems. I hope this talk has inspired you
+to build bigger, better, bolder systems
+much faster with all of that. Thank you. And now go build.

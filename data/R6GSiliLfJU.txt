@@ -1,0 +1,758 @@
+- So thank you for being here today folks. My name is Bruno Emer. I'm here with my colleague Byron Arnao. We are both solutions
+architects at the critical capabilities team and today
+we're going to talk about like how customers can like
+leverage specific architectural patterns to reduce the area
+of impact and survive to difficult days, right? I just want to be mindful that
+this session is going to get like very academic and like it's a 100, 300 level sessions. So we won't be talking about
+like some networking concepts or even services like we
+are really focusing on architectural patterns
+on this session here. - So this is a little bit of
+an experiment we've invited you to today. So this is basically, we're gonna conduct this
+workshop as a format of which the two of us, when we were
+thinking about doing this, the conversation that we were having. And so we're gonna be taking
+a little bit of the roles of what we hear customers typically
+talk about and some of the challenges and things that you
+should be thinking about when you're thinking about
+isolation in this way. So with that being said, you know, at AWS embedded in our culture
+is this notion of things will fail all the time. You've seen this slide probably
+if you've been here through the week. This has come up
+in a couple different places. So this is at the very
+heart of what we do in AWS. Hopefully through today, you're gonna learn enough where
+failures or impacts that you see will not be impacts in your company. First I want to think
+about or just generally think about the categories
+of failure, right? So these go and there's a
+lot of these things that you should probably recognize, right? So we think about code
+deployments and configuration. And so these are the typical
+things that you'd see from bad code deployments, from
+application misconfiguration, those type of things.
+And recognize, right? When we're thinking about
+hardware and those type of problems, right? We're definitely not thinking
+about the type of issues that, you know, where they start
+out in the beginning where you might have some hardware
+failures and it goes through the middle in which it runs great
+and then at the end of course it starts to burn out. And so you end up having
+that problem in which that it starts to fail. Data and
+state type of issues. The second category that
+I'm sort of showing here is, you know, typically gonna
+be when you have stale data caches, misconfiguration, you'll have out of memory that
+you might have in instances, those type of problems,
+those categories of things. And then you have things like
+third party type of things. So you can think about work, other services or workloads in
+your organization that you're dependent upon. Think about the news feeds or
+other parts for applications that you have. Those type of problems are
+the ones that you'll generally sort of think about in there. And then core infrastructure, right? We know what those are, right? Those RAC failures, infrastructure stuff, things of that nature that are
+kind of network data center issues, et cetera. And then of course we have
+highly unlikely scenarios and you guys have seen a few pictures
+of these and think about things like, you know, when we're talking about like
+meteor strikes, you know, whole region failures, power
+grid issues, et cetera, things of that nature. So
+with all of those being said, these, when you think about
+the various causes for these, right? The things off to the left, here are the things that we
+obviously we design for high availability, right? These are the things like
+whether it's operator errors, which we're talking about,
+bad code deployments, component post failures,
+entire rack failures, those type of things. And then we think about things
+like on the other side here, which are really where we do
+our DR type of discoveries, right? Most customers really sort of
+focus on this is like longer term type of issues. We
+total internet failure, regional failures, et cetera,
+things of that nature, right? So those are very unlikely to have, right? So those are more rare. - Yeah. So, Byron I guess that like
+what you've been saying is really the way for us to think
+about like failures is to try to anticipate them, right? And those categories helps us
+to get to that point, right? But I guess then, the question
+really becomes like how do we protect ourselves
+against those failures? Like what are the mechanisms
+are the way of thinking for us to get there? - Yeah, so good question. And so the ones set up on the top right? A lot of customers think
+about their oil check green, they really, these are the ones
+that commonly we know about, right? RAC down, we have auto
+scaling groups for that. AZ impairments, those type
+of things. Again, you know, you can see deal with
+multi AZ deployments, regional failovers can deal
+with regional impairments, right? But the ones
+that are on the bottom, like the bad deployments, human
+failures and poison pills, which some customers know is
+black swan kind of events where you've got a sequel injection
+or something of bad code, something that goes and
+knocks out a system. Those are the ones that
+really are difficult to fully mitigate. - Yeah. So again, thinking
+from that standpoint, right? And thinking about those
+failures and how hard it is to mitigate, I guess then again, it just triggers another question, which is what happens when a
+workload becomes like too big or actually really too
+important to fail, right? Like for this most critical
+applications that we talk about. - Yeah, so good question here. So let's talk about a real
+world scenario to start with, right? So we've got plenty
+of people that have these critical hyper scaling type
+of applications in which they sort of become too big to test. This is not really the type of
+thing that necessarily every workload is gonna necessarily
+have to have this type of isolation with, but for the
+most critical ones, you know, it takes a long time to
+test and scale, right? And so when, you know, we think about that and how do we do this today, right? - Well I guess that this is
+really like about understanding the challenges, right? And again, as Byron was saying, we do have like a lot of
+failure modes and there are like mitigations like in place for
+us to start thinking about it and talking about architecture, right? It's really understanding the
+journey and kind of like what we have in place nowadays, right? So most of the applications
+that we are usually seeing, like they rely on those like
+traditional enterprise recovery strategies. So we are mostly
+talking about like backup, restore practice, right? And this is something
+like very calm, right? But as we start shifting to
+the cloud and we start shifting to more like advanced
+like resilience patterns, we'll definitely be thinking
+much more like as you mentioned about high availability and
+we'll be talking about like disaster recovery, right? And again, as I mentioned, it's really a matter of like
+evolving this like through the journey. So usually what we see is like
+customers are starting with like multi zonal, so relying
+on the availability zones and implementing like some sort
+of active high available implementations, like high available applications
+or even like thinking about like multi-zonal failover
+strategies, right? Then it tends to evolve like
+even more and we start getting into like multi-region,
+active deployments and again, even multi-region like failovers, right? Which is like taking out this
+boundaries of our regions and like just extrapolating
+the application to them. And I guess that really the
+message is thinking about like this kind of like as fundamentals
+is actually what enables us to start thinking about
+like more advanced resilience patterns, right? So I guess that this is really
+like just to set some context on like where the conversation
+should come from and where it goes to, right? And again, like having that in mind, I think that really getting back, like taking another step back
+and asking the question again, which is how do we usually
+protect against those failures that at the beginning were
+not easy for us to mitigate? - Yeah. So just to sort of review here, been the way back machine, you know, we looked at the ones
+that were easy to fail, but the ones on the bottom right
+and these are the ones that we really need to be able to solve for. So let's think about that from
+the perspective of bulkhead pattern, right? So you have a ship, it's a concept that's borrowed
+from naval engineering where you have this bulkhead and the
+way that it's set up is all these internal chambers with
+inside the boat so that if a particular area is impacted
+where, I don't know, let's say you've hit an
+iceberg, let's say for example, that the entire boat wouldn't
+fill up with water, right? And so that prevents the
+entire ship from sinking. And so that's an isolated failure. That's the type of thing that
+we're thinking about with that. So with all of that being said, how do we build this in software? - Well, and again, I think
+that this is a great concept, right? And I feel that this is
+really when we start talking about the concept of like
+cell-based architectures, right? But just before we got that, I just want to like ask the audience here, how many of you here in this
+room have heard about like this notion of cell-based architectures before? All right, cool, thank you. And like from those that
+actually heard about it, how many of you have this pattern
+running in your production environments? So really
+implemented those, all right, I see a few hands there, would love to catch up with
+you guys later and kind of like get more knowledge about
+like what you're doing there because this is something that
+we are really interested in, right? But just like moving forward
+and making sure that we are like baseline, like that
+we are leveling set like this presentation. The notion of like cell
+based architecture, it's kind of like similar to
+what Byron was talking about when he was mentioning the
+bulk head better, right? So when we look at like
+traditional software architectures or like traditional
+application architectures, we would have like everything
+being fed and everything being served by pretty much like
+the infrastructure that we provision, right? So in this example here we
+would have really like load balancer easy to instances in
+a database that would be like acting as a dependency. But the notion of creating
+this bulkhead really goes over like creating copies or actually
+different instances of this entire application. And by
+like entire application, I really mean like the application
+and all its dependencies that we actually own and
+deploying them individually as we would do it like the
+bulk head pattern, right? And this is really like what
+we would be calling the cells. So when we start like doing
+this and we start like deploying multiple copies of the entire application, we are actually isolating
+specific failures, right? Because if something happens
+to one specific cell, the only ones who will be
+affected will be the clients or the customers who will actually
+be tied to that specific cell, right? So you're like really reducing
+the blast ranges of potential failures, right? It's very important though to
+understand that when it comes about this sort of
+implementation data needs to be partition, right? We are not talking about
+replicating data to the cells. Like remember one concept is
+everything needs to live within the cell including the data
+that the users or the clients will be consuming, right? And again this is a way to
+like offer a complete isolation for that application, right? And again it also helps us
+because when we start thinking like around this model, it will actually provide us a
+predictable scale unit which in this case are going
+to be the cells, right? So a few concepts about the cells, right? Just to make sure that
+this is like very clear, the first thing is cells are
+meant to provide like workload isolation, right? So this is what we are trying
+to achieve here and by having this workload isolation, we will actually be able to
+like implement this like failure containment, right? So again, as the bulk head pattern, if there's a problem with one cell, the problem just expands that
+single cell not the entire environment, right? It's changing actually the
+notion of like scale because we start thinking about scaling
+out versus the scaling up, right? It's really the concept. If my workload's getting bigger, if I'm having like more
+users, more clients, I will be actually adding more cells. I'm not adding more capacity
+to the cells, right? And this lends us to the next
+step by which is cells will always have a maximum size. So like we are not saying that
+every cell will be different from the other. The idea is to make them like
+even because this will help us with testing and even with
+the manageability of like this entire environment, right? So again as we are saying, cells will be reducing the
+area of impact for those failures, right? And again, how it differs
+from like traditional environments, if I don't have
+like the notion of cells, if I just have like this
+single implementation, the single instance of my
+whole application and there's a failure, everyone gets impacted. But if I'm thinking about
+the notion of sales, right? And if there's like a
+specific failure on that, it's really like a matter of
+like containing that failure to the specific user group of
+users or clients, right? So we are like really reducing
+the impact it helps us with like potential financial
+losses because it's not like affecting pretty much everyone
+it helps with image for the company, right? Because it's not like necessary, it's not necessarily like a big thing. We are not going like in front
+page news by saying that the whole application went down, right? It's really changing this
+perception of how failures will actually affect users and
+how it actually affects our business, right? But I guess that's one thing,
+Byron, is we are talking about like this isolation between
+the cells and by copying like this data, right? And having like different
+like infrastructures, like different instances of that. But when it comes about
+access patterns and sharing this data kind of like
+making sure that it's very clear to us where each user should go to, how would we think about it? - Yeah. So we think about
+it from the standpoint of traditional architectures, right? We typically, and we've labeled here, I just went through and I
+labeled them A through H. So have an idea of these
+workloads and customers and we think about the nodes across the bottom. And so today when we have
+somebody that goes in and let's just call it workload
+E for example, right? And they go through and there's
+something wrong with that workload, right? And so it ends up poisoning
+that first node in there and then you end up having a problem. And so what effectively
+happens is that node becomes unavailable. So that's not great and
+ideally though unfortunately though you'll end up having
+that same workload and we talked about that poison pill or that
+black swan event in which it goes in and now what we see is
+a cascading failure that ends up happening across the entire workload. So that's kind of a challenge, right? And that we're taking out
+everything in all the workloads at the end of the day are unable
+to be able to leverage our service. - Yeah. And just kind of
+making clear when you're talking about this poison pill, it's not necessarily
+something intentional, right? Like you are also mentioning
+re tries that are going to be on code and can actually
+take the infrastructure down, right? - Yep, and we've all seen this before, we have these cascading
+failures in the area of impact, right? Is much of what we see today
+is that we have all clients. So another way of thinking
+about this problem though is to take this and to think
+about sharding this, right? And so if we take this entire
+thing and redo this and say okay, I'm gonna break this up into
+pieces so I've not got all eight of them going after the
+same set of workload or set of servers, right? But I'm gonna break those into pieces. So when we have E today, same
+problem, same poison pill, same deployment issue coming in, it goes in and as we said before, breaks that first note in
+there and it renders it unavailable. What we think's gonna happen
+when we do that with same thing when we go in we add the
+workload again same thing, it's gonna end up breaking
+that second one but the consequence here is much lower, right? If we look at this from the perspective, now F is going to be
+affected by this of course, but none of the other workloads are. And so you'll see across here
+when we do this except for E and F, all the other
+workloads are the ones that are you know, going to
+be preserved and be working as we expect them to do. So we think about the area of
+impact for this just to show this is clients divided by shards, right? So the more shards that
+you break this into, the less impact ultimately that
+you'll end up having, right? So with all of that being said, right, this is a real challenge to
+think about how do you route to all these various cells, right? Because now that's almost like
+the single point of failure there in a way. - Yeah. And and I guess that
+this is kind of like a natural question that we'll end up having which is when we have discharging
+this is reported users like and all those requests coming
+how do we know where the request should go to in
+terms of sales or even what shards like the users belong to. And this is why when it comes
+about like implementing the cell based architectures
+or even thinking about like discharging at the application level, we need to think about
+implementing a routing mechanism, right? So when you're talking
+about this routing mechanisms, we're talking about like a
+really thin layer that will be responsible for like implementing
+the routing logic, right? And pretty much like the
+application will start relying on that, right? So I won't say that this
+is going to make like the application lives like way easier, right? It does introduce some
+complexity and this is why this component needs to definitely
+be very resilient, right? It needs to be running all
+the time because like all the logic about the routing, like where the request is
+going to, how it's going to be handled, like what's the shard what's the cell that needs
+to be, it definitely needs to be handled by this
+specific component, right? So the notion is really like
+keeping this component as simple as we can, right? And this is what we mean like
+by saying that this is a thin routing layer, right? And by the way, by thin routing there I'm just
+like really talking about a few lines of code, right? Like if we're want to like
+think about the software engineering behind it, it
+should be a few lines of code, not more than that. - So would you have a
+database look up in there as an example? - Ideally not, right? Like we want this to be
+ephemeral because again we want to make it like very resilient
+and we want to reduce the need for external dependencies
+for this component, right? And by also reducing
+additionally to reducing the external dependencies, we also want to make this
+component statically stable, right? Which in fact means that even
+if there's like an environment on the infrastructure where
+this component's running, right? If it's running like across
+different ACS and then there's like a problem with that
+AZ that would affect that component we would like still
+for example having enough capacity to keep operating, right? So this is really like what
+this is all about, right? And when it comes about like
+ways of implementing this, like there are plenty ways
+that we can think about how to implement this technically
+and how we can make this routing mechanism work. And I'm just going back and
+talk like very briefly about two of those, right? So a very simple way to
+think about it is by using a technology like a protocol
+that's been around for a while, which is DNS, right? Pretty much every application
+leveraged DNS nowadays the whole internet really
+relies on DNS, right? So we can think about just
+having a routing there, building this piece of
+code that will basically be updating DNS entries, right? And then since we're talking
+about sales and charging, we'll provide to each of those
+users or those clients that are going to those like
+specific sales specifically like URL right? So like each client is
+responsible for just requesting like sending the requests
+directly where it needs to go, right? - And this is like a much
+simpler way to approach it in a way because it's not really,
+as we know, much software that's written for routing and sales. So like this is not kind of
+like using something off the shelf that's getting halfway there. - Yeah, exactly. That like really the building
+process for this type of like routing mechanism goes
+over building this piece of software that will actually
+update those entries at the DNS, right? And then shifting the control
+of this traffic back to the clients, right? And it can be like really a
+good thing if we're talking about a small number of
+cells or probably a small number of users. But if we start growing the
+application a lot and we start growing the number
+of cells and growing the user base, it can get very complex, right? We will see the management
+complexity coming with that, right? And just by an example, right? Like if I want to move one user
+from one cell to the other, I will have to rely on DNS, CTL, I have to send that
+information back to the client. So I need to be to that
+area as well, right? So again it works well for like
+simple use cases but I would say that depending on the
+complexity might not be the good idea, right? And really since we're talking
+about this ideas and the complexity, another way of handling this
+is thinking about building a cell router that will act
+pretty much as a load bouncer, right? So the idea here is not like
+relying on existing protocols, the idea here is building like
+this entire new layer that will receive all the requests
+and then this layer will be responsible for just sending
+the traffic where it needs to be, right? So it's really server side, it's not like relying on the clients, like the clients won't even
+know that this layer exists, right? But it gives us like full control
+over like where we need to send a traffic to. - Yeah and it seems like with
+something like this obviously whereas DNS might have TTLs
+things of that nature this year wouldn't and so it'd be a
+little bit more quicker reacting as well. - Yeah exactly. - Like we're client side - Exactly. We're really controlling
+all the traffic logic on the server side, right? But it doesn't mean that
+it's going to be simple to be honest, right? We need to think about like
+all those concepts that we just explored, we need to think about
+making this very resilient and there are a lot of
+different techniques that we can apply, right? So just as an example
+of if I had to build a routing layer, how I could approach that. One way of thinking would
+be really thinking about static disability and
+thinking about breaking this routing layer in two different
+layers which would be thinking about the control plane. Where I would implement all the logic, all the new cells new users, pretty much everything
+that's kind of the critical operations. I would send this to the
+control plane and then I would just have a data plane
+that would be basically receiving this information and
+routing the requests, right? And by the way, when you start talking about
+this it's really mostly because we understand that
+the plane tends to be much more complex because this is
+where you're handling out all the logic. This is where you are
+really implementing all the changes, right? So we wanna make sure that
+even if the control plane goes down the application, the routing wouldn't be impacted right? And there are really other
+mechanisms that we can think about we can add on top of
+that to make it even more resilient. We can think about the
+constant work pattern so there are a bunch of different
+stuff that we can do to make sure that this component's
+really resilience as it needs to be. - And this seems like what we're
+telling customers all along when we talk about static
+stability is really to be focused on data plane operations more
+than to be able to focus on control plane. 'Cause we know that control
+plane can be less reliable. - Yes, exactly. And like they can be
+less reliable, exactly, because there are more
+moving parts, right? - Yep. - There are more moving
+pieces so we don't want to be relying on that all the time. - Yeah. So what I think I'm getting
+and what I think about this and you know it's really important
+cause I think people get confused on this all the
+time is, right, cells are not availability zones or regions
+and this is an important distinguishing fact, right? Because I think it's easy
+with these segmentations, we talk about availability
+zones and regions as physical isolation boundaries. When we
+think about things like cells, we're really talking more
+about logical barriers for isolation, right? And so when we think about it, when I overlay and I just put
+this together to sort of like say okay, you know if you look
+at a cell it can actually, 'Cause we still have the same
+HA DR kind of considerations that we have, none of that's went away. So we can really have cells
+that can straddle multiple AZs in multiple regions, right? Because we might have an
+application, customers saying okay this is highly critical, highly scalable need to be
+able to have that availability level. So you should be really
+sort of cells provide com compartmentalization and you
+really should be designing for that combination of those
+things to achieve their reliability goals. And so also cells are not
+necessarily used as implicitly as a scaling mechanism. They can be, it helps you to
+scale certainly by being able to have that stability across
+your entire user base and your customers coming in. But I wouldn't think about this
+necessarily first if I had, it is really gonna depend on
+the complexity of the workload as to whether I think that this
+is appropriate for scaling. - Yeah, so basically
+what you're saying here, like with this statement Byron, is if my only need is to just
+scale my application and it's not a critical application to my business, I might not really even be
+thinking about leveraging sales or charging, I might think about different practice. That is pretty much it, right? - Yep. Yeah. - All right cool. And just keep going on
+the conversation because now we've got the notion of cells, we've got the notion of charging, right? We talked about this routing there, we talked about how we, we can make this routing
+layer more resilient, right? So this notion of static
+stability, control plane, data plane. But when I get back to
+your example, Byron, I really got to a point
+where initially without any charging, if there was that poison
+fuel scenario talked about, it would affect all the customers, right? Then we kept going and we
+were talking about sharding but what we saw there is if one problem, like one customer like has a problem, it will actually affect not
+only the customer but like more customers that are basically
+sitting on the same shard right? So my question really becomes
+is there a way for us to make it even more resilient? Are there like any other
+techniques or like patterns that we can leverage on this space? - I thought you'd never ask. So when we think about the sharding we went through the example
+before and we remember right the 25% or one fourth of the
+customers were impacted. But maybe there's another way
+to think about that problem, right? So if we take the same thing
+where we go through and we say, you know, we want to redistribute
+this and we want to use something called shuffle sharding. And so with shuffle sharding
+basically says is that you can take these workloads but instead
+of sort of mapping them on a one to one basis to
+each one of the cells, I can map those two different
+nodes within this form. And so then their partners
+or the customers that they're co-resident with or the workloads
+they're co-resident with are on different nodes in there, right? And so we can continue seeing
+these are randomly or you can do this algorithmically or
+through hash to be able to assign these so that each of these
+are turned around and assigned to different nodes. So taking the example that we gave before, we have workload E coming in
+and it's mapped of course as we had before but not to the first
+one but it's actually to the first and the third in
+this particular case. And that same poison pill comes in, that same black swan event
+takes out the system and then again as we expect takes
+out the second one. But what we do notice here and
+we should point out is that the partners of the workloads
+that are adjacent in this particular case are different. So there's a different
+combination and so we can see the same thing when we see
+workload C who was unaffected, didn't have a poison pill,
+didn't have anything with it, it's still happy smiling, everything's great for them
+and they're unaffected at the workload level. But we look at it in the same and we take, we take the same one here and
+we can go to workload D who's also sharing with workload E, that same failed one in the failed set. And so we can see workload D
+comes in here and it's still working too. So the same
+problem that we had before, we've really mitigated by
+being able to do shuffle sharding and of course when we go through, we look at the rest of the
+workloads, they don't care, they were unaffected by this whole thing. And so we can see in our case
+here all of these are green or one E is red, our area of impact is the
+client's over combinations. Some really powerful math in here. - Yeah and just getting
+back to the math, right? Like if we can add some observations on what we just discussed
+over the session, right? If we're talking about a
+traditional architecture where we are not leveraging any
+sort of sharding or so charging like no cells, nothing like that. If there's a problem then it's
+going to probably be like a complete outage, right? So like everyone will be impacted.
+If we actually evolve and we start talking about sharding we are actually in reducing
+the impact and it's going to be localized only to customers
+that are sharing the same shard right? In the example that Byron said
+and like just taking like the number of nodes, the number of
+combinations he put together, it would be affecting 25%
+of the customers, right? So we are definitely
+reducing the impact of a failure in this application. But if we take another step
+back and we are actually talking about shuffle charging, which is another mechanism for us, the impact would be really
+localized to customers or clients that have the same combination of nodes. So reducing the impact even more, right? Or in the example you mentioned
+it's going to be like 12.5% of the customers impacted, right? So we are like really reducing
+the area of impact by just thinking about desegregation here, right? And just adding some more
+context to it, right? Because we've got this example
+that had eight nodes and two nodes per shard right? And then we are kind of
+having those users spread across those. But the math is really powerful
+in that. So if we take, actually we start thinking
+about increasing this infrastructure and increasing
+the number of shards right? And let's say we are going
+to a hundred nodes and each shard will actually
+have five nodes, right? The actually total number of
+combinations that we can get out of this is 75 million, right? So you can think about
+getting these cards and just taking, randomly picking
+five cards we can get up to 75 million different combinations, right? - And this is really substantial, right? This changes from a fault
+isolation or the blast radius. This is pretty significant. - Yeah it completely is, right? And by the way, if we start even if we keep
+going on that example and if I take any five nodes
+now the likelihood of customers that won't be
+impacted is going to be 77%. So 77% of my customers in
+this infrastructure won't pretty much see anything, right? And in the opposite side, the likelihood of having
+five customers that are be sharing the same five
+nodes is going to be 0.000 this lot of zeros, like 13%, right? So we are definitely reducing
+the area of impact as we start growing our infrastructure
+and now we start like changing the way we we're applying
+this shard right? So this is pretty much it. And by the way, this is something that we
+actually do internally at AWS. So if we're thinking about like
+where we use this route 53, Amazon route 53 for example, our DNS managed service uses
+leverage this exact same architectural pattern, right? So this is basically what
+helps the service to keep its very high SLA right? So this is where it comes from. But I guess at this point
+we are really talking about those patterns. We are really talking about
+how to implement that but we haven't landed to a more
+concrete use case, right? So why don't we do this? Why don't we start thinking
+about where we would be using it in real life, right? And again, just making
+sure that those patterns, when we're talking about
+cell based architectures, we're talking about
+sharding, shuffle sharding it definitely increases the
+complexity of the environment. So we don't really want
+to have this spread to all of our applications. We are really talking about
+those critical applications, right? So this is what we are
+referring to and just taking the example, let's picture
+that we have a coffee shop, right? And me and I don't have it, I was actually going to use
+a candy shop but he's kind of into running and stuff, told me to stay away from sugar, right? But my coffee shop has two
+different units, right? One of them is in Sao Paulo
+and another one is in New York. And I have my point of sales, my registers there and every
+time that someone comes to my my store, they need to pay for
+something and they go to like register and they start paying
+and this is processed by some sort of backend service, right? In this example here. So imagine that we are
+just like performing a new deployment, right? And I'm performing a canary
+deployment meaning that I'm not deploying to all my POSs
+all my registers at the same time. So I'm just going to
+touch one of them, right? And actually what we have
+behind the scenes is this notion of shuffle sharding, right? So all my different registers
+are going like to those different backend services
+and they are basically like processing those orders. But I just did the deployment
+to POS number two to the register number two and it
+was a bad deployment, right? For some reason I couldn't
+capture this on my tests, something broke
+down so this is really one of the failures that you've mentioned, like you talked about Byron,
+and what actually is going to happen is this is going
+to impact my backend. So as we can see two servers in this whole infrastructure are going
+to be taken down, right? And POS two will be unavailable, right? And we can argue that POS
+two is actually sharing the infrastructure with register number eight, POS number eight and POS
+number three as well, right? And they might be
+somewhat affected by that, but because I have shuffle
+sharding in this example, they won't really be
+down right? In this case. Like they are able to still be working. So what I'm saying is that
+if I have this in my real life scenario, if I have this in my store, I'm just really reducing
+the blast radios here. - So you're saying I'm still
+gonna be able to get coffee even if the back ends are
+broken for a particular one. - Exactly that. So instead of if you're a customer in my coffee shop, you go there,
+you're trying to buy coffee, I'm not going to say I can't
+sell you anymore because everything went now I'm basically
+going to tell you can you sir please go to the register
+number three so I can take care of all their our
+register number one or whatever other register I have. So it's really reducing the
+impact and this is how it looks really in real life
+and kind of a more real life example, right? - So I guess we think about
+how do we operate these cells? - Yeah. And operations
+is really getting to be different when we compare
+with the traditional architecture, right? Because again now we
+are talking about cells, it's not a single infrastructure
+we are talking about different deployments, right? But there are many more things
+that we need to be aware of and we need to think about, right? So the first thing that we
+need to kind of get back to the concepts is we were talking
+that every cell has a fixed size, right? But what happens if I start
+getting my users into those cells and then one specific
+user starts consuming more of my resources, right? I do need to have some sort
+of heat management there. So I need to think about
+others in these cases. And again this is something
+new that just came with this notion of cells, it wasn't there before but we
+need to address this, right? And really the way of thinking
+is making sure that we always have a rebalancing or
+really a migration tool. So we are able to take
+users from one cell to other cells or even users that
+will belong to their specific cells depending on how
+much they're using it. And the opposite is also true, right? Because I have this maximum
+size and then I might have infrastructure that no one's using, right? So I do need to think
+about low distribution, I need to be smart enough to
+evenly get my users across those different cells as
+even as they can, right? So I will be making an optimal usage of my infrastructure, right? And another thing is even though
+we are talking about cells, we are talking about shuffle
+sharding and the objective is really to reduce the blast
+ranges of potential failures in our code or our infrastructure, things can fail, and actually
+things will fail all the time. We need to be aware of that. So the notion of high availability
+needs to be even inside the cells, right? Like cells can fail, the components can fail at
+any single time and we need to think about addressing disaster recovery, high availability needs
+within the cells, right? So it's really taking the
+notion of what we use to do for a single application
+doing this for that single application. But many times
+as we build more cells, right? And another thing is really
+thinking about how the tech stack will influence the management. So the way that I use to
+manage like SQL servers, relational database are not
+going to be the same that I'll be managing no SQL
+database for example. So being aware of what's
+the technical stack, what's are the services, what are the technologies
+that I'm leveraging? It's very important on
+this example, right? And just if we can kind of
+like dive deeper a little bit more and we can lend to like
+again another more concrete example we can talk about
+like how monitoring tends to change, right? Because the notion of monitoring
+that we always knew about is I just want to look at my environment, I want to understand what's
+going on and based on that I'll have my metrics, my SLOs and I'll be able to
+take actions if something is not as I expect to be, but let's pretend that one of my SLOs is really
+around measuring the latents that my requests are having
+right? Before using cells or before using any of those
+techniques that we're talking about, I would do this evenly
+across all my requests, all my servers, all my infrastructure. But now we're talking about cells. So we have multiple instances. What it means is that I want
+to be able to understand if there's something wrong with
+a particular cell and just taking the metrics from every
+single cell and trying to map my entire application
+health out of that might not be a good way, right, of doing it. So we need to be able to
+understand what's going on at each cell level. We need to be able to understand
+like how this is affecting the customers that belong to that cell. Meaning that it's really
+more things that we will need to do, right? So it's really additional
+overhead in terms of management that we will come
+naturally with the notion of cells and the notion of
+these techniques that we're talking. But then, I actually would
+have another question on that because we were talking about management, we were talking about the
+number of cells we were talking about how management
+really changes, right? And some of the complexities
+that we will get. But really in the end, is it going to be better for
+us to have small cells or big cells? What would be the best
+approach for us to think about? - Yeah, this is really
+the crux of the question. It's a really important one, right? So smaller cells, obviously,
+we're able to reduce the area of impact. The more granular we are, the less customers that we
+have and they have less impact. We talked about combinations
+before and so that kind of feeds directly into this. It's also with smaller
+cells easier to test, it's a little bit more
+manageable about what you do. It's really a trade off
+conversation and it definitely depends on whether you know
+what your architecture or what your workload is or the
+criticality of that, right? - Yeah. So basically what
+you're saying, Byron, is if I have smaller cells, I'm actually reducing the
+blast ranges of a vental failure, right? Because I have smaller cells, it's going to be more cells
+but less clients attached to each of those cells. - Yep. - But if I'm talking about bigger cells, it might be easier for me
+to manage and therefore it's cheaper. But if something goes wrong
+with that cell just because it's bigger and it has potentially
+more users attached to it, it's going to affect more users. So the isolation's not
+quite the same, right? - Yeah. And so, and I mean smaller cells, they're easier to operate, right? There's less to do, right? The stack is smaller effectively. But when you think about this
+at a cost efficiency level, if I have less cells, ultimately you can think about
+ELBs or anything else that's in that stack that you're having
+to deal with and having to provision less of them. And so there's some cost
+efficiency in that by having larger ones. It's a little easier
+sort of you have reduced splits so that you're not going through
+and having the situation in which that particular customer
+or cell ends up filling up, which is gonna cause you to
+have to move people to another one in order to get the
+capacity or you have failures to evict people and move them
+to migrate to another one. And this could be really
+challenging for those of you who remember VMware and you think
+about the emotion and when you're going through and having
+to acquiesce and move that workload in live when you're doing it, it's a very challenging
+piece of software, right? Remember this is not a piece
+of software that's given to you, right? So this is gonna be something
+you're gonna be developing when you're thinking about
+that orchestration and managing those splits in the migration
+of people in between those cells. And so the system is also
+ultimately with less cells involved from an orchestration standpoint, a little easier to manage as well. Remember we talked about that
+routing layer and the amount of cells that are in there. So less complexity in there as well. So that'd be other topics that
+are really important, right, to consider in this, which is authentication and
+authorization stuff, right? So how am I doing that? Today, you know if I'm going to a single stack
+and managing that endpoint is a little bit simpler. Does each cell have its own
+cell certificate where you're terminating traffic, right? It's a little bit more management there. We've all been through the
+nightmare of having a certificate that's expiring in a service
+that fails as a result of that, right? So that's kind of another thing. What are the team boundaries?
+What's the process, right? So where do our developer teams
+sit within the organization so that are they straddled
+across three different development groups and three
+different business units that are contributing to that cells, right? So that's another thing that's
+gonna really make that stack or that individual cell more
+complex and how do we network that? Is there VPCs? Is that straddled? What's the network architecture
+of those things? You know, is that gonna be aligned on a cell level? Is that gonna be aligned
+across some other, shared between a number of cells, right? So those are pieces we have, you know, our AWS accounts, is it gonna
+be in a single AWS account? Am I gonna break that up ourselves? So all of those things are
+gonna be really kind of key things to consider when we do this. So. - Yeah, so I guess by like
+that we are kind of like seeing here is that when it comes about
+these critical applications that we are able to implement
+like a very good mechanism for sharding or even if we can
+extrapolate even like more in talking about shuffle sharding
+then we're talking about sales, adding the routing layer, making sure that everything
+is really resilient. This solution really tends to
+solve the problem that we were seeing before, right? So this is even though
+adding more complexity, it comes with the
+benefit of addressing the problems that we saw and
+really helping us with those kind of scalable
+applications as well, right? So I guess that one more
+thing I guess we can kind of do a quick recap of
+everything we talked because I know it was a lot of
+information we were kind of discussing here today. So let's kind of go over
+it and just make sure that those concepts are well
+said for us, right? So the first thing is when
+we're talking about cells, we are talking about
+logical isolation, right? And again, tying it back to
+the bulk head concept that you mentioned, right? We will be isolating those
+cells and if there's a failure, the failure will be contained
+to that specific cell and therefore it helps us to
+really reduce the blast rages. It helps us to really
+make sure that most of the environment, depending
+on what we are doing, can still be working, right? Another thing is really
+when we start talking about sharding and shuffle sharding examples, we understand that there's
+a very strong need for data modeling because basically
+the notion of cells is having everything there. It's like
+a central, a single instance. So each cell is really like a
+single instance and the data is not going to be shared
+across cells, right? So we need to understand how
+to proper model this data. If we're talking about like sharding we need to understand like what
+we will be like the base for our sharding strategy, right? Are we talking about like customer ideas? Are we talking about like last names? So we need to have this
+data modeling effort before we can even start
+implementing those patterns, right? And I guess that
+the third thing is really we will be aware that when it
+comes about routing traffic and getting into those patterns, we need to build this thing,
+a statically stable routing layer and that this component
+is going to be crucial for our solution to be working, right? Pretty much all the requests
+will be flowing through that. So it becomes very critical
+to the whole application, right? We need to think about
+building this component, otherwise we won't be able
+to route those requests. - Yeah and definitely the need
+to focus on data modeling, is really critical. I can't
+underscore that enough. I think that that's one that
+we see as a big challenge here and it really enables you to
+be able to have shared nothing on the cells. And so
+additionally when you look at it, I think monitoring changes
+are kind of key, right? So today we're going through
+and we're looking at cells, we're looking at services rather
+at SLO and SLI at an entire service level. But when
+we're breaking this down, now we're thinking about
+doing this across cells. So that dimension, the amount
+of data that we're ingesting and we're monitoring is huge,
+is vastly significantly more than we had before. And so thinking about deployments
+today when we do bluegreen or we do deployments across, we're gonna end up having
+more cells to deploy across. And so that's a complexity
+that we don't have today. You're just doing it to a
+single stack, set in region or wherever you're doing it. So that's multiplying that
+out is definitely gonna be another piece. Cell orchestration
+needs to be implemented. And we talked about that before, right? That's huge. Again, not a piece of software
+you can buy off the shelf today. So that's definitely some
+complexity and that needs to be implemented. And we talked about all those
+things with routing layers, et cetera in order to make those. And you know the other
+thing that, you know, is a key takeaway for me really
+is extreme resilience can be achieved with shuffle sharding. And so this is like kind
+of the ultimate when you're thinking about how you want
+to really build these critical workloads for resiliency. - All right? And I guess
+that last but not least, cells are not availability
+zones and cells are not regions, right? Cells are meant to
+provide logical isolation, but we always need to think
+about how we should expand ourselves across different
+ACS and even different regions, right? So they walk together but
+they are not the same thing. It's very important to understand
+that the notion of cells is really logical isolation,
+not physical isolation, right? So this is a very important concept. Another thing as well when
+we talk a lot about it today, right? Cells are not necessarily
+a scaling mechanism. One of the benefits that
+we get out of implementing cell based architectures is
+that it's easier for us to scale the application as
+we are still getting more users or more clients. It's
+a matter of scaling out. So like really creating more
+cells and just mapping new users to that. But I would say personally that
+if your only need is really to scale the application
+and if it's not a very critical application or you're
+not willing to deal with the added complexity that
+are other mechanisms that will help you to scale as well. Right? So I guess that the message
+really is if you just need to scale, and this is the only problem, let's kind of try to
+understand if there are other better mechanisms that won't
+bring the additional complexity that sales are going to add
+your environment, right? - It's just gonna really
+depend on the application and the criticality. Yeah. - Yes, exactly. Like I would say let's not do
+this to applications that are really non-critical applications, right? Because it might not be worth it, right? - And it really does lend
+itself really to soft state applications more than it is
+to hard state applications like DNS, right? Soft state application, hard state with transactions,
+maybe not necessarily gonna be the best use case for it
+'cause it introduces a lot of complexity if you're willing
+to introduce that cause of the criticality, you know,
+that's okay as well. - Yeah. And as we're talking
+about state and soft state or hard state, it's very
+important to learn that when it comes about cells, data should
+not be shared between cells, right? So everything that belongs to
+a user or a client that sits within a cell should stay on that cell. We should not be just sharing
+data across different cells. - So don't use Dynamo as
+an example across all of your cells. - Yeah, I guess that the
+idea would be really if you have different cells and
+they are using Dynamo DB, you would want to create a
+Dynamo DB table per cell, right? If you want to make sure that
+you are like implementing this sort of like isolation at every
+single like dependency that your application has, right? And this would be one
+way of thinking about it. - Just to share nothing ultimately, which is the mantra right? - That's correct. That's
+correct. We don't want to be sharing nothing. And then finally I guess
+that it's very important to understand that cells have
+no interdependent logic. So again, we talked a lot
+about keeping everything that the application needs to
+be working within the cell. So we are not saying, all right, I have two cells and those
+two cells are dependent of each other. If this is the case, it might not be really truly
+a cell-based architecture because it might not give us
+all the isolation and like it might not help us to like really
+reduce the impact for like any problems that are happening, right? So basically in this example I talked about if cell B goes down, it would also affect cell one, right? So cell E, right? So this is not what we want, right? So I guess that this is pretty much it. - Yeah. And just, you know, one quick question when
+we were doing this, I forgot to ask in the beginning here, how many developers do
+we have in the audience? Just to raise your hands. Okay, great. And I guess the rest solutions
+architects or architects? Okay, great. Good mix here. Just wanted
+to get an idea on that. Well I think that's all
+we had to say on that one. I thank you for your time today. This has been great talking to y'all. And again, some of those people
+that are here that have been doing cellular deployments
+or cell-based architecture deployments, maybe you'll join
+us on the stage next year as we're talking about
+this. So that'd be great. But thanks everybody for your time. - [Bruno] Thank you all.
