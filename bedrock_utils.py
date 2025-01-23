@@ -14,6 +14,7 @@ class BedrockHelper:
     REGION_NAME = "us-east-1"
     MODEL_ALIASES = {
         "s35v2": {"name": "Cloaude 3.5 Sonnet v2", "model_id": "us.anthropic.claude-3-5-sonnet-20241022-v2:0"},
+        "nm": {"name": "Nova Micro", "model_id": "amazon.nova-micro-v1:0"},
         "np": {"name": "Nova Pro", "model_id": "amazon.nova-pro-v1:0"},
         "nl": {"name": "Nova Lite", "model_id": "amazon.nova-lite-v1:0"},
         "s35": {"name": "Cloaude 3.5 Sonnet", "model_id": "us.anthropic.claude-3-5-sonnet-20240620-v1:0"},
@@ -125,6 +126,7 @@ class BedrockHelper:
             "system": system_prompt,
             "inferenceConfig": inference_config
         })
+
         # logger.info(f"Sending request to Bedrock with prompt: {messages}")
         response = self.bedrock_client.invoke_model(modelId=model_id, body=body, trace="ENABLED")
         response_body = json.loads(response['body'].read())
@@ -239,6 +241,7 @@ class BedrockHelper:
         * 과거 Bedrock을 통해 세 명의 고객이 생성적 AI를 생산적인 방식으로 활용해온 사례가 공유되었다.
         * Sunlife는 AWS의 프로그램을 활용해 내부 비즈니스 애플리케이션의 ROI를 측정하고, 더 빠르게 시장에 진입할 수 있었다.
         * Natwest는 고객 맞춤형 마케팅과 생성적 AI의 케이스를 통해 클릭률 및 전환율을 높이고, 잘못된 정보와 환각 현상을 줄일 수 있었다.
+        
         ### 금융 서비스 산업에서의 생성적 AI 활용
         * 생성적 AI는 복잡한 문서를 분석하여 금융 서비스 산업에서 실질적인 통찰력을 제공하는 데 도움을 준다. 이를 통해 분석가는 데이터에서 실제적인 인사이트를 도출할 수 있다.
         * 자동화된 규제 준수 프로세스는 인력 소요 시간을 33%에서 60%까지 절감하며, 고객과의 상호작용에서 인사이트를 창출하는 데 효과적이다.

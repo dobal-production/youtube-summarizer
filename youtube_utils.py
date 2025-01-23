@@ -80,3 +80,4 @@ class YouTubeHelper:
 class VideoInfo:
     video_id: str
     title: str
+    category: str

@@ -18,8 +18,8 @@ def setup_logging():
 
 logger = setup_logging()
 
-def get_file_path(file_name: str, extension: str, suffix: str= "") -> Path:
-    return (Path(config.DATA_DIR) / f"{file_name}.{extension}") if not suffix else (Path(config.DATA_DIR) / f"{file_name}_{suffix}.{extension}")
+def get_file_path(folder_name: str, file_name: str, extension: str, suffix: str= "") -> Path:
+    return (Path(folder_name) / f"{file_name}.{extension}") if not suffix else (Path(config.DATA_DIR) / f"{file_name}_{suffix}.{extension}")
 
 def translate_to_file(video_id: str, source_lang: str, target_lang: str, region: str) -> None:
     translate = boto3.client('translate', region_name=region)
@@ -54,7 +54,7 @@ def translate_to_file(video_id: str, source_lang: str, target_lang: str, region:
 def download_transcripts(video_id, language):
     try:
         transcripts = YouTubeHelper.get_transcript(video_id, language)
-        with open(get_file_path(video_id, "txt"), 'w', encoding=config.FILE_ENCODING) as f:
+        with open(get_file_path(config.DATA_DIR, video_id, "txt"), 'w', encoding=config.FILE_ENCODING) as f:
             f.write(transcripts)
     except Exception as e:
         logger.error(f"Error on download_transcripts: {str(e)}")
@@ -68,7 +68,7 @@ def translate_transcripts(video_id, source_lang, target_lang, region):
     translate_to_file(video_id, source_lang, target_lang, region)
 
 def get_transcripts(video_id, target_lang="ko"):
-    translated_file_path = get_file_path(video_id, "txt", target_lang)
+    translated_file_path = get_file_path(config.DATA_DIR, video_id, "txt", target_lang)
 
     if (translated_file_path).exists():
         return get_translated_transcripts(video_id, target_lang)
@@ -76,7 +76,7 @@ def get_transcripts(video_id, target_lang="ko"):
     return get_original_transcripts(video_id)
 
 def get_original_transcripts(video_id):
-    transcripts_file = get_file_path(video_id, "txt")
+    transcripts_file = get_file_path(config.DATA_DIR, video_id, "txt")
 
     if transcripts_file.exists():
         with open(transcripts_file, 'r', encoding=config.FILE_ENCODING) as f:
@@ -85,7 +85,7 @@ def get_original_transcripts(video_id):
     return transcripts
 
 def get_translated_transcripts(video_id, target_lang="ko"):
-    translated_file_path = get_file_path(video_id, "txt", target_lang)
+    translated_file_path = get_file_path(config.DATA_DIR, video_id, "txt", target_lang)
 
     if (translated_file_path).exists():
         with open(translated_file_path, 'r', encoding=config.FILE_ENCODING) as f:
@@ -93,14 +93,14 @@ def get_translated_transcripts(video_id, target_lang="ko"):
 
 #initialize markdown file
 def initialize_markdown(video_id):
-    summary_file = get_file_path(video_id, "md")
+    summary_file = get_file_path(config.DATA_DIR, video_id, "md")
     if summary_file.exists():
         with open(summary_file, 'w', encoding=config.FILE_ENCODING) as f:
             f.write("")
             
 # save summarized text to markdown file
 def save_as_md(text, video_id, model_name):
-    summary_file = get_file_path(video_id, "md")
+    summary_file = get_file_path(config.DATA_DIR, video_id, "md")
     with open(summary_file, 'a', encoding=config.FILE_ENCODING) as f:
         f.write(f"\n## {model_name}\n")
         f.write(text)
@@ -135,7 +135,7 @@ def process_model_summaries(
         raise
 
 def get_videos():
-    list_file = get_file_path("video_list", "yaml")
+    list_file = get_file_path(config.DATA_DIR, "video_list", "yaml")
 
     if not list_file.exists():
         with open(list_file, 'w', encoding=config.FILE_ENCODING) as f:
@@ -144,12 +144,12 @@ def get_videos():
     with open(list_file, 'r', encoding=config.FILE_ENCODING) as f:
         videos = yaml.safe_load(f)
 
-    return [VideoInfo(video_id=video['video_id'], title=video['title']) for video in videos] if videos else []
+    return [VideoInfo(video_id=video['video_id'], title=video['title'], category=video['category']) for video in videos] if videos else []
 
-# add to list as yaml file named video_list.yaml
+# add to list as yaml file named videos.yaml
 from dataclasses import asdict
-def add_to_videos(video_id, video_title):
-    new_video = VideoInfo(video_id=video_id, title=video_title)
+def add_to_videos(video_id, video_title, category):
+    new_video = VideoInfo(video_id, video_title, category)
 
     videos = get_videos()
 
@@ -170,7 +170,7 @@ def add_to_videos(video_id, video_title):
         logger.error(f"Error on add_to_list: {str(e)}")
 
 def add_to_list_file(videos):
-    list_file = get_file_path("video_list", "yaml")
+    list_file = get_file_path(config.DATA_DIR, "video_list", "yaml")
     try:
         with open(list_file, 'w', encoding=config.FILE_ENCODING) as f:
             yaml.dump(
@@ -186,7 +186,7 @@ def add_to_list_file(videos):
 
 
 def display_summary(video_id, video_title):
-    summary_file = get_file_path(video_id, "md")
+    summary_file = get_file_path(config.DATA_DIR, video_id, "md")
     if summary_file.exists():
         with open(summary_file, 'r', encoding=config.FILE_ENCODING) as f:
             summary = f.read()
@@ -214,9 +214,9 @@ def embed_youtube_player(video_id: str):
     """
     st.markdown(youtube_embed, unsafe_allow_html=True)
 
-def get_selected_video(videos, key):
+def display_video_selection(category, videos, key):
     if videos:
-        video_options = convert_to_list(videos)
+        video_options = get_videos_in_selected_category(category, videos)
         return st.selectbox("Select a video",
                             options=video_options,
                             format_func=lambda x: x[1],
@@ -224,15 +224,20 @@ def get_selected_video(videos, key):
                             )
     return None
 
-def load_video_list():
-    list_file = get_file_path("video_list", "yaml")
-    if list_file.exists():
-        with open(list_file, 'r', encoding=config.FILE_ENCODING) as f:
-            videos = yaml.safe_load(f) or []
-    return videos
+def display_insight_from_video(videos, categories):
+    with st.container():
+        row1_col1, row1_col2 = st.columns([0.3, 0.7])
 
-def display_insight_from_video(videos):
-    selected_item = get_selected_video(videos, "tab3")
+        with row1_col1:
+            selected_category = st.selectbox("Select a category",
+                                             options=categories,
+                                             index=0,
+                                             key="select_category_tab3"
+                                             )
+
+        with row1_col2:
+            selected_video = display_video_selection(selected_category, videos, "tab3")
+
     question = st.text_area(
         "Ask a question about the video",
         placeholder="What is the video about?",
@@ -241,7 +246,7 @@ def display_insight_from_video(videos):
     if st.button("Get Answer"):
         if question:
             try:
-                transcripts = get_transcripts(selected_item[0], "en")
+                transcripts = get_transcripts(selected_video[0], "en")
 
                 # Get the answer from the transcript
                 bedrock = BedrockHelper()
@@ -274,7 +279,7 @@ def display_related_files(video_id):
         row1_col1, row1_col2 = st.columns([0.3, 0.7])
 
         with row1_col1:
-            if get_file_path(video_id, "txt").exists():
+            if get_file_path(config.DATA_DIR, video_id, "txt").exists():
                 st.download_button(
                     label=f"Download Transcripts",
                     data=get_original_transcripts(video_id),
@@ -283,7 +288,7 @@ def display_related_files(video_id):
                 )
         with row1_col2:
             #if translated file exists, display it
-            if get_file_path(video_id, "txt", "ko").exists():
+            if get_file_path(config.DATA_DIR, video_id, "txt", "ko").exists():
                 st.download_button(
                     label=f"Download Translated Transcripts",
                     data=get_translated_transcripts(video_id, "ko"),
@@ -291,16 +296,27 @@ def display_related_files(video_id):
                     mime="text/plain"
                 )
 
-def display_explore_summaries(videos):
-    selected_item = get_selected_video(videos, "tab2")
+def display_explore_summaries(videos, categories):
+    with st.container():
+        row1_col1, row1_col2 = st.columns([0.3, 0.7])
+
+        with row1_col1:
+            selected_category = st.selectbox("Select a category",
+                                             options=categories,
+                                             index=0,
+                                             key="select_category_tab2"
+                                             )
+
+        with row1_col2:
+            selected_video = display_video_selection(selected_category, videos, "tab2")
+
     # Display summaries
-    if selected_item:
-        embed_youtube_player(selected_item[0])
-        display_related_files(selected_item[0])
-        display_summary(selected_item[0], selected_item[1])
+    if selected_video:
+        embed_youtube_player(selected_video[0])
+        display_related_files(selected_video[0])
+        display_summary(selected_video[0], selected_video[1])
 
-
-def summarize_new_video():
+def summarize_new_video(categories_options):
     with st.container():
         row1_col1, row1_col2 = st.columns(2)
 
@@ -324,16 +340,17 @@ def summarize_new_video():
             source_lang_options = ["en", "ko"]
             origin_lang = st.selectbox("Select Source Language", options=source_lang_options, index=0)
 
-        with row2_col2:
             target_lang_options = ["ko", "en"]
             target_lang = st.selectbox("Select Target Language", options=target_lang_options, index=0)
             isTranslate = st.checkbox("Translate", value=True)
 
+        with row2_col2:
+            category = st.selectbox("Select Category", options=categories_options, index=0)
+
         with row2_col3:
-            # AWS Region selection
             region_options = ["us-east-1", "us-west-2"]
             region = st.selectbox("AWS Region", options=region_options, index=0)
-    # Process button
+
     if st.button("Summarize"):
         if video_id:
             try:
@@ -355,7 +372,7 @@ def summarize_new_video():
                         video_id=video_id
                     )
 
-                add_to_videos(video_id, video_title)
+                add_to_videos(video_id, video_title, category)
 
                 # Display results
                 st.success("Processing completed successfully!")
@@ -368,31 +385,48 @@ def summarize_new_video():
         else:
             st.warning("Please enter a YouTube Video ID")
 
+# load category list from meta/categories.yaml
+def load_category_list():
+    category_file = get_file_path(config.META_DIR, "categories", "yaml")
+    if category_file.exists():
+        with open(category_file, 'r', encoding=config.FILE_ENCODING) as f:
+            categories = yaml.safe_load(f) or []
 
-def convert_to_list(videos):
-    items = {video['video_id']: video['title'] for video in videos}
+    return categories
+
+# load video list from meta/videos.yaml
+def load_video_list():
+    list_file = get_file_path(config.META_DIR, "videos", "yaml")
+    if list_file.exists():
+        with open(list_file, 'r', encoding=config.FILE_ENCODING) as f:
+            videos = yaml.safe_load(f) or []
+    return videos
+
+def get_videos_in_selected_category(category, videos):
+    items = {video['video_id']: video['title'] for video in videos if video['category'] == category}
     video_options = list(items.items())
     return video_options
 
 def streamlit_app():
+    categories = load_category_list()
+
     st.title("YouTube Summarizer")
 
     tab1, tab2, tab3 = st.tabs(["New Summary", "Explore Summaries", "Get Insight"])
 
     with tab1:
-        summarize_new_video()
+        summarize_new_video(categories)
 
-    # Load video list
     videos = load_video_list()
 
     if videos:
         with tab2:
-            display_explore_summaries(videos)
+            display_explore_summaries(videos, categories)
 
         with tab3:
-            display_insight_from_video(videos)
+            display_insight_from_video(videos, categories)
 
-# for command line
+# (Will be Deprecated) for command line
 def main():
     parser = argparse.ArgumentParser(description='YouTube 자막 요약')
     parser.add_argument('--video_id', required=True, help='YouTube Video ID')

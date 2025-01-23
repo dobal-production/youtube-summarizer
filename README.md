@@ -17,11 +17,6 @@ python -m venv venv
 source ./venv/bon/activate
 ```
 
-## Streamlit install
-```shell
-pip install streamlit
-```
-
 ## 필요 패키지 설치 (주의: 가상환경이 반드시 설정되어 있어야 함)
 ```shell
 pip install -r requirements.txt
