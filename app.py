@@ -137,15 +137,13 @@ def process_model_summaries(
 
 # add to list as yaml file named videos.yaml
 from dataclasses import asdict
-def add_to_videos(video_id, video_title, category):
-    new_video = Video(video_id, video_title, category)
-
+def add_to_videos(new_video: Video):
     videos = load_videos()
 
     try:
         # if video id exists in the DB, return
         for video in videos:
-            if video.video_id == video_id:
+            if video.video_id == new_video.video_id:
                 logger.info(f"Video ID {video_id} already exists in the list")
                 return
 
@@ -363,13 +361,15 @@ def summarize_new_video(categories_options):
                         video_id=video_id
                     )
 
-                add_to_videos(video_id, video_title, category)
+                new_video = Video(video_id, video_title, category)
+
+                add_to_videos(new_video)
 
                 # Display results
                 st.success("Processing completed successfully!")
 
                 # Display summaries
-                display_summary(video_id, video_title)
+                display_summary(new_video)
 
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")

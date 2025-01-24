@@ -112,7 +112,7 @@ class BedrockHelper:
             "temperature": temperature,
             "system": self.SYSTEM_PROMPT
         })
-        response = self.bedrock_client.invoke_model(modelId=model_id, body=body)
+        response = self.bedrock_client.invoke_model(modelId=model_id, body=body, trace="ENABLED")
         response_body = json.loads(response['body'].read())
         return response_body['content'][0]['text']
 
@@ -197,6 +197,7 @@ class BedrockHelper:
         </transcript>
         
         <transcript>에 있는 내용을 읽고 <question>에 있는 질문에 답해주세요.
+        <transcript>에 없는 내용을 포함해서는 안됩니다.
         응답은 반드시 한국어로 해야 합니다.
         
         <question>
