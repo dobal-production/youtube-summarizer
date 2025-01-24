@@ -6,8 +6,9 @@ import logging
 import streamlit as st
 import yaml
 import app_config as config
-from youtube_utils import YouTubeHelper, VideoInfo
+from youtube_utils import YouTubeHelper
 from bedrock_utils import BedrockHelper
+from video import Video
 
 def setup_logging():
     logging.basicConfig(
@@ -134,24 +135,12 @@ def process_model_summaries(
         logger.error(f"Failed to initialize Bedrock: {str(e)}")
         raise
 
-def get_videos():
-    list_file = get_file_path(config.DATA_DIR, "video_list", "yaml")
-
-    if not list_file.exists():
-        with open(list_file, 'w', encoding=config.FILE_ENCODING) as f:
-            f.write("")
-
-    with open(list_file, 'r', encoding=config.FILE_ENCODING) as f:
-        videos = yaml.safe_load(f)
-
-    return [VideoInfo(video_id=video['video_id'], title=video['title'], category=video['category']) for video in videos] if videos else []
-
 # add to list as yaml file named videos.yaml
 from dataclasses import asdict
 def add_to_videos(video_id, video_title, category):
-    new_video = VideoInfo(video_id, video_title, category)
+    new_video = Video(video_id, video_title, category)
 
-    videos = get_videos()
+    videos = load_videos()
 
     try:
         # if video id exists in the DB, return
@@ -184,13 +173,12 @@ def add_to_list_file(videos):
         logger.error(f"Error on add_to_list_file: {str(e)}")
         raise
 
-
-def display_summary(video_id, video_title):
-    summary_file = get_file_path(config.DATA_DIR, video_id, "md")
+def display_summary(video: Video):
+    summary_file = get_file_path(config.DATA_DIR, video.video_id, "md")
     if summary_file.exists():
         with open(summary_file, 'r', encoding=config.FILE_ENCODING) as f:
             summary = f.read()
-            st.subheader(video_title)
+            st.subheader(video.title)
             st.markdown(
                 f"""
                 <div style="min-height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
@@ -200,7 +188,7 @@ def display_summary(video_id, video_title):
                 unsafe_allow_html=True
             )
     else:
-        st.warning(f"No summary found for video ID {video_id}")
+        st.warning(f"No summary found for video ID {video.video_id}")
 
 def embed_youtube_player(video_id: str):
     youtube_embed = f"""
@@ -216,10 +204,9 @@ def embed_youtube_player(video_id: str):
 
 def display_video_selection(category, videos, key):
     if videos:
-        video_options = get_videos_in_selected_category(category, videos)
         return st.selectbox("Select a video",
-                            options=video_options,
-                            format_func=lambda x: x[1],
+                            options=list(filter(lambda x: x.category == category, videos)),
+                            format_func=lambda x: x.title,
                             key=f"select_video_{key}"
                             )
     return None
@@ -243,34 +230,38 @@ def display_insight_from_video(videos, categories):
         placeholder="What is the video about?",
         key="question_input"
     )
+
     if st.button("Get Answer"):
         if question:
-            try:
-                transcripts = get_transcripts(selected_video[0], "en")
-
-                # Get the answer from the transcript
-                bedrock = BedrockHelper()
-
-                full_answer = ""
-                response_placeholder = st.empty()
-
-                # Stream the response
-                for response_chunk in bedrock.get_insight_stream(
-                        model_alias="np",
-                        transcripts=transcripts,
-                        question=question,
-                        max_tokens=config.DEFAULT_MAX_TOKENS
-                ):
-                    if response_chunk:
-                        full_answer += response_chunk
-                        response_placeholder.markdown(full_answer + " ▋")
-
-                # Final update
-                response_placeholder.markdown(full_answer)
-            except Exception as e:
-                st.error(f"An error occurred on getting insight: {str(e)}")
+            get_insight_from_bedrock(question, selected_video)
         else:
             st.warning("Please enter a question")
+
+def get_insight_from_bedrock(question, video):
+    try:
+        transcripts = get_transcripts(video.video_id, "en")
+
+        # Get the answer from the transcript
+        bedrock = BedrockHelper()
+
+        full_answer = ""
+        response_placeholder = st.empty()
+
+        # Stream the response
+        for response_chunk in bedrock.get_insight_stream(
+                model_alias="nm",
+                transcripts=transcripts,
+                question=question,
+                max_tokens=config.DEFAULT_MAX_TOKENS
+        ):
+            if response_chunk:
+                full_answer += response_chunk
+                response_placeholder.markdown(full_answer + " ▋")
+
+        # Final update
+        response_placeholder.markdown(full_answer)
+    except Exception as e:
+        st.error(f"An error occurred on getting insight: {str(e)}")
 
 
 # Display selected video's link for transcripts and translated files with file icon
@@ -312,9 +303,9 @@ def display_explore_summaries(videos, categories):
 
     # Display summaries
     if selected_video:
-        embed_youtube_player(selected_video[0])
-        display_related_files(selected_video[0])
-        display_summary(selected_video[0], selected_video[1])
+        embed_youtube_player(selected_video.video_id)
+        display_related_files(selected_video.video_id)
+        display_summary(selected_video)
 
 def summarize_new_video(categories_options):
     with st.container():
@@ -394,18 +385,17 @@ def load_category_list():
 
     return categories
 
-# load video list from meta/videos.yaml
-def load_video_list():
+def load_videos():
     list_file = get_file_path(config.META_DIR, "videos", "yaml")
-    if list_file.exists():
-        with open(list_file, 'r', encoding=config.FILE_ENCODING) as f:
-            videos = yaml.safe_load(f) or []
-    return videos
 
-def get_videos_in_selected_category(category, videos):
-    items = {video['video_id']: video['title'] for video in videos if video['category'] == category}
-    video_options = list(items.items())
-    return video_options
+    if not list_file.exists():
+        with open(list_file, 'w', encoding=config.FILE_ENCODING) as f:
+            f.write("")
+
+    with open(list_file, 'r', encoding=config.FILE_ENCODING) as f:
+        videos = yaml.safe_load(f)
+
+    return [Video(video_id=video['video_id'], title=video['title'], category=video['category']) for video in videos] if videos else []
 
 def streamlit_app():
     categories = load_category_list()
@@ -417,7 +407,7 @@ def streamlit_app():
     with tab1:
         summarize_new_video(categories)
 
-    videos = load_video_list()
+    videos = load_videos()
 
     if videos:
         with tab2:

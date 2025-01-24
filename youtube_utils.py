@@ -2,7 +2,6 @@
 # print("environments", sys.executable)
 from googleapiclient.discovery import build
 from youtube_transcript_api import YouTubeTranscriptApi
-from dataclasses import dataclass
 import app_config as ac
 import logging
 from contextlib import contextmanager
@@ -15,7 +14,6 @@ def setup_logging():
     )
     return logging.getLogger(__name__)
 logger = setup_logging()
-
 
 class YouTubeHelper:
     @staticmethod
@@ -74,10 +72,3 @@ class YouTubeHelper:
         except Exception as e:
             logger.error(f"Video title extraction error: {e}")
             raise
-
-# dataclass for video information
-@dataclass
-class VideoInfo:
-    video_id: str
-    title: str
-    category: str
