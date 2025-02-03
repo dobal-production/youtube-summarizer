@@ -157,7 +157,7 @@ def add_to_videos(new_video: Video):
         logger.error(f"Error on add_to_list: {str(e)}")
 
 def add_to_list_file(videos):
-    list_file = get_file_path(config.META_DIR, "video_list", "yaml")
+    list_file = get_file_path(config.META_DIR, "videos", "yaml")
     try:
         with open(list_file, 'w', encoding=config.FILE_ENCODING) as f:
             yaml.dump(
