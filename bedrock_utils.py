@@ -1,6 +1,7 @@
 import json
 import boto3
 import logging
+import time
 
 def setup_logging():
     logging.basicConfig(
@@ -15,7 +16,7 @@ class BedrockHelper:
     MODEL_ALIASES = {
         "s35v2": {"name": "Cloaude 3.5 Sonnet v2", "model_id": "us.anthropic.claude-3-5-sonnet-20241022-v2:0"},
         "nm": {"name": "Nova Micro", "model_id": "amazon.nova-micro-v1:0"},
-        "np": {"name": "Nova Pro", "model_id": "amazon.nova-pro-v1:0"},
+        "np": {"name": "Nova Pro", "model_id": "us.amazon.nova-pro-v1:0"},
         "nl": {"name": "Nova Lite", "model_id": "amazon.nova-lite-v1:0"},
         "s35": {"name": "Cloaude 3.5 Sonnet", "model_id": "us.anthropic.claude-3-5-sonnet-20240620-v1:0"},
         "h35": {"name": "Cloaude 3.5 Haiku", "model_id": "us.anthropic.claude-3-5-haiku-20241022-v1:0"},
@@ -38,24 +39,6 @@ class BedrockHelper:
     def get_model_aliases(self):
         return list(self.MODEL_ALIASES.keys())
 
-    def __get_llm_result(self, model_id, prompt, max_tokens=4096, temperature=0):
-        try:
-            if "anthropic.claude" in model_id:
-                return self.__invoke_claude(model_id, prompt, max_tokens, temperature)
-            elif "amazon.titan" in model_id:
-                return self.__invoke_titan(model_id, prompt, max_tokens, temperature)
-            elif "ai21.j2" in model_id:
-                return self.__invoke_ai21(model_id, prompt, max_tokens, temperature)
-            elif "cohere.command" in model_id:
-                return self.__invoke_cohere(model_id, prompt, max_tokens, temperature)
-            elif "amazon.nova" in model_id:
-                return self.__invoke_nova(model_id, prompt, max_tokens, temperature)
-            else:
-                raise ValueError(f"Unsupported model: {model_id}")
-        except Exception as e:
-            logger.error(f"Error on __get_llm_result: {str(e)}")
-            raise
-
     def get_translated_text(self, model_alias, text, max_tokens=4096, temperature=0):
         model_id = self.get_model_id(model_alias)
         prompt = self.__generate_translate_prompt(text)
@@ -66,7 +49,12 @@ class BedrockHelper:
         model_id = self.get_model_id(model_alias)
         prompt = self.__generate_summary_prompt(text)
 
-        return self.__get_llm_result(model_id, prompt, max_tokens, temperature)
+        start_time = time.perf_counter()  # Start timing
+        response = self.__get_llm_result(model_id, prompt, max_tokens, temperature)
+        end_time = time.perf_counter()  # End timing
+        logger.info(f"{model_id} - Time taken to get response: {end_time - start_time:.2f} seconds")  # Print the time taken
+
+        return response
 
     def get_insight(self, model_alias, transcripts, question, max_tokens=4096, temperature=0):
         model_id = self.get_model_id(model_alias)
@@ -77,93 +65,51 @@ class BedrockHelper:
     def get_insight_stream(self, model_alias, transcripts, question, max_tokens=4096, temperature=0):
         model_id = self.get_model_id(model_alias)
         prompt = self.__generate_insights_prompt(transcripts, question)
-
         messages = [{"role": "user", "content": [{"text": prompt}]}]
-        inference_config = {"max_new_tokens": max_tokens, "temperature": temperature}
+        inference_config = {"maxTokens": max_tokens, "temperature": temperature}
         system_prompt =  [{"text": "You are an AI assistant that helps analyze video transcripts and provide detailed insights."}]
-        body = json.dumps({
-            "schemaVersion": "messages-v1",
-            "messages": messages,
-            "system": system_prompt,
-            "inferenceConfig": inference_config
-        })
 
         try:
-            response = self.bedrock_client.invoke_model_with_response_stream(modelId=model_id, body=body)
-            print("Sending request to Bedrock...")  # Debug print
+            response = self.bedrock_client.converse_stream(
+                modelId=model_id,
+                system=system_prompt,
+                messages=messages,
+                inferenceConfig=inference_config
+            )
 
-            for event in response['body']:
-                chunk_bytes = event["chunk"]["bytes"]
-                chunk = json.loads(chunk_bytes.decode())
-                # print(f"Received chunk: {chunk}")  # Debug print
-
-                if "contentBlockDelta" in chunk:
-                    yield chunk["contentBlockDelta"]["delta"]["text"]
+            logger.info("Sending request to Bedrock...")  # Debug print
+            stream = response.get('stream')
+            if stream:
+                for event in stream:
+                    if "contentBlockDelta" in event:
+                        yield event["contentBlockDelta"]["delta"]["text"]
 
         except Exception as e:
             raise Exception(f"Error in getting streaming insight: {str(e)}")
 
-    def __invoke_claude(self, model_id, prompt, max_tokens, temperature):
-        messages = [{"role": "user", "content": prompt}]
-        body = json.dumps({
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": max_tokens,
-            "messages": messages,
-            "temperature": temperature,
-            "system": self.SYSTEM_PROMPT
-        })
-        response = self.bedrock_client.invoke_model(modelId=model_id, body=body, trace="ENABLED")
-        response_body = json.loads(response['body'].read())
-        return response_body['content'][0]['text']
 
-    def __invoke_nova(self, model_id, prompt, max_tokens, temperature):
-        messages = [{"role": "user", "content": [{"text": prompt}]}]
-        inference_config = {"max_new_tokens": max_tokens, "temperature": temperature}
-        system_prompt =  [{"text": self.SYSTEM_PROMPT}]
-        body = json.dumps({
-            "schemaVersion": "messages-v1",
-            "messages": messages,
-            "system": system_prompt,
-            "inferenceConfig": inference_config
-        })
+    def __get_llm_result(self, model_id, prompt, max_tokens=4096, temperature=0):
+        messages = [{"role": "user", "content": [{"text": prompt }]}]
+        inference_config = {"maxTokens": max_tokens, "temperature": temperature}
 
-        # logger.info(f"Sending request to Bedrock with prompt: {messages}")
-        response = self.bedrock_client.invoke_model(modelId=model_id, body=body, trace="ENABLED")
-        response_body = json.loads(response['body'].read())
-        return response_body['output']['message']['content'][0]['text']
+        try:
+            response = self.bedrock_client.converse(
+                modelId=model_id,
+                messages=messages,
+                inferenceConfig=inference_config
+            )
 
-    def __invoke_titan(self, model_id, prompt, max_tokens, temperature):
-        body = json.dumps({
-            "inputText": prompt,
-            "textGenerationConfig": {
-                "maxTokenCount": max_tokens,
-                "temperature": temperature,
-                "topP": 1,
-            }
-        })
-        response = self.bedrock_client.invoke_model(modelId=model_id, body=body)
-        response_body = json.loads(response['body'].read())
-        return response_body['results'][0]['outputText']
+            token_usage = response['usage']
+            logger.info("Input tokens: %s", token_usage['inputTokens'])
+            logger.info("Output tokens: %s", token_usage['outputTokens'])
+            logger.info("Total tokens: %s", token_usage['totalTokens'])
+            logger.info("Stop reason: %s", response['stopReason'])
 
-    def __invoke_ai21(self, model_id, prompt, max_tokens, temperature):
-        body = json.dumps({
-            "prompt": prompt,
-            "maxTokens": max_tokens,
-            "temperature": temperature,
-        })
-        response = self.bedrock_client.invoke_model(modelId=model_id, body=body)
-        response_body = json.loads(response['body'].read())
-        return response_body['completions'][0]['data']['text']
+            return response['output']['message']['content'][0]['text']
+        except Exception as e:
+            logger.error(f"Error on __get_llm_result: {str(e)}")
+            raise
 
-    def __invoke_cohere(self, model_id, prompt, max_tokens, temperature):
-        body = json.dumps({
-            "prompt": prompt,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        })
-        response = self.bedrock_client.invoke_model(modelId=model_id, body=body)
-        response_body = json.loads(response['body'].read())
-        return response_body['generations'][0]['text']
 
     def __generate_translate_prompt(self, text):
         #Your response must be in Korean.
