@@ -1,0 +1,21 @@
+app:
+  title: "YouTube Summarizer"
+  settings:
+    theme:
+      light: "Light Theme"
+      dark: "Dark Theme"
+    language:
+      selector: "Language Selector"
+      current: "Current Language"
+  navigation:
+    menu:
+      home: "Home"
+      settings: "Settings"
+      about: "About"
+
+tab:
+  new: "New Summary"
+  buttons: 
+    summarize: "Summarize"
+  labels:
+    translate: "Translate"
