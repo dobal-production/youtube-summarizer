@@ -3,6 +3,8 @@ import boto3
 import logging
 import time
 
+MAX_TOKEN = 4096
+
 def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
@@ -14,10 +16,12 @@ logger = setup_logging()
 class BedrockHelper:
     REGION_NAME = "us-east-1"
     MODEL_ALIASES = {
+        "s4": {"name": "Cloaude 4 Sonnet", "model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
+        "s37": {"name": "Cloaude 3.7 Sonnet", "model_id": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"},
         "s35v2": {"name": "Cloaude 3.5 Sonnet v2", "model_id": "us.anthropic.claude-3-5-sonnet-20241022-v2:0"},
-        "nm": {"name": "Nova Micro", "model_id": "amazon.nova-micro-v1:0"},
+        "nm": {"name": "Nova Micro", "model_id": "us.amazon.nova-micro-v1:0"},
         "np": {"name": "Nova Pro", "model_id": "us.amazon.nova-pro-v1:0"},
-        "nl": {"name": "Nova Lite", "model_id": "amazon.nova-lite-v1:0"},
+        "nl": {"name": "Nova Lite", "model_id": "us.amazon.nova-lite-v1:0"},
         "s35": {"name": "Cloaude 3.5 Sonnet", "model_id": "us.anthropic.claude-3-5-sonnet-20240620-v1:0"},
         "h35": {"name": "Cloaude 3.5 Haiku", "model_id": "us.anthropic.claude-3-5-haiku-20241022-v1:0"},
         "h3": {"name": "Cloaude 3 Haiku", "model_id": "anthropic.claude-3-haiku-20240307-v1:0"},
@@ -30,40 +34,51 @@ class BedrockHelper:
     def __init__(self):
         self.bedrock_client = boto3.client('bedrock-runtime', region_name=self.REGION_NAME)
 
-    def get_model_id(self, model_alias):
+    def get_model_id_by_alias(self, model_alias):
         return self.MODEL_ALIASES[model_alias]["model_id"]
+
+    def get_model_id_by_name(self, model_name):
+        for model in self.MODEL_ALIASES.values():
+            if model["name"] == model_name:
+                return model["model_id"]
+        return None
 
     def get_model_name(self, model_alias):
         return self.MODEL_ALIASES[model_alias]["name"]
 
+    def get_model_names(self):
+        return [model["name"] for model in self.MODEL_ALIASES.values()]
+
+    def get_model_alias_by_name(self, model_name):
+        for alias, model in self.MODEL_ALIASES.items():
+            if model["name"] == model_name:
+                return alias
+        return None
+
     def get_model_aliases(self):
         return list(self.MODEL_ALIASES.keys())
 
-    def get_translated_text(self, model_alias, text, max_tokens=4096, temperature=0):
-        model_id = self.get_model_id(model_alias)
+    def get_translated_text(self, model_alias, text, max_tokens=MAX_TOKEN, temperature=0):
+        model_id = self.get_model_id_by_alias(model_alias)
         prompt = self.__generate_translate_prompt(text)
 
         return self.__get_llm_result(model_id, prompt, max_tokens, temperature)
 
-    def get_summarized_text(self, model_alias, text, max_tokens=4096, temperature=0):
-        model_id = self.get_model_id(model_alias)
+    def get_summarized_text(self, model_alias, text, max_tokens=MAX_TOKEN, temperature=0):
+        model_id = self.get_model_id_by_alias(model_alias)
         prompt = self.__generate_summary_prompt(text)
-
-        start_time = time.perf_counter()  # Start timing
         response = self.__get_llm_result(model_id, prompt, max_tokens, temperature)
-        end_time = time.perf_counter()  # End timing
-        logger.info(f"{model_id} - Time taken to get response: {end_time - start_time:.2f} seconds")  # Print the time taken
 
         return response
 
-    def get_insight(self, model_alias, transcripts, question, max_tokens=4096, temperature=0):
-        model_id = self.get_model_id(model_alias)
+    def get_insight(self, model_alias, transcripts, question, max_tokens=MAX_TOKEN, temperature=0):
+        model_id = self.get_model_id_by_alias(model_alias)
         prompt = self.__generate_insights_prompt(transcripts, question)
 
         return self.__get_llm_result(model_id, prompt, max_tokens, temperature)
 
-    def get_insight_stream(self, model_alias, transcripts, question, max_tokens=4096, temperature=0):
-        model_id = self.get_model_id(model_alias)
+    def get_insight_stream(self, model_alias, transcripts, question, max_tokens=MAX_TOKEN, temperature=0):
+        model_id = self.get_model_id_by_alias(model_alias)
         prompt = self.__generate_insights_prompt(transcripts, question)
         messages = [{"role": "user", "content": [{"text": prompt}]}]
         inference_config = {"maxTokens": max_tokens, "temperature": temperature}
@@ -88,22 +103,33 @@ class BedrockHelper:
             raise Exception(f"Error in getting streaming insight: {str(e)}")
 
 
-    def __get_llm_result(self, model_id, prompt, max_tokens=4096, temperature=0):
+    def __get_llm_result(self, model_id, prompt, max_tokens=MAX_TOKEN, temperature=0):
         messages = [{"role": "user", "content": [{"text": prompt }]}]
         inference_config = {"maxTokens": max_tokens, "temperature": temperature}
 
         try:
+            start_time = time.perf_counter()  # Start timing
             response = self.bedrock_client.converse(
                 modelId=model_id,
                 messages=messages,
                 inferenceConfig=inference_config
             )
+            end_time = time.perf_counter()  # End timing
 
-            token_usage = response['usage']
-            logger.info("Input tokens: %s", token_usage['inputTokens'])
-            logger.info("Output tokens: %s", token_usage['outputTokens'])
-            logger.info("Total tokens: %s", token_usage['totalTokens'])
-            logger.info("Stop reason: %s", response['stopReason'])
+            # Output token usage information with model id as JSON format
+            response_uage = json.dumps({
+                "inputTokens": response['usage']['inputTokens'],
+                "outputTokens": response['usage']['outputTokens'],
+                "totalTokens": response['usage']['totalTokens'],
+                "responseTime": round(end_time - start_time, 2),
+                "model_id": model_id
+            })
+
+            logger.info(response_uage)
+
+            # save response_usage to file under logs directory
+            with open(f'logs/response_usage_{int(time.time())}.json', 'w') as f:
+                f.write(response_uage)
 
             return response['output']['message']['content'][0]['text']
         except Exception as e:
@@ -158,7 +184,7 @@ class BedrockHelper:
         {text}
         </transcript>
         
-        당신은 YouTube영상에 대한 내용을 정리하는 기자입니다.
+        당신은 YouTube영상에 대한 내용을 정리하는 IT분야 기자입니다.
         <transcript>에 있는 내용을 읽고 핵심 내용들을 주제별로 정리해 주세요.
         <conditions>에 있는 조건을 준수해주세요.
         답변은 markdown 형식으로 하며, <format>의 형식을 참고해주세요.

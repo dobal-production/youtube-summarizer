@@ -1,0 +1,21 @@
+app:
+  title: "유튜브 요약기"
+  settings:
+    theme:
+      light: "밝은 테마"
+      dark: "어두운 테마"
+    language:
+      selector: "언어 선택"
+      current: "현재 언어"
+  navigation:
+    menu:
+      home: "홈"
+      settings: "설정"
+      about: "정보"
+
+tab:
+  new: "새 요약"
+  buttons: 
+    summarize: "요약하기"
+  labels:
+    translate: "Translate"
