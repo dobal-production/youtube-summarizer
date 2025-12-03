@@ -1,0 +1,40 @@
+models:
+  s4.5:
+    name: "Cloaude Sonnet 4.5"
+    model_id: "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+  s4:
+    name: "Cloaude 4 Sonnet"
+    model_id: "us.anthropic.claude-sonnet-4-20250514-v1:0"
+  s3.7:
+    name: "Cloaude 3.7 Sonnet"
+    model_id: "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+  s3.5v2:
+    name: "Cloaude 3.5 Sonnet v2"
+    model_id: "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
+  n2l:
+    name: "Nova 2 Lite"
+    model_id: "us.amazon.nova-2-lite-v1:0"
+  nm:
+    name: "Nova Micro"
+    model_id: "us.amazon.nova-micro-v1:0"
+  np:
+    name: "Nova Pro"
+    model_id: "us.amazon.nova-pro-v1:0"
+  nl:
+    name: "Nova Lite"
+    model_id: "us.amazon.nova-lite-v1:0"
+  s35:
+    name: "Cloaude 3.5 Sonnet"
+    model_id: "us.anthropic.claude-3-5-sonnet-20240620-v1:0"
+  h35:
+    name: "Cloaude 3.5 Haiku"
+    model_id: "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+  h3:
+    name: "Cloaude 3 Haiku"
+    model_id: "anthropic.claude-3-haiku-20240307-v1:0"
+  c21:
+    name: "Claude 2.1"
+    model_id: "anthropic.claude-v2:1"
+  tg1e:
+    name: "Titan Text G1 - Express"
+    model_id: "amazon.titan-text-express-v1"

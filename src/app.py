@@ -12,9 +12,6 @@ from utils.i18n_manager import I18nManager
 from video import Video
 from language_detection import detect_browser_language
 
-# from utils.storage.storage_factory import get_storage
-# from config import Config
-
 def setup_logging():
     """로깅 설정을 구성하고 로거 인스턴스를 반환합니다.
     
@@ -46,35 +43,29 @@ def get_file_path(folder_name: str, file_name: str, extension: str, suffix: str 
             Path(config.DATA_DIR) / f"{file_name}_{suffix}.{extension}")
 
 
-def translate_to_file(video_id: str, source_lang: str, target_lang: str, region: str) -> None:
-    """AWS Translate 서비스를 사용하여 자막 파일을 번역합니다.
+def translate_to_file(video_id: str, source_lang: str, target_lang: str, model_alias: str = "np") -> None:
+    """Bedrock을 사용하여 자막 파일을 번역합니다.
     
     Args:
         video_id (str): YouTube 비디오 ID
         source_lang (str): 원본 언어 코드
         target_lang (str): 대상 언어 코드
-        region (str): 번역 서비스를 위한 AWS 리전
+        model_alias (str, optional): 번역에 사용할 Bedrock 모델 별칭. 기본값은 "np".
     
     Raises:
         FileNotFoundError: 원본 자막 파일을 찾을 수 없을 때
-        boto3.exceptions.Boto3Error: AWS 번역이 실패할 때
-        Exception: 기타 예상치 못한 오류
+        Exception: 번역이 실패할 때
     """
-    translate = boto3.client('translate', region_name=region)
-
     try:
-        with open(Path(config.DATA_DIR) / f"{video_id}.txt", 'rb') as file:
+        with open(Path(config.DATA_DIR) / f"{video_id}.txt", 'r', encoding=config.FILE_ENCODING) as file:
             text = file.read()
 
-        response = translate.translate_document(
-            Document={
-                'Content': text, 'ContentType': 'text/plain'
-            },
-            SourceLanguageCode=source_lang,
-            TargetLanguageCode=target_lang
+        bedrock = BedrockHelper()
+        translated_text = bedrock.get_translated_text(
+            model_alias=model_alias,
+            text=text,
+            max_tokens=config.DEFAULT_MAX_TOKENS
         )
-
-        translated_text = (response["TranslatedDocument"]["Content"]).decode(config.FILE_ENCODING)
 
         with open(Path(config.DATA_DIR) / f"{video_id}_ko.txt", 'w', encoding=config.FILE_ENCODING) as file:
             file.write(translated_text)
@@ -82,11 +73,8 @@ def translate_to_file(video_id: str, source_lang: str, target_lang: str, region:
     except FileNotFoundError:
         logger.error(f"Source file for video {video_id} not found")
         raise
-    except boto3.exceptions.Boto3Error as e:
-        logger.error(f"AWS Translation error: {str(e)}")
-        raise
     except Exception as e:
-        logger.error(f"Unexpected error in translate_to_file: {str(e)}")
+        logger.error(f"Error in translate_to_file: {str(e)}")
         raise
 
 
@@ -126,20 +114,20 @@ def download_transcripts(video_id, language):
         raise
 
 
-def translate_transcripts(video_id, source_lang, target_lang, region):
+def translate_transcripts(video_id, source_lang, target_lang, model_alias="np"):
     """원본 언어와 대상 언어가 다른 경우 자막 파일을 번역합니다.
     
     Args:
         video_id (str): YouTube 비디오 ID
         source_lang (str): 원본 언어 코드
         target_lang (str): 대상 언어 코드
-        region (str): 번역 서비스를 위한 AWS 리전
+        model_alias (str, optional): 번역에 사용할 Bedrock 모델 별칭. 기본값은 "np".
     """
     if source_lang == target_lang:
         logger.info("Source and target languages are the same. No translation needed.")
         return
 
-    translate_to_file(video_id, source_lang, target_lang, region)
+    translate_to_file(video_id, source_lang, target_lang, model_alias)
 
 
 def get_transcripts(video_id, target_lang="ko"):
@@ -504,14 +492,13 @@ def save_transcript_to_s3(video_id):
         logger.error(f"Error on save_transcript_to_s3: {str(e)}")
 
 
-def execute_summary_process(category, is_translate, origin_lang, region, selected_models, target_lang, video_id):
+def execute_summary_process(category, is_translate, origin_lang, selected_models, target_lang, video_id):
     """완전한 비디오 요약 프로세스를 실행합니다.
     
     Args:
         category (str): 비디오 카테고리
-        isTranslate (bool): 자막을 번역할지 여부
+        is_translate (bool): 자막을 번역할지 여부
         origin_lang (str): 비디오의 원본 언어
-        region (str): 서비스를 위한 AWS 리전
         selected_models (List[str]): 선택된 Bedrock 모델 목록
         target_lang (str): 번역을 위한 대상 언어
         video_id (str): YouTube 비디오 ID
@@ -526,7 +513,9 @@ def execute_summary_process(category, is_translate, origin_lang, region, selecte
 
         if is_translate:
             with st.spinner("Translating transcripts..."):
-                translate_transcripts(video_id, origin_lang, target_lang, region=region)
+                # 첫 번째 선택된 모델을 번역에 사용
+                translate_model = selected_models[0] if selected_models else "np"
+                translate_transcripts(video_id, origin_lang, target_lang, model_alias=translate_model)
 
         with st.spinner("Generating summaries..."):
             transcripts = get_transcripts(video_id, "en")
@@ -568,17 +557,11 @@ def summarize_new_video(categories_options):
             category = st.selectbox("Select Category", options=categories_options, index=0)
 
     with st.container():
-        row2_col1, row2_col2 = st.columns(2)
-
-        with row2_col1:
-            model_options = BedrockHelper.MODEL_ALIASES.keys()
-            selected_models = st.multiselect("Select Bedrock Models",
-                                             options=model_options,
-                                             default=["s4"])
-
-        with row2_col2:
-            region_options = ["us-east-1", "us-west-2"]
-            region = st.selectbox("AWS Region", options=region_options, index=0)
+        bedrock_helper = BedrockHelper()
+        model_options = bedrock_helper.get_model_aliases()
+        selected_models = st.multiselect("Select Bedrock Models",
+                                         options=model_options,
+                                         default=list(model_options)[0])
 
     with st.container():
         row3_col1, row3_col2, row3_col3 = st.columns(3)
@@ -599,7 +582,7 @@ def summarize_new_video(categories_options):
 
     if st.button(i18n.get_label("tab.buttons.summarize")):
         if video_id:
-            execute_summary_process(category, is_translate, source_lang, region, selected_models, target_lang, video_id)
+            execute_summary_process(category, is_translate, source_lang, selected_models, target_lang, video_id)
         else:
             st.warning("Please enter a YouTube Video ID")
 
@@ -639,6 +622,13 @@ def load_videos():
 
 def main_streamlit():
     """메인 Streamlit 애플리케이션 진입점입니다."""
+    st.set_page_config(
+        page_title="YouTube Video Summarizer",
+        page_icon="🎥",
+        layout="wide",
+        initial_sidebar_state="auto"
+    )
+    
     st.session_state['language'] = detect_browser_language()
     i18n.set_language(st.session_state['language'])
     categories = load_category_list()
@@ -668,19 +658,18 @@ def main_terminal():
         --video_id (str): YouTube 비디오 ID (필수)
         --models (str): Bedrock 모델 ID들, 쉼표로 구분 (기본값: "np")
         --lang (str): 언어 코드 (기본값: 'en')
-        --region (str): AWS 리전 (기본값: config.DEFAULT_REGION)
     """
     parser = argparse.ArgumentParser(description='YouTube 자막 요약')
     parser.add_argument('--video_id', required=True, help='YouTube Video ID')
     parser.add_argument('--models', default="np", help='Bedrock Model IDs, allow comma for multiple ids')
     parser.add_argument('--lang', default='en', help='en, ko')
-    parser.add_argument('--region', default=config.DEFAULT_REGION, help='AWS Region')
 
     args = parser.parse_args()
 
     try:
         download_transcripts(args.video_id, args.lang)
-        translate_transcripts(args.video_id, args.lang, 'ko', region=args.region)
+        model_alias = args.models.split(",")[0]
+        translate_transcripts(args.video_id, args.lang, 'ko', model_alias=model_alias)
         transcripts = get_translated_transcripts(args.video_id)
 
         process_model_summaries(

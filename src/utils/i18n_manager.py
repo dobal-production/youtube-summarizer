@@ -109,8 +109,6 @@ class I18nManager:
         if not self.available_languages:
             raise ValueError(f"No label files found in {self.labels_dir}")
 
-        print(f"Available languages: {', '.join(self.available_languages)}")
-
     def _load_language(self, language_code: str) -> None:
         """
         Load labels for a specific language.
@@ -151,7 +149,6 @@ class I18nManager:
                 # Security: Use safe_load to prevent code execution
                 content = yaml.safe_load(file)
                 self.labels_cache[language_code] = content or {}
-                print(f"Loaded labels for language: {language_code}")
         except yaml.YAMLError as e:
             raise Exception(f"Invalid YAML format in label file: {str(e)}")
         except Exception as e:
@@ -177,7 +174,6 @@ class I18nManager:
 
         self.current_language = language_code
         self._load_language(language_code)
-        print(f"Language set to: {language_code}")
 
     def get_label(self, key: str, language: str = None, default: str = None) -> str:
         """

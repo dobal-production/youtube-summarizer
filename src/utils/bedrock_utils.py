@@ -2,6 +2,8 @@ import json
 import boto3
 import logging
 import time
+import yaml
+import os
 
 MAX_TOKEN = 4096
 
@@ -15,24 +17,22 @@ logger = setup_logging()
 
 class BedrockHelper:
     REGION_NAME = "us-east-1"
-    MODEL_ALIASES = {
-        "s4": {"name": "Cloaude 4 Sonnet", "model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
-        "s37": {"name": "Cloaude 3.7 Sonnet", "model_id": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"},
-        "s35v2": {"name": "Cloaude 3.5 Sonnet v2", "model_id": "us.anthropic.claude-3-5-sonnet-20241022-v2:0"},
-        "nm": {"name": "Nova Micro", "model_id": "us.amazon.nova-micro-v1:0"},
-        "np": {"name": "Nova Pro", "model_id": "us.amazon.nova-pro-v1:0"},
-        "nl": {"name": "Nova Lite", "model_id": "us.amazon.nova-lite-v1:0"},
-        "s35": {"name": "Cloaude 3.5 Sonnet", "model_id": "us.anthropic.claude-3-5-sonnet-20240620-v1:0"},
-        "h35": {"name": "Cloaude 3.5 Haiku", "model_id": "us.anthropic.claude-3-5-haiku-20241022-v1:0"},
-        "h3": {"name": "Cloaude 3 Haiku", "model_id": "anthropic.claude-3-haiku-20240307-v1:0"},
-        "c21": {"name": "Claude 2.1", "model_id": "anthropic.claude-v2:1"},
-        "tg1e": {"name": "Titan Text G1 - Express", "model_id": "amazon.titan-text-express-v1"}
-    }
-
-    SYSTEM_PROMPT =  "You are a helpful AI assistant. Be concise and precise in your answers."
+    SYSTEM_PROMPT = "You are a helpful AI assistant. Be concise and precise in your answers."
 
     def __init__(self):
         self.bedrock_client = boto3.client('bedrock-runtime', region_name=self.REGION_NAME)
+        self.MODEL_ALIASES = self._load_model_aliases()
+
+    def _load_model_aliases(self):
+        """Load model aliases from YAML configuration file"""
+        config_path = os.path.join(os.path.dirname(__file__), '..', 'meta', 'model-alias.yaml')
+        try:
+            with open(config_path, 'r') as f:
+                config = yaml.safe_load(f)
+                return config.get('models', {})
+        except Exception as e:
+            logger.error(f"Error loading model aliases from {config_path}: {str(e)}")
+            raise
 
     def get_model_id_by_alias(self, model_alias):
         return self.MODEL_ALIASES[model_alias]["model_id"]
@@ -90,6 +90,7 @@ class BedrockHelper:
                 system=system_prompt,
                 messages=messages,
                 inferenceConfig=inference_config
+                # ,serviceTier="flex"
             )
 
             logger.info("Sending request to Bedrock...")  # Debug print

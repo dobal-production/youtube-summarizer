@@ -9,6 +9,9 @@ COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY data/ data/
+COPY labels/ labels/
+COPY utils/ utils/
+COPY meta/ meta/
 COPY *.py .
 
 EXPOSE 80
@@ -21,4 +24,5 @@ ENTRYPOINT [ "streamlit", "run", "app.py", \
              "--browser.serverAddress", "0.0.0.0", \
              "--server.enableCORS", "false", \
              "--server.enableXsrfProtection", "false", \
+             "--server.baseUrlPath", "/youtube", \
              "--server.port", "80"]
