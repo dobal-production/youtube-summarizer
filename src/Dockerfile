@@ -24,5 +24,4 @@ ENTRYPOINT [ "streamlit", "run", "app.py", \
              "--browser.serverAddress", "0.0.0.0", \
              "--server.enableCORS", "false", \
              "--server.enableXsrfProtection", "false", \
-             "--server.baseUrlPath", "/youtube", \
              "--server.port", "80"]
