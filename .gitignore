@@ -55,6 +55,7 @@ src/logs/
 # Temporary Files
 *.tmp
 *.temp
+*.dobal
 .cache/
 
 # Docker
@@ -62,6 +63,3 @@ src/logs/
 
 # AWS
 .aws/
-
-# etc
-.dobal
