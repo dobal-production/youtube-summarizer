@@ -354,6 +354,7 @@ def display_video_selection(category, videos, key):
     if videos:
         filtered_videos = list(filter(lambda x: x.category == category, videos))
         if filtered_videos:
+            filtered_videos.sort(key=lambda x: x.title.lower())
             return st.selectbox("Select a video",
                                 options=filtered_videos,
                                 format_func=lambda x: x.title,
