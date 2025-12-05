@@ -421,6 +421,22 @@ def get_insight_from_bedrock(question, video, model_alias):
         st.error(f"An error occurred on getting insight: {str(e)}")
 
 
+def get_summary_content(video_id):
+    """요약 마크다운 파일 내용을 읽습니다.
+    
+    Args:
+        video_id (str): YouTube 비디오 ID
+    
+    Returns:
+        str: 요약 내용
+    """
+    summary_file = get_file_path(config.DATA_DIR, video_id, "md")
+    if summary_file.exists():
+        with open(summary_file, 'r', encoding=config.FILE_ENCODING) as f:
+            return f.read()
+    return ""
+
+
 def display_related_files(video_id):
     """자막 및 번역된 파일의 다운로드 버튼을 표시합니다.
     
@@ -428,7 +444,7 @@ def display_related_files(video_id):
         video_id (str): YouTube 비디오 ID
     """
     with st.container():
-        row1_col1, row1_col2 = st.columns([0.3, 0.7])
+        row1_col1, row1_col2, row1_col3 = st.columns([0.33, 0.33, 0.34])
 
         with row1_col1:
             if get_file_path(config.DATA_DIR, video_id, "txt").exists():
@@ -445,6 +461,14 @@ def display_related_files(video_id):
                     data=get_translated_transcripts(video_id, "ko"),
                     file_name=f"{video_id}_ko.txt",
                     mime="text/plain"
+                )
+        with row1_col3:
+            if get_file_path(config.DATA_DIR, video_id, "md").exists():
+                st.download_button(
+                    label=f"Download Summary",
+                    data=get_summary_content(video_id),
+                    file_name=f"{video_id}_summary.md",
+                    mime="text/markdown"
                 )
 
 
