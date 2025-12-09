@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 
 
-class I18nManager:
+class I18nHelper:
     """
     Manages internationalization for multi-language applications.
 
@@ -379,20 +379,20 @@ class I18nManager:
 # Convenience function to create a global instance
 _global_i18n = None
 
-def get_i18n_manager(labels_dir: str = None, default_language: str = 'en-US') -> I18nManager:
+def get_i18n_manager(labels_dir: str = None, default_language: str = 'en-US') -> I18nHelper:
     """
-    Get or create a global I18nManager instance.
+    Get or create a global I18nHelper instance.
 
     Args:
         labels_dir (str): Directory containing label files
         default_language (str): Default language code
 
     Returns:
-        I18nManager: Global I18nManager instance
+        I18nHelper: Global I18nHelper instance
     """
     global _global_i18n
     if _global_i18n is None:
-        _global_i18n = I18nManager(labels_dir, default_language)
+        _global_i18n = I18nHelper(labels_dir, default_language)
     return _global_i18n
 
 
