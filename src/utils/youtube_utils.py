@@ -5,7 +5,7 @@ import re
 
 from googleapiclient.discovery import build
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
-import app_config as ac
+from .secret_utils import get_secret_value
 
 
 class YouTubeError(Exception):
@@ -57,7 +57,8 @@ class YouTubeHelper:
         """YouTube API 클라이언트 컨텍스트 매니저"""
         youtube = None
         try:
-            youtube = build('youtube', 'v3', developerKey=ac.YOUTUBE_API_KEY)
+            api_key = get_secret_value('youtube-api-key')
+            youtube = build('youtube', 'v3', developerKey=api_key)
             yield youtube
         except Exception as e:
             self.logger.error(f"YouTube API 클라이언트 생성 실패: {e}")

@@ -8,7 +8,7 @@ import yaml
 import app_config as config
 from utils.youtube_utils import YouTubeHelper
 from utils.bedrock_utils import BedrockHelper
-from utils.i18n_manager import I18nManager
+from utils.i18n_utils import I18nHelper
 from video import Video
 from language_detection import detect_browser_language
 
@@ -25,7 +25,7 @@ def setup_logging():
     return logging.getLogger(__name__)
 
 logger = setup_logging()
-i18n =  I18nManager()
+i18n =  I18nHelper()
 
 def get_file_path(folder_name: str, file_name: str, extension: str, suffix: str = "") -> Path:
     """폴더, 파일명, 확장자 및 선택적 접미사를 기반으로 파일 경로를 생성합니다.
